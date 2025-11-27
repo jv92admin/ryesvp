@@ -1,5 +1,8 @@
 import prisma from './prisma';
 import { Event, Venue, EventCategory, EventStatus } from '@prisma/client';
+import { toZonedTime } from 'date-fns-tz';
+
+const AUSTIN_TIMEZONE = 'America/Chicago';
 
 export type EventWithVenue = Event & { venue: Venue };
 
@@ -78,16 +81,17 @@ export async function getEventsByDate(date: Date): Promise<EventWithVenue[]> {
 }
 
 // Group events by date for display
-// Uses local date components to avoid timezone issues
+// Converts dates to Central Time before grouping to ensure correct date headers
 export function groupEventsByDate(events: EventWithVenue[]): Map<string, EventWithVenue[]> {
   const grouped = new Map<string, EventWithVenue[]>();
   
   for (const event of events) {
-    // Use local date components instead of ISO string to avoid timezone conversion
-    const year = event.startDateTime.getFullYear();
-    const month = String(event.startDateTime.getMonth() + 1).padStart(2, '0');
-    const day = String(event.startDateTime.getDate()).padStart(2, '0');
-    const dateKey = `${year}-${month}-${day}`; // YYYY-MM-DD in local timezone
+    // Convert to Central Time before extracting date components
+    const centralTime = toZonedTime(event.startDateTime, AUSTIN_TIMEZONE);
+    const year = centralTime.getFullYear();
+    const month = String(centralTime.getMonth() + 1).padStart(2, '0');
+    const day = String(centralTime.getDate()).padStart(2, '0');
+    const dateKey = `${year}-${month}-${day}`; // YYYY-MM-DD in Central Time
     
     if (!grouped.has(dateKey)) {
       grouped.set(dateKey, []);
