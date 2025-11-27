@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getStoredInviteRef, clearInviteData } from '@/lib/invite';
 
-export default function InviteRequiredPage() {
+function InviteRequiredContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get('next') || '/';
@@ -162,6 +162,21 @@ export default function InviteRequiredPage() {
         </div>
       </main>
     </>
+  );
+}
+
+export default function InviteRequiredPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </main>
+    }>
+      <InviteRequiredContent />
+    </Suspense>
   );
 }
 
