@@ -54,3 +54,34 @@ export function isNewListing(createdAt: Date): boolean {
   return isWithinHours(createdAt, 48);
 }
 
+/**
+ * Client-side grouping of events by date
+ * Similar to server-side groupEventsByDate but handles JSON date strings
+ */
+export function groupEventsByDateClient<T extends { startDateTime: Date | string }>(
+  events: T[]
+): Map<string, T[]> {
+  const grouped = new Map<string, T[]>();
+  
+  for (const event of events) {
+    // Handle both Date objects and ISO strings from JSON
+    const date = typeof event.startDateTime === 'string' 
+      ? new Date(event.startDateTime) 
+      : event.startDateTime;
+    
+    // Convert to Central Time before extracting date components
+    const centralTime = toZonedTime(date, AUSTIN_TIMEZONE);
+    const year = centralTime.getFullYear();
+    const month = String(centralTime.getMonth() + 1).padStart(2, '0');
+    const day = String(centralTime.getDate()).padStart(2, '0');
+    const dateKey = `${year}-${month}-${day}`; // YYYY-MM-DD in Central Time
+    
+    if (!grouped.has(dateKey)) {
+      grouped.set(dateKey, []);
+    }
+    grouped.get(dateKey)!.push(event);
+  }
+  
+  return grouped;
+}
+

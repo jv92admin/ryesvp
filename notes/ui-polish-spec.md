@@ -662,6 +662,27 @@ export function SocialEngagementPanel({
 
 ---
 
+## Future: Activity Feed (Not Scoped)
+
+The Social Sidebar currently shows:
+- Your upcoming events (static list)
+- Friends going to events (static list)
+
+**Future enhancement:** Real-time activity feed showing:
+- Friend-level: "Alice marked Going to Deadmau5" with timestamps
+- Community-level: "3 people in EDM Crew are going to..."
+- Notifications: "New event at Moody Center matches your interests"
+
+**Requirements for activity feed:**
+- Activity logging table (who did what, when)
+- Pagination/infinite scroll in sidebar
+- Optional: WebSocket for real-time updates
+- Privacy controls (who sees your activity)
+
+This is a significant feature - scope separately when ready.
+
+---
+
 **Last Updated:** November 2024
 **Status:** Core UI Polish Complete - Phases 1, 2, 4, 5, 7 implemented.
 

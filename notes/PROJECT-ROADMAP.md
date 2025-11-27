@@ -5,7 +5,7 @@
 Master tracker for all workstreams. Individual specs contain implementation details.
 
 **Spec Documents:**
-- `ui-polish-spec.md` - Visual improvements, event cards, layout
+- `ui-polish-spec.md` - Visual improvements, event cards, layout, social sidebar
 - `social-layer-spec.md` - Friends, lists, communities
 - `social-layer-phase5-spec.md` - Invite codes, user discovery
 - `data-enrichment-spec.md` - Knowledge Graph, Spotify integration
@@ -17,12 +17,9 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 | # | Item | Spec | Est. Time | Status |
 |---|------|------|-----------|--------|
-| 1 | **Invite Codes** | `social-layer-phase5-spec.md` | Half day | 🔲 Next |
-| 2 | **Lazy Loading** | `ui-polish-spec.md` Phase 3 | 1-2 hrs | 🔲 Pending |
-| 3 | **Social Engagement Panel** | `ui-polish-spec.md` Phase 8 | 1-2 hrs | 🔲 Pending |
-| 4 | **Enrichment Refinement** | `data-enrichment-spec.md` | 1-2 hrs | 🔲 Pending |
-| 5 | **Artist Caching** | `data-enrichment-spec.md` | 1 hr | 🔲 Pending |
-| 6 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
+| 1 | **Enrichment Refinement** | `data-enrichment-spec.md` | 1-2 hrs | 🔲 Next |
+| 2 | **Artist Caching** | `data-enrichment-spec.md` | 1 hr | 🔲 Pending |
+| 3 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
 
 ---
 
@@ -31,9 +28,11 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 ### UI Polish ✅
 - [x] Typography & Color (Geist Sans)
 - [x] Event Card with Images (images, NEW badge, category badges)
-- [x] Layout Improvements (max-w-5xl)
+- [x] Layout Improvements (max-w-6xl, 2-column layout)
 - [x] Event Detail Polish (hero image, enrichment section)
 - [x] Share Button (native share API, clipboard fallback)
+- [x] Lazy Loading (50 events per page, "Load More" button)
+- [x] Social Sidebar (right column with network, events, friend activity)
 
 ### Social Layer ✅
 - [x] Friends Foundation (db, api, /friends page)
@@ -50,19 +49,24 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 - [x] Event Card Badges (Spotify/Wikipedia icons)
 - [x] Backfill existing events (230 processed)
 
+### Invite Codes ✅
+- [x] Invite code generation (one per user)
+- [x] Share button includes `?ref=` code
+- [x] Invite link card on /friends page
+- [x] Invite banner on event pages (logged-out users)
+- [x] Invite context on login page ("Alice invited you!")
+- [x] Auto-friend on signup via invite
+- [x] Simplified login to Google OAuth only
+
 ---
 
-## Next Up: Invite Codes
+## Next Up: Infrastructure & Refinement
 
-**Why first?** Key growth mechanism. Sharing an event → friend signs up → auto-connected.
+**Enrichment Refinement** - Fix fuzzy category matches, improve accuracy.
 
-**Scope:**
-- Share modal with "include friend request" option
-- Generate invite codes (e.g., `/events/abc?ref=XYZ`)
-- On signup, show pending invites
-- Accept → instant friendship
+**Scheduled Jobs** - Automate scraping and enrichment via cron.
 
-See `social-layer-phase5-spec.md` for full spec.
+See respective spec docs for details.
 
 ---
 
@@ -70,6 +74,8 @@ See `social-layer-phase5-spec.md` for full spec.
 
 | Item | Spec | Notes |
 |------|------|-------|
+| Activity Feed | `ui-polish-spec.md` | Real-time friend/community activity in sidebar. Requires activity logging. |
+| Invite-Gated Signup | `social-layer-phase5-spec.md` | Email-first flow, require invite for new users. **Deprioritized** - current soft invite approach works well for now. |
 | "New to You" Tracking | `ui-polish-spec.md` | Requires `lastVisitAt` on User |
 | User Discovery | `social-layer-phase5-spec.md` | Find friends without email |
 | "Go Together" | `social-layer-phase5-spec.md` | Coordinate attendance |
@@ -90,10 +96,20 @@ See `social-layer-phase5-spec.md` for full spec.
 - Category inference
 - Event card badges
 
-### Sprint: Invite Codes + UI Polish (Current)
-- [ ] Invite codes
-- [ ] Lazy loading
-- [ ] Social engagement panel
+### Sprint: Invite Codes (Complete ✅)
+- Invite codes with auto-friend
+- Share button integration
+- Login page invite context
+- Google OAuth only
+
+### Sprint: UI Polish (Complete ✅)
+- Lazy loading (50 per page)
+- Social Sidebar with:
+  - Your Network (friends + communities)
+  - Your Events (upcoming)
+  - Friends Going (friend activity)
+  - Quick invite link copy
+- Two-column responsive layout
 
 ### Sprint: Infrastructure (Future)
 - [ ] Scheduled jobs (cron)
@@ -102,5 +118,5 @@ See `social-layer-phase5-spec.md` for full spec.
 
 ---
 
-**Last Updated:** November 2024
+**Last Updated:** November 27, 2024
 
