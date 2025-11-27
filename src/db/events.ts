@@ -130,22 +130,36 @@ export function groupEventsByDate(events: EventWithVenue[]): Map<string, EventWi
 }
 
 export async function getEventsWithAttendance(params: GetEventsParams = {}): Promise<EventWithVenue[]> {
-  const events = await getEvents(params);
-  
-  // No social filtering needed
+  // No social filtering needed - use regular getEvents
   if (!params.myEvents && !params.friendsGoing && !params.listId && !params.communityId) {
-    return events;
+    return getEvents(params);
   }
   
   if (!params.userId) {
-    return events;
+    return getEvents(params);
   }
   
-  // Special case: myEvents filters to user's own events
+  // Build base where clause (same as getEvents)
+  const baseWhere: Record<string, unknown> = {};
+  
+  if (params.startDate || params.endDate) {
+    baseWhere.startDateTime = {};
+    if (params.startDate) (baseWhere.startDateTime as Record<string, Date>).gte = params.startDate;
+    if (params.endDate) (baseWhere.startDateTime as Record<string, Date>).lte = params.endDate;
+  } else {
+    baseWhere.startDateTime = { gte: new Date() };
+  }
+  
+  if (params.category) baseWhere.category = params.category;
+  if (params.venueId) baseWhere.venueId = params.venueId;
+  if (params.status) baseWhere.status = params.status;
+  else baseWhere.status = 'SCHEDULED';
+  
+  // Special case: myEvents filters to user's own events directly at DB level
   if (params.myEvents) {
-    const filteredEvents = await prisma.event.findMany({
+    return prisma.event.findMany({
       where: {
-        id: { in: events.map(e => e.id) },
+        ...baseWhere,
         userEvents: { 
           some: { 
             userId: params.userId,
@@ -155,8 +169,9 @@ export async function getEventsWithAttendance(params: GetEventsParams = {}): Pro
       },
       include: { venue: true },
       orderBy: { startDateTime: 'asc' },
+      take: params.limit || 1000,
+      skip: params.offset || 0,
     });
-    return filteredEvents;
   }
   
   // Determine which user IDs to filter by
@@ -191,10 +206,10 @@ export async function getEventsWithAttendance(params: GetEventsParams = {}): Pro
     return [];
   }
   
-  // Filter to only events where at least one user has GOING or INTERESTED status
-  const filteredEvents = await prisma.event.findMany({
+  // Query events directly at DB level with attendance filter
+  return prisma.event.findMany({
     where: {
-      id: { in: events.map(e => e.id) },
+      ...baseWhere,
       userEvents: { 
         some: { 
           userId: { in: filterUserIds },
@@ -204,9 +219,9 @@ export async function getEventsWithAttendance(params: GetEventsParams = {}): Pro
     },
     include: { venue: true },
     orderBy: { startDateTime: 'asc' },
+    take: params.limit || 1000,
+    skip: params.offset || 0,
   });
-  
-  return filteredEvents;
 }
 
 // Get social signals for a list of events (efficient batch query)

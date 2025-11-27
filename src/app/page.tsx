@@ -39,16 +39,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   
   // Get first page of events with social signals
   const events = await getEventsWithSocialSignals({
-    venueId: params.venueId || undefined,
-    startDate: params.startDate ? new Date(params.startDate) : undefined,
-    endDate: params.endDate ? new Date(params.endDate + 'T23:59:59') : undefined,
+        venueId: params.venueId || undefined,
+        startDate: params.startDate ? new Date(params.startDate) : undefined,
+        endDate: params.endDate ? new Date(params.endDate + 'T23:59:59') : undefined,
     myEvents: user ? params.myEvents === 'true' : false,
     friendsGoing: user ? params.friendsGoing === 'true' : false,
     listId: user ? params.listId || undefined : undefined,
     communityId: user ? params.communityId || undefined : undefined,
     userId: user?.dbUser.id || '',
     limit: PAGE_SIZE + 1, // Fetch one extra to check if more exist
-  });
+      });
   
   const hasMore = events.length > PAGE_SIZE;
   const initialEvents = hasMore ? events.slice(0, -1) : events;
@@ -96,7 +96,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 }}
               />
             </div>
-          </div>
+            </div>
         </div>
       </main>
     </>
