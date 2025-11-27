@@ -3,11 +3,22 @@ import { Event, Venue, EventCategory, EventStatus } from '@prisma/client';
 import { toZonedTime } from 'date-fns-tz';
 import { getFriendIds } from './friends';
 import { getListMemberIds, getAllListMemberIds } from './lists';
-import { getCommunityMemberIds } from './communities';
+import { getCommunityMemberIds, getUserCommunities } from './communities';
 
 const AUSTIN_TIMEZONE = 'America/Chicago';
 
 export type EventWithVenue = Event & { venue: Venue };
+
+// Social signals for an event
+export type EventSocialSignals = {
+  friendsGoing: number;
+  friendsInterested: number;
+  communitiesGoing: { communityId: string; communityName: string; count: number }[];
+};
+
+export type EventWithSocial = EventWithVenue & {
+  social?: EventSocialSignals;
+};
 
 export interface GetEventsParams {
   startDate?: Date;
@@ -168,5 +179,223 @@ export async function getEventsWithAttendance(params: GetEventsParams = {}): Pro
   });
   
   return filteredEvents;
+}
+
+// Get social signals for a list of events (efficient batch query)
+export async function getEventSocialSignals(
+  eventIds: string[],
+  userId: string
+): Promise<Map<string, EventSocialSignals>> {
+  const signalsMap = new Map<string, EventSocialSignals>();
+  
+  if (eventIds.length === 0) {
+    return signalsMap;
+  }
+  
+  // Initialize all events with empty signals
+  for (const id of eventIds) {
+    signalsMap.set(id, {
+      friendsGoing: 0,
+      friendsInterested: 0,
+      communitiesGoing: [],
+    });
+  }
+  
+  // Get friend IDs
+  const friendIds = await getFriendIds(userId);
+  
+  // Get user's communities
+  const communities = await getUserCommunities(userId);
+  
+  // Query friends' attendance
+  if (friendIds.length > 0) {
+    const friendAttendance = await prisma.userEvent.findMany({
+      where: {
+        eventId: { in: eventIds },
+        userId: { in: friendIds },
+        status: { in: ['GOING', 'INTERESTED'] },
+      },
+      select: {
+        eventId: true,
+        status: true,
+      },
+    });
+    
+    for (const att of friendAttendance) {
+      const signals = signalsMap.get(att.eventId);
+      if (signals) {
+        if (att.status === 'GOING') {
+          signals.friendsGoing++;
+        } else {
+          signals.friendsInterested++;
+        }
+      }
+    }
+  }
+  
+  // Query community members' attendance (for each community)
+  for (const community of communities) {
+    // Get accepted members of this community (excluding self)
+    const memberIds = await getCommunityMemberIds(community.id, userId);
+    
+    if (memberIds.length === 0) continue;
+    
+    const communityAttendance = await prisma.userEvent.groupBy({
+      by: ['eventId'],
+      where: {
+        eventId: { in: eventIds },
+        userId: { in: memberIds },
+        status: 'GOING',
+      },
+      _count: {
+        userId: true,
+      },
+    });
+    
+    for (const att of communityAttendance) {
+      const signals = signalsMap.get(att.eventId);
+      if (signals && att._count.userId > 0) {
+        signals.communitiesGoing.push({
+          communityId: community.id,
+          communityName: community.name,
+          count: att._count.userId,
+        });
+      }
+    }
+  }
+  
+  return signalsMap;
+}
+
+// Get events with social signals attached
+export async function getEventsWithSocialSignals(
+  params: GetEventsParams & { userId: string }
+): Promise<EventWithSocial[]> {
+  const events = await getEventsWithAttendance(params);
+  
+  if (!params.userId) {
+    return events;
+  }
+  
+  const signalsMap = await getEventSocialSignals(
+    events.map(e => e.id),
+    params.userId
+  );
+  
+  return events.map(event => ({
+    ...event,
+    social: signalsMap.get(event.id),
+  }));
+}
+
+// Detailed attendee info for event page
+export type EventAttendee = {
+  id: string;
+  displayName: string | null;
+  email: string;
+  status: 'GOING' | 'INTERESTED';
+};
+
+export type EventDetailedSocial = {
+  friends: EventAttendee[];
+  communities: {
+    communityId: string;
+    communityName: string;
+    attendees: EventAttendee[];
+  }[];
+};
+
+// Get detailed social info for a single event (for event detail page)
+export async function getEventDetailedSocial(
+  eventId: string,
+  userId: string
+): Promise<EventDetailedSocial> {
+  const result: EventDetailedSocial = {
+    friends: [],
+    communities: [],
+  };
+  
+  // Get friend IDs
+  const friendIds = await getFriendIds(userId);
+  
+  // Get friends' attendance with user details
+  if (friendIds.length > 0) {
+    const friendAttendance = await prisma.userEvent.findMany({
+      where: {
+        eventId,
+        userId: { in: friendIds },
+        status: { in: ['GOING', 'INTERESTED'] },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            displayName: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        status: 'asc', // GOING first
+      },
+    });
+    
+    result.friends = friendAttendance.map(a => ({
+      id: a.user.id,
+      displayName: a.user.displayName,
+      email: a.user.email,
+      status: a.status as 'GOING' | 'INTERESTED',
+    }));
+  }
+  
+  // Get user's communities
+  const communities = await getUserCommunities(userId);
+  
+  // For each community, get members who are attending
+  for (const community of communities) {
+    const memberIds = await getCommunityMemberIds(community.id, userId);
+    
+    if (memberIds.length === 0) continue;
+    
+    // Filter out friends (they're already shown in friends section)
+    const nonFriendMemberIds = memberIds.filter(id => !friendIds.includes(id));
+    
+    if (nonFriendMemberIds.length === 0) continue;
+    
+    const communityAttendance = await prisma.userEvent.findMany({
+      where: {
+        eventId,
+        userId: { in: nonFriendMemberIds },
+        status: { in: ['GOING', 'INTERESTED'] },
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            displayName: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        status: 'asc',
+      },
+    });
+    
+    if (communityAttendance.length > 0) {
+      result.communities.push({
+        communityId: community.id,
+        communityName: community.name,
+        attendees: communityAttendance.map(a => ({
+          id: a.user.id,
+          displayName: a.user.displayName,
+          email: a.user.email,
+          status: a.status as 'GOING' | 'INTERESTED',
+        })),
+      });
+    }
+  }
+  
+  return result;
 }
 

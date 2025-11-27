@@ -1,54 +1,84 @@
-# Social Layer Phase 4 - Enhanced Discovery & Interaction
+# Social Layer Phase 5 - Invites, Discovery & Coordination
 
 ## Overview
 
-Phase 4 focuses on surfacing social signals throughout the app and enabling direct interaction between users when viewing events.
+Phase 5 focuses on friend discovery, invite management, and event coordination features. This is the "next level" social networking layer.
+
+> **Note:** This was originally Phase 4 but was split out. Phase 4 now covers event badges and filters (simpler scope).
 
 ---
 
 ## Goals
 
-1. **Event-level social signals** - Show who from your network is attending each event
-2. **User discovery** - Discover new friends through shared event interest
-3. **Direct interaction** - Enable "go together" coordination
+1. **Invite codes** - Generate invite links that auto-add friends on signup
+2. **User discovery** - Discover new friends through shared event interest  
+3. **"Go together" coordination** - Share events, coordinate attendance
+4. **Referral tracking** - Track who invited whom
 
 ---
 
-## Feature 1: Event Page Social Signals
+## Feature 1: Invite Codes & Referral Links
 
-### Current State
-- Event detail page shows basic event info
-- No indication of friends/community members attending
+### Problem
+- Currently anyone can sign up, no way to track who invited whom
+- Friends have to manually search by exact email to connect
+- No incentive/tracking for organic growth
 
-### Target State
-- Show "Friends Going" section with avatars/names
-- Show "From Your Communities" section with grouped counts
-- De-duplicate: Friends shown first, then community members who aren't friends
+### Solution
+- Users can generate invite links with unique codes
+- When someone signs up via link, they're auto-added as friend
+- Referral tracked for analytics
 
 ### Implementation
 
 ```
-Event Detail Page Layout:
-┌─────────────────────────────────────┐
-│ Event Title                         │
-│ Date · Venue                        │
-├─────────────────────────────────────┤
-│ 👥 Friends Going (3)                │
-│ [Avatar] [Avatar] [Avatar]          │
-│ Sarah, Mike, and Alex               │
-├─────────────────────────────────────┤
-│ 🎵 EDM Lovers (5 members going)     │
-│ 🏟️ Austin FC Fans (2 members going) │
-├─────────────────────────────────────┤
-│ Your Status: [Going] [Interested]   │
-└─────────────────────────────────────┘
+Invite Link: ryesvp.com/join?ref=abc123
+
+Flow:
+1. User A generates invite link
+2. User B clicks link, signs up
+3. On signup completion:
+   - Create friendship (auto-accepted)
+   - Store referral record
+4. Both users see "Connected via invite!"
 ```
 
-### API Changes
-- `GET /api/events/[id]/social` - Returns:
-  - Friends going/interested
-  - Community breakdown (visible members only, respecting reciprocity)
-  - Suggested friends (people going you might know)
+### Data Model
+
+```prisma
+model InviteCode {
+  id        String   @id @default(uuid())
+  code      String   @unique
+  userId    String   // Who created the invite
+  user      User     @relation(fields: [userId], references: [id])
+  maxUses   Int?     // null = unlimited
+  usedCount Int      @default(0)
+  expiresAt DateTime?
+  createdAt DateTime @default(now())
+  
+  redemptions InviteRedemption[]
+  
+  @@index([code])
+  @@index([userId])
+}
+
+model InviteRedemption {
+  id           String   @id @default(uuid())
+  inviteCodeId String
+  inviteCode   InviteCode @relation(fields: [inviteCodeId], references: [id])
+  newUserId    String   // Who signed up
+  newUser      User     @relation(fields: [newUserId], references: [id])
+  createdAt    DateTime @default(now())
+  
+  @@unique([inviteCodeId, newUserId])
+}
+```
+
+### API Endpoints
+- `POST /api/invites` - Generate new invite code
+- `GET /api/invites` - List my invite codes
+- `GET /api/invites/[code]` - Validate code (public)
+- `POST /api/invites/[code]/redeem` - Called on signup
 
 ---
 

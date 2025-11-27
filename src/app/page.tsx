@@ -1,4 +1,4 @@
-import { getEventsWithAttendance, groupEventsByDate } from '@/db/events';
+import { getEventsWithSocialSignals, groupEventsByDate } from '@/db/events';
 import { getAllVenues } from '@/db/venues';
 import { getPrivateLists } from '@/db/lists';
 import { getUserCommunities } from '@/db/communities';
@@ -33,16 +33,25 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       ])
     : [[], []];
   
-  const events = await getEventsWithAttendance({
-    venueId: params.venueId || undefined,
-    startDate: params.startDate ? new Date(params.startDate) : undefined,
-    endDate: params.endDate ? new Date(params.endDate + 'T23:59:59') : undefined,
-    friendsGoing: params.friendsGoing === 'true',
-    listId: params.listId || undefined,
-    communityId: params.communityId || undefined,
-    userId: user?.dbUser.id,
-    limit: 1000,
-  });
+  // Get events with social signals if user is logged in
+  const events = user 
+    ? await getEventsWithSocialSignals({
+        venueId: params.venueId || undefined,
+        startDate: params.startDate ? new Date(params.startDate) : undefined,
+        endDate: params.endDate ? new Date(params.endDate + 'T23:59:59') : undefined,
+        friendsGoing: params.friendsGoing === 'true',
+        listId: params.listId || undefined,
+        communityId: params.communityId || undefined,
+        userId: user.dbUser.id,
+        limit: 1000,
+      })
+    : await getEventsWithSocialSignals({
+        venueId: params.venueId || undefined,
+        startDate: params.startDate ? new Date(params.startDate) : undefined,
+        endDate: params.endDate ? new Date(params.endDate + 'T23:59:59') : undefined,
+        userId: '', // No user, no social signals
+        limit: 1000,
+      });
   
   const groupedEvents = groupEventsByDate(events);
   const sortedDates = Array.from(groupedEvents.keys()).sort();

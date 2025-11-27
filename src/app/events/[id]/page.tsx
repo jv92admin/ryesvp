@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getEventById } from '@/db/events';
+import { getEventById, getEventDetailedSocial } from '@/db/events';
 import { Header } from '@/components/Header';
 import { AttendanceButton } from '@/components/AttendanceButton';
 import { ShareButton } from '@/components/ShareButton';
+import { EventSocialSection } from '@/components/EventSocialSection';
 import { getCurrentUser } from '@/lib/auth';
 import { getUserEventByEventId } from '@/db/userEvents';
 import { getEventAttendance } from '@/db/userEvents';
@@ -31,6 +32,9 @@ export default async function EventPage({ params }: EventPageProps) {
   
   // Get attendance counts
   const attendance = await getEventAttendance(id);
+  
+  // Get social signals (friends/communities going) if logged in
+  const socialSignals = user ? await getEventDetailedSocial(id, user.dbUser.id) : null;
   
   // Check if event is new
   const isNew = isNewListing(event.createdAt);
@@ -169,6 +173,9 @@ export default async function EventPage({ params }: EventPageProps) {
             />
           </div>
         </div>
+
+        {/* Social section - Who's going from your network */}
+        {socialSignals && <EventSocialSection social={socialSignals} />}
 
         {/* Attendance section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">

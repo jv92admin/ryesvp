@@ -1,12 +1,13 @@
 import Link from 'next/link';
-import { EventWithVenue } from '@/db/events';
+import { EventWithSocial } from '@/db/events';
 import { formatEventDate, isNewListing } from '@/lib/utils';
 
 interface EventCardProps {
-  event: EventWithVenue;
+  event: EventWithSocial;
 }
 
 export function EventCard({ event }: EventCardProps) {
+  const social = event.social;
   const isNew = isNewListing(event.createdAt);
   
   const categoryColors: Record<string, string> = {
@@ -90,6 +91,30 @@ export function EventCard({ event }: EventCardProps) {
             <span className="text-gray-400">📅</span>
             {formatEventDate(event.startDateTime)}
           </p>
+          
+          {/* Social Signals */}
+          {social && (social.friendsGoing > 0 || social.friendsInterested > 0 || social.communitiesGoing.length > 0) && (
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              {social.friendsGoing > 0 && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">
+                  👥 {social.friendsGoing} friend{social.friendsGoing !== 1 ? 's' : ''} going
+                </span>
+              )}
+              {social.friendsInterested > 0 && !social.friendsGoing && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-600 text-xs font-medium rounded-full">
+                  👥 {social.friendsInterested} interested
+                </span>
+              )}
+              {social.communitiesGoing.slice(0, 2).map((c) => (
+                <span 
+                  key={c.communityId}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 bg-purple-50 text-purple-700 text-xs font-medium rounded-full"
+                >
+                  🎭 {c.count} from {c.communityName}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </Link>
