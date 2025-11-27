@@ -47,12 +47,65 @@ model Event {
   updatedAt     DateTime    @updatedAt
 
   userEvents UserEvent[]
+  enrichment Enrichment?
 
   @@unique([source, sourceEventId]) // Dedup by source + external ID
   @@index([venueId])
   @@index([startDateTime])
   @@index([status])
   @@index([category])
+}
+
+// Enrichment - data gathered from external APIs (Knowledge Graph, Spotify)
+model Enrichment {
+  id            String   @id @default(uuid())
+  eventId       String   @unique
+  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  
+  // Search metadata
+  searchQuery   String   // What we searched for
+  
+  // Knowledge Graph data
+  kgEntityId    String?  // Knowledge Graph entity ID
+  kgName        String?  // Canonical name
+  kgDescription String?  // Short description
+  kgBio         String?  // Longer bio (Text field)
+  kgImageUrl    String?
+  kgWikiUrl     String?
+  kgTypes       String[] // Array of @type values
+  kgScore       Float?   // Result score (confidence)
+  
+  // Spotify data
+  spotifyId         String?  // Spotify artist ID
+  spotifyName       String?  // Artist name from Spotify
+  spotifyUrl        String?  // Link to Spotify profile
+  spotifyGenres     String[] // Array of genres
+  spotifyPopularity Int?     // 0-100 popularity score
+  spotifyImageUrl   String?
+  
+  // Inferred data
+  inferredCategory EventCategory? // Category we think it should be
+  categoryUpdated  Boolean @default(false) // Did we update the event category?
+  
+  // Meta
+  status        EnrichmentStatus @default(PENDING)
+  retryCount    Int      @default(0)
+  errorMessage  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([status])
+  @@index([kgEntityId])
+  @@index([spotifyId])
+}
+
+enum EnrichmentStatus {
+  PENDING     // Not yet processed
+  PROCESSING  // Currently being enriched
+  COMPLETED   // Successfully enriched
+  PARTIAL     // Some sources worked, others didn't
+  FAILED      // All sources failed
+  SKIPPED     // Intentionally skipped (e.g., no keywords)
 }
 
 // User - synced from Supabase Auth
@@ -74,6 +127,10 @@ model User {
   ownedLists             List[] @relation("OwnedLists")
   listMemberships        ListMember[]
   sentListInvitations    ListMember[] @relation("ListInvitations")
+  
+  // Invites
+  inviteCode             InviteCode?
+  inviteRedemption       InviteRedemption?  // How this user was referred
 
   @@index([authProviderId])
 }
@@ -132,6 +189,7 @@ enum EventCategory {
   CONCERT
   COMEDY
   THEATER
+  MOVIE
   SPORTS
   FESTIVAL
   OTHER
@@ -199,4 +257,30 @@ enum ListRole {
   OWNER  // Can delete list, manage all members
   ADMIN  // Can manage members (future)
   MEMBER // Regular member
+}
+
+// InviteCode - one per user, used for referral links
+model InviteCode {
+  id          String   @id @default(uuid())
+  code        String   @unique  // Short code, e.g. "abc123"
+  userId      String   @unique  // One code per user
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usedCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  
+  redemptions InviteRedemption[]
+  
+  @@index([code])
+}
+
+// InviteRedemption - tracks who signed up via which invite
+model InviteRedemption {
+  id           String     @id @default(uuid())
+  inviteCodeId String
+  inviteCode   InviteCode @relation(fields: [inviteCodeId], references: [id], onDelete: Cascade)
+  newUserId    String     @unique  // Each user can only be referred once
+  newUser      User       @relation(fields: [newUserId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+  
+  @@index([inviteCodeId])
 }

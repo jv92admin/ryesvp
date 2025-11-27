@@ -1,5 +1,7 @@
 # Data Enrichment Specification
 
+> **See also:** `PROJECT-ROADMAP.md` for overall project priorities
+
 ## Overview
 
 Data enrichment automatically gathers context about events from the web, helping users decide if they want to attend. Instead of building specific integrations for each event type, we use a general approach that works across music, comedy, speakers, sports, and more.
@@ -635,5 +637,48 @@ if (cached && cached.expiresAt > new Date()) {
 ---
 
 **Last Updated:** November 2024
-**Status:** Ready for Implementation
+**Status:** Core Implementation Complete
+
+---
+
+## Implementation Status
+
+### ✅ Completed
+
+| Phase | What | Notes |
+|-------|------|-------|
+| Phase 1 | Knowledge Graph Integration | Bio, image, Wikipedia links, category inference from @type |
+| Phase 2 | Spotify Integration | Artist links, genres for music events. Stricter matching to avoid false positives. |
+| Phase 4 | Backfill Existing Events | 230 events processed. 61 fully enriched, 96 partial, 73 no matches. |
+| - | MOVIE category | Added to handle films correctly (was incorrectly showing as THEATER) |
+| - | Event Card Badges | Spotify/Wikipedia icons on cards, click through to external sites |
+| - | Event Detail Enrichment | Full enrichment section on event pages |
+
+### 🔲 Pending
+
+| Phase | What | Notes | Priority |
+|-------|------|-------|----------|
+| - | Category Refinement | Fuzzy matches still happening. Sports, generic events miscategorized. | **Next** |
+| - | Artist Caching | `ArtistCache` model exists. Wire up to reduce API calls for repeat artists. | **Next** |
+| Phase 3 | Scheduled Enrichment | Cron job. Will combine with event scraping cron - see `/notes/scheduled-jobs-spec.md` | Later |
+| - | Retry Logic | Max retries, exponential backoff for rate limits. | Later |
+
+**Why caching before cron?** Caching reduces API calls, making the cron job more efficient when we build it. Both scraping and enrichment cron will be built together as one "scheduled jobs" sprint.
+
+### Known Issues
+
+1. **Generic queries fail**: Events like "Gospel Brunch", "Texas WBB" don't have good KG matches
+2. **Spotify opportunistic search removed**: Now only searches if KG indicates music. More accurate but may miss some artists.
+3. **Movies in theaters**: Works now with MOVIE category, but depends on KG having film data
+
+### Running Enrichment
+
+```bash
+# Enrich new events only
+npx tsx scripts/enrich-events.ts --limit=50
+
+# Re-enrich all events (force)
+npx tsx scripts/enrich-events.ts --force --limit=250
+```
+
 

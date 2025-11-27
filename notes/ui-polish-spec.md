@@ -1,5 +1,7 @@
 # UI Polish Specification
 
+> **See also:** `PROJECT-ROADMAP.md` for overall project priorities
+
 ## Overview
 
 This spec covers visual improvements to make the app feel polished and engaging, independent of the social layer. Focus is on quick wins with maximum impact.
@@ -661,5 +663,109 @@ export function SocialEngagementPanel({
 ---
 
 **Last Updated:** November 2024
-**Status:** Core UI Polish Complete - Phases 1, 2, 4, 5, 7 implemented. Moving to Social Layer.
+**Status:** Core UI Polish Complete - Phases 1, 2, 4, 5, 7 implemented.
+
+---
+
+## Project Status Summary
+
+### ✅ Completed
+
+**UI Polish:**
+- Phase 1: Typography & Color (Geist Sans, clean spacing)
+- Phase 2: Event Card with Images (images, NEW badge, category badges)
+- Phase 4: Layout Improvements (max-w-5xl, better density)
+- Phase 5: Event Detail Polish (hero image, share button)
+- Phase 7: Share Event (native share API, clipboard fallback)
+
+**Social Layer:**
+- Phase 1: Friends Foundation (db, api, /friends page)
+- Phase 2: Private Lists (integrated into /friends)
+- Phase 3: Communities (/communities, detail pages, reciprocal visibility)
+
+**Data Enrichment:**
+- Phase 1: Knowledge Graph (bio, image, Wikipedia, category inference)
+- Phase 2: Spotify (artist links, genres for music events)
+- Phase 4: Backfill (all 230 existing events processed)
+- Spotify/Wikipedia badges on event cards + detail pages
+- MOVIE category added for films
+
+### 🔲 Pending / Deferred
+
+**Social Layer (Priority):**
+| Item | Notes | Priority |
+|------|-------|----------|
+| **Invite Codes** | Shareable links that add friends/join communities. Key growth mechanism! See `/notes/social-layer-phase5-spec.md` | **Next** |
+| User Discovery | Find friends without knowing email. Profile pages, suggested friends. | Future |
+| "Go Together" | Coordinate attendance with friends. | Future |
+| Event Badges/Filters | "X friends going" badge. Already partially done via event cards. | Low |
+
+**UI Polish:**
+| Item | Notes | Priority |
+|------|-------|----------|
+| Lazy Loading (Phase 3) | Loading ~300 events at once. "Load More" pagination needed for scale. | Medium |
+| Social Engagement Panel (Phase 8) | Home page side panel prompting friend adds, showing activity. See wireframe below. | Medium |
+| "New to You" Tracking (Phase 6) | Show events added since last visit. Requires adding `lastVisitAt` field to User model (small migration, not fundamental). | Low |
+
+**Data Enrichment:**
+| Item | Notes | Priority |
+|------|-------|----------|
+| Category Refinement | Fuzzy matches still happening (sports, generic events). | **Next** |
+| Artist Caching | Wire up ArtistCache to reduce API calls. | **Next** |
+| Scheduled Jobs | Cron for enrichment + scraping. Will build together. See `/notes/scheduled-jobs-spec.md` | Later |
+
+---
+
+## Social Engagement Panel (Phase 8 Detail)
+
+**Goal:** Drive friend/community building from the home page.
+
+**Placement:** Above or beside event filters on home page (responsive).
+
+**States:**
+
+| User State | Panel Content |
+|------------|---------------|
+| Not logged in | "Sign in to see who's going" |
+| New user (0 friends) | "Add friends to see who's going to events" + CTAs |
+| Has pending requests | "2 friend requests waiting" → link to /friends |
+| Has friends, no activity | Minimize or show stats ("3 friends going this week") |
+
+**Wireframe:**
+```
+┌─────────────────────────────────────────────────────┐
+│ 👋 Get more out of RyesVP                           │
+│                                                     │
+│ Add friends to see who's going to events.           │
+│                                                     │
+│ [Add Friends]  [Create a List]                      │
+│                                                     │
+│ ─────────────────────────────────────────────────── │
+│ 📬 2 friend requests waiting →                      │
+└─────────────────────────────────────────────────────┘
+```
+
+---
+
+## Next Sprint Suggestions
+
+**Priority Order:**
+
+1. **Data Enrichment Refinement** (1-2 hrs)
+   - Fix fuzzy category matches (sports, generic events)
+   - Wire up ArtistCache to reduce API calls
+
+2. **Invite Codes** (half day) - `/notes/social-layer-phase5-spec.md`
+   - Key growth mechanism: share event → friend joins
+   - Makes the social layer actually useful for acquisition
+
+3. **UI Quick Wins** (1-2 hrs each)
+   - Lazy loading / "Load More" for events
+   - Social Engagement Panel on home page
+
+4. **Scheduled Jobs** (later, combine with scraping)
+   - Cron for enrichment + event scraping
+   - Build together as one infrastructure sprint
+
+---
 

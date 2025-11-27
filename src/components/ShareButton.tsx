@@ -1,24 +1,60 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface ShareButtonProps {
   title: string;
   venueName: string;
   dateFormatted: string;
   eventUrl: string;
+  isLoggedIn?: boolean;
 }
 
-export function ShareButton({ title, venueName, dateFormatted, eventUrl }: ShareButtonProps) {
+export function ShareButton({ title, venueName, dateFormatted, eventUrl, isLoggedIn }: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
+  const [inviteCode, setInviteCode] = useState<string | null>(null);
 
-  const shareText = `Hey! Check out this event:
+  // Fetch invite code if logged in
+  useEffect(() => {
+    async function fetchInviteCode() {
+      if (!isLoggedIn) return;
+      
+      try {
+        const response = await fetch('/api/invites/me');
+        if (response.ok) {
+          const data = await response.json();
+          setInviteCode(data.code);
+        }
+      } catch (error) {
+        console.error('Failed to fetch invite code:', error);
+      }
+    }
+    
+    fetchInviteCode();
+  }, [isLoggedIn]);
+
+  // Build share URL with invite code if available
+  const shareUrl = inviteCode 
+    ? `${eventUrl}?ref=${inviteCode}`
+    : eventUrl;
+
+  const shareText = inviteCode
+    ? `Hey! Check out this event:
 
 🎵 ${title}
 📍 ${venueName}
 📅 ${dateFormatted}
 
-${eventUrl}`;
+${shareUrl}
+
+👋 Join me on RyesVP!`
+    : `Hey! Check out this event:
+
+🎵 ${title}
+📍 ${venueName}
+📅 ${dateFormatted}
+
+${shareUrl}`;
 
   const handleShare = async () => {
     // Try native share first (mobile)
@@ -27,7 +63,7 @@ ${eventUrl}`;
         await navigator.share({
           title: title,
           text: shareText,
-          url: eventUrl,
+          url: shareUrl,
         });
         return;
       } catch (e) {

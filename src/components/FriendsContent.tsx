@@ -7,6 +7,7 @@ import { FriendRequestCard } from '@/components/FriendRequestCard';
 import { ListCard } from '@/components/ListCard';
 import { CreateListModal } from '@/components/CreateListModal';
 import { ListDetailModal } from '@/components/ListDetailModal';
+import { InviteLinkCard } from '@/components/InviteLinkCard';
 
 type User = {
   id: string;
@@ -194,6 +195,9 @@ export function FriendsContent() {
 
   return (
     <>
+      {/* Invite Link Card */}
+      <InviteLinkCard />
+
       {/* Tabs */}
       <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-lg">
         <button

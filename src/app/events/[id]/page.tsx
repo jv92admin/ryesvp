@@ -5,9 +5,13 @@ import { Header } from '@/components/Header';
 import { AttendanceButton } from '@/components/AttendanceButton';
 import { ShareButton } from '@/components/ShareButton';
 import { EventSocialSection } from '@/components/EventSocialSection';
+import { EventEnrichment } from '@/components/EventEnrichment';
+import { InviteBanner } from '@/components/InviteBanner';
+import { InviteRedemptionHandler } from '@/components/InviteRedemptionHandler';
 import { getCurrentUser } from '@/lib/auth';
 import { getUserEventByEventId } from '@/db/userEvents';
 import { getEventAttendance } from '@/db/userEvents';
+import { getEventEnrichment } from '@/db/enrichment';
 import { formatInTimeZone } from 'date-fns-tz';
 import { isNewListing } from '@/lib/utils';
 import { headers } from 'next/headers';
@@ -36,6 +40,9 @@ export default async function EventPage({ params }: EventPageProps) {
   // Get social signals (friends/communities going) if logged in
   const socialSignals = user ? await getEventDetailedSocial(id, user.dbUser.id) : null;
   
+  // Get enrichment data (artist info, Spotify, etc.)
+  const enrichment = await getEventEnrichment(id);
+  
   // Check if event is new
   const isNew = isNewListing(event.createdAt);
   
@@ -52,6 +59,7 @@ export default async function EventPage({ params }: EventPageProps) {
     CONCERT: 'bg-purple-100 text-purple-800',
     COMEDY: 'bg-yellow-100 text-yellow-800',
     THEATER: 'bg-pink-100 text-pink-800',
+    MOVIE: 'bg-red-100 text-red-800',
     SPORTS: 'bg-green-100 text-green-800',
     FESTIVAL: 'bg-orange-100 text-orange-800',
     OTHER: 'bg-gray-100 text-gray-800',
@@ -61,6 +69,7 @@ export default async function EventPage({ params }: EventPageProps) {
     CONCERT: '🎵',
     COMEDY: '😂',
     THEATER: '🎭',
+    MOVIE: '🎬',
     SPORTS: '🏆',
     FESTIVAL: '🎪',
     OTHER: '📅',
@@ -71,6 +80,12 @@ export default async function EventPage({ params }: EventPageProps) {
       <Header />
       <main className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 py-8">
+        {/* Invite Banner - shows for non-logged in users with ?ref= */}
+        <InviteBanner isLoggedIn={!!user} />
+        
+        {/* Invite Redemption Handler - redeems invite after login */}
+        {user && <InviteRedemptionHandler />}
+
         {/* Back link */}
         <Link
           href="/"
@@ -170,9 +185,13 @@ export default async function EventPage({ params }: EventPageProps) {
               venueName={event.venue.name}
               dateFormatted={dateFormatted}
               eventUrl={eventUrl}
+              isLoggedIn={!!user}
             />
           </div>
         </div>
+
+        {/* Artist/Event Info from Enrichment */}
+        {enrichment && <EventEnrichment enrichment={enrichment} />}
 
         {/* Social section - Who's going from your network */}
         {socialSignals && <EventSocialSection social={socialSignals} />}

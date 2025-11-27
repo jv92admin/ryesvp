@@ -1,5 +1,7 @@
 # Social Layer Specification
 
+> **See also:** `PROJECT-ROADMAP.md` for overall project priorities
+
 ## Overview
 
 RyesVP's social layer enables users to discover events through their social network and coordinate attendance with friends. The model is built on three primitives:

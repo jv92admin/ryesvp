@@ -9,6 +9,13 @@ const AUSTIN_TIMEZONE = 'America/Chicago';
 
 export type EventWithVenue = Event & { venue: Venue };
 
+// Enrichment preview for event cards
+export type EnrichmentPreview = {
+  spotifyUrl: string | null;
+  wikipediaUrl: string | null;
+  genres: string[];
+};
+
 // Social signals for an event
 export type EventSocialSignals = {
   friendsGoing: number;
@@ -18,6 +25,7 @@ export type EventSocialSignals = {
 
 export type EventWithSocial = EventWithVenue & {
   social?: EventSocialSignals;
+  enrichment?: EnrichmentPreview;
 };
 
 export interface GetEventsParams {
@@ -273,8 +281,14 @@ export async function getEventsWithSocialSignals(
 ): Promise<EventWithSocial[]> {
   const events = await getEventsWithAttendance(params);
   
+  // Get enrichment previews for all events
+  const enrichmentMap = await getEnrichmentPreviews(events.map(e => e.id));
+  
   if (!params.userId) {
-    return events;
+    return events.map(event => ({
+      ...event,
+      enrichment: enrichmentMap.get(event.id),
+    }));
   }
   
   const signalsMap = await getEventSocialSignals(
@@ -285,7 +299,38 @@ export async function getEventsWithSocialSignals(
   return events.map(event => ({
     ...event,
     social: signalsMap.get(event.id),
+    enrichment: enrichmentMap.get(event.id),
   }));
+}
+
+// Get enrichment preview data for event cards
+async function getEnrichmentPreviews(eventIds: string[]): Promise<Map<string, EnrichmentPreview>> {
+  const map = new Map<string, EnrichmentPreview>();
+  
+  if (eventIds.length === 0) return map;
+  
+  const enrichments = await prisma.enrichment.findMany({
+    where: {
+      eventId: { in: eventIds },
+      status: { in: ['COMPLETED', 'PARTIAL'] },
+    },
+    select: {
+      eventId: true,
+      spotifyUrl: true,
+      kgWikiUrl: true,
+      spotifyGenres: true,
+    },
+  });
+  
+  for (const e of enrichments) {
+    map.set(e.eventId, {
+      spotifyUrl: e.spotifyUrl,
+      wikipediaUrl: e.kgWikiUrl,
+      genres: e.spotifyGenres?.slice(0, 2) || [],
+    });
+  }
+  
+  return map;
 }
 
 // Detailed attendee info for event page

@@ -1,277 +1,209 @@
-# Social Layer Phase 5 - Invites, Discovery & Coordination
+# Social Layer Phase 5 - Invite Links
+
+> **See also:** `PROJECT-ROADMAP.md` for overall project priorities
+> **Status:** 🔲 IN PROGRESS
 
 ## Overview
 
-Phase 5 focuses on friend discovery, invite management, and event coordination features. This is the "next level" social networking layer.
-
-> **Note:** This was originally Phase 4 but was split out. Phase 4 now covers event badges and filters (simpler scope).
+Invite-only growth: Every external share includes an invite code. New users sign up via invite links and are auto-friended with the inviter.
 
 ---
 
-## Goals
+## MVP Scope
 
-1. **Invite codes** - Generate invite links that auto-add friends on signup
-2. **User discovery** - Discover new friends through shared event interest  
-3. **"Go together" coordination** - Share events, coordinate attendance
-4. **Referral tracking** - Track who invited whom
+### What We're Building
+
+1. **One invite code per user** - Generated on first share
+2. **Share button on events** - Copies invite link to clipboard
+3. **Auto-friend on signup** - If `?ref=` present, create friendship
+4. **Graceful fallback** - If already signed up, just show the event
+
+### What We're NOT Building (Yet)
+
+- ❌ Internal notification system
+- ❌ "Share with specific friend" picker
+- ❌ Phone number storage
+- ❌ Multiple invite codes per user
+- ❌ Invite expiration
+- ❌ Referral analytics dashboard
 
 ---
 
-## Feature 1: Invite Codes & Referral Links
+## User Flow
 
-### Problem
-- Currently anyone can sign up, no way to track who invited whom
-- Friends have to manually search by exact email to connect
-- No incentive/tracking for organic growth
-
-### Solution
-- Users can generate invite links with unique codes
-- When someone signs up via link, they're auto-added as friend
-- Referral tracked for analytics
-
-### Implementation
+### Sharing an Event
 
 ```
-Invite Link: ryesvp.com/join?ref=abc123
-
-Flow:
-1. User A generates invite link
-2. User B clicks link, signs up
-3. On signup completion:
-   - Create friendship (auto-accepted)
-   - Store referral record
-4. Both users see "Connected via invite!"
+User clicks "Share" on event detail page
+         ↓
+Copy invite link to clipboard:
+ryesvp.com/events/abc123?ref=xyz789
+         ↓
+Paste in text/email/social media
 ```
 
-### Data Model
+### Receiving a Shared Link
+
+| Recipient Status | What Happens |
+|------------------|--------------|
+| **Not on platform** | See event → Signup banner → OAuth → Auto-friend → Back to event |
+| **On platform, not friend** | See event (ref ignored) |
+| **Already friend** | See event |
+
+---
+
+## Data Model
 
 ```prisma
 model InviteCode {
-  id        String   @id @default(uuid())
-  code      String   @unique
-  userId    String   // Who created the invite
-  user      User     @relation(fields: [userId], references: [id])
-  maxUses   Int?     // null = unlimited
-  usedCount Int      @default(0)
-  expiresAt DateTime?
-  createdAt DateTime @default(now())
+  id          String   @id @default(uuid())
+  code        String   @unique  // Short code, e.g. "abc123"
+  userId      String   @unique  // One code per user
+  user        User     @relation(fields: [userId], references: [id])
+  usedCount   Int      @default(0)
+  createdAt   DateTime @default(now())
   
   redemptions InviteRedemption[]
   
   @@index([code])
-  @@index([userId])
 }
 
 model InviteRedemption {
-  id           String   @id @default(uuid())
+  id           String     @id @default(uuid())
   inviteCodeId String
   inviteCode   InviteCode @relation(fields: [inviteCodeId], references: [id])
-  newUserId    String   // Who signed up
-  newUser      User     @relation(fields: [newUserId], references: [id])
-  createdAt    DateTime @default(now())
-  
-  @@unique([inviteCodeId, newUserId])
-}
-```
-
-### API Endpoints
-- `POST /api/invites` - Generate new invite code
-- `GET /api/invites` - List my invite codes
-- `GET /api/invites/[code]` - Validate code (public)
-- `POST /api/invites/[code]/redeem` - Called on signup
-
----
-
-## Feature 2: User Discovery from Events
-
-### Actions on Attendee Avatars
-When viewing someone's avatar on an event page:
-
-| User Type | Available Actions |
-|-----------|-------------------|
-| Friend | View profile, Message |
-| Community member (not friend) | Add Friend, View profile |
-| Non-friend, non-community | (Hidden - spam prevention) |
-
-### "Add Friend" Flow
-1. User sees community member's avatar on event
-2. Clicks avatar → mini profile card appears
-3. "Add Friend" button sends friend request
-4. Notification badge appears for recipient
-
-### Privacy Rules
-- Only show users who have opted in to visibility
-- Community members only visible to other community members
-- No random user discovery (must share a community)
-
----
-
-## Feature 3: "Go Together" Coordination
-
-### Option A: Share Link (Simple)
-- Generate shareable event link
-- Recipients see your name + "is going to this event"
-- No phone numbers needed
-
-### Option B: Native Share (Recommended)
-- Use Web Share API
-- Pre-filled message: "Hey! I'm going to [Event] on [Date]. Want to join?"
-- Works with any messaging app (iMessage, WhatsApp, etc.)
-
-### Option C: In-App Messaging (Complex - Future)
-- Real-time chat per event
-- Requires WebSocket infrastructure
-- Privacy/moderation concerns
-- **Recommendation:** Defer to Phase 5+
-
----
-
-## Feature 4: Event Cards Social Enhancement
-
-### Current State
-- Event cards show basic info only
-
-### Target State
-- Show social indicators on event cards:
-  - "3 friends going" badge
-  - "EDM Lovers: 5 going" badge (if in that community)
-  - Priority: Friends > Communities > General
-
-### Visual Design
-```
-┌─────────────────────────────────────┐
-│ Event Title                         │
-│ Dec 15 · Moody Center               │
-│ ┌─────────────────────────────────┐ │
-│ │ 👥 3 friends   🎵 5 EDM Lovers  │ │
-│ └─────────────────────────────────┘ │
-└─────────────────────────────────────┘
-```
-
----
-
-## Data Requirements
-
-### New API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/events/[id]/social` | GET | Social signals for event |
-| `/api/events/[id]/share` | POST | Generate share link |
-
-### New/Modified DB Queries
-
-```typescript
-// Get social signals for an event
-async function getEventSocialSignals(eventId: string, userId: string) {
-  // Friends going
-  const friendIds = await getFriendIds(userId);
-  const friendsGoing = await getUserEventsForUsers(eventId, friendIds);
-  
-  // Communities breakdown
-  const communities = await getUserCommunities(userId);
-  const communitySignals = await Promise.all(
-    communities.map(async (c) => ({
-      community: c,
-      going: await getCommunityMembersAtEvent(c.id, eventId, userId),
-    }))
-  );
-  
-  // De-duplicate: remove friends from community counts
-  // ...
-  
-  return { friendsGoing, communitySignals };
+  newUserId    String     @unique  // Each user can only be referred once
+  newUser      User       @relation(fields: [newUserId], references: [id])
+  createdAt    DateTime   @default(now())
 }
 ```
 
 ---
 
-## Privacy & Reciprocity Rules
+## API Endpoints
 
-### Visibility Matrix
+### GET /api/invites/me
 
-| Viewer Status | Can See |
-|---------------|---------|
-| Visible in community | Names of visible members |
-| Hidden in community | Counts only |
-| Friend | Always see friend's attendance |
-| Not connected | Cannot see attendance |
+Get current user's invite code (create if doesn't exist).
 
-### Edge Cases
-- User is friend AND community member → Show once under "Friends"
-- User is in multiple communities → Show in first community alphabetically
-- User has hidden visibility → Show in counts, not names
+**Response:**
+```json
+{
+  "code": "abc123",
+  "usedCount": 5,
+  "createdAt": "2024-11-27T..."
+}
+```
 
----
+### GET /api/invites/[code]
 
-## Implementation Phases
+Validate an invite code (public endpoint).
 
-### Phase 4a: Event Page Social (Priority)
-1. Add `/api/events/[id]/social` endpoint
-2. Update event detail page with social section
-3. Implement friend/community breakdown
-4. Respect visibility rules
+**Response:**
+```json
+{
+  "valid": true,
+  "inviterName": "Alice"  // Display name or null
+}
+```
 
-**Estimated:** 3-4 hours
+### POST /api/invites/[code]/redeem
 
-### Phase 4b: Event Card Badges
-1. Modify event query to include social counts
-2. Update EventCard component with badges
-3. Performance optimization (caching)
+Redeem invite code after signup. Called automatically by auth flow.
 
-**Estimated:** 2-3 hours
-
-### Phase 4c: User Discovery
-1. Add mini profile card component
-2. "Add Friend" from event attendee list
-3. Friend request notification polish
-
-**Estimated:** 2-3 hours
-
-### Phase 4d: Go Together / Share
-1. Implement native Web Share API
-2. Generate shareable event links
-3. "Going with you" indicator
-
-**Estimated:** 2-3 hours
+**Response:**
+```json
+{
+  "success": true,
+  "friendshipCreated": true,
+  "inviterName": "Alice"
+}
+```
 
 ---
 
-## Open Questions
+## Implementation Tasks
 
-1. **Performance:** How to efficiently query social signals for many events?
-   - Option: Batch query, cache results
-   - Option: Load on demand (lazy load)
+### 1. Database (15 min)
+- [ ] Add InviteCode model to schema
+- [ ] Add InviteRedemption model to schema
+- [ ] Add relations to User model
+- [ ] Run migration
 
-2. **Notification overload:** How to avoid spamming users?
-   - Option: Daily digest
-   - Option: Only notify for close friends
+### 2. Invite Code Logic (30 min)
+- [ ] Create `src/db/invites.ts` with:
+  - `getOrCreateInviteCode(userId)`
+  - `validateInviteCode(code)`
+  - `redeemInviteCode(code, newUserId)`
 
-3. **Phone numbers:** Do we need them for messaging?
-   - Recommendation: Avoid storing phone numbers
-   - Use native share instead
+### 3. API Routes (30 min)
+- [ ] `GET /api/invites/me`
+- [ ] `GET /api/invites/[code]`
+- [ ] `POST /api/invites/[code]/redeem`
 
-4. **Profile pages:** Should users have public profiles?
-   - Currently: No public profiles
-   - Consideration: Profile visible to friends only
+### 4. Auth Flow Integration (45 min)
+- [ ] Store `ref` param in localStorage before OAuth redirect
+- [ ] After signup, check for stored ref
+- [ ] Call redeem endpoint if ref exists
+- [ ] Clear stored ref
+
+### 5. Share Button Update (30 min)
+- [ ] Modify ShareButton to include invite code
+- [ ] Fetch user's invite code on mount
+- [ ] Generate link: `{origin}/events/{id}?ref={code}`
+
+### 6. Invite Banner (30 min)
+- [ ] Show banner on event page when `?ref=` present and not logged in
+- [ ] "Alice invited you! Sign up to connect."
+- [ ] Banner links to OAuth signup
+
+**Total: ~3 hours**
+
+---
+
+## Edge Cases
+
+| Scenario | Behavior |
+|----------|----------|
+| User tries to redeem own invite | Ignore silently |
+| User already signed up, clicks invite link | Just show event |
+| User already friends with inviter | Don't create duplicate friendship |
+| Invalid/expired invite code | Show event without invite banner |
+| User signed up via invite, inviter deleted account | Friendship already exists, no issue |
+
+---
+
+## Future Enhancements (Not MVP)
+
+### Internal Sharing
+- "Share with Friend" button for platform users
+- Shows friend picker
+- Sends in-app notification
+- Requires notification system first
+
+### Event-Specific Context
+- Track which event was shared
+- "Alice invited you to see Deadmau5!"
+- Analytics: which events drive signups
+
+### Multiple Invite Codes
+- Create codes for different contexts
+- "My EDM crew" vs "Work friends"
+- Track which code performs best
+
+### Referral Rewards
+- Track referral chains
+- Gamification: "You've invited 10 friends!"
+- Eventually: perks for top referrers
 
 ---
 
 ## Success Metrics
 
-- Users click on social indicators
-- Friend requests sent from event pages increase
-- "Going" conversions increase when friends are attending
-- Share link usage
-
----
-
-## Dependencies
-
-- Phase 1: Friends Foundation ✅
-- Phase 2: Private Lists ✅
-- Phase 3: Communities ✅
-- Profile/Display Names ✅
+- % of signups via invite link (goal: >80%)
+- Invite link shares per active user
+- Signup → first friend connection rate
+- Events viewed after invite signup
 
 ---
 
