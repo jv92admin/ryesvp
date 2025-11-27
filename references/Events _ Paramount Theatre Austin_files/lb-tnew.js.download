@@ -1,0 +1,46 @@
+(function() {
+  const promise = new Promise(resolve => {
+    const btnObj = createJumpLink();
+    resolve(btnObj);
+  })
+  
+  promise.then(obj => {
+    const container = document.querySelector('.tn-event-detail__main-container');
+    if (!container) return;
+
+    const target = container.querySelector('.tn-event-detail__performance-details-container');
+    
+    if (target && container.lastElementChild != target) {
+      container.insertAdjacentElement('afterbegin', obj.wrap);
+      
+      obj.btn.addEventListener('click', ev => {
+        target.nextElementSibling.scrollIntoView({behavior: 'smooth'})
+      })
+
+      const observerHandler = (entries) => {
+        if (!entries[0].isIntersecting) {
+          obj.wrap.classList.add('is-hidden');
+        } else {
+          obj.wrap.classList.remove('is-hidden');
+        }
+      }
+
+      const observer = new window.IntersectionObserver(observerHandler);
+      observer.observe(target)
+    }
+  })  
+})();
+
+function createJumpLink() {
+  const btnWrap = document.createElement('div');
+  btnWrap.id = 'tickets-jump-wrapper';
+
+  const btn = document.createElement('button');
+  btn.innerHTML = 'Select Tickets';
+  btn.classList.add('button__primary', 'button--small');
+  btn.id = 'tickets-jump';
+
+  btnWrap.insertAdjacentElement('afterbegin', btn);
+
+  return { wrap: btnWrap, btn: btn };
+}

@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Venue - physical location where events happen
+model Venue {
+  id         String   @id @default(uuid())
+  name       String
+  slug       String   @unique // e.g., "moody-center", "paramount-theatre"
+  websiteUrl String?
+  address    String?
+  city       String   @default("Austin")
+  state      String   @default("TX")
+  lat        Float?
+  lng        Float?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  events Event[]
+
+  @@index([slug])
+}
+
+// Event - a specific show/performance at a venue
+model Event {
+  id            String      @id @default(uuid())
+  venueId       String
+  venue         Venue       @relation(fields: [venueId], references: [id])
+  title         String
+  description   String?
+  startDateTime DateTime
+  endDateTime   DateTime?
+  url           String?     // Link to tickets/info
+  imageUrl      String?
+  source        EventSource @default(VENUE_WEBSITE)
+  sourceEventId String?     // External ID from source (for dedup)
+  status        EventStatus @default(SCHEDULED)
+  category      EventCategory @default(OTHER)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  userEvents UserEvent[]
+
+  @@unique([source, sourceEventId]) // Dedup by source + external ID
+  @@index([venueId])
+  @@index([startDateTime])
+  @@index([status])
+  @@index([category])
+}
+
+// User - synced from Supabase Auth
+model User {
+  id             String   @id @default(uuid())
+  authProviderId String   @unique // Supabase Auth user ID
+  email          String   @unique
+  displayName    String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  userEvents UserEvent[]
+
+  @@index([authProviderId])
+}
+
+// UserEvent - tracks user's relationship to an event (going/interested)
+model UserEvent {
+  id        String          @id @default(uuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  eventId   String
+  event     Event           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  status    AttendanceStatus
+  comment   String?         // e.g., "Section 105, Row F"
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+
+  @@unique([userId, eventId]) // One status per user per event
+  @@index([userId])
+  @@index([eventId])
+}
+
+// Enums
+enum EventSource {
+  VENUE_WEBSITE
+  TICKETMASTER
+  SEATGEEK
+  MANUAL
+}
+
+enum EventStatus {
+  SCHEDULED
+  CANCELLED
+  POSTPONED
+  SOLD_OUT
+}
+
+enum EventCategory {
+  CONCERT
+  COMEDY
+  THEATER
+  SPORTS
+  FESTIVAL
+  OTHER
+}
+
+enum AttendanceStatus {
+  GOING
+  INTERESTED
+  NOT_GOING
+}
