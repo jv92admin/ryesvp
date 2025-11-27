@@ -27,6 +27,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     startDate: params.startDate ? new Date(params.startDate) : undefined,
     endDate: params.endDate ? new Date(params.endDate + 'T23:59:59') : undefined,
     friendsGoing: params.friendsGoing === 'true',
+    userId: user?.dbUser.id,
     limit: 1000,
   });
   
@@ -37,7 +38,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     <>
       <Header />
       <main className="min-h-screen bg-gray-50">
-        <div className="max-w-3xl mx-auto px-4 py-8">
+        <div className="max-w-5xl mx-auto px-4 py-8">
           <header className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900">
               RyesVP - Events with Friends

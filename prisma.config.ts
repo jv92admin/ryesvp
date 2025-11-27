@@ -10,8 +10,7 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    url: env("DATABASE_URL"),
-    // shadowDatabaseUrl: env("DIRECT_URL"), // Optional - Prisma will use url if not provided
+    url: env("DIRECT_URL"), // Use direct connection for migrations (port 5432)
   },
 });
 

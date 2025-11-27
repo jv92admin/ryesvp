@@ -1,6 +1,7 @@
 import prisma from './prisma';
 import { Event, Venue, EventCategory, EventStatus } from '@prisma/client';
 import { toZonedTime } from 'date-fns-tz';
+import { getFriendIds } from './friends';
 
 const AUSTIN_TIMEZONE = 'America/Chicago';
 
@@ -15,6 +16,7 @@ export interface GetEventsParams {
   limit?: number;
   offset?: number;
   friendsGoing?: boolean;
+  userId?: string; // Required when friendsGoing is true
 }
 
 export async function getEvents(params: GetEventsParams = {}): Promise<EventWithVenue[]> {
@@ -105,16 +107,25 @@ export function groupEventsByDate(events: EventWithVenue[]): Map<string, EventWi
 export async function getEventsWithAttendance(params: GetEventsParams = {}): Promise<EventWithVenue[]> {
   const events = await getEvents(params);
   
-  if (!params.friendsGoing) {
+  if (!params.friendsGoing || !params.userId) {
     return events;
   }
   
-  // Filter to only events that have at least one UserEvent with GOING or INTERESTED status
-  const eventsWithAttendance = await prisma.event.findMany({
+  // Get user's friend IDs
+  const friendIds = await getFriendIds(params.userId);
+  
+  if (friendIds.length === 0) {
+    // No friends, return empty array for "friends going" filter
+    return [];
+  }
+  
+  // Filter to only events where at least one friend has GOING or INTERESTED status
+  const eventsWithFriendsGoing = await prisma.event.findMany({
     where: {
       id: { in: events.map(e => e.id) },
       userEvents: { 
         some: { 
+          userId: { in: friendIds },
           status: { in: ['GOING', 'INTERESTED'] }
         } 
       },
@@ -123,6 +134,6 @@ export async function getEventsWithAttendance(params: GetEventsParams = {}): Pro
     orderBy: { startDateTime: 'asc' },
   });
   
-  return eventsWithAttendance;
+  return eventsWithFriendsGoing;
 }
 

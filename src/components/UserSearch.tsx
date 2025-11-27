@@ -1,0 +1,144 @@
+'use client';
+
+import { useState } from 'react';
+
+type User = {
+  id: string;
+  email: string;
+  displayName: string | null;
+};
+
+interface UserSearchProps {
+  onSendRequest: (userId: string) => void;
+  existingFriendIds: string[];
+  pendingRequestIds: string[];
+}
+
+export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds }: UserSearchProps) {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
+
+  const handleSearch = async () => {
+    if (query.length < 3) return;
+    
+    setLoading(true);
+    setSearched(true);
+    
+    try {
+      const res = await fetch(`/api/users/search?email=${encodeURIComponent(query)}`);
+      if (!res.ok) throw new Error('Search failed');
+      const json = await res.json();
+      setResults(json.users || []);
+    } catch (err) {
+      console.error('Search error:', err);
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const getButtonState = (userId: string): 'friend' | 'pending' | 'add' => {
+    if (existingFriendIds.includes(userId)) return 'friend';
+    if (pendingRequestIds.includes(userId)) return 'pending';
+    return 'add';
+  };
+
+  return (
+    <div>
+      <div className="flex gap-2 mb-6">
+        <input
+          type="email"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Search by email..."
+          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        />
+        <button
+          onClick={handleSearch}
+          disabled={query.length < 3 || loading}
+          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading ? 'Searching...' : 'Search'}
+        </button>
+      </div>
+
+      {searched && results.length === 0 && !loading && (
+        <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
+          <p className="text-gray-500">No users found matching "{query}"</p>
+          <p className="text-sm text-gray-400 mt-1">
+            Make sure to enter a valid email address
+          </p>
+        </div>
+      )}
+
+      {results.length > 0 && (
+        <div className="space-y-3">
+          {results.map((user) => {
+            const state = getButtonState(user.id);
+            const initials = user.displayName
+              ? user.displayName
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')
+                  .toUpperCase()
+                  .slice(0, 2)
+              : user.email[0].toUpperCase();
+
+            return (
+              <div
+                key={user.id}
+                className="bg-white rounded-lg border border-gray-200 p-4 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-medium text-sm">
+                    {initials}
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">
+                      {user.displayName || user.email.split('@')[0]}
+                    </p>
+                    <p className="text-sm text-gray-500">{user.email}</p>
+                  </div>
+                </div>
+
+                {state === 'friend' && (
+                  <span className="text-sm text-green-600 font-medium">✓ Friends</span>
+                )}
+                {state === 'pending' && (
+                  <span className="text-sm text-gray-500 italic">Pending</span>
+                )}
+                {state === 'add' && (
+                  <button
+                    onClick={() => onSendRequest(user.id)}
+                    className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Add Friend
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {!searched && (
+        <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
+          <p className="text-gray-500">Enter an email address to find friends</p>
+          <p className="text-sm text-gray-400 mt-1">
+            Search requires at least 3 characters
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+

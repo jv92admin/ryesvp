@@ -3,10 +3,13 @@ import Link from 'next/link';
 import { getEventById } from '@/db/events';
 import { Header } from '@/components/Header';
 import { AttendanceButton } from '@/components/AttendanceButton';
+import { ShareButton } from '@/components/ShareButton';
 import { getCurrentUser } from '@/lib/auth';
 import { getUserEventByEventId } from '@/db/userEvents';
 import { getEventAttendance } from '@/db/userEvents';
 import { formatInTimeZone } from 'date-fns-tz';
+import { isNewListing } from '@/lib/utils';
+import { headers } from 'next/headers';
 
 const AUSTIN_TIMEZONE = 'America/Chicago';
 
@@ -28,6 +31,18 @@ export default async function EventPage({ params }: EventPageProps) {
   
   // Get attendance counts
   const attendance = await getEventAttendance(id);
+  
+  // Check if event is new
+  const isNew = isNewListing(event.createdAt);
+  
+  // Get the current URL for sharing
+  const headersList = await headers();
+  const host = headersList.get('host') || 'localhost:3000';
+  const protocol = host.includes('localhost') ? 'http' : 'https';
+  const eventUrl = `${protocol}://${host}/events/${id}`;
+  
+  // Format date for share message
+  const dateFormatted = formatInTimeZone(event.startDateTime, AUSTIN_TIMEZONE, 'EEEE, MMMM d \'at\' h:mm a');
 
   const categoryColors: Record<string, string> = {
     CONCERT: 'bg-purple-100 text-purple-800',
@@ -38,11 +53,20 @@ export default async function EventPage({ params }: EventPageProps) {
     OTHER: 'bg-gray-100 text-gray-800',
   };
 
+  const categoryEmojis: Record<string, string> = {
+    CONCERT: '🎵',
+    COMEDY: '😂',
+    THEATER: '🎭',
+    SPORTS: '🏆',
+    FESTIVAL: '🎪',
+    OTHER: '📅',
+  };
+
   return (
     <>
       <Header />
       <main className="min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Back link */}
         <Link
           href="/"
@@ -51,9 +75,29 @@ export default async function EventPage({ params }: EventPageProps) {
           ← Back to events
         </Link>
 
+        {/* Hero Image */}
+        {event.imageUrl ? (
+          <div className="w-full h-48 sm:h-64 md:h-80 rounded-xl overflow-hidden mb-6 shadow-sm">
+            <img 
+              src={event.imageUrl} 
+              alt={event.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ) : (
+          <div className="w-full h-48 sm:h-64 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center mb-6">
+            <span className="text-6xl">{categoryEmojis[event.category] || '📅'}</span>
+          </div>
+        )}
+
         {/* Event header */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex items-center gap-2 mb-3">
+            {isNew && (
+              <span className="px-2 py-0.5 text-xs font-semibold bg-emerald-500 text-white rounded">
+                NEW
+              </span>
+            )}
             <span className={`px-2 py-0.5 text-xs font-medium rounded ${categoryColors[event.category]}`}>
               {event.category}
             </span>
@@ -69,7 +113,7 @@ export default async function EventPage({ params }: EventPageProps) {
             )}
           </div>
 
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
             {event.title}
           </h1>
 
@@ -101,22 +145,29 @@ export default async function EventPage({ params }: EventPageProps) {
           {event.description && (
             <div className="mt-6 pt-6 border-t border-gray-100">
               <h2 className="font-semibold text-gray-900 mb-2">About</h2>
-              <p className="text-gray-600">{event.description}</p>
+              <p className="text-gray-600 whitespace-pre-line">{event.description}</p>
             </div>
           )}
 
-          {event.url && (
-            <div className="mt-6">
+          {/* Action Buttons */}
+          <div className="mt-6 flex flex-col sm:flex-row gap-3">
+            {event.url && (
               <a
                 href={event.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center w-full sm:w-auto px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center justify-center px-6 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Get Tickets →
               </a>
-            </div>
-          )}
+            )}
+            <ShareButton 
+              title={event.title}
+              venueName={event.venue.name}
+              dateFormatted={dateFormatted}
+              eventUrl={eventUrl}
+            />
+          </div>
         </div>
 
         {/* Attendance section */}

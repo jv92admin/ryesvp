@@ -38,3 +38,19 @@ export function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(' ');
 }
 
+/**
+ * Check if a date is within the last N hours
+ */
+export function isWithinHours(date: Date, hours: number): boolean {
+  const now = new Date();
+  const diff = now.getTime() - new Date(date).getTime();
+  return diff < hours * 60 * 60 * 1000 && diff > 0;
+}
+
+/**
+ * Check if an event was added recently (within 48 hours)
+ */
+export function isNewListing(createdAt: Date): boolean {
+  return isWithinHours(createdAt, 48);
+}
+
