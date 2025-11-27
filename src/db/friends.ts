@@ -232,23 +232,25 @@ export async function getFriendship(
   });
 }
 
-// Search users by email (for adding friends)
+// Search users by exact email (for adding friends)
+// Requires exact email match to prevent browsing all users
 export async function searchUsersByEmail(
   query: string,
   excludeUserId: string
 ): Promise<User[]> {
-  return prisma.user.findMany({
+  // Require exact email match for privacy
+  const user = await prisma.user.findUnique({
     where: {
-      email: {
-        contains: query,
-        mode: 'insensitive',
-      },
-      id: {
-        not: excludeUserId,
-      },
+      email: query.toLowerCase().trim(),
     },
-    take: 10,
   });
+
+  // Don't return the searching user themselves
+  if (!user || user.id === excludeUserId) {
+    return [];
+  }
+
+  return [user];
 }
 
 // Get friend count

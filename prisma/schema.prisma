@@ -69,6 +69,11 @@ model User {
   // Friends
   sentFriendRequests     Friendship[] @relation("SentFriendRequests")
   receivedFriendRequests Friendship[] @relation("ReceivedFriendRequests")
+  
+  // Lists & Communities
+  ownedLists             List[] @relation("OwnedLists")
+  listMemberships        ListMember[]
+  sentListInvitations    ListMember[] @relation("ListInvitations")
 
   @@index([authProviderId])
 }
@@ -143,4 +148,55 @@ enum FriendshipStatus {
   ACCEPTED  // Mutual friendship
   DECLINED  // Request declined (can re-request later)
   BLOCKED   // User blocked (cannot interact)
+}
+
+// List - Private lists for organizing friends, or public communities
+model List {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  ownerId     String
+  isPublic    Boolean  @default(false) // false = private list, true = community
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner   User         @relation("OwnedLists", fields: [ownerId], references: [id], onDelete: Cascade)
+  members ListMember[]
+
+  @@index([ownerId])
+  @@index([isPublic])
+}
+
+// ListMember - membership in a list or community
+model ListMember {
+  id          String           @id @default(uuid())
+  listId      String
+  userId      String
+  status      ListMemberStatus @default(ACTIVE) // For private lists, always ACTIVE
+  role        ListRole         @default(MEMBER)
+  invitedById String?          // Who invited this user (for communities)
+  isVisible   Boolean          @default(true) // Reciprocity toggle (communities only)
+  joinedAt    DateTime         @default(now())
+
+  list      List  @relation(fields: [listId], references: [id], onDelete: Cascade)
+  user      User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy User? @relation("ListInvitations", fields: [invitedById], references: [id])
+
+  @@unique([listId, userId])
+  @@index([listId])
+  @@index([userId])
+  @@index([status])
+}
+
+enum ListMemberStatus {
+  PENDING  // Invitation sent (communities only)
+  ACTIVE   // Active member
+  DECLINED // Declined invitation
+  LEFT     // Left the community
+}
+
+enum ListRole {
+  OWNER  // Can delete list, manage all members
+  ADMIN  // Can manage members (future)
+  MEMBER // Regular member
 }

@@ -1,5 +1,6 @@
 import { getEventsWithAttendance, groupEventsByDate } from '@/db/events';
 import { getAllVenues } from '@/db/venues';
+import { getPrivateLists } from '@/db/lists';
 import { EventCard } from '@/components/EventCard';
 import { EventFilters } from '@/components/EventFilters';
 import { Header } from '@/components/Header';
@@ -14,6 +15,7 @@ interface HomePageProps {
     startDate?: string;
     endDate?: string;
     friendsGoing?: string;
+    listId?: string;
   }>;
 }
 
@@ -21,12 +23,14 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const params = await searchParams;
   const user = await getCurrentUser();
   const venues = await getAllVenues();
+  const lists = user ? await getPrivateLists(user.dbUser.id) : [];
   
   const events = await getEventsWithAttendance({
     venueId: params.venueId || undefined,
     startDate: params.startDate ? new Date(params.startDate) : undefined,
     endDate: params.endDate ? new Date(params.endDate + 'T23:59:59') : undefined,
     friendsGoing: params.friendsGoing === 'true',
+    listId: params.listId || undefined,
     userId: user?.dbUser.id,
     limit: 1000,
   });
@@ -50,6 +54,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
           <EventFilters 
             venues={venues} 
+            lists={lists.map(l => ({ id: l.id, name: l.name }))}
             showFriendsFilter={!!user}
           />
 

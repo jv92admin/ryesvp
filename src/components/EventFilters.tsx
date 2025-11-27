@@ -9,12 +9,18 @@ interface Venue {
   slug: string;
 }
 
+interface ListOption {
+  id: string;
+  name: string;
+}
+
 interface EventFiltersProps {
   venues: Venue[];
+  lists?: ListOption[];
   showFriendsFilter?: boolean;
 }
 
-export function EventFilters({ venues, showFriendsFilter = false }: EventFiltersProps) {
+export function EventFilters({ venues, lists = [], showFriendsFilter = false }: EventFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -22,6 +28,7 @@ export function EventFilters({ venues, showFriendsFilter = false }: EventFilters
   const [startDate, setStartDate] = useState(searchParams.get('startDate') || '');
   const [endDate, setEndDate] = useState(searchParams.get('endDate') || '');
   const [friendsGoing, setFriendsGoing] = useState(searchParams.get('friendsGoing') === 'true');
+  const [listId, setListId] = useState(searchParams.get('listId') || '');
 
   const applyFilters = () => {
     const params = new URLSearchParams();
@@ -29,6 +36,7 @@ export function EventFilters({ venues, showFriendsFilter = false }: EventFilters
     if (startDate) params.set('startDate', startDate);
     if (endDate) params.set('endDate', endDate);
     if (friendsGoing) params.set('friendsGoing', 'true');
+    if (listId) params.set('listId', listId);
     
     const queryString = params.toString();
     router.push(queryString ? `/?${queryString}` : '/');
@@ -39,10 +47,11 @@ export function EventFilters({ venues, showFriendsFilter = false }: EventFilters
     setStartDate('');
     setEndDate('');
     setFriendsGoing(false);
+    setListId('');
     router.push('/');
   };
 
-  const hasFilters = venueId || startDate || endDate || friendsGoing;
+  const hasFilters = venueId || startDate || endDate || friendsGoing || listId;
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
@@ -108,6 +117,29 @@ export function EventFilters({ venues, showFriendsFilter = false }: EventFilters
             <label htmlFor="friendsGoing" className="text-sm font-medium text-gray-700">
               Friends going
             </label>
+          </div>
+        )}
+
+        {/* List Filter */}
+        {showFriendsFilter && lists.length > 0 && (
+          <div className="flex-1 min-w-[160px]">
+            <label htmlFor="list" className="block text-sm font-medium text-gray-700 mb-1">
+              Filter by List
+            </label>
+            <select
+              id="list"
+              value={listId}
+              onChange={(e) => setListId(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+            >
+              <option value="">All Events</option>
+              <option value="__all_lists__">Any List Member Going</option>
+              {lists.map((list) => (
+                <option key={list.id} value={list.id}>
+                  {list.name}
+                </option>
+              ))}
+            </select>
           </div>
         )}
 

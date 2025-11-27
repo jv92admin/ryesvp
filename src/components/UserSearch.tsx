@@ -59,7 +59,7 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Search by email..."
+          placeholder="Enter exact email address..."
           className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
         <button
@@ -73,9 +73,9 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
 
       {searched && results.length === 0 && !loading && (
         <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
-          <p className="text-gray-500">No users found matching "{query}"</p>
+          <p className="text-gray-500">No user found with email "{query}"</p>
           <p className="text-sm text-gray-400 mt-1">
-            Make sure to enter a valid email address
+            Enter the exact email address of the person you want to add
           </p>
         </div>
       )}
@@ -132,9 +132,9 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
 
       {!searched && (
         <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
-          <p className="text-gray-500">Enter an email address to find friends</p>
+          <p className="text-gray-500">Enter a friend's email address</p>
           <p className="text-sm text-gray-400 mt-1">
-            Search requires at least 3 characters
+            You'll need their exact email to find them
           </p>
         </div>
       )}

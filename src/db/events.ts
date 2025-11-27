@@ -2,6 +2,7 @@ import prisma from './prisma';
 import { Event, Venue, EventCategory, EventStatus } from '@prisma/client';
 import { toZonedTime } from 'date-fns-tz';
 import { getFriendIds } from './friends';
+import { getListMemberIds, getAllListMemberIds } from './lists';
 
 const AUSTIN_TIMEZONE = 'America/Chicago';
 
@@ -16,7 +17,8 @@ export interface GetEventsParams {
   limit?: number;
   offset?: number;
   friendsGoing?: boolean;
-  userId?: string; // Required when friendsGoing is true
+  listId?: string; // Filter by list members going
+  userId?: string; // Required when friendsGoing or listId is set
 }
 
 export async function getEvents(params: GetEventsParams = {}): Promise<EventWithVenue[]> {
@@ -107,25 +109,46 @@ export function groupEventsByDate(events: EventWithVenue[]): Map<string, EventWi
 export async function getEventsWithAttendance(params: GetEventsParams = {}): Promise<EventWithVenue[]> {
   const events = await getEvents(params);
   
-  if (!params.friendsGoing || !params.userId) {
+  // No social filtering needed
+  if (!params.friendsGoing && !params.listId) {
     return events;
   }
   
-  // Get user's friend IDs
-  const friendIds = await getFriendIds(params.userId);
+  if (!params.userId) {
+    return events;
+  }
   
-  if (friendIds.length === 0) {
-    // No friends, return empty array for "friends going" filter
+  // Determine which user IDs to filter by
+  let filterUserIds: string[] = [];
+  
+  if (params.listId === '__all_lists__') {
+    // Filter by all list members across all user's lists
+    filterUserIds = await getAllListMemberIds(params.userId);
+  } else if (params.listId) {
+    // Filter by specific list members
+    try {
+      filterUserIds = await getListMemberIds(params.listId, params.userId);
+    } catch {
+      // If list not found or not authorized, return empty
+      return [];
+    }
+  } else if (params.friendsGoing) {
+    // Filter by friends
+    filterUserIds = await getFriendIds(params.userId);
+  }
+  
+  if (filterUserIds.length === 0) {
+    // No users to filter by, return empty array
     return [];
   }
   
-  // Filter to only events where at least one friend has GOING or INTERESTED status
-  const eventsWithFriendsGoing = await prisma.event.findMany({
+  // Filter to only events where at least one user has GOING or INTERESTED status
+  const filteredEvents = await prisma.event.findMany({
     where: {
       id: { in: events.map(e => e.id) },
       userEvents: { 
         some: { 
-          userId: { in: friendIds },
+          userId: { in: filterUserIds },
           status: { in: ['GOING', 'INTERESTED'] }
         } 
       },
@@ -134,6 +157,6 @@ export async function getEventsWithAttendance(params: GetEventsParams = {}): Pro
     orderBy: { startDateTime: 'asc' },
   });
   
-  return eventsWithFriendsGoing;
+  return filteredEvents;
 }
 

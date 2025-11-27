@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import { UserSearch } from '@/components/UserSearch';
 import { FriendCard } from '@/components/FriendCard';
 import { FriendRequestCard } from '@/components/FriendRequestCard';
+import { ListCard } from '@/components/ListCard';
+import { CreateListModal } from '@/components/CreateListModal';
+import { ListDetailModal } from '@/components/ListDetailModal';
 
 type User = {
   id: string;
@@ -39,11 +42,24 @@ type FriendsData = {
   pendingCount: number;
 };
 
+type ListWithCount = {
+  id: string;
+  name: string;
+  description: string | null;
+  ownerId: string;
+  isPublic: boolean;
+  createdAt: string;
+  _count: { members: number };
+};
+
 export function FriendsContent() {
   const [data, setData] = useState<FriendsData | null>(null);
+  const [lists, setLists] = useState<ListWithCount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'search'>('friends');
+  const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'search' | 'lists'>('friends');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedListId, setSelectedListId] = useState<string | null>(null);
 
   const fetchFriends = async () => {
     try {
@@ -64,8 +80,21 @@ export function FriendsContent() {
     }
   };
 
+  const fetchLists = async () => {
+    try {
+      const res = await fetch('/api/lists');
+      if (res.ok) {
+        const json = await res.json();
+        setLists(json.lists || []);
+      }
+    } catch (err) {
+      console.error('Error fetching lists:', err);
+    }
+  };
+
   useEffect(() => {
     fetchFriends();
+    fetchLists();
   }, []);
 
   const handleAccept = async (friendshipId: string) => {
@@ -127,13 +156,49 @@ export function FriendsContent() {
     }
   };
 
+  const handleCreateList = async (name: string, description: string, memberIds: string[]) => {
+    try {
+      const res = await fetch('/api/lists', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, description }),
+      });
+      if (!res.ok) throw new Error('Failed to create list');
+      const { list } = await res.json();
+
+      for (const friendId of memberIds) {
+        await fetch(`/api/lists/${list.id}/members`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ friendId }),
+        });
+      }
+
+      await fetchLists();
+      setShowCreateModal(false);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to create list');
+    }
+  };
+
+  const handleDeleteList = async (listId: string) => {
+    if (!confirm('Are you sure you want to delete this list?')) return;
+    try {
+      const res = await fetch(`/api/lists/${listId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete list');
+      await fetchLists();
+    } catch (err) {
+      console.error('Error deleting list:', err);
+    }
+  };
+
   return (
     <>
       {/* Tabs */}
       <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-lg">
         <button
           onClick={() => setActiveTab('friends')}
-          className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+          className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
             activeTab === 'friends'
               ? 'bg-white text-gray-900 shadow-sm'
               : 'text-gray-600 hover:text-gray-900'
@@ -143,7 +208,7 @@ export function FriendsContent() {
         </button>
         <button
           onClick={() => setActiveTab('requests')}
-          className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors relative ${
+          className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors relative ${
             activeTab === 'requests'
               ? 'bg-white text-gray-900 shadow-sm'
               : 'text-gray-600 hover:text-gray-900'
@@ -157,14 +222,24 @@ export function FriendsContent() {
           )}
         </button>
         <button
+          onClick={() => setActiveTab('lists')}
+          className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+            activeTab === 'lists'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Lists {lists.length > 0 && `(${lists.length})`}
+        </button>
+        <button
           onClick={() => setActiveTab('search')}
-          className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+          className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
             activeTab === 'search'
               ? 'bg-white text-gray-900 shadow-sm'
               : 'text-gray-600 hover:text-gray-900'
           }`}
         >
-          Add Friends
+          Add
         </button>
       </div>
 
@@ -211,7 +286,6 @@ export function FriendsContent() {
           {/* Requests Tab */}
           {activeTab === 'requests' && (
             <div className="space-y-6">
-              {/* Received Requests */}
               <section>
                 <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
                   Received ({data.pendingReceived.length})
@@ -233,7 +307,6 @@ export function FriendsContent() {
                 )}
               </section>
 
-              {/* Sent Requests */}
               <section>
                 <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
                   Sent ({data.pendingSent.length})
@@ -255,6 +328,38 @@ export function FriendsContent() {
             </div>
           )}
 
+          {/* Lists Tab */}
+          {activeTab === 'lists' && (
+            <div className="space-y-4">
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="w-full px-4 py-3 text-sm font-medium text-blue-600 bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+              >
+                + Create New List
+              </button>
+
+              {lists.length === 0 ? (
+                <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
+                  <p className="text-gray-500 mb-2">No lists yet</p>
+                  <p className="text-sm text-gray-400">
+                    Create lists to organize friends (e.g., "Concert Crew", "Work Friends")
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {lists.map((list) => (
+                    <ListCard
+                      key={list.id}
+                      list={list}
+                      onView={() => setSelectedListId(list.id)}
+                      onDelete={() => handleDeleteList(list.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Search Tab */}
           {activeTab === 'search' && (
             <UserSearch
@@ -268,7 +373,25 @@ export function FriendsContent() {
           )}
         </>
       )}
+
+      {/* Create List Modal */}
+      {showCreateModal && (
+        <CreateListModal
+          onClose={() => setShowCreateModal(false)}
+          onCreate={handleCreateList}
+        />
+      )}
+
+      {/* List Detail Modal */}
+      {selectedListId && (
+        <ListDetailModal
+          listId={selectedListId}
+          onClose={() => {
+            setSelectedListId(null);
+            fetchLists();
+          }}
+        />
+      )}
     </>
   );
 }
-
