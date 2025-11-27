@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { createOrUpdateUser } from '@/db/users';
+import { getUserByAuthId } from '@/db/users';
 import { User } from '@prisma/client';
 import { redirect } from 'next/navigation';
 
@@ -13,7 +13,8 @@ export interface AuthUser {
 
 /**
  * Get the current authenticated user (Supabase + DB user)
- * Returns null if not authenticated
+ * Returns null if not authenticated OR if user doesn't exist in our DB yet
+ * (new users must complete invite flow before DB user is created)
  */
 export async function getCurrentUser(): Promise<AuthUser | null> {
   const supabase = await createClient();
@@ -23,12 +24,13 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
     return null;
   }
 
-  // Sync user to database (create if doesn't exist)
-  const dbUser = await createOrUpdateUser({
-    authProviderId: supabaseUser.id,
-    email: supabaseUser.email,
-    displayName: supabaseUser.user_metadata?.display_name || null,
-  });
+  // Check if user exists in our database (don't auto-create)
+  const dbUser = await getUserByAuthId(supabaseUser.id);
+  
+  if (!dbUser) {
+    // User has Supabase auth but no DB account yet (hasn't completed invite flow)
+    return null;
+  }
 
   return {
     supabaseUser: {

@@ -50,6 +50,7 @@ export function SocialSidebar({ isLoggedIn }: SocialSidebarProps) {
   const [data, setData] = useState<SocialData | null>(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [mobileExpanded, setMobileExpanded] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) {
@@ -165,7 +166,15 @@ export function SocialSidebar({ isLoggedIn }: SocialSidebarProps) {
 
   if (!data) return null;
 
-  return (
+  // Summary stats for mobile collapsed view
+  const summaryStats = {
+    friends: data.friendCount,
+    events: data.myEvents.length,
+    friendsGoing: data.friendsEvents.length,
+  };
+
+  // Full sidebar content (shared between mobile expanded and desktop)
+  const SidebarContent = () => (
     <div className="space-y-4">
       {/* Your Network */}
       <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -338,6 +347,62 @@ export function SocialSidebar({ isLoggedIn }: SocialSidebarProps) {
         </div>
       )}
     </div>
+  );
+
+  return (
+    <>
+      {/* Mobile: Collapsible Summary Card */}
+      <div className="lg:hidden">
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+          {/* Collapsed Header - Always visible */}
+          <button
+            onClick={() => setMobileExpanded(!mobileExpanded)}
+            className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex items-center gap-3 text-sm">
+              <span className="flex items-center gap-1.5">
+                <span>👥</span>
+                <span className="font-medium">{summaryStats.friends}</span>
+              </span>
+              <span className="text-gray-300">•</span>
+              <span className="flex items-center gap-1.5">
+                <span>📅</span>
+                <span className="font-medium">{summaryStats.events}</span>
+              </span>
+              {summaryStats.friendsGoing > 0 && (
+                <>
+                  <span className="text-gray-300">•</span>
+                  <span className="flex items-center gap-1.5 text-purple-600">
+                    <span>🎉</span>
+                    <span className="font-medium">{summaryStats.friendsGoing} going</span>
+                  </span>
+                </>
+              )}
+            </div>
+            <svg 
+              className={`w-5 h-5 text-gray-400 transition-transform ${mobileExpanded ? 'rotate-180' : ''}`} 
+              fill="none" 
+              stroke="currentColor" 
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          
+          {/* Expanded Content */}
+          {mobileExpanded && (
+            <div className="border-t border-gray-200 p-4">
+              <SidebarContent />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Desktop: Full Sidebar */}
+      <div className="hidden lg:block">
+        <SidebarContent />
+      </div>
+    </>
   );
 }
 

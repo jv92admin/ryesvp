@@ -7,6 +7,7 @@ import { EventFilters } from '@/components/EventFilters';
 import { Header } from '@/components/Header';
 import { SetNameBanner } from '@/components/SetNameBanner';
 import { SocialSidebar } from '@/components/SocialSidebar';
+import { InviteBanner } from '@/components/InviteBanner';
 import { getCurrentUser } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -58,15 +59,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       {user && <SetNameBanner />}
       <main className="min-h-screen bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 py-8">
-          {/* Header */}
-          <header className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">
-              RyesVP - Events with Friends
-            </h1>
-            <p className="text-gray-600 mt-2">
-              See what&apos;s happening. Go together
-            </p>
-          </header>
+          {/* Invite Banner for logged-out users with ?ref= */}
+          <InviteBanner isLoggedIn={!!user} />
+          
 
           {/* Filters - Full Width */}
           <EventFilters 
@@ -78,8 +73,15 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
           {/* Two Column Layout */}
           <div className="flex flex-col lg:flex-row gap-6">
+            {/* Social Sidebar - Shows first on mobile (via order), right column on desktop */}
+            <aside className="order-first lg:order-last lg:w-80 flex-shrink-0">
+              <div className="lg:sticky lg:top-4">
+                <SocialSidebar isLoggedIn={!!user} />
+              </div>
+            </aside>
+
             {/* Events List - Main Column */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 order-last lg:order-first">
               <EventListWithPagination
                 initialEvents={initialEvents}
                 initialHasMore={hasMore}
@@ -94,14 +96,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 }}
               />
             </div>
-
-            {/* Social Sidebar - Right Column */}
-            <aside className="lg:w-80 flex-shrink-0">
-              <div className="lg:sticky lg:top-4">
-                <SocialSidebar isLoggedIn={!!user} />
-                  </div>
-            </aside>
-            </div>
+          </div>
         </div>
       </main>
     </>

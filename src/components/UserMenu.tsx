@@ -3,15 +3,21 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { getAvatarStyle, getInitials, getDisplayName } from '@/lib/avatar';
 
 interface UserMenuProps {
+  userId: string;
+  displayName: string | null;
   email: string;
 }
 
-export function UserMenu({ email }: UserMenuProps) {
+export function UserMenu({ userId, displayName, email }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
+  
+  const name = getDisplayName(displayName, email);
+  const initials = getInitials(displayName, email);
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -24,12 +30,20 @@ export function UserMenu({ email }: UserMenuProps) {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+        className="flex items-center gap-2 px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
       >
-        <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-medium">
-          {email[0].toUpperCase()}
+        <span 
+          className="w-8 h-8 rounded-full flex items-center justify-center font-medium text-white text-sm"
+          style={getAvatarStyle(userId)}
+        >
+          {initials}
         </span>
-        <span className="hidden sm:inline max-w-[150px] truncate">{email}</span>
+        <span className="hidden sm:inline font-medium text-gray-900 max-w-[120px] truncate">
+          {name}
+        </span>
+        <svg className="w-4 h-4 text-gray-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
       </button>
 
       {isOpen && (

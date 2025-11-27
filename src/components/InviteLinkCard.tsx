@@ -28,7 +28,7 @@ export function InviteLinkCard() {
   }, []);
 
   const inviteLink = inviteCode
-    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/events?ref=${inviteCode}`
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/?ref=${inviteCode}`
     : '';
 
   const handleCopy = async () => {

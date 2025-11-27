@@ -15,10 +15,23 @@ export async function Header() {
 
   return (
     <header className="bg-white border-b border-gray-200">
-      <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-        <Link href="/" className="text-xl font-bold text-gray-900">
-          RyesVP
-        </Link>
+      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+        {/* Logo + Tagline */}
+        <div className="flex items-center gap-4">
+          <Link href="/" className="group">
+            <div className="p-[2px] rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 transition-all">
+              <div className="flex items-center gap-2.5 px-3 py-1.5 bg-white rounded-[10px]">
+                <span className="text-2xl">🎟️</span>
+                <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent group-hover:from-purple-700 group-hover:to-blue-700">
+                  RyesVP
+                </span>
+              </div>
+            </div>
+          </Link>
+          <span className="hidden sm:inline text-gray-500 text-base">
+            <em className="font-semibold">See</em> what&apos;s happening. <em className="font-semibold">Go</em> with friends.
+          </span>
+        </div>
         
         <nav className="flex items-center gap-4">
           {user && (
@@ -48,7 +61,11 @@ export async function Header() {
             </>
           )}
           {user ? (
-            <UserMenu email={user.supabaseUser.email} />
+            <UserMenu 
+              userId={user.dbUser.id}
+              displayName={user.dbUser.displayName}
+              email={user.supabaseUser.email}
+            />
           ) : (
             <Link
               href="/login"

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { getStoredReturnUrl, getStoredInviteRef } from '@/lib/invite';
+import { getStoredReturnUrl, getStoredInviteRef, storeInviteRef } from '@/lib/invite';
 
 export default function LoginPage() {
   const [returnUrl, setReturnUrl] = useState('/');
@@ -19,9 +19,15 @@ export default function LoginPage() {
     // Priority: query param > stored return URL > default
     setReturnUrl(next || storedReturn || '/');
 
-    // Check for invite code
+    // Check for ?ref= param in URL and store it
+    const refParam = params.get('ref');
+    if (refParam) {
+      storeInviteRef(refParam);
+    }
+
+    // Check for invite code (from URL or localStorage)
     async function checkInvite() {
-      const ref = getStoredInviteRef();
+      const ref = refParam || getStoredInviteRef();
       if (ref) {
         try {
           const response = await fetch(`/api/invites/${ref}`);
@@ -94,7 +100,7 @@ export default function LoginPage() {
           <p className="text-xs text-gray-500 text-center mt-4">
             {inviterName 
               ? `Sign up to connect with ${inviterName}`
-              : 'New here? Your account will be created automatically.'
+              : 'Existing user? Sign in. New? You\'ll need an invite code.'
             }
           </p>
         </div>
