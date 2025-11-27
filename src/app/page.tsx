@@ -75,7 +75,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Social Sidebar - Shows first on mobile (via order), right column on desktop */}
             <aside className="order-first lg:order-last lg:w-80 flex-shrink-0">
-              <div className="lg:sticky lg:top-4">
+              <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:scrollbar-thin">
                 <SocialSidebar isLoggedIn={!!user} />
               </div>
             </aside>
