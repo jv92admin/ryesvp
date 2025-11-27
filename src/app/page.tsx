@@ -40,10 +40,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
         <div className="max-w-3xl mx-auto px-4 py-8">
           <header className="mb-6">
             <h1 className="text-3xl font-bold text-gray-900">
-              Austin Events
+              RyesVP - Events with Friends
             </h1>
             <p className="text-gray-600 mt-2">
-              Concerts, comedy, and more happening in Austin, TX
+              See what's happening. Go together
             </p>
           </header>
 
