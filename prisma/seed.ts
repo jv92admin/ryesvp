@@ -88,165 +88,19 @@ async function main() {
 
   console.log(`✅ Created ${venues.length} venues`);
 
-  // Create sample events (dates relative to now)
-  const now = new Date();
-  const addDays = (days: number) => {
-    const date = new Date(now);
-    date.setDate(date.getDate() + days);
-    date.setHours(20, 0, 0, 0); // 8 PM
-    return date;
-  };
-
-  const events = await Promise.all([
-    // Moody Center events
-    prisma.event.upsert({
-      where: { source_sourceEventId: { source: 'MANUAL', sourceEventId: 'seed-1' } },
-      update: {},
-      create: {
-        venueId: venues[0].id,
-        title: 'Taylor Swift - The Eras Tour',
-        description: 'Experience the iconic Eras Tour live!',
-        startDateTime: addDays(30),
-        url: 'https://moodycenteratx.com/events',
-        source: EventSource.MANUAL,
-        sourceEventId: 'seed-1',
-        category: EventCategory.CONCERT,
-        status: EventStatus.SOLD_OUT,
+  // Remove any existing seed events (cleanup)
+  const deletedSeedEvents = await prisma.event.deleteMany({
+    where: {
+      source: EventSource.MANUAL,
+      sourceEventId: {
+        startsWith: 'seed-',
       },
-    }),
-    prisma.event.upsert({
-      where: { source_sourceEventId: { source: 'MANUAL', sourceEventId: 'seed-2' } },
-      update: {},
-      create: {
-        venueId: venues[0].id,
-        title: 'Austin Spurs vs. Rio Grande Valley Vipers',
-        description: 'NBA G League basketball action',
-        startDateTime: addDays(5),
-        url: 'https://moodycenteratx.com/events',
-        source: EventSource.MANUAL,
-        sourceEventId: 'seed-2',
-        category: EventCategory.SPORTS,
-      },
-    }),
-    // Paramount events
-    prisma.event.upsert({
-      where: { source_sourceEventId: { source: 'MANUAL', sourceEventId: 'seed-3' } },
-      update: {},
-      create: {
-        venueId: venues[1].id,
-        title: 'John Mulaney - Live Comedy',
-        description: 'Stand-up comedy from the Emmy-winning comedian',
-        startDateTime: addDays(14),
-        url: 'https://austintheatre.org/events',
-        source: EventSource.MANUAL,
-        sourceEventId: 'seed-3',
-        category: EventCategory.COMEDY,
-      },
-    }),
-    prisma.event.upsert({
-      where: { source_sourceEventId: { source: 'MANUAL', sourceEventId: 'seed-4' } },
-      update: {},
-      create: {
-        venueId: venues[1].id,
-        title: 'Classic Film Series: Casablanca',
-        description: 'Screening of the 1942 classic on the big screen',
-        startDateTime: addDays(3),
-        url: 'https://austintheatre.org/events',
-        source: EventSource.MANUAL,
-        sourceEventId: 'seed-4',
-        category: EventCategory.OTHER,
-      },
-    }),
-    // ACL Live events
-    prisma.event.upsert({
-      where: { source_sourceEventId: { source: 'MANUAL', sourceEventId: 'seed-5' } },
-      update: {},
-      create: {
-        venueId: venues[2].id,
-        title: 'Khruangbin',
-        description: 'Psychedelic soul trio from Houston',
-        startDateTime: addDays(21),
-        url: 'https://acl-live.com/events',
-        source: EventSource.MANUAL,
-        sourceEventId: 'seed-5',
-        category: EventCategory.CONCERT,
-      },
-    }),
-    prisma.event.upsert({
-      where: { source_sourceEventId: { source: 'MANUAL', sourceEventId: 'seed-6' } },
-      update: {},
-      create: {
-        venueId: venues[2].id,
-        title: 'Austin City Limits Taping: Leon Bridges',
-        description: 'Live taping for the legendary PBS series',
-        startDateTime: addDays(7),
-        url: 'https://acl-live.com/events',
-        source: EventSource.MANUAL,
-        sourceEventId: 'seed-6',
-        category: EventCategory.CONCERT,
-      },
-    }),
-    // Stubb's events
-    prisma.event.upsert({
-      where: { source_sourceEventId: { source: 'MANUAL', sourceEventId: 'seed-7' } },
-      update: {},
-      create: {
-        venueId: venues[3].id,
-        title: 'Turnstile with Snail Mail',
-        description: 'Hardcore punk meets indie rock',
-        startDateTime: addDays(10),
-        url: 'https://stubbsaustin.com/events',
-        source: EventSource.MANUAL,
-        sourceEventId: 'seed-7',
-        category: EventCategory.CONCERT,
-      },
-    }),
-    prisma.event.upsert({
-      where: { source_sourceEventId: { source: 'MANUAL', sourceEventId: 'seed-8' } },
-      update: {},
-      create: {
-        venueId: venues[3].id,
-        title: 'Gospel Brunch',
-        description: 'Sunday gospel music with BBQ buffet',
-        startDateTime: addDays(4),
-        url: 'https://stubbsaustin.com/events',
-        source: EventSource.MANUAL,
-        sourceEventId: 'seed-8',
-        category: EventCategory.CONCERT,
-      },
-    }),
-    // Emo's events
-    prisma.event.upsert({
-      where: { source_sourceEventId: { source: 'MANUAL', sourceEventId: 'seed-9' } },
-      update: {},
-      create: {
-        venueId: venues[4].id,
-        title: 'Local Natives',
-        description: 'Indie rock from Los Angeles',
-        startDateTime: addDays(18),
-        url: 'https://emosaustin.com/events',
-        source: EventSource.MANUAL,
-        sourceEventId: 'seed-9',
-        category: EventCategory.CONCERT,
-      },
-    }),
-    prisma.event.upsert({
-      where: { source_sourceEventId: { source: 'MANUAL', sourceEventId: 'seed-10' } },
-      update: {},
-      create: {
-        venueId: venues[4].id,
-        title: 'Remi Wolf',
-        description: 'Funk-pop sensation',
-        startDateTime: addDays(2),
-        url: 'https://emosaustin.com/events',
-        source: EventSource.MANUAL,
-        sourceEventId: 'seed-10',
-        category: EventCategory.CONCERT,
-      },
-    }),
-  ]);
-
-  console.log(`✅ Created ${events.length} events`);
+    },
+  });
+  
+  if (deletedSeedEvents.count > 0) {
+    console.log(`🗑️  Deleted ${deletedSeedEvents.count} seed events`);
+  }
   console.log('🌱 Seeding complete!');
 }
 
