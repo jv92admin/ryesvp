@@ -658,172 +658,45 @@ npm run build
 
 ## Phase 8: Data Quality & Scraper Improvements
 
-### Task 8.1: Audit Moody Center Scraper
+**📋 SOURCE OF TRUTH: All implementation details, code examples, and HTML structure analysis are in `notes/phase8-data-extraction-scope.md`. Read that document first, then follow the tasks below.**
 
-**Action**: Review `src/ingestion/sources/moodyCenter.ts`
+### Task 8.1: Implement Moody Center Improvements
 
-**Current issues to fix**:
-1. Time always defaults to 8 PM
-2. No opponent extraction for basketball games
-3. Category inference could be better
+**Action**: Follow `notes/phase8-data-extraction-scope.md` Section 1
 
----
+**What to do**:
+1. Read Section 1 "Moody Center" in the scope document
+2. Implement the recommended changes using JSON-LD structured data (preferred approach)
+3. Extract opponent names, exact times, end dates, and full-resolution images
+4. Follow the code examples provided in the scope document
 
-### Task 8.2: Improve Moody Center Date/Time Parsing
-
-**Action**: Update `src/ingestion/utils/dateParser.ts`
-
-**Find and update parseMoodyCenterDate function**:
-```typescript
-/**
- * Parse date string like "Sunday / Feb 1 / 2026" with optional time
- * Returns a Date object
- */
-export function parseMoodyCenterDate(dateStr: string, timeStr?: string): Date | null {
-  try {
-    // Format: "Sunday / Feb 1 / 2026"
-    const parts = dateStr.split('/').map(p => p.trim());
-    if (parts.length !== 3) return null;
-
-    const [, monthDay, year] = parts;
-    const monthDayParts = monthDay.split(' ');
-    if (monthDayParts.length !== 2) return null;
-
-    const monthAbbr = monthDayParts[0];
-    const day = parseInt(monthDayParts[1], 10);
-    const yearNum = parseInt(year, 10);
-
-    const monthMap: Record<string, number> = {
-      'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3,
-      'May': 4, 'Jun': 5, 'Jul': 6, 'Aug': 7,
-      'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11,
-    };
-
-    const month = monthMap[monthAbbr];
-    if (month === undefined || isNaN(day) || isNaN(yearNum)) return null;
-
-    // Parse time if provided (e.g., "7:00 PM", "8:00pm")
-    let hours = 20; // Default to 8 PM
-    let minutes = 0;
-    
-    if (timeStr) {
-      const timeMatch = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/i);
-      if (timeMatch) {
-        hours = parseInt(timeMatch[1], 10);
-        minutes = parseInt(timeMatch[2], 10);
-        const ampm = timeMatch[3]?.toUpperCase();
-        if (ampm === 'PM' && hours !== 12) hours += 12;
-        if (ampm === 'AM' && hours === 12) hours = 0;
-      }
-    }
-
-    return new Date(yearNum, month, day, hours, minutes, 0, 0);
-  } catch (error) {
-    console.error('Error parsing Moody Center date:', dateStr, error);
-    return null;
-  }
-}
-```
+**Files to modify**: `src/ingestion/sources/moodyCenter.ts`
 
 ---
 
-### Task 8.3: Improve Category Inference
+### Task 8.2: Implement Paramount Theatre Improvements
 
-**Action**: Update `src/ingestion/utils/dateParser.ts`
+**Action**: Follow `notes/phase8-data-extraction-scope.md` Section 2
 
-**Replace inferCategory function**:
-```typescript
-/**
- * Extract category from event title or description
- */
-export function inferCategory(title: string, description?: string | null): string {
-  const text = `${title} ${description || ''}`.toLowerCase();
-  
-  // Sports - check first (more specific patterns)
-  if (text.includes('basketball') || text.includes('vs.') || text.includes('vs ') || 
-      text.includes('longhorns') || text.includes('spurs') || text.includes('game day')) {
-    return 'SPORTS';
-  }
-  
-  // Comedy
-  if (text.includes('comedy') || text.includes('stand-up') || text.includes('standup') ||
-      text.includes('comedian') || text.includes('laugh')) {
-    return 'COMEDY';
-  }
-  
-  // Theater
-  if (text.includes('theater') || text.includes('theatre') || text.includes('play') || 
-      text.includes('musical') || text.includes('broadway') || text.includes('ballet') ||
-      text.includes('opera') || text.includes('dance')) {
-    return 'THEATER';
-  }
-  
-  // Festival
-  if (text.includes('festival') || text.includes('fest ')) {
-    return 'FESTIVAL';
-  }
-  
-  // Film
-  if (text.includes('film') || text.includes('movie') || text.includes('screening') ||
-      text.includes('cinema')) {
-    return 'OTHER'; // Could add FILM category later
-  }
-  
-  // Default to Concert for music-related or unknown
-  if (text.includes('concert') || text.includes('tour') || text.includes('live') ||
-      text.includes('band') || text.includes('music') || text.includes('singer')) {
-    return 'CONCERT';
-  }
-  
-  return 'OTHER';
-}
-```
+**What to do**:
+1. Read Section 2 "Paramount Theatre" in the scope document
+2. Extract `data-tn-product-type-id` and map to categories
+3. Follow the code examples provided in the scope document
+
+**Files to modify**: `src/ingestion/sources/paramount.ts`
 
 ---
 
-### Task 8.4: Add Notes Field to Schema (Optional)
+### Task 8.3: Test and Verify Improvements
 
-**Action**: If you want to store additional metadata, add to `prisma/schema.prisma`:
+**Action**: Follow `notes/phase8-data-extraction-scope.md` Section 4 "Testing Instructions"
 
-Find the Event model and add after `description`:
-```prisma
-notes         String?     // Additional scraped context
-```
-
-Then run:
-```bash
-npx prisma migrate dev --name add-notes-field
-```
-
----
-
-### Task 8.5: Update Paramount Scraper for Genre
-
-**Action**: Update `src/ingestion/sources/paramount.ts`
-
-Find where events are pushed (around line 105-120) and update to extract genre from the container:
-
-After this line:
-```typescript
-const category = inferCategory(title, null) as EventCategory;
-```
-
-Add:
-```typescript
-// Try to get more specific category from page context
-// Look for genre indicators in parent containers
-const parentText = $prod.text().toLowerCase();
-let refinedCategory = category;
-if (parentText.includes('comedy') || parentText.includes('stand-up')) {
-  refinedCategory = 'COMEDY' as EventCategory;
-} else if (parentText.includes('film') || parentText.includes('movie') || parentText.includes('screening')) {
-  refinedCategory = 'OTHER' as EventCategory; // Film
-} else if (parentText.includes('music') || parentText.includes('concert')) {
-  refinedCategory = 'CONCERT' as EventCategory;
-}
-```
-
-Then use `refinedCategory` instead of `category` in the events.push call.
+**What to do**:
+1. Run the updated scrapers
+2. Verify events have exact times (not defaults)
+3. Check basketball events have opponent names
+4. Verify Paramount events have correct categories
+5. Follow the validation steps in the scope document
 
 ---
 

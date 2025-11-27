@@ -1,6 +1,8 @@
 import { ScraperResult } from './types';
 import { fetchEventsFromMoodyCenter } from './sources/moodyCenter';
 import { fetchEventsFromParamount } from './sources/paramount';
+import { fetchEventsFromAclLive } from './sources/aclLive';
+import { fetchEventsFromStubbs } from './sources/stubbs';
 import { fetchMockEvents } from './sources/mock';
 import { upsertEvents } from './upsert';
 
@@ -30,6 +32,16 @@ export async function runAllScrapers(): Promise<{
       name: 'Paramount Theatre',
       venueSlug: 'paramount-theatre',
       fn: fetchEventsFromParamount,
+    },
+    {
+      name: 'ACL Live',
+      venueSlug: 'acl-live',
+      fn: fetchEventsFromAclLive,
+    },
+    {
+      name: "Stubb's BBQ",
+      venueSlug: 'stubbs',
+      fn: fetchEventsFromStubbs,
     },
     // Mock scraper only runs in development or when explicitly requested
     ...(process.env.NODE_ENV === 'development' && process.env.ENABLE_MOCK_SCRAPER === 'true' ? [{
@@ -89,6 +101,10 @@ export async function runScraper(scraperName: string): Promise<ScraperResult> {
     'moody-center': fetchEventsFromMoodyCenter,
     'paramount': fetchEventsFromParamount,
     'paramount-theatre': fetchEventsFromParamount,
+    'acl-live': fetchEventsFromAclLive,
+    'acl': fetchEventsFromAclLive,
+    'stubbs': fetchEventsFromStubbs,
+    'stubbs-bbq': fetchEventsFromStubbs,
     'mock': fetchMockEvents,
   };
 

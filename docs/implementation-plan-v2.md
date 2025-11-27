@@ -84,6 +84,8 @@ Add filtering capabilities to the home page for better event discovery.
 
 ## Phase 8: Data Quality & Scraper Improvements
 
+**📋 Detailed Specification**: See `notes/phase8-data-extraction-scope.md` for comprehensive HTML structure analysis, code examples, and implementation guidance.
+
 ### What
 Audit existing scrapers to extract richer metadata and improve data quality.
 
@@ -95,13 +97,14 @@ Audit existing scrapers to extract richer metadata and improve data quality.
 
 ### Deliverables
 1. **Moody Center improvements**:
-   - Extract opponent names for basketball/sports events
+   - **Use JSON-LD structured data** (discovered in audit) for exact times and end dates
+   - Extract opponent names for basketball/sports events from descriptions
    - Capture event subcategory if available
-   - Improve date/time parsing (currently defaults to 8 PM)
+   - Use full-resolution image URLs from JSON-LD
 
 2. **Paramount improvements**:
-   - Extract genre/category from page (Comedy, Music, Film, etc.)
-   - Distinguish Paramount Theatre vs Stateside Theatre
+   - Extract genre/category from `data-tn-product-type-id` attribute
+   - Distinguish Paramount Theatre vs Stateside Theatre (investigation needed)
    - Better image URL handling
 
 3. **General improvements**:

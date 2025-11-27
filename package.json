@@ -14,7 +14,9 @@
     "ingest:offline": "tsx scripts/ingest-offline.ts",
     "ingest:all": "tsx scripts/ingest-offline.ts --all",
     "ingest:moody": "tsx scripts/ingest-offline.ts --venue=moody-center",
-    "ingest:paramount": "tsx scripts/ingest-offline.ts --venue=paramount"
+    "ingest:paramount": "tsx scripts/ingest-offline.ts --venue=paramount",
+    "ingest:acl": "tsx scripts/ingest-offline.ts --venue=acl-live",
+    "ingest:stubbs": "tsx scripts/ingest-offline.ts --venue=stubbs"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.0.1",
