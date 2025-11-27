@@ -15,8 +15,8 @@ export async function createOrUpdateUser(data: {
   return prisma.user.upsert({
     where: { authProviderId: data.authProviderId },
     update: {
+      // Only update email, NOT displayName (preserve user's choice)
       email: data.email,
-      displayName: data.displayName,
     },
     create: {
       authProviderId: data.authProviderId,

@@ -3,6 +3,7 @@ import { Event, Venue, EventCategory, EventStatus } from '@prisma/client';
 import { toZonedTime } from 'date-fns-tz';
 import { getFriendIds } from './friends';
 import { getListMemberIds, getAllListMemberIds } from './lists';
+import { getCommunityMemberIds } from './communities';
 
 const AUSTIN_TIMEZONE = 'America/Chicago';
 
@@ -18,7 +19,8 @@ export interface GetEventsParams {
   offset?: number;
   friendsGoing?: boolean;
   listId?: string; // Filter by list members going
-  userId?: string; // Required when friendsGoing or listId is set
+  communityId?: string; // Filter by community members going
+  userId?: string; // Required when friendsGoing, listId, or communityId is set
 }
 
 export async function getEvents(params: GetEventsParams = {}): Promise<EventWithVenue[]> {
@@ -110,7 +112,7 @@ export async function getEventsWithAttendance(params: GetEventsParams = {}): Pro
   const events = await getEvents(params);
   
   // No social filtering needed
-  if (!params.friendsGoing && !params.listId) {
+  if (!params.friendsGoing && !params.listId && !params.communityId) {
     return events;
   }
   
@@ -121,7 +123,15 @@ export async function getEventsWithAttendance(params: GetEventsParams = {}): Pro
   // Determine which user IDs to filter by
   let filterUserIds: string[] = [];
   
-  if (params.listId === '__all_lists__') {
+  if (params.communityId) {
+    // Filter by community members
+    try {
+      filterUserIds = await getCommunityMemberIds(params.communityId, params.userId);
+    } catch {
+      // If community not found or not authorized, return empty
+      return [];
+    }
+  } else if (params.listId === '__all_lists__') {
     // Filter by all list members across all user's lists
     filterUserIds = await getAllListMemberIds(params.userId);
   } else if (params.listId) {

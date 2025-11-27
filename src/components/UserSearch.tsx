@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getAvatarStyle, getInitials, getDisplayName } from '@/lib/avatar';
 
 type User = {
   id: string;
@@ -84,14 +85,8 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
         <div className="space-y-3">
           {results.map((user) => {
             const state = getButtonState(user.id);
-            const initials = user.displayName
-              ? user.displayName
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('')
-                  .toUpperCase()
-                  .slice(0, 2)
-              : user.email[0].toUpperCase();
+            const initials = getInitials(user.displayName, user.email);
+            const avatarStyle = getAvatarStyle(user.id);
 
             return (
               <div
@@ -99,12 +94,16 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
                 className="bg-white rounded-lg border border-gray-200 p-4 flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-medium text-sm">
+                  <div 
+                    className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm"
+                    style={avatarStyle}
+                    title={getDisplayName(user.displayName, user.email)}
+                  >
                     {initials}
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">
-                      {user.displayName || user.email.split('@')[0]}
+                      {getDisplayName(user.displayName, user.email)}
                     </p>
                     <p className="text-sm text-gray-500">{user.email}</p>
                   </div>

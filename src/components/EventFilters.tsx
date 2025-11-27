@@ -14,13 +14,19 @@ interface ListOption {
   name: string;
 }
 
+interface CommunityOption {
+  id: string;
+  name: string;
+}
+
 interface EventFiltersProps {
   venues: Venue[];
   lists?: ListOption[];
+  communities?: CommunityOption[];
   showFriendsFilter?: boolean;
 }
 
-export function EventFilters({ venues, lists = [], showFriendsFilter = false }: EventFiltersProps) {
+export function EventFilters({ venues, lists = [], communities = [], showFriendsFilter = false }: EventFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -29,6 +35,7 @@ export function EventFilters({ venues, lists = [], showFriendsFilter = false }: 
   const [endDate, setEndDate] = useState(searchParams.get('endDate') || '');
   const [friendsGoing, setFriendsGoing] = useState(searchParams.get('friendsGoing') === 'true');
   const [listId, setListId] = useState(searchParams.get('listId') || '');
+  const [communityId, setCommunityId] = useState(searchParams.get('communityId') || '');
 
   const applyFilters = () => {
     const params = new URLSearchParams();
@@ -37,6 +44,7 @@ export function EventFilters({ venues, lists = [], showFriendsFilter = false }: 
     if (endDate) params.set('endDate', endDate);
     if (friendsGoing) params.set('friendsGoing', 'true');
     if (listId) params.set('listId', listId);
+    if (communityId) params.set('communityId', communityId);
     
     const queryString = params.toString();
     router.push(queryString ? `/?${queryString}` : '/');
@@ -48,10 +56,11 @@ export function EventFilters({ venues, lists = [], showFriendsFilter = false }: 
     setEndDate('');
     setFriendsGoing(false);
     setListId('');
+    setCommunityId('');
     router.push('/');
   };
 
-  const hasFilters = venueId || startDate || endDate || friendsGoing || listId;
+  const hasFilters = venueId || startDate || endDate || friendsGoing || listId || communityId;
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
@@ -122,9 +131,9 @@ export function EventFilters({ venues, lists = [], showFriendsFilter = false }: 
 
         {/* List Filter */}
         {showFriendsFilter && lists.length > 0 && (
-          <div className="flex-1 min-w-[160px]">
+          <div className="flex-1 min-w-[140px]">
             <label htmlFor="list" className="block text-sm font-medium text-gray-700 mb-1">
-              Filter by List
+              List
             </label>
             <select
               id="list"
@@ -132,11 +141,33 @@ export function EventFilters({ venues, lists = [], showFriendsFilter = false }: 
               onChange={(e) => setListId(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
             >
-              <option value="">All Events</option>
-              <option value="__all_lists__">Any List Member Going</option>
+              <option value="">All</option>
+              <option value="__all_lists__">Any List</option>
               {lists.map((list) => (
                 <option key={list.id} value={list.id}>
                   {list.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* Community Filter */}
+        {showFriendsFilter && communities.length > 0 && (
+          <div className="flex-1 min-w-[140px]">
+            <label htmlFor="community" className="block text-sm font-medium text-gray-700 mb-1">
+              Community
+            </label>
+            <select
+              id="community"
+              value={communityId}
+              onChange={(e) => setCommunityId(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
+            >
+              <option value="">All</option>
+              {communities.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
                 </option>
               ))}
             </select>
