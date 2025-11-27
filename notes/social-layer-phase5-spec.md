@@ -175,6 +175,15 @@ Redeem invite code after signup. Called automatically by auth flow.
 
 ## Future Enhancements (Not MVP)
 
+### Invite-Gated Signup (Priority)
+When ready for true invite-only:
+1. **Email-first flow**: User enters email on login page
+2. **Check existing user**: If email exists → proceed to OAuth sign-in
+3. **Check invite for new users**: If no invite code → "Request an invite" or waitlist
+4. **With invite code**: Show inviter name → proceed to OAuth → auto-friend
+
+This gates new signups while allowing existing users to sign in freely.
+
 ### Internal Sharing
 - "Share with Friend" button for platform users
 - Shows friend picker

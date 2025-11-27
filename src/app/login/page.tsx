@@ -1,17 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { getStoredReturnUrl } from '@/lib/invite';
+import { getStoredReturnUrl, getStoredInviteRef } from '@/lib/invite';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [message, setMessage] = useState('');
   const [returnUrl, setReturnUrl] = useState('/');
+  const [inviterName, setInviterName] = useState<string | null>(null);
+  const [loadingInvite, setLoadingInvite] = useState(true);
 
-  // Get return URL from query params or localStorage
+  // Get return URL and check for invite
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const next = params.get('next');
@@ -19,6 +18,27 @@ export default function LoginPage() {
     
     // Priority: query param > stored return URL > default
     setReturnUrl(next || storedReturn || '/');
+
+    // Check for invite code
+    async function checkInvite() {
+      const ref = getStoredInviteRef();
+      if (ref) {
+        try {
+          const response = await fetch(`/api/invites/${ref}`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.valid) {
+              setInviterName(data.inviterName);
+            }
+          }
+        } catch (error) {
+          console.error('Error checking invite:', error);
+        }
+      }
+      setLoadingInvite(false);
+    }
+
+    checkInvite();
   }, []);
 
   const handleGoogleLogin = async () => {
@@ -33,44 +53,34 @@ export default function LoginPage() {
     });
   };
 
-  const handleMagicLink = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus('loading');
-
-    const supabase = createClient();
-    const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(returnUrl)}`;
-    
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: callbackUrl,
-      },
-    });
-
-    if (error) {
-      setStatus('error');
-      setMessage(error.message);
-    } else {
-      setStatus('success');
-      setMessage('Check your email for the magic link!');
-    }
-  };
-
   return (
     <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link href="/" className="text-2xl font-bold text-gray-900">
-            Austin Events
+            RyesVP
           </Link>
-          <p className="text-gray-600 mt-2">Sign in to track events</p>
+          <p className="text-gray-600 mt-2">
+            Discover Austin events and go with friends
+          </p>
         </div>
 
+        {/* Invite Banner */}
+        {!loadingInvite && inviterName && (
+          <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg p-4 mb-4 text-center shadow-lg">
+            <p className="text-lg font-semibold">
+              🎉 {inviterName} invited you!
+            </p>
+            <p className="text-sm text-white/80 mt-1">
+              Sign up to connect and discover events together
+            </p>
+          </div>
+        )}
+
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          {/* Google OAuth Button */}
           <button
             onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors mb-6"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -81,60 +91,12 @@ export default function LoginPage() {
             <span className="font-medium text-gray-700">Continue with Google</span>
           </button>
 
-          <div className="relative mb-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">or</span>
-            </div>
-          </div>
-
-          {/* Magic Link Form */}
-          {status === 'success' ? (
-            <div className="text-center">
-              <div className="text-4xl mb-4">📧</div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">
-                Check your email
-              </h2>
-              <p className="text-gray-600">
-                We sent a magic link to <strong>{email}</strong>
-              </p>
-              <button
-                onClick={() => setStatus('idle')}
-                className="mt-4 text-sm text-blue-600 hover:underline"
-              >
-                Use a different email
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={handleMagicLink}>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email address
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              />
-              
-              {status === 'error' && (
-                <p className="mt-2 text-sm text-red-600">{message}</p>
-              )}
-
-              <button
-                type="submit"
-                disabled={status === 'loading'}
-                className="w-full mt-4 px-4 py-2 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-              >
-                {status === 'loading' ? 'Sending...' : 'Send magic link'}
-              </button>
-            </form>
-          )}
+          <p className="text-xs text-gray-500 text-center mt-4">
+            {inviterName 
+              ? `Sign up to connect with ${inviterName}`
+              : 'New here? Your account will be created automatically.'
+            }
+          </p>
         </div>
 
         <p className="text-center text-sm text-gray-500 mt-4">
