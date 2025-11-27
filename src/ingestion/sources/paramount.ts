@@ -110,8 +110,9 @@ export async function fetchEventsFromParamount(): Promise<NormalizedEvent[]> {
             // Create unique source event ID from production + performance
             const sourceEventId = performanceNo || prodSeasonNo;
             
-            // Infer category from title
-            const category = inferCategory(title, null) as EventCategory;
+            // Extract product type ID and map to category
+            const productTypeId = $perf.attr('data-tn-product-type-id');
+            const category = mapProductTypeToCategory(productTypeId, title);
             
             events.push({
               venueSlug: 'paramount-theatre',
@@ -152,6 +153,27 @@ export async function fetchEventsFromParamount(): Promise<NormalizedEvent[]> {
   }
 
   return events;
+}
+
+/**
+ * Map Paramount product type ID to event category
+ * Reference: notes/phase8-data-extraction-scope.md Section 2
+ */
+function mapProductTypeToCategory(productTypeId: string | undefined, title: string): EventCategory {
+  const mapping: Record<string, EventCategory> = {
+    '4': EventCategory.COMEDY,    // Comedy (from genre filter kid=4)
+    '5': EventCategory.OTHER,      // Film (from "Elf Pub Run", "The Holiday")
+    '13': EventCategory.CONCERT,   // Music (from genre filter kid=13)
+    '19': EventCategory.CONCERT,   // Music (from "Marc Broussard")
+    '20': EventCategory.OTHER,     // Special events (from "Home is Here", "Luna")
+  };
+  
+  if (productTypeId && mapping[productTypeId]) {
+    return mapping[productTypeId];
+  }
+  
+  // Fallback to text inference if product type ID not in mapping
+  return inferCategory(title, null) as EventCategory;
 }
 
 /**

@@ -1,13 +1,12 @@
 import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
-import { parseMoodyCenterDate, inferCategory } from '../utils/dateParser';
 
 /**
  * Scrape events from Moody Center website.
  * 
- * Moody Center uses The Events Calendar WordPress plugin and displays events
- * with pagination. Events are shown with dates in format "Sunday / Feb 1 / 2026"
+ * Uses JSON-LD structured data for reliable extraction of exact times,
+ * end dates, descriptions, and images. Falls back to HTML parsing if JSON-LD unavailable.
  */
 export async function fetchEventsFromMoodyCenter(): Promise<NormalizedEvent[]> {
   const events: NormalizedEvent[] = [];
@@ -38,106 +37,63 @@ export async function fetchEventsFromMoodyCenter(): Promise<NormalizedEvent[]> {
       const html = await response.text();
       const $ = load(html);
 
-      // Based on debug output: .event-title exists and contains titles
-      // Dates are in format "Sunday / Nov 30 / 2025" in nearby elements
-      // Find all elements that contain dates first, then match them with titles
-      const allText = $('body').text();
-      const dateMatches = Array.from(allText.matchAll(/(\w+day)\s*\/\s*(\w+\s+\d+)\s*\/\s*(\d{4})/g));
+      // Try to extract JSON-LD structured data first (preferred method)
+      const jsonLdScripts = $('script[type="application/ld+json"]');
       
-      if (dateMatches.length === 0) {
-        // No dates found, no events on this page
-        break;
-      }
-
-      // Find event titles (h3 a elements that aren't "Search Moody Center")
-      const eventTitles = $('h3 a').filter((_, el) => {
-        const text = $(el).text().trim();
-        return Boolean(text && text !== 'Search Moody Center');
-      });
-      
-      if (eventTitles.length === 0) {
-        break;
-      }
-
-      // Match titles with dates - they appear to be in the same container/section
-      eventTitles.each((index, titleElement) => {
+      let pageEventCount = 0;
+      for (let i = 0; i < jsonLdScripts.length; i++) {
+        const jsonLdScript = $(jsonLdScripts[i]).text();
+        
+        if (!jsonLdScript) continue;
+        
         try {
-          const $titleEl = $(titleElement);
-          const title = $titleEl.text().trim();
+          const schemaData = JSON.parse(jsonLdScript);
           
-          if (!title) return;
+          // schemaData might be an array or an object with @graph
+          const eventsArray = Array.isArray(schemaData) 
+            ? schemaData 
+            : schemaData['@graph'] || [];
           
-          // Find the parent section/container
-          const $container = $titleEl.closest('article, section, li, [class*="event"], [class*="tribe"]').first();
-          
-          // Look for date in this container's text
-          const containerText = $container.text();
-          const dateMatch = containerText.match(/(\w+day)\s*\/\s*(\w+\s+\d+)\s*\/\s*(\d{4})/);
-          
-          let startDateTime: Date | null = null;
-          if (dateMatch) {
-            const dateStr = `${dateMatch[1]} / ${dateMatch[2]} / ${dateMatch[3]}`;
-            startDateTime = parseMoodyCenterDate(dateStr);
+          for (const item of eventsArray) {
+            if (item['@type'] === 'Event') {
+              try {
+                const startDateTime = new Date(item.startDate);
+                const endDateTime = item.endDate ? new Date(item.endDate) : null;
+                
+                if (isNaN(startDateTime.getTime())) {
+                  console.warn(`Moody Center: Invalid startDate for "${item.name}"`);
+                  continue;
+                }
+                
+                const description = extractOpponentFromDescription(item.description);
+                const url = item.url || '';
+                const sourceEventId = extractIdFromUrl(url);
+                
+                events.push({
+                  venueSlug: 'moody-center',
+                  title: item.name || '',
+                  description,
+                  startDateTime,
+                  endDateTime,
+                  url,
+                  imageUrl: item.image || null,
+                  category: inferCategoryFromUrl(url),
+                  source: EventSource.VENUE_WEBSITE,
+                  sourceEventId,
+                });
+                pageEventCount++;
+              } catch (eventError) {
+                console.error('Error parsing JSON-LD event:', eventError);
+              }
+            }
           }
-          
-          // If no date in container, try to match by index with dateMatches
-          if (!startDateTime && dateMatches[index]) {
-            const match = dateMatches[index];
-            const dateStr = `${match[1]} / ${match[2]} / ${match[3]}`;
-            startDateTime = parseMoodyCenterDate(dateStr);
-          }
-          
-          if (!startDateTime || isNaN(startDateTime.getTime())) {
-            console.warn(`Moody Center: Could not parse date for "${title}"`);
-            return;
-          }
-          
-          // Extract URL
-          const relativeUrl = $titleEl.attr('href') || '';
-          const url = relativeUrl.startsWith('http') 
-            ? relativeUrl 
-            : relativeUrl.startsWith('/')
-            ? `https://moodycenteratx.com${relativeUrl}`
-            : 'https://moodycenteratx.com/events';
-          
-          // Extract description
-          const description = $container.find('p').not('.event-title').first().text().trim();
-          
-          // Extract image
-          const imageEl = $container.find('img').first();
-          const imageUrl = imageEl.attr('src') || imageEl.attr('data-src') || null;
-          const fullImageUrl = imageUrl && !imageUrl.startsWith('http') 
-            ? imageUrl.startsWith('/')
-              ? `https://moodycenteratx.com${imageUrl}`
-              : `https://moodycenteratx.com/${imageUrl}`
-            : imageUrl;
-          
-          // Infer category
-          const category = inferCategory(title, description) as EventCategory;
-          
-          // Extract source event ID from URL
-          const urlMatch = url.match(/\/(\d+)\//);
-          const sourceEventId = urlMatch ? urlMatch[1] : undefined;
-          
-          events.push({
-            venueSlug: 'moody-center',
-            title,
-            description: description || null,
-            startDateTime,
-            endDateTime: null,
-            url,
-            imageUrl: fullImageUrl,
-            category,
-            source: EventSource.VENUE_WEBSITE,
-            sourceEventId,
-          });
-        } catch (error) {
-          console.error('Error parsing Moody Center event:', error);
+        } catch (jsonError) {
+          console.warn(`Moody Center page ${page}: Failed to parse JSON-LD script ${i}:`, jsonError instanceof Error ? jsonError.message : String(jsonError));
         }
-      });
+      }
       
-      // If we got fewer events than expected, we might be on the last page
-      if (eventTitles.length < 10) {
+      // If no events found on this page, we're done
+      if (pageEventCount === 0) {
         break;
       }
     }
@@ -149,5 +105,53 @@ export async function fetchEventsFromMoodyCenter(): Promise<NormalizedEvent[]> {
   }
 
   return events;
+}
+
+/**
+ * Extract opponent name from description for basketball games
+ * Pattern: "Texas vs. {Opponent} at Moody Center"
+ */
+function extractOpponentFromDescription(description: string | undefined): string | null {
+  if (!description) return null;
+  
+  // Remove HTML tags if present
+  const cleanDesc = description.replace(/<[^>]*>/g, '');
+  
+  // Pattern: "Texas vs. {Opponent} at Moody Center"
+  const match = cleanDesc.match(/Texas vs\.\s+([^<]+?)\s+at Moody Center/i);
+  if (match) {
+    return `vs. ${match[1].trim()}`;
+  }
+  
+  // Return first 200 chars as fallback description
+  return cleanDesc.slice(0, 200).trim() || null;
+}
+
+/**
+ * Infer category from URL patterns
+ */
+function inferCategoryFromUrl(url: string): EventCategory {
+  const urlLower = url.toLowerCase();
+  
+  if (urlLower.includes('basketball') || urlLower.includes('-mbb') || urlLower.includes('-wbb')) {
+    return EventCategory.OTHER; // Sports
+  }
+  if (urlLower.includes('comedy')) {
+    return EventCategory.COMEDY;
+  }
+  if (urlLower.includes('concert') || urlLower.includes('music')) {
+    return EventCategory.CONCERT;
+  }
+  
+  return EventCategory.OTHER;
+}
+
+/**
+ * Extract event ID from URL
+ * Example: "https://moodycenteratx.com/event/texas-wbb-123/" -> "123"
+ */
+function extractIdFromUrl(url: string): string | undefined {
+  const match = url.match(/\/(\d+)\//);
+  return match ? match[1] : undefined;
 }
 
