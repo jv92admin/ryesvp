@@ -112,6 +112,12 @@ export async function fetchEventsFromParamount(): Promise<NormalizedEvent[]> {
             
             // Extract product type ID and map to category
             const productTypeId = $perf.attr('data-tn-product-type-id');
+            
+            // Log product type IDs we encounter (for debugging category mapping)
+            if (productTypeId && !['4', '5', '9', '13', '18', '19', '20', '25'].includes(productTypeId)) {
+              console.log(`Paramount: Unknown product type ID ${productTypeId} for "${title}"`);
+            }
+            
             const category = mapProductTypeToCategory(productTypeId, title);
             
             events.push({
@@ -163,17 +169,28 @@ function mapProductTypeToCategory(productTypeId: string | undefined, title: stri
   const mapping: Record<string, EventCategory> = {
     '4': EventCategory.COMEDY,    // Comedy (from genre filter kid=4)
     '5': EventCategory.OTHER,      // Film (from "Elf Pub Run", "The Holiday")
+    '9': EventCategory.OTHER,      // Merchandise/Badges (from "Moontower Badges 2026")
     '13': EventCategory.CONCERT,   // Music (from genre filter kid=13)
+    '18': EventCategory.CONCERT,   // Music (from "Tommy Emmanuel CGP")
     '19': EventCategory.CONCERT,   // Music (from "Marc Broussard")
     '20': EventCategory.OTHER,     // Special events (from "Home is Here", "Luna")
+    '25': EventCategory.CONCERT,   // Music (from "Los Lonely Boys")
   };
   
   if (productTypeId && mapping[productTypeId]) {
     return mapping[productTypeId];
   }
   
-  // Fallback to text inference if product type ID not in mapping
-  return inferCategory(title, null) as EventCategory;
+  // If no product type ID, try to infer from title
+  // This handles cases where product type ID is missing or unknown
+  const inferred = inferCategory(title, null) as EventCategory;
+  
+  // Log when we fall back to inference (helps identify missing mappings)
+  if (productTypeId) {
+    console.log(`Paramount: Product type ID ${productTypeId} not mapped for "${title}", using inferred category: ${inferred}`);
+  }
+  
+  return inferred;
 }
 
 /**
