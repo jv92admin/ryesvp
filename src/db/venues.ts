@@ -19,3 +19,8 @@ export async function getVenueBySlug(slug: string): Promise<Venue | null> {
   });
 }
 
+// Alias for consistency with task naming
+export async function getAllVenues(): Promise<Venue[]> {
+  return getVenues();
+}
+

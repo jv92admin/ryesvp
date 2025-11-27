@@ -11,6 +11,7 @@ export interface GetEventsParams {
   status?: EventStatus;
   limit?: number;
   offset?: number;
+  friendsGoing?: boolean;
 }
 
 export async function getEvents(params: GetEventsParams = {}): Promise<EventWithVenue[]> {
@@ -20,8 +21,9 @@ export async function getEvents(params: GetEventsParams = {}): Promise<EventWith
     category,
     venueId,
     status = 'SCHEDULED',
-    limit = 50,
+    limit = 1000,
     offset = 0,
+    friendsGoing = false,
   } = params;
 
   const where: Record<string, unknown> = {};
@@ -94,5 +96,29 @@ export function groupEventsByDate(events: EventWithVenue[]): Map<string, EventWi
   }
   
   return grouped;
+}
+
+export async function getEventsWithAttendance(params: GetEventsParams = {}): Promise<EventWithVenue[]> {
+  const events = await getEvents(params);
+  
+  if (!params.friendsGoing) {
+    return events;
+  }
+  
+  // Filter to only events that have at least one UserEvent with GOING or INTERESTED status
+  const eventsWithAttendance = await prisma.event.findMany({
+    where: {
+      id: { in: events.map(e => e.id) },
+      userEvents: { 
+        some: { 
+          status: { in: ['GOING', 'INTERESTED'] }
+        } 
+      },
+    },
+    include: { venue: true },
+    orderBy: { startDateTime: 'asc' },
+  });
+  
+  return eventsWithAttendance;
 }
 

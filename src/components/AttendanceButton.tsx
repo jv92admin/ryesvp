@@ -124,9 +124,9 @@ export function AttendanceButton({
             onBlur={handleCommentSave}
             placeholder="e.g., Section 105, Row F, Seat 9"
             rows={2}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm text-gray-900"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-600 mt-1">
             Comment saves automatically when you click away
           </p>
         </div>

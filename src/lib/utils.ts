@@ -1,16 +1,23 @@
 import { format, formatDistanceToNow, isToday, isTomorrow, isThisWeek } from 'date-fns';
+import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
+
+// Austin, TX is in Central Time (America/Chicago)
+const AUSTIN_TIMEZONE = 'America/Chicago';
 
 export function formatEventDate(date: Date): string {
-  if (isToday(date)) {
-    return `Today at ${format(date, 'h:mm a')}`;
+  // Convert to Central Time for display
+  const centralTime = toZonedTime(date, AUSTIN_TIMEZONE);
+  
+  if (isToday(centralTime)) {
+    return `Today at ${formatInTimeZone(date, AUSTIN_TIMEZONE, 'h:mm a')}`;
   }
-  if (isTomorrow(date)) {
-    return `Tomorrow at ${format(date, 'h:mm a')}`;
+  if (isTomorrow(centralTime)) {
+    return `Tomorrow at ${formatInTimeZone(date, AUSTIN_TIMEZONE, 'h:mm a')}`;
   }
-  if (isThisWeek(date)) {
-    return format(date, "EEEE 'at' h:mm a"); // "Friday at 8:00 PM"
+  if (isThisWeek(centralTime)) {
+    return formatInTimeZone(date, AUSTIN_TIMEZONE, "EEEE 'at' h:mm a"); // "Friday at 8:00 PM"
   }
-  return format(date, "EEE, MMM d 'at' h:mm a"); // "Fri, Jan 15 at 8:00 PM"
+  return formatInTimeZone(date, AUSTIN_TIMEZONE, "EEE, MMM d 'at' h:mm a"); // "Fri, Jan 15 at 8:00 PM"
 }
 
 export function formatDateHeading(dateString: string): string {

@@ -6,7 +6,9 @@ import { AttendanceButton } from '@/components/AttendanceButton';
 import { getCurrentUser } from '@/lib/auth';
 import { getUserEventByEventId } from '@/db/userEvents';
 import { getEventAttendance } from '@/db/userEvents';
-import { format } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
+
+const AUSTIN_TIMEZONE = 'America/Chicago';
 
 interface EventPageProps {
   params: Promise<{ id: string }>;
@@ -76,11 +78,11 @@ export default async function EventPage({ params }: EventPageProps) {
               <span className="text-xl">📅</span>
               <div>
                 <p className="font-medium text-gray-900">
-                  {format(event.startDateTime, 'EEEE, MMMM d, yyyy')}
+                  {formatInTimeZone(event.startDateTime, AUSTIN_TIMEZONE, 'EEEE, MMMM d, yyyy')}
                 </p>
                 <p className="text-sm">
-                  {format(event.startDateTime, 'h:mm a')}
-                  {event.endDateTime && ` - ${format(event.endDateTime, 'h:mm a')}`}
+                  {formatInTimeZone(event.startDateTime, AUSTIN_TIMEZONE, 'h:mm a')}
+                  {event.endDateTime && ` - ${formatInTimeZone(event.endDateTime, AUSTIN_TIMEZONE, 'h:mm a')}`}
                 </p>
               </div>
             </div>

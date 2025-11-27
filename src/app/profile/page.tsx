@@ -67,7 +67,7 @@ export default async function ProfilePage() {
                           <div key={event.id}>
                             <EventCard event={event} />
                             {userEvent?.comment && (
-                              <div className="ml-4 mt-1 text-sm text-gray-600">
+                              <div className="ml-4 mt-1 text-sm text-gray-900">
                                 💬 {userEvent.comment}
                               </div>
                             )}
@@ -107,7 +107,7 @@ export default async function ProfilePage() {
                           <div key={event.id}>
                             <EventCard event={event} />
                             {userEvent?.comment && (
-                              <div className="ml-4 mt-1 text-sm text-gray-600">
+                              <div className="ml-4 mt-1 text-sm text-gray-900">
                                 💬 {userEvent.comment}
                               </div>
                             )}
