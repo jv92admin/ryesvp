@@ -18,6 +18,7 @@ export type EnrichmentPreview = {
 
 // Social signals for an event
 export type EventSocialSignals = {
+  userStatus: 'GOING' | 'INTERESTED' | null; // Current user's attendance status
   friendsGoing: number;
   friendsInterested: number;
   communitiesGoing: { communityId: string; communityName: string; count: number }[];
@@ -36,10 +37,11 @@ export interface GetEventsParams {
   status?: EventStatus;
   limit?: number;
   offset?: number;
+  myEvents?: boolean; // Filter to user's own events (GOING or INTERESTED)
   friendsGoing?: boolean;
   listId?: string; // Filter by list members going
   communityId?: string; // Filter by community members going
-  userId?: string; // Required when friendsGoing, listId, or communityId is set
+  userId?: string; // Required when myEvents, friendsGoing, listId, or communityId is set
 }
 
 export async function getEvents(params: GetEventsParams = {}): Promise<EventWithVenue[]> {
@@ -131,12 +133,30 @@ export async function getEventsWithAttendance(params: GetEventsParams = {}): Pro
   const events = await getEvents(params);
   
   // No social filtering needed
-  if (!params.friendsGoing && !params.listId && !params.communityId) {
+  if (!params.myEvents && !params.friendsGoing && !params.listId && !params.communityId) {
     return events;
   }
   
   if (!params.userId) {
     return events;
+  }
+  
+  // Special case: myEvents filters to user's own events
+  if (params.myEvents) {
+    const filteredEvents = await prisma.event.findMany({
+      where: {
+        id: { in: events.map(e => e.id) },
+        userEvents: { 
+          some: { 
+            userId: params.userId,
+            status: { in: ['GOING', 'INTERESTED'] }
+          } 
+        },
+      },
+      include: { venue: true },
+      orderBy: { startDateTime: 'asc' },
+    });
+    return filteredEvents;
   }
   
   // Determine which user IDs to filter by
@@ -203,10 +223,31 @@ export async function getEventSocialSignals(
   // Initialize all events with empty signals
   for (const id of eventIds) {
     signalsMap.set(id, {
+      userStatus: null,
       friendsGoing: 0,
       friendsInterested: 0,
       communitiesGoing: [],
     });
+  }
+  
+  // Get user's own attendance status for these events
+  const userAttendance = await prisma.userEvent.findMany({
+    where: {
+      eventId: { in: eventIds },
+      userId: userId,
+      status: { in: ['GOING', 'INTERESTED'] },
+    },
+    select: {
+      eventId: true,
+      status: true,
+    },
+  });
+  
+  for (const att of userAttendance) {
+    const signals = signalsMap.get(att.eventId);
+    if (signals) {
+      signals.userStatus = att.status as 'GOING' | 'INTERESTED';
+    }
   }
   
   // Get friend IDs

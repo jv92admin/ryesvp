@@ -98,9 +98,19 @@ export function EventCard({ event }: EventCardProps) {
               {formatEventDate(event.startDateTime)}
             </p>
             
-            {/* Social Signals (friends/communities) */}
-            {social && (social.friendsGoing > 0 || social.friendsInterested > 0 || social.communitiesGoing.length > 0) && (
+            {/* Social Signals (user status, friends, communities) */}
+            {social && (social.userStatus || social.friendsGoing > 0 || social.friendsInterested > 0 || social.communitiesGoing.length > 0) && (
               <div className="flex flex-wrap items-center gap-2 mt-2">
+                {/* User's own status */}
+                {social.userStatus && (
+                  <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded-full ${
+                    social.userStatus === 'GOING' 
+                      ? 'bg-emerald-100 text-emerald-700' 
+                      : 'bg-amber-100 text-amber-700'
+                  }`}>
+                    {social.userStatus === 'GOING' ? '✓ You\'re going' : '★ You\'re interested'}
+                  </span>
+                )}
                 {social.friendsGoing > 0 && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">
                     👥 {social.friendsGoing} friend{social.friendsGoing !== 1 ? 's' : ''} going

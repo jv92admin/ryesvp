@@ -18,6 +18,7 @@ interface HomePageProps {
     venueId?: string;
     startDate?: string;
     endDate?: string;
+    myEvents?: string;
     friendsGoing?: string;
     listId?: string;
     communityId?: string;
@@ -40,6 +41,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     venueId: params.venueId || undefined,
     startDate: params.startDate ? new Date(params.startDate) : undefined,
     endDate: params.endDate ? new Date(params.endDate + 'T23:59:59') : undefined,
+    myEvents: user ? params.myEvents === 'true' : false,
     friendsGoing: user ? params.friendsGoing === 'true' : false,
     listId: user ? params.listId || undefined : undefined,
     communityId: user ? params.communityId || undefined : undefined,
@@ -85,6 +87,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                   venueId: params.venueId,
                   startDate: params.startDate,
                   endDate: params.endDate,
+                  myEvents: params.myEvents === 'true',
                   friendsGoing: params.friendsGoing === 'true',
                   listId: params.listId,
                   communityId: params.communityId,
@@ -96,9 +99,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <aside className="lg:w-80 flex-shrink-0">
               <div className="lg:sticky lg:top-4">
                 <SocialSidebar isLoggedIn={!!user} />
-              </div>
+                  </div>
             </aside>
-          </div>
+            </div>
         </div>
       </main>
     </>

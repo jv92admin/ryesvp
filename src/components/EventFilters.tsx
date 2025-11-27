@@ -32,6 +32,7 @@ export function EventFilters({ venues, lists = [], communities = [], showFriends
   
   // Derive initial values from searchParams
   const getInitialFriendsValue = () => {
+    if (searchParams.get('myEvents') === 'true') return '__my_events__';
     if (searchParams.get('friendsGoing') === 'true') return '__all_friends__';
     return searchParams.get('listId') || '';
   };
@@ -59,7 +60,9 @@ export function EventFilters({ venues, lists = [], communities = [], showFriends
     if (endDate) params.set('endDate', endDate);
     
     // Handle friends filter
-    if (friendsValue === '__all_friends__') {
+    if (friendsValue === '__my_events__') {
+      params.set('myEvents', 'true');
+    } else if (friendsValue === '__all_friends__') {
       params.set('friendsGoing', 'true');
     } else if (friendsValue) {
       params.set('listId', friendsValue);
@@ -146,6 +149,7 @@ export function EventFilters({ venues, lists = [], communities = [], showFriends
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
             >
               <option value="">Everyone</option>
+              <option value="__my_events__">My Events</option>
               <option value="__all_friends__">All Friends</option>
               {lists.length > 0 && (
                 <>

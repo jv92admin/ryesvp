@@ -12,6 +12,7 @@ interface EventListWithPaginationProps {
     venueId?: string;
     startDate?: string;
     endDate?: string;
+    myEvents?: boolean;
     friendsGoing?: boolean;
     listId?: string;
     communityId?: string;
@@ -42,6 +43,7 @@ export function EventListWithPagination({
     if (filters.venueId) params.set('venueId', filters.venueId);
     if (filters.startDate) params.set('startDate', filters.startDate);
     if (filters.endDate) params.set('endDate', filters.endDate);
+    if (filters.myEvents) params.set('myEvents', 'true');
     if (filters.friendsGoing) params.set('friendsGoing', 'true');
     if (filters.listId) params.set('listId', filters.listId);
     if (filters.communityId) params.set('communityId', filters.communityId);

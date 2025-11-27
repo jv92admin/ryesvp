@@ -120,7 +120,8 @@ export function CommunityDetailContent({ communityId }: CommunityDetailContentPr
         body: JSON.stringify({ isVisible: !membership.isVisible }),
       });
       if (!res.ok) throw new Error('Failed to update visibility');
-      await fetchCommunity();
+      // Refresh both community data and events to reflect new visibility
+      await Promise.all([fetchCommunity(), fetchEvents()]);
     } catch (err) {
       console.error('Error toggling visibility:', err);
     }

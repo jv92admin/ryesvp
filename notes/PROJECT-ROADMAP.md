@@ -17,9 +17,35 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 | # | Item | Spec | Est. Time | Status |
 |---|------|------|-----------|--------|
-| 1 | **Enrichment Refinement** | `data-enrichment-spec.md` | 1-2 hrs | 🔲 Next |
-| 2 | **Artist Caching** | `data-enrichment-spec.md` | 1 hr | 🔲 Pending |
-| 3 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
+| 1 | **Delete Account** | See below | 2-3 hrs | 🔲 Next |
+| 2 | **Enrichment Refinement** | `data-enrichment-spec.md` | 1-2 hrs | 🔲 Pending |
+| 3 | **Artist Caching** | `data-enrichment-spec.md` | 1 hr | 🔲 Pending |
+| 4 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
+
+---
+
+## Delete Account Feature
+
+**Why priority?** Critical for user trust, GDPR compliance, and app store requirements. Better to implement early before data model complexity grows.
+
+**Scope:**
+- [ ] Settings page with "Delete Account" section
+- [ ] Confirmation modal ("Type DELETE to confirm")
+- [ ] API endpoint: `DELETE /api/users/me`
+- [ ] Cascade delete all user data:
+  - UserEvents (RSVPs)
+  - Friendships (sent & received)
+  - List memberships
+  - Owned Lists (delete or transfer?)
+  - Community memberships
+  - Invite codes & redemptions
+- [ ] Delete Supabase Auth user
+- [ ] Logout and redirect to home
+
+**Future enhancements:**
+- Data export before deletion (GDPR portability)
+- Grace period / soft delete with recovery window
+- Email confirmation before deletion
 
 ---
 

@@ -241,9 +241,11 @@ export function SocialSidebar({ isLoggedIn }: SocialSidebarProps) {
       <div className="bg-white border border-gray-200 rounded-lg p-4">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-gray-900">Your Events</h3>
-          <Link href="/profile" className="text-sm text-blue-600 hover:underline">
-            View All
-          </Link>
+          {data.myEvents.length > 0 && (
+            <Link href="/?myEvents=true" className="text-sm text-blue-600 hover:underline">
+              View All
+            </Link>
+          )}
         </div>
 
         {data.myEvents.length === 0 ? (
@@ -258,6 +260,15 @@ export function SocialSidebar({ isLoggedIn }: SocialSidebarProps) {
                 href={`/events/${ue.event.id}`}
                 className="block p-2 -mx-2 rounded-lg hover:bg-gray-50 transition-colors"
               >
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${
+                    ue.status === 'GOING' 
+                      ? 'bg-emerald-100 text-emerald-700' 
+                      : 'bg-amber-100 text-amber-700'
+                  }`}>
+                    {ue.status === 'GOING' ? '✓ Going' : '★ Interested'}
+                  </span>
+                </div>
                 <p className="text-sm font-medium text-gray-900 line-clamp-1">
                   {ue.event.title}
                 </p>

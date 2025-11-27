@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
   const venueId = searchParams.get('venueId') || undefined;
   const startDate = searchParams.get('startDate');
   const endDate = searchParams.get('endDate');
+  const myEvents = searchParams.get('myEvents') === 'true';
   const friendsGoing = searchParams.get('friendsGoing') === 'true';
   const listId = searchParams.get('listId') || undefined;
   const communityId = searchParams.get('communityId') || undefined;
@@ -26,6 +27,7 @@ export async function GET(request: NextRequest) {
     venueId,
     startDate: startDate ? new Date(startDate) : undefined,
     endDate: endDate ? new Date(endDate + 'T23:59:59') : undefined,
+    myEvents: user ? myEvents : false,
     friendsGoing: user ? friendsGoing : false,
     listId: user ? listId : undefined,
     communityId: user ? communityId : undefined,
