@@ -15,6 +15,12 @@ export function ProfileContent() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  
+  // Delete account state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -63,6 +69,28 @@ export function ProfileContent() {
       setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to save' });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'DELETE') return;
+    
+    setDeleting(true);
+    setDeleteError(null);
+
+    try {
+      const res = await fetch('/api/users/me', { method: 'DELETE' });
+
+      if (!res.ok) {
+        const json = await res.json();
+        throw new Error(json.error || 'Failed to delete account');
+      }
+
+      // Redirect to home page after successful deletion
+      window.location.href = '/';
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : 'Failed to delete account');
+      setDeleting(false);
     }
   };
 
@@ -164,6 +192,97 @@ export function ProfileContent() {
           Email cannot be changed
         </p>
       </div>
+
+      {/* Danger Zone */}
+      <div className="bg-white rounded-xl border-2 border-red-200 p-6">
+        <h2 className="text-sm font-semibold text-red-600 uppercase tracking-wide mb-4">
+          Danger Zone
+        </h2>
+        <p className="text-gray-700 mb-4">
+          Permanently delete your account and all associated data. This action cannot be undone.
+        </p>
+        <button
+          onClick={() => setShowDeleteModal(true)}
+          className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
+        >
+          Delete Account
+        </button>
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              Delete Your Account?
+            </h3>
+            <p className="text-gray-600 mb-4">
+              This will permanently delete:
+            </p>
+            <ul className="text-sm text-gray-600 mb-4 space-y-1">
+              <li className="flex items-center gap-2">
+                <span className="text-red-500">•</span>
+                Your profile and display name
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-red-500">•</span>
+                All event RSVPs (going/interested)
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-red-500">•</span>
+                All friendships and friend requests
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-red-500">•</span>
+                Lists and communities you own
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-red-500">•</span>
+                All community memberships
+              </li>
+            </ul>
+            
+            <p className="text-sm text-gray-700 mb-2">
+              Type <span className="font-mono font-bold text-red-600">DELETE</span> to confirm:
+            </p>
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="Type DELETE"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4 font-mono"
+              autoFocus
+            />
+
+            {deleteError && (
+              <div className="mb-4 p-3 rounded-lg text-sm bg-red-50 text-red-700">
+                {deleteError}
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeleteConfirmText('');
+                  setDeleteError(null);
+                }}
+                disabled={deleting}
+                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== 'DELETE' || deleting}
+                className="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deleting ? 'Deleting...' : 'Delete Forever'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
