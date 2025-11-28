@@ -17,35 +17,26 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 | # | Item | Spec | Est. Time | Status |
 |---|------|------|-----------|--------|
-| 1 | **Delete Account** | See below | 2-3 hrs | 🔲 Next |
-| 2 | **Enrichment Refinement** | `data-enrichment-spec.md` | 1-2 hrs | 🔲 Pending |
-| 3 | **Artist Caching** | `data-enrichment-spec.md` | 1 hr | 🔲 Pending |
-| 4 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
+| 1 | **LLM-First Enrichment** | `data-enrichment-spec.md` | 2-3 hrs | 🔲 Next |
+| 2 | **Artist Caching** | `data-enrichment-spec.md` | 1 hr | 🔲 After LLM |
+| 3 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
+| 4 | **Ticketmaster/SeatGeek APIs** | `data-enrichment-spec.md` | TBD | 🔲 Explore |
 
 ---
 
-## Delete Account Feature
+## Delete Account Feature ✅ COMPLETE
 
-**Why priority?** Critical for user trust, GDPR compliance, and app store requirements. Better to implement early before data model complexity grows.
-
-**Scope:**
-- [ ] Settings page with "Delete Account" section
-- [ ] Confirmation modal ("Type DELETE to confirm")
-- [ ] API endpoint: `DELETE /api/users/me`
-- [ ] Cascade delete all user data:
-  - UserEvents (RSVPs)
-  - Friendships (sent & received)
-  - List memberships
-  - Owned Lists (delete or transfer?)
-  - Community memberships
-  - Invite codes & redemptions
-- [ ] Delete Supabase Auth user
-- [ ] Logout and redirect to home
+- [x] Settings page with "Delete Account" section (Danger Zone)
+- [x] Confirmation modal ("Type DELETE to confirm")
+- [x] API endpoint: `DELETE /api/users/me`
+- [x] Cascade delete all user data (UserEvents, Friendships, Lists, Communities, Invites)
+- [x] Clear `ListMember.invitedById` references before delete
+- [x] Delete Supabase Auth user (if service role key available)
+- [x] Logout and redirect to home
 
 **Future enhancements:**
 - Data export before deletion (GDPR portability)
 - Grace period / soft delete with recovery window
-- Email confirmation before deletion
 
 ---
 
@@ -84,15 +75,25 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 - [x] Auto-friend on signup via invite
 - [x] Simplified login to Google OAuth only
 
+### Delete Account ✅
+- [x] Danger Zone section in Profile Settings
+- [x] Confirmation modal (type DELETE to confirm)
+- [x] `DELETE /api/users/me` endpoint
+- [x] Cascade delete all user data
+- [x] Supabase Auth deletion (with service role key)
+
 ---
 
-## Next Up: Infrastructure & Refinement
+## Next Up: LLM-First Enrichment
 
-**Enrichment Refinement** - Fix fuzzy category matches, improve accuracy.
+**Problem:** Current KG-first enrichment struggles with:
+- Context blindness ("Couch" band → furniture wiki)
+- Generic events ("Gospel Brunch", "Texas WBB")
+- Sports/local acts
 
-**Scheduled Jobs** - Automate scraping and enrichment via cron.
+**Solution:** LLM categorizes first, then targeted API lookups.
 
-See respective spec docs for details.
+See `data-enrichment-spec.md` for full details.
 
 ---
 
@@ -137,12 +138,22 @@ See respective spec docs for details.
   - Quick invite link copy
 - Two-column responsive layout
 
+### Sprint: Delete Account (Complete ✅)
+- [x] DELETE /api/users/me endpoint
+- [x] Danger Zone UI + confirmation modal
+- [x] Cascade delete + Supabase Auth cleanup
+
+### Sprint: LLM Enrichment (Next)
+- [ ] OpenAI/Gemini integration
+- [ ] LLM-first categorization
+- [ ] Targeted Spotify/KG lookups
+- [ ] Artist caching
+
 ### Sprint: Infrastructure (Future)
 - [ ] Scheduled jobs (cron)
-- [ ] Artist caching
-- [ ] Enrichment refinement
+- [ ] Ticketmaster/SeatGeek exploration
 
 ---
 
-**Last Updated:** November 27, 2024
+**Last Updated:** November 28, 2024
 

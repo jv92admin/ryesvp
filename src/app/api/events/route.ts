@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getEventsWithSocialSignals } from '@/db/events';
 import { getCurrentUser } from '@/lib/auth';
+import { EventCategory } from '@prisma/client';
 
 const PAGE_SIZE = 50;
 
@@ -12,8 +13,15 @@ export async function GET(request: NextRequest) {
   const offset = parseInt(searchParams.get('offset') || '0', 10);
   const limit = parseInt(searchParams.get('limit') || String(PAGE_SIZE), 10);
   
-  // Filters
-  const venueId = searchParams.get('venueId') || undefined;
+  // Filters - support both single and multi-select
+  const venueIdsParam = searchParams.get('venueIds');
+  const venueIds = venueIdsParam ? venueIdsParam.split(',').filter(Boolean) : undefined;
+  
+  const categoriesParam = searchParams.get('categories');
+  const categories = categoriesParam 
+    ? categoriesParam.split(',').filter(Boolean) as EventCategory[]
+    : undefined;
+  
   const startDate = searchParams.get('startDate');
   const endDate = searchParams.get('endDate');
   const myEvents = searchParams.get('myEvents') === 'true';
@@ -24,7 +32,8 @@ export async function GET(request: NextRequest) {
   const user = await getCurrentUser();
   
   const events = await getEventsWithSocialSignals({
-    venueId,
+    venueIds,
+    categories,
     startDate: startDate ? new Date(startDate) : undefined,
     endDate: endDate ? new Date(endDate + 'T23:59:59') : undefined,
     myEvents: user ? myEvents : false,

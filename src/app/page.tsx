@@ -9,6 +9,7 @@ import { SetNameBanner } from '@/components/SetNameBanner';
 import { SocialSidebar } from '@/components/SocialSidebar';
 import { InviteBanner } from '@/components/InviteBanner';
 import { getCurrentUser } from '@/lib/auth';
+import { EventCategory } from '@prisma/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +18,8 @@ const PAGE_SIZE = 50;
 interface HomePageProps {
   searchParams: Promise<{
     venueId?: string;
+    venueIds?: string;
+    categories?: string;
     startDate?: string;
     endDate?: string;
     myEvents?: string;
@@ -37,18 +40,25 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       ])
     : [[], []];
   
+  // Parse multi-select params
+  const venueIds = params.venueIds ? params.venueIds.split(',').filter(Boolean) : undefined;
+  const categories = params.categories 
+    ? params.categories.split(',').filter(Boolean) as EventCategory[]
+    : undefined;
+  
   // Get first page of events with social signals
   const events = await getEventsWithSocialSignals({
-        venueId: params.venueId || undefined,
-        startDate: params.startDate ? new Date(params.startDate) : undefined,
-        endDate: params.endDate ? new Date(params.endDate + 'T23:59:59') : undefined,
+    venueIds,
+    categories,
+    startDate: params.startDate ? new Date(params.startDate) : undefined,
+    endDate: params.endDate ? new Date(params.endDate + 'T23:59:59') : undefined,
     myEvents: user ? params.myEvents === 'true' : false,
     friendsGoing: user ? params.friendsGoing === 'true' : false,
     listId: user ? params.listId || undefined : undefined,
     communityId: user ? params.communityId || undefined : undefined,
     userId: user?.dbUser.id || '',
     limit: PAGE_SIZE + 1, // Fetch one extra to check if more exist
-      });
+  });
   
   const hasMore = events.length > PAGE_SIZE;
   const initialEvents = hasMore ? events.slice(0, -1) : events;
@@ -86,7 +96,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 initialEvents={initialEvents}
                 initialHasMore={hasMore}
                 filters={{
-                  venueId: params.venueId,
+                  venueIds: params.venueIds,
+                  categories: params.categories,
                   startDate: params.startDate,
                   endDate: params.endDate,
                   myEvents: params.myEvents === 'true',

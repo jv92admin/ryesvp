@@ -9,7 +9,8 @@ interface EventListWithPaginationProps {
   initialEvents: EventWithSocial[];
   initialHasMore: boolean;
   filters: {
-    venueId?: string;
+    venueIds?: string;
+    categories?: string;
     startDate?: string;
     endDate?: string;
     myEvents?: boolean;
@@ -40,7 +41,8 @@ export function EventListWithPagination({
     // Build query string from filters
     const params = new URLSearchParams();
     params.set('offset', String(events.length));
-    if (filters.venueId) params.set('venueId', filters.venueId);
+    if (filters.venueIds) params.set('venueIds', filters.venueIds);
+    if (filters.categories) params.set('categories', filters.categories);
     if (filters.startDate) params.set('startDate', filters.startDate);
     if (filters.endDate) params.set('endDate', filters.endDate);
     if (filters.myEvents) params.set('myEvents', 'true');

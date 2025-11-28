@@ -1,11 +1,10 @@
-// Main enrichment service
+// Main enrichment service - LLM-first approach
 
 import prisma from '@/db/prisma';
-import { Event, Enrichment, EnrichmentStatus, EventCategory } from '@prisma/client';
-import { extractKeywords, getPrimaryKeyword } from './keywords';
+import { Event, EnrichmentStatus, EventCategory } from '@prisma/client';
 import { searchKnowledgeGraph, KGResult, isMusicRelated } from './knowledgeGraph';
-import { searchSpotifyArtist, SpotifyArtist, isConfidentMatch, isGenericQuery } from './spotify';
-import { inferCategory, shouldUpdateCategory, hasHighConfidenceKGType } from './categoryInference';
+import { searchSpotifyArtist, SpotifyArtist, isConfidentMatch } from './spotify';
+import { categorizeWithLLM, LLMEnrichmentResult } from './llm';
 
 // Environment variables
 const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY || '';
@@ -19,6 +18,7 @@ const DELAY_BETWEEN_REQUESTS_MS = 100;
 export interface EnrichmentResult {
   eventId: string;
   status: EnrichmentStatus;
+  llmResult: LLMEnrichmentResult | null;
   kgResult: KGResult | null;
   spotifyResult: SpotifyArtist | null;
   inferredCategory: EventCategory | null;
@@ -36,7 +36,12 @@ export interface EnrichmentSummary {
 }
 
 /**
- * Enrich a single event
+ * Enrich a single event using LLM-first approach
+ * 
+ * Flow:
+ * 1. LLM categorizes and extracts performer name
+ * 2. Based on category, query Spotify (music) or KG (comedy/theater)
+ * 3. Store combined results
  */
 export async function enrichEvent(
   event: Event & { venue: { name: string } }
@@ -44,21 +49,12 @@ export async function enrichEvent(
   const result: EnrichmentResult = {
     eventId: event.id,
     status: EnrichmentStatus.PENDING,
+    llmResult: null,
     kgResult: null,
     spotifyResult: null,
     inferredCategory: null,
     categoryUpdated: false,
   };
-
-  // Extract keywords from title
-  const keywords = extractKeywords(event.title, event.venue.name);
-  const primaryKeyword = keywords[0] || null;
-
-  if (!primaryKeyword) {
-    result.status = EnrichmentStatus.SKIPPED;
-    await saveEnrichment(event.id, primaryKeyword || event.title, result);
-    return result;
-  }
 
   try {
     // Mark as processing
@@ -66,64 +62,108 @@ export async function enrichEvent(
       where: { eventId: event.id },
       create: {
         eventId: event.id,
-        searchQuery: primaryKeyword,
+        searchQuery: event.title,
         status: EnrichmentStatus.PROCESSING,
       },
       update: {
         status: EnrichmentStatus.PROCESSING,
-        searchQuery: primaryKeyword,
+        searchQuery: event.title,
       },
     });
 
-    // Query Knowledge Graph
-    result.kgResult = await searchKnowledgeGraph(primaryKeyword, GOOGLE_API_KEY);
+    // Step 1: LLM categorization (always run)
+    const dateStr = event.startDateTime.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric',
+    });
+    
+    result.llmResult = await categorizeWithLLM(
+      event.title,
+      event.venue.name,
+      dateStr,
+      {
+        description: event.description,
+        url: event.url,
+        currentCategory: event.category,
+      }
+    );
     await delay(DELAY_BETWEEN_REQUESTS_MS);
 
-    // Decide if we need Spotify
-    const shouldQuerySpotify = shouldTrySpotify(result.kgResult) && !isGenericQuery(primaryKeyword);
-    
-    if (shouldQuerySpotify) {
-      result.spotifyResult = await searchSpotifyArtist(
-        primaryKeyword,
-        SPOTIFY_CLIENT_ID,
-        SPOTIFY_CLIENT_SECRET
-      );
+    // Use LLM result for category
+    if (result.llmResult) {
+      result.inferredCategory = result.llmResult.category;
       
-      // Validate Spotify match - must have actual name similarity
-      if (result.spotifyResult && !isConfidentMatch(
-        primaryKeyword,
-        result.spotifyResult.name,
-        result.spotifyResult.popularity
-      )) {
-        console.log(`  Rejected Spotify match: "${result.spotifyResult.name}" for query "${primaryKeyword}"`);
-        result.spotifyResult = null; // Reject low-confidence match
+      // Step 2: Targeted API lookups based on LLM category
+      const searchTerm = result.llmResult.performer || event.title;
+      
+      if (result.llmResult.category === 'CONCERT') {
+        // Music event - query Spotify
+        console.log(`  Searching Spotify for: ${searchTerm}`);
+        result.spotifyResult = await searchSpotifyArtist(
+          searchTerm,
+          SPOTIFY_CLIENT_ID,
+          SPOTIFY_CLIENT_SECRET
+        );
+        
+        // Validate match
+        if (result.spotifyResult && result.llmResult.performer) {
+          if (!isConfidentMatch(searchTerm, result.spotifyResult.name, result.spotifyResult.popularity)) {
+            console.log(`  Rejected Spotify match: "${result.spotifyResult.name}" for "${searchTerm}"`);
+            result.spotifyResult = null;
+          }
+        }
+        await delay(DELAY_BETWEEN_REQUESTS_MS);
+      }
+      
+      if (['COMEDY', 'THEATER', 'MOVIE'].includes(result.llmResult.category) && result.llmResult.performer) {
+        // Non-music with performer - query KG for bio/wiki
+        console.log(`  Searching KG for: ${searchTerm}`);
+        result.kgResult = await searchKnowledgeGraph(searchTerm, GOOGLE_API_KEY);
+        await delay(DELAY_BETWEEN_REQUESTS_MS);
+      }
+    } else {
+      // LLM failed - fall back to legacy flow
+      console.log('  LLM failed, using legacy KG-first flow');
+      result.kgResult = await searchKnowledgeGraph(event.title, GOOGLE_API_KEY);
+      await delay(DELAY_BETWEEN_REQUESTS_MS);
+      
+      // Check if music-related
+      if (result.kgResult && isMusicRelated(result.kgResult.types)) {
+        result.spotifyResult = await searchSpotifyArtist(
+          event.title,
+          SPOTIFY_CLIENT_ID,
+          SPOTIFY_CLIENT_SECRET
+        );
       }
     }
 
-    // Infer category
-    result.inferredCategory = inferCategory(result.kgResult, result.spotifyResult);
-    const isConfident = hasHighConfidenceKGType(result.kgResult);
-
-    // Check if we should update the event's category
-    if (result.inferredCategory && shouldUpdateCategory(event.category, result.inferredCategory, isConfident)) {
+    // Update event category if LLM is confident
+    if (result.llmResult && 
+        result.llmResult.confidence !== 'low' &&
+        result.llmResult.category !== event.category) {
       await prisma.event.update({
         where: { id: event.id },
-        data: { category: result.inferredCategory },
+        data: { category: result.llmResult.category },
       });
       result.categoryUpdated = true;
+      console.log(`  Updated category: ${event.category} → ${result.llmResult.category}`);
     }
 
     // Determine final status
-    if (result.kgResult || result.spotifyResult) {
-      result.status = result.kgResult && result.spotifyResult
+    if (result.llmResult) {
+      result.status = (result.spotifyResult || result.kgResult)
         ? EnrichmentStatus.COMPLETED
-        : EnrichmentStatus.PARTIAL;
+        : EnrichmentStatus.PARTIAL; // LLM worked but no API enrichment
+    } else if (result.kgResult || result.spotifyResult) {
+      result.status = EnrichmentStatus.PARTIAL;
     } else {
       result.status = EnrichmentStatus.FAILED;
     }
 
     // Save enrichment
-    await saveEnrichment(event.id, primaryKeyword, result);
+    await saveEnrichment(event.id, result.llmResult?.performer || event.title, result);
 
   } catch (error) {
     result.status = EnrichmentStatus.FAILED;
@@ -133,7 +173,7 @@ export async function enrichEvent(
       where: { eventId: event.id },
       create: {
         eventId: event.id,
-        searchQuery: primaryKeyword,
+        searchQuery: event.title,
         status: EnrichmentStatus.FAILED,
         errorMessage: result.error,
       },
@@ -149,35 +189,6 @@ export async function enrichEvent(
 }
 
 /**
- * Decide if we should query Spotify
- * Only search Spotify if KG indicates music-related entity
- */
-function shouldTrySpotify(kgResult: KGResult | null): boolean {
-  // No KG result - don't blindly search Spotify (causes false matches)
-  if (!kgResult) return false;
-  
-  // KG indicates music - definitely try Spotify
-  if (isMusicRelated(kgResult.types)) return true;
-  
-  // Check description for music hints
-  const desc = kgResult.description?.toLowerCase() || '';
-  const bio = kgResult.bio?.toLowerCase() || '';
-  
-  if (desc.includes('band') || desc.includes('musician') || desc.includes('singer') || 
-      desc.includes('rapper') || desc.includes('dj') || desc.includes('music')) {
-    return true;
-  }
-  
-  if (bio.includes('band') || bio.includes('musician') || bio.includes('recording artist') ||
-      bio.includes('singer') || bio.includes('songwriter')) {
-    return true;
-  }
-  
-  // KG found something but it's not music - skip Spotify
-  return false;
-}
-
-/**
  * Save enrichment data to database
  */
 async function saveEnrichment(
@@ -185,7 +196,7 @@ async function saveEnrichment(
   searchQuery: string,
   result: EnrichmentResult
 ): Promise<void> {
-  const { kgResult, spotifyResult, inferredCategory, categoryUpdated, status, error } = result;
+  const { llmResult, kgResult, spotifyResult, inferredCategory, categoryUpdated, status, error } = result;
 
   await prisma.enrichment.upsert({
     where: { eventId },
@@ -194,6 +205,12 @@ async function saveEnrichment(
       searchQuery,
       status,
       errorMessage: error,
+      
+      // LLM data
+      llmCategory: llmResult?.category,
+      llmPerformer: llmResult?.performer,
+      llmDescription: llmResult?.description,
+      llmConfidence: llmResult?.confidence,
       
       // Knowledge Graph
       kgEntityId: kgResult?.entityId,
@@ -221,6 +238,12 @@ async function saveEnrichment(
       searchQuery,
       status,
       errorMessage: error,
+      
+      // LLM data
+      llmCategory: llmResult?.category,
+      llmPerformer: llmResult?.performer,
+      llmDescription: llmResult?.description,
+      llmConfidence: llmResult?.confidence,
       
       // Knowledge Graph
       kgEntityId: kgResult?.entityId,
@@ -340,5 +363,6 @@ function delay(ms: number): Promise<void> {
 export { extractKeywords, getPrimaryKeyword } from './keywords';
 export type { KGResult } from './knowledgeGraph';
 export type { SpotifyArtist } from './spotify';
-export { isGenericQuery } from './spotify';
+export type { LLMEnrichmentResult } from './llm';
+export { categorizeWithLLM } from './llm';
 

@@ -33,7 +33,9 @@ export interface GetEventsParams {
   startDate?: Date;
   endDate?: Date;
   category?: EventCategory;
+  categories?: EventCategory[]; // Multi-select categories
   venueId?: string;
+  venueIds?: string[]; // Multi-select venues
   status?: EventStatus;
   limit?: number;
   offset?: number;
@@ -49,11 +51,12 @@ export async function getEvents(params: GetEventsParams = {}): Promise<EventWith
     startDate,
     endDate,
     category,
+    categories,
     venueId,
+    venueIds,
     status = 'SCHEDULED',
     limit = 1000,
     offset = 0,
-    friendsGoing = false,
   } = params;
 
   const where: Record<string, unknown> = {};
@@ -67,8 +70,20 @@ export async function getEvents(params: GetEventsParams = {}): Promise<EventWith
     where.startDateTime = { gte: new Date() };
   }
 
-  if (category) where.category = category;
-  if (venueId) where.venueId = venueId;
+  // Category filter (multi-select takes precedence)
+  if (categories && categories.length > 0) {
+    where.category = { in: categories };
+  } else if (category) {
+    where.category = category;
+  }
+  
+  // Venue filter (multi-select takes precedence)
+  if (venueIds && venueIds.length > 0) {
+    where.venueId = { in: venueIds };
+  } else if (venueId) {
+    where.venueId = venueId;
+  }
+  
   if (status) where.status = status;
 
   return prisma.event.findMany({
@@ -150,8 +165,20 @@ export async function getEventsWithAttendance(params: GetEventsParams = {}): Pro
     baseWhere.startDateTime = { gte: new Date() };
   }
   
-  if (params.category) baseWhere.category = params.category;
-  if (params.venueId) baseWhere.venueId = params.venueId;
+  // Category filter (multi-select takes precedence)
+  if (params.categories && params.categories.length > 0) {
+    baseWhere.category = { in: params.categories };
+  } else if (params.category) {
+    baseWhere.category = params.category;
+  }
+  
+  // Venue filter (multi-select takes precedence)
+  if (params.venueIds && params.venueIds.length > 0) {
+    baseWhere.venueId = { in: params.venueIds };
+  } else if (params.venueId) {
+    baseWhere.venueId = params.venueId;
+  }
+  
   if (params.status) baseWhere.status = params.status;
   else baseWhere.status = 'SCHEDULED';
   

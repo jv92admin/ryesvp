@@ -654,24 +654,127 @@ if (cached && cached.expiresAt > new Date()) {
 | - | Event Card Badges | Spotify/Wikipedia icons on cards, click through to external sites |
 | - | Event Detail Enrichment | Full enrichment section on event pages |
 
-### 🔲 Pending
+### 🔲 Pending: LLM-First Enrichment Refactor
 
-| Phase | What | Notes | Priority |
-|-------|------|-------|----------|
-| - | Category Refinement | Fuzzy matches still happening. Sports, generic events miscategorized. | **Next** |
-| - | Artist Caching | `ArtistCache` model exists. Wire up to reduce API calls for repeat artists. | **Next** |
-| Phase 3 | Scheduled Enrichment | Cron job. Will combine with event scraping cron - see `/notes/scheduled-jobs-spec.md` | Later |
-| - | Retry Logic | Max retries, exponential backoff for rate limits. | Later |
+The current approach (keyword extraction → KG → Spotify) has limitations:
+- KG returns wrong entities without context ("Couch" band → furniture wiki)
+- Generic events fail ("Gospel Brunch", "Texas WBB")
+- Sports/local events miscategorized
 
-**Why caching before cron?** Caching reduces API calls, making the cron job more efficient when we build it. Both scraping and enrichment cron will be built together as one "scheduled jobs" sprint.
+**New Approach: LLM-First with Targeted API Lookups**
 
-### Known Issues
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ LLM-FIRST ENRICHMENT FLOW                                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│ 1. LLM CATEGORIZATION (always run - ~$0.02 per 250 events)     │
+│    Input:                                                       │
+│      - Event title                                              │
+│      - Venue name + city                                        │
+│      - Date                                                     │
+│      - Event description (from scrape)                          │
+│      - Source URL                                               │
+│      - Current category (venue's guess)                         │
+│    Output:                                                      │
+│      - category: CONCERT | COMEDY | THEATER | MOVIE | SPORTS    │
+│      - performer: "artist name" or null                         │
+│      - description: "1-2 sentence context for attendees"        │
+│      - confidence: high | medium | low                          │
+│                                                                 │
+│ 2. TARGETED API LOOKUP (based on LLM output)                   │
+│    - CONCERT → Spotify search (use performer name from LLM)     │
+│    - COMEDY → KG search with "comedian" type hint               │
+│    - THEATER/MOVIE → KG search with show/film hint              │
+│    - SPORTS → Skip API (LLM description sufficient)             │
+│                                                                 │
+│ 3. STORE COMBINED RESULTS                                       │
+│    - LLM description (always available)                         │
+│    - Spotify link + genres (if music)                           │
+│    - Wikipedia link (if KG match)                               │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Why LLM First?**
+- Understands context: "Couch at Stubb's" = band, not furniture
+- Handles edge cases: "Texas WBB at Moody" = Women's Basketball
+- Always provides description (no more empty enrichment)
+- Guides targeted API lookups (better accuracy)
+
+**The Prompt:**
+```
+You categorize events for a concert discovery app in Austin, TX.
+
+Event: "${title}"
+Venue: ${venueName} (${city})
+Date: ${date}
+Description: ${description || "none"}
+Source URL: ${url}
+
+Respond in JSON only:
+{
+  "category": "CONCERT" | "COMEDY" | "THEATER" | "MOVIE" | "SPORTS" | "FESTIVAL" | "OTHER",
+  "performer": "artist/performer name or null",
+  "description": "1-2 sentence description for someone deciding whether to attend",
+  "confidence": "high" | "medium" | "low"
+}
+```
+
+**Cost Estimate (GPT-4o-mini):**
+- ~200 input + 100 output tokens per event
+- 250 events ≈ $0.02 per batch
+- Essentially free at our scale
+
+**Implementation Tasks:**
+
+| Step | What | Time |
+|------|------|------|
+| 1 | Add OpenAI/Gemini client | 30 min |
+| 2 | Create LLM enrichment function | 30 min |
+| 3 | Update enrichment script to LLM-first flow | 30 min |
+| 4 | Use LLM performer name for targeted Spotify/KG | 20 min |
+| 5 | Add `llmDescription` field to Enrichment model | 10 min |
+| 6 | Test on problem events (Couch, Texas WBB) | 20 min |
+
+**Total: ~2-3 hours**
+
+---
+
+### Future: External APIs (After LLM Refactor)
+
+| Source | Good For | Notes |
+|--------|----------|-------|
+| **Ticketmaster Discovery API** | Event categories, images | Free tier, fuzzy match on title+venue+date |
+| **SeatGeek API** | Similar to Ticketmaster | Free tier |
+| **MusicBrainz** | Comprehensive music DB | Free, open source |
+| **Last.fm** | Artist info, similar artists | Free |
+
+These could validate/enhance LLM output but add complexity. Evaluate after LLM-first is working.
+
+---
+
+### Artist Caching (After LLM Refactor)
+
+`ArtistCache` model exists in spec. Wire up to reduce API calls for repeat artists. More valuable once LLM provides accurate performer names.
+
+---
+
+### Scheduled Enrichment (After LLM Refactor)
+
+Cron job for scraping + enrichment. See `/notes/scheduled-jobs-spec.md`.
+
+---
+
+### Known Issues (Current System)
 
 1. **Generic queries fail**: Events like "Gospel Brunch", "Texas WBB" don't have good KG matches
-2. **Spotify opportunistic search removed**: Now only searches if KG indicates music. More accurate but may miss some artists.
-3. **Movies in theaters**: Works now with MOVIE category, but depends on KG having film data
+2. **Context blindness**: KG doesn't know venue context ("Couch" at Stubb's = band)
+3. **Spotify opportunistic search removed**: Now only searches if KG indicates music
 
-### Running Enrichment
+**LLM-first approach addresses all of these.**
+
+### Running Enrichment (Current)
 
 ```bash
 # Enrich new events only
