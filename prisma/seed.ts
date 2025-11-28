@@ -84,6 +84,56 @@ async function main() {
         state: 'TX',
       },
     }),
+    // Texas Performing Arts venues
+    prisma.venue.upsert({
+      where: { slug: 'bass-concert-hall' },
+      update: {},
+      create: {
+        name: 'Bass Concert Hall',
+        slug: 'bass-concert-hall',
+        websiteUrl: 'https://texasperformingarts.org',
+        address: '2350 Robert Dedman Dr',
+        city: 'Austin',
+        state: 'TX',
+      },
+    }),
+    prisma.venue.upsert({
+      where: { slug: 'mccullough-theatre' },
+      update: {},
+      create: {
+        name: 'McCullough Theatre',
+        slug: 'mccullough-theatre',
+        websiteUrl: 'https://texasperformingarts.org',
+        address: '2375 Robert Dedman Dr',
+        city: 'Austin',
+        state: 'TX',
+      },
+    }),
+    prisma.venue.upsert({
+      where: { slug: 'bates-recital-hall' },
+      update: {},
+      create: {
+        name: 'Bates Recital Hall',
+        slug: 'bates-recital-hall',
+        websiteUrl: 'https://texasperformingarts.org',
+        address: '2406 Robert Dedman Dr',
+        city: 'Austin',
+        state: 'TX',
+      },
+    }),
+    // Long Center venues
+    prisma.venue.upsert({
+      where: { slug: 'long-center' },
+      update: {},
+      create: {
+        name: 'Long Center',
+        slug: 'long-center',
+        websiteUrl: 'https://thelongcenter.org',
+        address: '701 W Riverside Dr',
+        city: 'Austin',
+        state: 'TX',
+      },
+    }),
   ]);
 
   console.log(`✅ Created ${venues.length} venues`);

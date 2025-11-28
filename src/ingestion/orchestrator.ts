@@ -3,6 +3,8 @@ import { fetchEventsFromMoodyCenter } from './sources/moodyCenter';
 import { fetchEventsFromParamount } from './sources/paramount';
 import { fetchEventsFromAclLive } from './sources/aclLive';
 import { fetchEventsFromStubbs } from './sources/stubbs';
+import { fetchEventsFromTPA } from './sources/texasPerformingArts';
+import { fetchEventsFromLongCenter } from './sources/longCenter';
 import { fetchMockEvents } from './sources/mock';
 import { upsertEvents } from './upsert';
 
@@ -42,6 +44,16 @@ export async function runAllScrapers(): Promise<{
       name: "Stubb's BBQ",
       venueSlug: 'stubbs',
       fn: fetchEventsFromStubbs,
+    },
+    {
+      name: 'Texas Performing Arts',
+      venueSlug: 'bass-concert-hall',
+      fn: fetchEventsFromTPA,
+    },
+    {
+      name: 'Long Center',
+      venueSlug: 'long-center',
+      fn: fetchEventsFromLongCenter,
     },
     // Mock scraper only runs in development or when explicitly requested
     ...(process.env.NODE_ENV === 'development' && process.env.ENABLE_MOCK_SCRAPER === 'true' ? [{
@@ -105,6 +117,11 @@ export async function runScraper(scraperName: string): Promise<ScraperResult> {
     'acl': fetchEventsFromAclLive,
     'stubbs': fetchEventsFromStubbs,
     'stubbs-bbq': fetchEventsFromStubbs,
+    'tpa': fetchEventsFromTPA,
+    'bass-concert-hall': fetchEventsFromTPA,
+    'texas-performing-arts': fetchEventsFromTPA,
+    'long-center': fetchEventsFromLongCenter,
+    'longcenter': fetchEventsFromLongCenter,
     'mock': fetchMockEvents,
   };
 

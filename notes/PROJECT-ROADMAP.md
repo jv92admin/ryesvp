@@ -17,10 +17,17 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 | # | Item | Spec | Est. Time | Status |
 |---|------|------|-----------|--------|
-| 1 | **LLM-First Enrichment** | `data-enrichment-spec.md` | 2-3 hrs | 🔲 Next |
-| 2 | **Artist Caching** | `data-enrichment-spec.md` | 1 hr | 🔲 After LLM |
+| 1 | **Ticketmaster + SeatGeek APIs** | `data-enrichment-spec.md` | 3-4 hrs | 🔲 Next |
+| 2 | **Artist Entity Model** | - | 2 hrs | 🔲 After APIs |
 | 3 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
-| 4 | **Ticketmaster/SeatGeek APIs** | `data-enrichment-spec.md` | TBD | 🔲 Explore |
+| 4 | **"Go Together" UX Design** | - | Design phase | 🔲 Think through |
+
+### API Integration Plan
+**Goal:** Integrate BOTH Ticketmaster Discovery API AND SeatGeek API
+- Ticketmaster: Largest inventory, 5K req/day free tier (plenty for our needs)
+- SeatGeek: Cleaner API, good backup/supplement
+- Benefits: 10x event coverage, pricing data, less scraper maintenance
+- Store all events in Prisma (cache locally, batch daily)
 
 ---
 
@@ -82,18 +89,23 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 - [x] Cascade delete all user data
 - [x] Supabase Auth deletion (with service role key)
 
----
+### LLM-First Enrichment ✅
+- [x] OpenAI integration (gpt-4o-mini)
+- [x] LLM categorization with performer extraction
+- [x] llmCategory, llmPerformer, llmDescription, llmConfidence fields
+- [x] Targeted Spotify/KG lookups using LLM-extracted performer
+- [x] Dramatically improved categorization accuracy
 
-## Next Up: LLM-First Enrichment
+### New Venue Scrapers ✅
+- [x] Texas Performing Arts (Bass Concert Hall, McCullough, Bates Recital)
+- [x] Long Center (Dell Hall, Rollins Studio, Terrace)
+- [x] ~110 new events added
 
-**Problem:** Current KG-first enrichment struggles with:
-- Context blindness ("Couch" band → furniture wiki)
-- Generic events ("Gospel Brunch", "Texas WBB")
-- Sports/local acts
-
-**Solution:** LLM categorizes first, then targeted API lookups.
-
-See `data-enrichment-spec.md` for full details.
+### Multi-Select Filters ✅
+- [x] Category filter (multi-select with checkboxes)
+- [x] Venue filter (multi-select with checkboxes)
+- [x] Renamed "Friends" → "Show Events", "Everyone" → "All Events"
+- [x] Compact filter UI
 
 ---
 
@@ -143,17 +155,25 @@ See `data-enrichment-spec.md` for full details.
 - [x] Danger Zone UI + confirmation modal
 - [x] Cascade delete + Supabase Auth cleanup
 
-### Sprint: LLM Enrichment (Next)
-- [ ] OpenAI/Gemini integration
-- [ ] LLM-first categorization
-- [ ] Targeted Spotify/KG lookups
-- [ ] Artist caching
+### Sprint: LLM Enrichment + Venue Expansion (Complete ✅)
+- [x] OpenAI gpt-4o-mini integration
+- [x] LLM-first categorization with performer extraction
+- [x] Targeted Spotify/KG lookups
+- [x] Texas Performing Arts scraper (Puppeteer)
+- [x] Long Center scraper (JSON-LD)
+- [x] Multi-select filters (category + venue)
+- [x] Filter UI improvements
+
+### Sprint: API Integration (Next)
+- [ ] Ticketmaster Discovery API integration
+- [ ] SeatGeek API integration
+- [ ] Artist entity model (foundation for "follow artist")
 
 ### Sprint: Infrastructure (Future)
 - [ ] Scheduled jobs (cron)
-- [ ] Ticketmaster/SeatGeek exploration
+- [ ] Artist caching
 
 ---
 
-**Last Updated:** November 28, 2024
+**Last Updated:** November 28, 2025
 
