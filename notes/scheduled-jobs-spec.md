@@ -6,9 +6,10 @@
 
 This document covers the scheduled/async job infrastructure for RyesVP, including:
 1. Event scraping from venue websites
-2. Data enrichment (Knowledge Graph, Spotify)
+2. Data enrichment (Knowledge Graph, Spotify, LLM)
+3. Ticketmaster data refresh (pricing, presales, availability)
 
-Both jobs follow the same pattern: run periodically, process in batches, handle failures gracefully.
+All jobs follow the same pattern: run periodically, process in batches, handle failures gracefully.
 
 ---
 
@@ -33,6 +34,63 @@ Both jobs follow the same pattern: run periodically, process in batches, handle 
 **Frequency:** Daily at 4 AM (after scraping completes)
 
 **Batch Size:** 50 events per run (to respect API rate limits)
+
+### 3. Ticketmaster Data Refresh (Future)
+
+**Purpose:** Keep TM-sourced data fresh (prices change, presales end, events sell out)
+
+**Current State:** Manual script execution (`scripts/enrich-tm.ts`)
+
+**Frequency:** Varies by event proximity (see Staleness Strategy below)
+
+**Batch Size:** 50 events per run
+
+#### Staleness Strategy
+
+TM data changes over time - prices fluctuate, presales end, events sell out. 
+Refresh frequency should be based on how soon the event is:
+
+| Event Timeframe | Refresh Frequency | Rationale |
+|-----------------|-------------------|-----------|
+| Next 7 days | Daily | Prices most volatile, availability critical |
+| 8-30 days | Weekly | Moderate changes |
+| 30+ days | On-demand | Refresh when user views event detail |
+
+#### What Changes in TM Data
+
+- **Prices**: Dynamic pricing means prices rise as events approach
+- **Availability**: Events go from "On Sale" → "Low Availability" → "Sold Out"
+- **Presale Status**: Presales end, general sale starts
+- **Event Status**: Cancelled, postponed, rescheduled
+- **Supporting Acts**: Openers announced closer to show date
+
+#### Implementation Notes
+
+- Track `tmLastChecked` timestamp on each enrichment record
+- Query: events where `tmLastChecked` is stale based on `startDateTime`
+- API budget is generous (5K calls/day), so can be aggressive with refresh
+- Consider: only refresh events that users have marked "Going" or "Interested"
+
+#### Batch Download Strategy (Recommended)
+
+Instead of per-event API calls, download all TM events for our venues in batch:
+
+```
+Daily at 3 AM:
+  For each venue (6 total):
+    → 1 API call: "All events at venue X, next 6 months"
+    → Store in TMEventCache table
+  
+  Then match offline:
+    → Compare our events vs cache (no API calls)
+    → Update Enrichment records
+```
+
+**Benefits:**
+- 6 API calls vs 100+ per-event calls
+- No rate limiting issues
+- Instant offline matching
+- Prices/URLs up to 24h stale (acceptable with disclaimer)
 
 ---
 
@@ -170,6 +228,10 @@ CRON_SECRET=random_secure_string
 GOOGLE_API_KEY=...
 SPOTIFY_CLIENT_ID=...
 SPOTIFY_CLIENT_SECRET=...
+OPENAI_API_KEY=...
+
+# Ticketmaster Discovery API
+TICKETMASTER_API_KEY=...
 ```
 
 ---
@@ -206,4 +268,38 @@ If scheduled jobs cause issues:
 
 **Last Updated:** November 2024
 **Status:** Scoped, ready when needed
+
+---
+
+## Appendix: Ticketmaster Integration
+
+### Current Implementation
+
+Ticketmaster is used as an **enrichment layer**, not a primary event source.
+Our venue scrapers remain the source of truth for event schedules.
+
+**What TM provides:**
+- Direct buy links (`tmUrl`)
+- Pricing (`tmPriceMin` - displayed as "From $XX")
+- Presale windows (`tmPresales`)
+- High-quality images (fallback only)
+- Opening acts (`tmSupportingActs`)
+- Genre/classification data
+
+**Manual scripts:**
+- `scripts/lookup-tm-venues.ts` - Find TM venue IDs
+- `scripts/enrich-tm.ts` - Match events to TM and enrich
+
+### Venue Mapping
+
+Venues must be manually mapped in `src/lib/ticketmaster/venues.ts`.
+Run `lookup-tm-venues.ts` to get TM venue IDs for new venues.
+
+### Match Algorithm
+
+1. Query TM for events at same venue on same date
+2. Compare titles using fuzzy matching (Levenshtein + normalization)
+3. ≥85% similarity → auto-accept
+4. 50-84% similarity → LLM confirmation (yes/no)
+5. <50% → no match
 

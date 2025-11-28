@@ -17,17 +17,34 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 | # | Item | Spec | Est. Time | Status |
 |---|------|------|-----------|--------|
-| 1 | **Ticketmaster + SeatGeek APIs** | `data-enrichment-spec.md` | 3-4 hrs | 🔲 Next |
-| 2 | **Artist Entity Model** | - | 2 hrs | 🔲 After APIs |
-| 3 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
-| 4 | **"Go Together" UX Design** | - | Design phase | 🔲 Think through |
+| 1 | **Data Model Cleanup** | - | 2-3 hrs | 🔴 HIGH PRIORITY |
+| 2 | **Buy with TM UI** | - | 1-2 hrs | 🔲 Next |
+| 3 | **SeatGeek API** | `data-enrichment-spec.md` | 2 hrs | 🔲 Pending API approval |
+| 4 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
+| 5 | **"Go Together" UX Design** | - | Design phase | 🔲 Think through |
 
-### API Integration Plan
-**Goal:** Integrate BOTH Ticketmaster Discovery API AND SeatGeek API
-- Ticketmaster: Largest inventory, 5K req/day free tier (plenty for our needs)
-- SeatGeek: Cleaner API, good backup/supplement
-- Benefits: 10x event coverage, pricing data, less scraper maintenance
-- Store all events in Prisma (cache locally, batch daily)
+### Data Model Cleanup (HIGH PRIORITY)
+**Problem:** Event data is fragmented across multiple fetch patterns:
+- `EventCard` uses `EventWithSocial` with `EnrichmentPreview`
+- Event detail page fetches event + enrichment separately
+- `SocialSidebar` has its own API without enrichment
+
+**Solution:** Consolidate into a single canonical event type:
+```typescript
+type EventWithDisplay = Event & {
+  displayTitle: string; // Always computed once at data layer
+  venue: Venue;
+  enrichment?: EnrichmentPreview;
+  social?: SocialSignals;
+};
+```
+- Compute `displayTitle` ONCE in the data layer
+- All views consume the same shape
+- Document data model in schema/types
+
+### API Integration Status
+- ✅ **Ticketmaster Discovery API** - Complete (enrichment layer)
+- 🔲 **SeatGeek API** - Pending API key approval
 
 ---
 
@@ -164,9 +181,17 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 - [x] Multi-select filters (category + venue)
 - [x] Filter UI improvements
 
+### Sprint: Ticketmaster Integration (Complete ✅)
+- [x] TM Discovery API client with rate limiting
+- [x] TMEventCache for batch downloads (6 API calls for all venues)
+- [x] LLM-powered event matching (same venue + date)
+- [x] Captures: URLs, prices, presales, genres, supporting acts
+- [x] `displayTitle` computed from enrichment (tmPreferTitle)
+- [x] Scripts: download-tm-cache, enrich-tm-from-cache, check-tm-enrichment
+- [ ] Buy with TM UI (next)
+
 ### Sprint: API Integration (Next)
-- [ ] Ticketmaster Discovery API integration
-- [ ] SeatGeek API integration
+- [ ] SeatGeek API integration (pending approval)
 - [ ] Artist entity model (foundation for "follow artist")
 
 ### Sprint: Infrastructure (Future)

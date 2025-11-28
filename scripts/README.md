@@ -1,4 +1,10 @@
-# Offline Ingestion Scripts
+# Scripts
+
+Scripts for ingestion, enrichment, and data management.
+
+---
+
+## Event Ingestion
 
 These scripts allow you to run event ingestion locally and upload results to your database.
 
@@ -115,4 +121,58 @@ Add to crontab (`crontab -e`):
 **Database connection errors:**
 - Verify `.env.local` has correct `DATABASE_URL`
 - Ensure database is accessible from your network
+
+---
+
+## Data Enrichment
+
+### LLM + Spotify + Knowledge Graph
+
+```bash
+npx dotenvx run -- npx tsx scripts/enrich-events.ts [--limit=N] [--force]
+```
+
+Options:
+- `--limit=N` - Maximum events to process (default: 50)
+- `--force` - Re-process all events, even those already enriched
+
+### Ticketmaster Enrichment
+
+Matches events to Ticketmaster and adds pricing, buy links, presales, etc.
+
+**Two-step process: Download cache, then match offline**
+
+```bash
+# Step 1: Download all TM events to cache (6 API calls total, ~30 sec)
+npx tsx scripts/download-tm-cache.ts [--months=6]
+
+# Step 2: Match our events against cache (no API calls, instant)
+npx tsx scripts/enrich-tm-from-cache.ts [--limit=N] [--venue=slug] [--dry-run]
+```
+
+**Setup (one-time):**
+1. Get a free API key at [developer.ticketmaster.com](https://developer.ticketmaster.com/)
+2. Add to `.env.local`: `TICKETMASTER_API_KEY=your_key_here`
+3. Run `npx tsx scripts/lookup-tm-venues.ts` to get TM venue IDs
+4. Update `src/lib/ticketmaster/venues.ts` with the IDs
+
+**Cache Strategy:**
+- `download-tm-cache.ts` fetches ALL events at our venues (next 6 months)
+- Stored in `TMEventCache` table
+- `enrich-tm-from-cache.ts` matches offline (no API rate limits)
+- Re-run cache download daily/weekly to keep prices fresh
+
+---
+
+## Other Scripts
+
+### Delete Mock Events
+```bash
+npx dotenvx run -- npx tsx scripts/delete-mock-events.ts
+```
+
+### Delete Seed Events
+```bash
+npx dotenvx run -- npx tsx scripts/delete-seed-events.ts
+```
 

@@ -14,6 +14,11 @@ export type EnrichmentPreview = {
   spotifyUrl: string | null;
   wikipediaUrl: string | null;
   genres: string[];
+  // TM data
+  displayTitle: string | null; // Computed: tmEventName if preferred, else null (use event.title)
+  tmUrl: string | null;
+  tmPriceMin: number | null;
+  tmPriceMax: number | null;
 };
 
 // Social signals for an event
@@ -402,6 +407,12 @@ async function getEnrichmentPreviews(eventIds: string[]): Promise<Map<string, En
       spotifyUrl: true,
       kgWikiUrl: true,
       spotifyGenres: true,
+      // TM fields
+      tmEventName: true,
+      tmPreferTitle: true,
+      tmUrl: true,
+      tmPriceMin: true,
+      tmPriceMax: true,
     },
   });
   
@@ -410,6 +421,11 @@ async function getEnrichmentPreviews(eventIds: string[]): Promise<Map<string, En
       spotifyUrl: e.spotifyUrl,
       wikipediaUrl: e.kgWikiUrl,
       genres: e.spotifyGenres?.slice(0, 2) || [],
+      // Compute displayTitle: use TM name only if explicitly preferred
+      displayTitle: e.tmPreferTitle && e.tmEventName ? e.tmEventName : null,
+      tmUrl: e.tmUrl,
+      tmPriceMin: e.tmPriceMin,
+      tmPriceMax: e.tmPriceMax,
     });
   }
   

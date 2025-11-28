@@ -43,6 +43,11 @@ export default async function EventPage({ params }: EventPageProps) {
   // Get enrichment data (artist info, Spotify, etc.)
   const enrichment = await getEventEnrichment(id);
   
+  // Compute displayTitle: use TM-preferred title if available
+  const displayTitle = enrichment?.tmPreferTitle && enrichment?.tmEventName 
+    ? enrichment.tmEventName 
+    : event.title;
+  
   // Check if event is new
   const isNew = isNewListing(event.createdAt);
   
@@ -133,7 +138,7 @@ export default async function EventPage({ params }: EventPageProps) {
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
-            {event.title}
+            {displayTitle}
           </h1>
 
           <div className="space-y-3 text-gray-600">
@@ -181,7 +186,7 @@ export default async function EventPage({ params }: EventPageProps) {
               </a>
             )}
             <ShareButton 
-              title={event.title}
+              title={displayTitle}
               venueName={event.venue.name}
               dateFormatted={dateFormatted}
               eventUrl={eventUrl}

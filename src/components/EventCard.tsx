@@ -13,6 +13,9 @@ export function EventCard({ event }: EventCardProps) {
   const enrichment = event.enrichment;
   const isNew = isNewListing(event.createdAt);
   
+  // Use TM-preferred title if available, otherwise fallback to event title
+  const displayTitle = enrichment?.displayTitle || event.title;
+  
   const categoryColors: Record<string, string> = {
     CONCERT: 'bg-purple-100 text-purple-800',
     COMEDY: 'bg-yellow-100 text-yellow-800',
@@ -83,7 +86,7 @@ export function EventCard({ event }: EventCardProps) {
             
             {/* Title */}
             <h3 className="font-semibold text-gray-900 line-clamp-2 leading-snug">
-              {event.title}
+              {displayTitle}
             </h3>
             
             {/* Venue */}
