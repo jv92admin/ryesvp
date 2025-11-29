@@ -50,6 +50,7 @@ export function SocialTab({ onBadgeCountChange }: SocialTabProps = {}) {
         // Calculate and emit badge count for recent squads
         if (onBadgeCountChange && socialData.yourPlans) {
           const badgeCount = countUnviewedRecentSquads(socialData.yourPlans);
+          console.log('🔥 SocialTab calling onBadgeCountChange with:', badgeCount);
           onBadgeCountChange(badgeCount);
         }
       } catch (err) {
