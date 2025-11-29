@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getAvatarStyle, getInitials } from '@/lib/avatar';
+import { InviteLinkCard } from '@/components/InviteLinkCard';
 
 type UserProfile = {
   id: string;
@@ -116,6 +117,9 @@ export function ProfileContent() {
 
   return (
     <div className="space-y-6">
+      {/* Invite Friends */}
+      <InviteLinkCard />
+      
       {/* Avatar Preview */}
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">

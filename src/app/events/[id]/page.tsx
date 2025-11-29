@@ -5,6 +5,7 @@ import { Header } from '@/components/Header';
 import { AttendanceButton } from '@/components/AttendanceButton';
 import { AttendanceSummary } from '@/components/AttendanceSummary';
 import { ShareButton } from '@/components/ShareButton';
+import { SmartSquadButton } from '@/components/SmartSquadButton';
 import { EventSocialSection } from '@/components/EventSocialSection';
 import { EventEnrichment } from '@/components/EventEnrichment';
 import { InviteBanner } from '@/components/InviteBanner';
@@ -12,6 +13,7 @@ import { InviteRedemptionHandler } from '@/components/InviteRedemptionHandler';
 import { getCurrentUser } from '@/lib/auth';
 import { getUserEventByEventId } from '@/db/userEvents';
 import { getEventAttendance } from '@/db/userEvents';
+import { getUserSquadForEvent } from '@/db/squads';
 import { getEventEnrichment } from '@/db/enrichment';
 import { formatInTimeZone } from 'date-fns-tz';
 import { isNewListing } from '@/lib/utils';
@@ -39,6 +41,9 @@ export default async function EventPage({ params }: EventPageProps) {
   // Get current user's attendance status (if logged in)
   const user = await getCurrentUser();
   const userEvent = user ? await getUserEventByEventId(user.dbUser.id, id) : null;
+  
+  // Get user's squad for this event (if logged in)
+  const userSquad = user ? await getUserSquadForEvent(user.dbUser.id, id) : null;
   
   // Get attendance counts
   const attendance = await getEventAttendance(id);
@@ -235,11 +240,37 @@ export default async function EventPage({ params }: EventPageProps) {
           </div>
           
           {user ? (
-            <AttendanceButton
-              eventId={id}
-              currentStatus={userEvent?.status || null}
-              currentComment={userEvent?.comment || null}
-            />
+            <div className="space-y-3">
+              <AttendanceButton
+                eventId={id}
+                currentStatus={userEvent?.status || null}
+                currentComment={userEvent?.comment || null}
+              />
+              
+              {/* Go Together Button */}
+              <div className="pt-3 border-t border-gray-100">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="font-medium text-gray-900">Coordinate with Friends</h3>
+                    <p className="text-sm text-gray-600">Create a planning room to coordinate attendance, budgets, and meetups</p>
+                  </div>
+                  <SmartSquadButton 
+                    eventId={id}
+                    userSquadId={userSquad?.id}
+                    friendsGoing={socialSignals?.friends.filter(f => f.status === 'GOING').length || 0}
+                    friendsInterested={socialSignals?.friends.filter(f => f.status === 'INTERESTED').length || 0}
+                    event={{
+                      id: event.id,
+                      title: displayTitle,
+                      startDateTime: typeof event.startDateTime === 'string' ? event.startDateTime : event.startDateTime.toISOString(),
+                      venue: {
+                        name: event.venue.name
+                      }
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
           ) : (
             <div className="space-y-3">
               <div className="flex gap-2">

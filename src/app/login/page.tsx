@@ -21,6 +21,7 @@ export default function LoginPage() {
 
     // Check for ?ref= param in URL and store it
     const refParam = params.get('ref');
+    
     if (refParam) {
       storeInviteRef(refParam);
     }

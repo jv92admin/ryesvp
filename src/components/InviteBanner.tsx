@@ -17,6 +17,7 @@ export function InviteBanner({ isLoggedIn }: InviteBannerProps) {
       // Store invite ref if present in URL
       const ref = checkAndStoreInviteRef();
       
+      
       if (!ref) {
         setLoading(false);
         return;

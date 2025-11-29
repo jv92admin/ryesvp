@@ -19,14 +19,14 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 | # | Item | Spec | Est. Time | Status |
 |---|------|------|-----------|--------|
-| 1 | **Phase 0: Ticket Statuses** | `squads-social-spec.md` | 1-2 days | 🔲 Next |
-| 2 | **Phase 1: Social Tab + Squads** | `squads-social-spec.md` | 2-3 weeks | 🔲 After Phase 0 |
-| 3 | **Phase 2: Communities Reimagined** | `squads-social-spec.md` | 2-3 weeks | 🔲 After Phase 1 |
+| 1 | **Phase 0: Ticket Statuses** | `squads-social-spec.md` | 1-2 days | ✅ Complete |
+| 2 | **Phase 1: Social Tab + Squads** | `squads-social-spec.md` | 2-3 weeks | ✅ Complete |
+| 3 | **Phase 2: Communities Reimagined** | `squads-social-spec.md` | 2-3 weeks | 🔲 Next |
 | 4 | **Phase 3: Soft Reputation** | `squads-social-spec.md` | 1 week | 🔲 After Phase 2 |
 | 5 | **TM Data Display** | - | 1-2 hrs | 🔲 When time permits |
 | 6 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
 
-### Phase 0: Ticket Statuses (NEXT)
+### Phase 0: Ticket Statuses ✅ COMPLETE
 See `squads-social-spec.md` for full details.
 
 **What we're adding:**
@@ -37,17 +37,19 @@ See `squads-social-spec.md` for full details.
 
 **Value:** "Oh, Alex needs a ticket, I'll DM him" - no marketplace needed.
 
-### Phase 1: Social Tab + Squads
+### Phase 1: Social Tab + Squads ✅ COMPLETE
 See `squads-social-spec.md` for full details.
 
-**What we're building:**
-- Kill SocialSidebar → New Social Tab toggle
-- Section A: Your Plans (Squads + Going)
-- Section B: Almost Plans (You + friends overlapping)
-- Section C: Ticket Activity (friends need/have)
-- Squad rooms with status, tickets, logistics
-- "Go Together" button creates Squads
-- Export "Share plan" text templates
+**What we built:**
+- ✅ Kill SocialSidebar → New Social Tab toggle
+- ✅ Section A: Your Plans (Squads + Going)  
+- ✅ Section B: Almost Plans (You + friends overlapping)
+- ✅ Section C: Community & Tickets (stubbed for Phase 2)
+- ✅ Squad rooms with status, tickets, logistics
+- ✅ "Go Together" button creates Squads
+- ✅ Export "Share plan" text templates
+- ✅ Squad data hygiene fixes (use enriched TM titles)
+- ✅ Invite/referral system fixes (profile + event consistency)
 
 ### Data Model Cleanup ✅ COMPLETE
 See `data-model-101.md` for full documentation.
@@ -202,8 +204,18 @@ See `data-model-101.md` for full documentation.
 - [x] Buy on Ticketmaster button (TM blue, with disclaimer)
 - [x] UI polish: back button, input text colors
 
+### Sprint: Phase 1 Social Tab + Squads (Complete ✅)
+- [x] Calendar/Social view toggle
+- [x] Social Tab with "Your Plans" and "Almost Plans" 
+- [x] Squad data model and rooms
+- [x] "Go Together" button creates Squads
+- [x] Share plan text export
+- [x] Squad data hygiene (TM enriched titles)
+- [x] Profile invite link functionality
+- [x] Invite/referral system consistency
+
 ### Sprint: API Integration (Next)
-- [ ] SeatGeek API integration (pending approval)
+- [ ] SeatGeek API integration (pending approval)  
 - [ ] Artist entity model (foundation for "follow artist")
 
 ### Sprint: Infrastructure (Future)

@@ -1,6 +1,8 @@
-# Social Layer Specification
+# Social Layer Specification (Friends & Communities)
 
 > **See also:** `PROJECT-ROADMAP.md` for overall project priorities
+> 
+> **Note:** This spec covers Friends/Lists/Communities. For Squads (event-specific planning), see `squads-social-spec.md`.
 
 ## Overview
 

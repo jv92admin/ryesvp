@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { EventDisplay } from '@/db/events';
+import { SmartSquadButton } from './SmartSquadButton';
 import { formatEventDate, isNewListing } from '@/lib/utils';
 
 interface EventCardProps {
@@ -136,6 +137,23 @@ export function EventCard({ event }: EventCardProps) {
             )}
           </div>
         </Link>
+        
+        {/* Smart Squad Button */}
+        <div className="flex-shrink-0 flex items-center justify-center px-3">
+          <SmartSquadButton
+            eventId={event.id}
+            userSquadId={event.userSquad?.id}
+            friendsGoing={social?.friendsGoing || 0}
+            friendsInterested={social?.friendsInterested || 0}
+            event={{
+              id: event.id,
+              title: displayTitle,
+              startDateTime: typeof event.startDateTime === 'string' ? event.startDateTime : event.startDateTime.toISOString(),
+              venue: { name: event.venue.name }
+            }}
+            variant="compact"
+          />
+        </div>
         
         {/* Right side: Enrichment icons - separate from main link */}
         {hasEnrichmentLinks && (

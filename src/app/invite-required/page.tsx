@@ -18,6 +18,7 @@ function InviteRequiredContent() {
   // On mount, check localStorage for stored invite code
   useEffect(() => {
     const storedCode = getStoredInviteRef();
+    
     if (storedCode) {
       setInviteCode(storedCode);
       // Auto-redeem the stored code

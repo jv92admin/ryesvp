@@ -2,12 +2,12 @@ import { getEventsWithSocialSignals } from '@/db/events';
 import { getAllVenues } from '@/db/venues';
 import { getPrivateLists } from '@/db/lists';
 import { getUserCommunities } from '@/db/communities';
-import { EventListWithPagination } from '@/components/EventListWithPagination';
 import { EventFilters } from '@/components/EventFilters';
 import { Header } from '@/components/Header';
 import { SetNameBanner } from '@/components/SetNameBanner';
-import { SocialSidebar } from '@/components/SocialSidebar';
+import { HomePageContent } from '@/components/HomePageContent';
 import { InviteBanner } from '@/components/InviteBanner';
+import { InviteRedemptionHandler } from '@/components/InviteRedemptionHandler';
 import { getCurrentUser } from '@/lib/auth';
 import { EventCategory } from '@prisma/client';
 
@@ -72,6 +72,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           {/* Invite Banner for logged-out users with ?ref= */}
           <InviteBanner isLoggedIn={!!user} />
           
+          {/* Invite Redemption Handler - redeems invite after login */}
+          {user && <InviteRedemptionHandler />}
 
           {/* Filters - Full Width */}
           <EventFilters 
@@ -81,33 +83,22 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             showFriendsFilter={!!user}
           />
 
-          {/* Two Column Layout */}
-          <div className="flex flex-col lg:flex-row gap-6">
-            {/* Social Sidebar - Shows first on mobile (via order), right column on desktop */}
-            <aside className="order-first lg:order-last lg:w-80 flex-shrink-0">
-              <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:scrollbar-thin">
-                <SocialSidebar isLoggedIn={!!user} />
-              </div>
-            </aside>
-
-            {/* Events List - Main Column */}
-            <div className="flex-1 min-w-0 order-last lg:order-first">
-              <EventListWithPagination
-                initialEvents={initialEvents}
-                initialHasMore={hasMore}
-                filters={{
-                  venueIds: params.venueIds,
-                  categories: params.categories,
-                  startDate: params.startDate,
-                  endDate: params.endDate,
-                  myEvents: params.myEvents === 'true',
-                  friendsGoing: params.friendsGoing === 'true',
-                  listId: params.listId,
-                  communityId: params.communityId,
-                }}
-              />
-            </div>
-            </div>
+          {/* Home Page Content with Conditional Layout */}
+          <HomePageContent
+            initialEvents={initialEvents}
+            initialHasMore={hasMore}
+            isLoggedIn={!!user}
+            filters={{
+              venueIds: params.venueIds,
+              categories: params.categories,
+              startDate: params.startDate,
+              endDate: params.endDate,
+              myEvents: params.myEvents === 'true',
+              friendsGoing: params.friendsGoing === 'true',
+              listId: params.listId,
+              communityId: params.communityId,
+            }}
+          />
         </div>
       </main>
     </>

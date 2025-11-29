@@ -63,7 +63,7 @@ ${shareUrl}`;
         await navigator.share({
           title: title,
           text: shareText,
-          url: shareUrl,
+          url: shareUrl, // This already includes ref code
         });
         return;
       } catch (e) {
@@ -71,7 +71,7 @@ ${shareUrl}`;
       }
     }
 
-    // Fall back to clipboard
+    // Fall back to clipboard - use full shareText with context
     try {
       await navigator.clipboard.writeText(shareText);
       setCopied(true);

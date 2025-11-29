@@ -48,6 +48,7 @@ model Event {
 
   userEvents UserEvent[]
   enrichment Enrichment?
+  squads     Squad[]
 
   @@unique([source, sourceEventId]) // Dedup by source + external ID
   @@index([venueId])
@@ -178,6 +179,10 @@ model User {
   // Invites
   inviteCode             InviteCode?
   inviteRedemption       InviteRedemption?  // How this user was referred
+  
+  // Squads
+  squadsCreated          Squad[]       @relation("SquadCreator")
+  squadMembers           SquadMember[]
 
   @@index([authProviderId])
 }
@@ -386,4 +391,69 @@ model TMEventCache {
   @@index([venueSlug, localDate])
   @@index([tmVenueId])
   @@index([fetchedAt])
+}
+
+// Squad - A planning room for one event with a group of friends
+model Squad {
+  id          String   @id @default(uuid())
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdById String
+  createdBy   User     @relation("SquadCreator", fields: [createdById], references: [id])
+  
+  // Logistics
+  meetTime    DateTime?
+  meetSpot    String?
+  deadline    DateTime?  // For ticket purchase deadline
+  playlistUrl String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  members     SquadMember[]
+  
+  @@index([eventId])
+  @@index([createdById])
+}
+
+model SquadMember {
+  id             String   @id @default(uuid())
+  squadId        String
+  squad          Squad    @relation(fields: [squadId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Status within squad
+  status         SquadMemberStatus @default(THINKING)
+  budget         SquadBudget?
+  ticketStatus   SquadTicketStatus @default(NOT_BOUGHT)
+  buyingForCount Int?     // If buying for others, how many
+  buyingForIds   String[] // Array of user IDs they're buying tickets for
+  
+  isOrganizer    Boolean  @default(false)
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  @@unique([squadId, userId])  // One membership per user per squad
+  @@index([userId])
+}
+
+enum SquadMemberStatus {
+  THINKING
+  IN
+  OUT
+}
+
+enum SquadBudget {
+  NO_PREFERENCE
+  UNDER_50
+  FIFTY_TO_100
+  OVER_100
+}
+
+enum SquadTicketStatus {
+  NOT_BOUGHT
+  BUYING_OWN
+  BUYING_FOR_OTHERS
 }

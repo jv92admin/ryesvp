@@ -294,7 +294,7 @@ async function main() {
         matched++;
         if (skippedLLM) llmSkipped++;
         console.log(`  ✓ Matched to TM: ${bestMatch.attractionName || bestMatch.name}`);
-        console.log(`    Price: ${bestMatch.priceMin ? `From $${bestMatch.priceMin}` : 'N/A'}`);
+        console.log(`    Status: ${bestMatch.status || 'N/A'}`);
         console.log(`    URL: ${bestMatch.url || 'N/A'}`);
 
         if (!dryRun && event.enrichment) {

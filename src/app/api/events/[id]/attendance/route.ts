@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { upsertUserEvent, deleteUserEvent, getUserEventByEventId } from '@/db/userEvents';
-import { AttendanceStatus } from '@prisma/client';
+import { updateSquadMemberStatus } from '@/db/squads';
+import { AttendanceStatus, SquadMemberStatus } from '@prisma/client';
+import prisma from '@/db/prisma';
 
 export async function GET(
   request: NextRequest,
@@ -47,6 +49,34 @@ export async function POST(
       comment: comment || null,
     });
 
+    // Sync with squad status if user is in a squad for this event
+    const userSquad = await prisma.squad.findFirst({
+      where: {
+        eventId,
+        members: {
+          some: { userId: user.dbUser.id },
+        },
+      },
+    });
+
+    if (userSquad) {
+      let squadStatus: SquadMemberStatus | undefined;
+      
+      if (status === AttendanceStatus.GOING) {
+        squadStatus = SquadMemberStatus.IN;
+      } else if (status === AttendanceStatus.INTERESTED) {
+        squadStatus = SquadMemberStatus.THINKING;
+      }
+      // Note: NOT_GOING doesn't change squad status automatically
+      // User needs to explicitly go "OUT" in squad
+
+      if (squadStatus) {
+        await updateSquadMemberStatus(userSquad.id, user.dbUser.id, {
+          status: squadStatus,
+        });
+      }
+    }
+
     return NextResponse.json({ userEvent });
   } catch (error) {
     console.error('Error updating attendance:', error);
@@ -66,6 +96,23 @@ export async function DELETE(
     const { id: eventId } = await params;
 
     await deleteUserEvent(user.dbUser.id, eventId);
+
+    // Sync with squad status if user is in a squad for this event
+    const userSquad = await prisma.squad.findFirst({
+      where: {
+        eventId,
+        members: {
+          some: { userId: user.dbUser.id },
+        },
+      },
+    });
+
+    if (userSquad) {
+      // When removing event attendance, set squad status to OUT
+      await updateSquadMemberStatus(userSquad.id, user.dbUser.id, {
+        status: SquadMemberStatus.OUT,
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

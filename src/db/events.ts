@@ -46,6 +46,10 @@ export type EventDisplay = EventWithVenue & {
   displayTitle: string;              // ALWAYS resolved - use TM title if preferred, else event.title
   enrichment?: EnrichmentDisplay;
   social?: EventSocialSignals;
+  userSquad?: {                      // User's squad for this event (if any)
+    id: string;
+    hasSquad: boolean;
+  } | null;
 };
 
 // Legacy alias for backwards compatibility during migration
@@ -436,6 +440,20 @@ export async function getEventsWithSocialSignals(
     ? await getEventSocialSignals(events.map(e => e.id), params.userId)
     : new Map();
   
+  // Get user's squads for these events if user is logged in
+  const userSquads = params.userId ? await prisma.squad.findMany({
+    where: {
+      eventId: { in: events.map(e => e.id) },
+      members: {
+        some: { userId: params.userId },
+      },
+    },
+    select: { id: true, eventId: true },
+  }) : [];
+  
+  // Create squad map for quick lookup
+  const squadMap = new Map(userSquads.map(squad => [squad.eventId, { id: squad.id, hasSquad: true }]));
+  
   // Build EventDisplay objects with displayTitle computed ONCE here
   return events.map(event => {
     const enrichmentData = enrichmentMap.get(event.id);
@@ -449,6 +467,7 @@ export async function getEventsWithSocialSignals(
       ...event,
       displayTitle,
       social: signalsMap.get(event.id),
+      userSquad: squadMap.get(event.id) || null,
       enrichment: enrichmentData ? {
         spotifyUrl: enrichmentData.spotifyUrl,
         wikipediaUrl: enrichmentData.wikipediaUrl,
