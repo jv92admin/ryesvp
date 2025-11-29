@@ -10,7 +10,7 @@ interface ViewedSquad {
 }
 
 interface CachedSquadData {
-  squads: { id: string }[];
+  squads: { id: string; squadId?: string }[];
   cachedAt: number;
 }
 
@@ -66,10 +66,13 @@ export function markSquadAsViewed(squadId: string): void {
 /**
  * Cache recent squads for instant badge calculation
  */
-export function cacheRecentSquads(recentSquads: { id: string; isRecentSquadAddition?: boolean }[]): void {
+export function cacheRecentSquads(recentSquads: { id: string; isRecentSquadAddition?: boolean; userSquad?: any }[]): void {
   try {
     const recentData = {
-      squads: recentSquads.filter(s => s.isRecentSquadAddition).map(s => ({ id: s.id })),
+      squads: recentSquads.filter(s => s.isRecentSquadAddition).map(s => ({ 
+        id: s.id, 
+        squadId: s.userSquad?.id  // Store both event ID and squad ID
+      })),
       cachedAt: Date.now()
     };
     localStorage.setItem(RECENT_SQUADS_KEY, JSON.stringify(recentData));
@@ -92,7 +95,9 @@ export function getInstantBadgeCount(): number {
     if (Date.now() - cachedAt > 60 * 60 * 1000) return 0;
     
     const viewedIds = getViewedSquadIds();
-    return recentSquads.filter(squad => !viewedIds.includes(squad.id)).length;
+    return recentSquads.filter(squad => 
+      !viewedIds.includes(squad.id) && !viewedIds.includes(squad.squadId || '')
+    ).length;
   } catch (error) {
     console.error('Error getting instant badge count:', error);
     return 0;
