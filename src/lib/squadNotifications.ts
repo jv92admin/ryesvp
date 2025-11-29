@@ -109,10 +109,6 @@ export function countUnviewedRecentSquads(recentSquads: { id: string; isRecentSq
   const currentEventIds = new Set(recentSquads.map(s => s.id));
   const currentSquadIds = new Set(recentSquads.map(s => s.userSquad?.id).filter(Boolean));
   
-  // Create sets for both event IDs and squad IDs for proper cleanup
-  const currentEventIds = new Set(recentSquads.map(s => s.id));
-  const currentSquadIds = new Set(recentSquads.map(s => s.userSquad?.id).filter(Boolean));
-  
   // Clean up viewed squad IDs that no longer exist (check both event and squad IDs)
   const validViewedIds = viewedIds.filter(id => 
     currentEventIds.has(id) || currentSquadIds.has(id)
