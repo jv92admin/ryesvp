@@ -109,12 +109,19 @@ export function countUnviewedRecentSquads(recentSquads: { id: string; isRecentSq
   const currentEventIds = new Set(recentSquads.map(s => s.id));
   const currentSquadIds = new Set(recentSquads.map(s => s.userSquad?.id).filter(Boolean));
   
-  // TEMPORARILY DISABLE CLEANUP - it's causing issues
-  // TODO: Fix cleanup logic properly later
-  const validViewedIds = viewedIds; // Don't clean anything for now
+  // Create sets for both event IDs and squad IDs for proper cleanup
+  const currentEventIds = new Set(recentSquads.map(s => s.id));
+  const currentSquadIds = new Set(recentSquads.map(s => s.userSquad?.id).filter(Boolean));
+  
+  // Clean up viewed squad IDs that no longer exist (check both event and squad IDs)
+  const validViewedIds = viewedIds.filter(id => 
+    currentEventIds.has(id) || currentSquadIds.has(id)
+  );
   
   const count = recentSquads.filter(squad => 
-    squad.isRecentSquadAddition && !validViewedIds.includes(squad.id)
+    squad.isRecentSquadAddition && 
+    !validViewedIds.includes(squad.id) && 
+    !validViewedIds.includes(squad.userSquad?.id)
   ).length;
   
   // Cache recent squads for instant badge calculation
