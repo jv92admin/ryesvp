@@ -24,6 +24,12 @@ export async function GET() {
         event: {
           include: {
             venue: true,
+            enrichment: {
+              select: {
+                tmEventName: true,
+                tmPreferTitle: true,
+              },
+            },
           },
         },
       },
@@ -34,16 +40,23 @@ export async function GET() {
     });
 
     return NextResponse.json({
-      events: userEvents.map((ue) => ({
-        id: ue.id,
-        status: ue.status,
-        event: {
-          id: ue.event.id,
-          title: ue.event.title,
-          startDateTime: ue.event.startDateTime.toISOString(),
-          venue: { name: ue.event.venue.name },
-        },
-      })),
+      events: userEvents.map((ue) => {
+        // Compute displayTitle using same logic as data layer
+        const displayTitle = ue.event.enrichment?.tmPreferTitle && ue.event.enrichment?.tmEventName
+          ? ue.event.enrichment.tmEventName
+          : ue.event.title;
+        
+        return {
+          id: ue.id,
+          status: ue.status,
+          event: {
+            id: ue.event.id,
+            title: displayTitle, // Use computed displayTitle
+            startDateTime: ue.event.startDateTime.toISOString(),
+            venue: { name: ue.event.venue.name },
+          },
+        };
+      }),
     });
   } catch (error) {
     console.error('Error fetching user events:', error);

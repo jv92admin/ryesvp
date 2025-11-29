@@ -9,30 +9,47 @@ const AUSTIN_TIMEZONE = 'America/Chicago';
 
 export type EventWithVenue = Event & { venue: Venue };
 
-// Enrichment preview for event cards
-export type EnrichmentPreview = {
+// ============================================================================
+// CANONICAL EVENT TYPE - Use this everywhere for display
+// ============================================================================
+
+/**
+ * Enrichment data subset for UI display (not all 30+ fields)
+ */
+export type EnrichmentDisplay = {
   spotifyUrl: string | null;
   wikipediaUrl: string | null;
   genres: string[];
-  // TM data
-  displayTitle: string | null; // Computed: tmEventName if preferred, else null (use event.title)
   tmUrl: string | null;
-  tmPriceMin: number | null;
-  tmPriceMax: number | null;
 };
 
-// Social signals for an event
+/**
+ * Social signals for an event
+ */
 export type EventSocialSignals = {
-  userStatus: 'GOING' | 'INTERESTED' | null; // Current user's attendance status
+  userStatus: 'GOING' | 'INTERESTED' | null;
   friendsGoing: number;
   friendsInterested: number;
   communitiesGoing: { communityId: string; communityName: string; count: number }[];
 };
 
-export type EventWithSocial = EventWithVenue & {
+/**
+ * THE canonical event type for all UI display.
+ * 
+ * DISCIPLINE: Always use this type when displaying events.
+ * - displayTitle is ALWAYS computed at the data layer (never in components)
+ * - enrichment/social are optional but always the same shape
+ * 
+ * DO NOT create alternative event types for sub-use-cases.
+ */
+export type EventDisplay = EventWithVenue & {
+  displayTitle: string;              // ALWAYS resolved - use TM title if preferred, else event.title
+  enrichment?: EnrichmentDisplay;
   social?: EventSocialSignals;
-  enrichment?: EnrichmentPreview;
 };
+
+// Legacy alias for backwards compatibility during migration
+export type EventWithSocial = EventDisplay;
 
 export interface GetEventsParams {
   startDate?: Date;
@@ -105,6 +122,48 @@ export async function getEventById(id: string): Promise<EventWithVenue | null> {
     where: { id },
     include: { venue: true },
   });
+}
+
+/**
+ * Get a single event with displayTitle computed.
+ * USE THIS for event detail pages and anywhere displaying a single event.
+ */
+export async function getEventDisplay(id: string): Promise<EventDisplay | null> {
+  const event = await prisma.event.findUnique({
+    where: { id },
+    include: { venue: true },
+  });
+  
+  if (!event) return null;
+  
+  // Get enrichment data
+  const enrichment = await prisma.enrichment.findUnique({
+    where: { eventId: id },
+    select: {
+      spotifyUrl: true,
+      kgWikiUrl: true,
+      spotifyGenres: true,
+      tmEventName: true,
+      tmPreferTitle: true,
+      tmUrl: true,
+    },
+  });
+  
+  // Compute displayTitle ONCE here
+  const displayTitle = enrichment?.tmPreferTitle && enrichment?.tmEventName
+    ? enrichment.tmEventName
+    : event.title;
+  
+  return {
+    ...event,
+    displayTitle,
+    enrichment: enrichment ? {
+      spotifyUrl: enrichment.spotifyUrl,
+      wikipediaUrl: enrichment.kgWikiUrl,
+      genres: enrichment.spotifyGenres?.slice(0, 2) || [],
+      tmUrl: enrichment.tmUrl,
+    } : undefined,
+  };
 }
 
 export async function getEventsByDate(date: Date): Promise<EventWithVenue[]> {
@@ -366,34 +425,54 @@ export async function getEventSocialSignals(
 // Get events with social signals attached
 export async function getEventsWithSocialSignals(
   params: GetEventsParams & { userId: string }
-): Promise<EventWithSocial[]> {
+): Promise<EventDisplay[]> {
   const events = await getEventsWithAttendance(params);
   
-  // Get enrichment previews for all events
-  const enrichmentMap = await getEnrichmentPreviews(events.map(e => e.id));
+  // Get enrichment data for all events (includes displayTitle computation data)
+  const enrichmentMap = await getEnrichmentForDisplay(events.map(e => e.id));
   
-  if (!params.userId) {
-    return events.map(event => ({
+  // Get social signals if user is logged in
+  const signalsMap = params.userId 
+    ? await getEventSocialSignals(events.map(e => e.id), params.userId)
+    : new Map();
+  
+  // Build EventDisplay objects with displayTitle computed ONCE here
+  return events.map(event => {
+    const enrichmentData = enrichmentMap.get(event.id);
+    
+    // CANONICAL displayTitle computation - happens only here
+    const displayTitle = enrichmentData?.preferTMTitle && enrichmentData?.tmEventName
+      ? enrichmentData.tmEventName
+      : event.title;
+    
+    return {
       ...event,
-      enrichment: enrichmentMap.get(event.id),
-    }));
-  }
-  
-  const signalsMap = await getEventSocialSignals(
-    events.map(e => e.id),
-    params.userId
-  );
-  
-  return events.map(event => ({
-    ...event,
-    social: signalsMap.get(event.id),
-    enrichment: enrichmentMap.get(event.id),
-  }));
+      displayTitle,
+      social: signalsMap.get(event.id),
+      enrichment: enrichmentData ? {
+        spotifyUrl: enrichmentData.spotifyUrl,
+        wikipediaUrl: enrichmentData.wikipediaUrl,
+        genres: enrichmentData.genres,
+        tmUrl: enrichmentData.tmUrl,
+      } : undefined,
+    };
+  });
 }
 
-// Get enrichment preview data for event cards
-async function getEnrichmentPreviews(eventIds: string[]): Promise<Map<string, EnrichmentPreview>> {
-  const map = new Map<string, EnrichmentPreview>();
+// Internal type for enrichment fetch (includes title computation data)
+type EnrichmentForDisplay = {
+  spotifyUrl: string | null;
+  wikipediaUrl: string | null;
+  genres: string[];
+  tmUrl: string | null;
+  // For displayTitle computation
+  tmEventName: string | null;
+  preferTMTitle: boolean;
+};
+
+// Get enrichment data needed for display (internal use)
+async function getEnrichmentForDisplay(eventIds: string[]): Promise<Map<string, EnrichmentForDisplay>> {
+  const map = new Map<string, EnrichmentForDisplay>();
   
   if (eventIds.length === 0) return map;
   
@@ -407,12 +486,9 @@ async function getEnrichmentPreviews(eventIds: string[]): Promise<Map<string, En
       spotifyUrl: true,
       kgWikiUrl: true,
       spotifyGenres: true,
-      // TM fields
       tmEventName: true,
       tmPreferTitle: true,
       tmUrl: true,
-      tmPriceMin: true,
-      tmPriceMax: true,
     },
   });
   
@@ -421,11 +497,9 @@ async function getEnrichmentPreviews(eventIds: string[]): Promise<Map<string, En
       spotifyUrl: e.spotifyUrl,
       wikipediaUrl: e.kgWikiUrl,
       genres: e.spotifyGenres?.slice(0, 2) || [],
-      // Compute displayTitle: use TM name only if explicitly preferred
-      displayTitle: e.tmPreferTitle && e.tmEventName ? e.tmEventName : null,
       tmUrl: e.tmUrl,
-      tmPriceMin: e.tmPriceMin,
-      tmPriceMax: e.tmPriceMax,
+      tmEventName: e.tmEventName,
+      preferTMTitle: e.tmPreferTitle,
     });
   }
   

@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { EventWithSocial } from '@/db/events';
+import { EventDisplay } from '@/db/events';
 import { formatEventDate, isNewListing } from '@/lib/utils';
 
 interface EventCardProps {
-  event: EventWithSocial;
+  event: EventDisplay;
 }
 
 export function EventCard({ event }: EventCardProps) {
@@ -13,8 +13,8 @@ export function EventCard({ event }: EventCardProps) {
   const enrichment = event.enrichment;
   const isNew = isNewListing(event.createdAt);
   
-  // Use TM-preferred title if available, otherwise fallback to event title
-  const displayTitle = enrichment?.displayTitle || event.title;
+  // displayTitle is already computed at the data layer - use directly
+  const { displayTitle } = event;
   
   const categoryColors: Record<string, string> = {
     CONCERT: 'bg-purple-100 text-purple-800',

@@ -156,7 +156,7 @@ export function ProfileContent() {
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder="Your name"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <p className="text-xs text-gray-500 mt-1">
             This is how your name appears to friends and in communities
@@ -250,7 +250,7 @@ export function ProfileContent() {
               value={deleteConfirmText}
               onChange={(e) => setDeleteConfirmText(e.target.value)}
               placeholder="Type DELETE"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4 font-mono"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4 font-mono"
               autoFocus
             />
 

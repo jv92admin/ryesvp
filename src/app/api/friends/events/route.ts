@@ -19,7 +19,7 @@ export async function GET() {
       return NextResponse.json({ events: [] });
     }
 
-    // Get friends' upcoming events
+    // Get friends' upcoming events with enrichment for displayTitle
     const friendEvents = await prisma.userEvent.findMany({
       where: {
         userId: { in: friendIds },
@@ -38,10 +38,13 @@ export async function GET() {
           },
         },
         event: {
-          select: {
-            id: true,
-            title: true,
-            startDateTime: true,
+          include: {
+            enrichment: {
+              select: {
+                tmEventName: true,
+                tmPreferTitle: true,
+              },
+            },
           },
         },
       },
@@ -52,15 +55,22 @@ export async function GET() {
     });
 
     return NextResponse.json({
-      events: friendEvents.map((fe) => ({
-        friendId: fe.user.id,
-        friendName: fe.user.displayName || fe.user.email.split('@')[0],
-        event: {
-          id: fe.event.id,
-          title: fe.event.title,
-          startDateTime: fe.event.startDateTime.toISOString(),
-        },
-      })),
+      events: friendEvents.map((fe) => {
+        // Compute displayTitle using same logic as data layer
+        const displayTitle = fe.event.enrichment?.tmPreferTitle && fe.event.enrichment?.tmEventName
+          ? fe.event.enrichment.tmEventName
+          : fe.event.title;
+        
+        return {
+          friendId: fe.user.id,
+          friendName: fe.user.displayName || fe.user.email.split('@')[0],
+          event: {
+            id: fe.event.id,
+            title: displayTitle, // Use computed displayTitle
+            startDateTime: fe.event.startDateTime.toISOString(),
+          },
+        };
+      }),
     });
   } catch (error) {
     console.error('Error fetching friends events:', error);

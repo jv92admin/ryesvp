@@ -79,7 +79,7 @@ JSON response:
         model: 'gpt-4o',
         messages: [{ role: 'user', content: prompt }],
         temperature: 0,
-        max_tokens: 200,
+        max_tokens: 400,
       }),
     });
 
@@ -304,20 +304,39 @@ async function main() {
               tmEventId: bestMatch.id,
               tmEventName: bestMatch.name,
               tmUrl: bestMatch.url,
-              tmPriceMin: bestMatch.priceMin,
-              tmPriceMax: bestMatch.priceMax,
-              tmPriceCurrency: bestMatch.priceCurrency,
+              
+              // Sales dates
               tmOnSaleStart: bestMatch.onSaleStart,
               tmOnSaleEnd: bestMatch.onSaleEnd,
               tmPresales: bestMatch.presales ?? undefined,
+              
+              // Images
               tmImageUrl: bestMatch.imageUrl,
+              tmSeatmapUrl: bestMatch.seatmapUrl,
+              
+              // Artist info
               tmAttractionId: bestMatch.attractionId,
               tmAttractionName: bestMatch.attractionName,
+              tmSupportingActs: bestMatch.supportingActs,
+              tmExternalLinks: bestMatch.externalLinks ?? undefined,
+              
+              // Classification
               tmGenre: bestMatch.genre,
               tmSubGenre: bestMatch.subGenre,
               tmSegment: bestMatch.segment,
-              tmSupportingActs: bestMatch.supportingActs,
-              tmExternalLinks: bestMatch.externalLinks ?? undefined,
+              
+              // Event details
+              tmInfo: bestMatch.info,
+              tmPleaseNote: bestMatch.pleaseNote,
+              tmTicketLimit: bestMatch.ticketLimit,
+              tmTimezone: bestMatch.timezone,
+              
+              // Promoter
+              tmPromoterId: bestMatch.promoterId,
+              tmPromoterName: bestMatch.promoterName,
+              
+              // Status & matching
+              tmStatus: bestMatch.status,
               tmMatchConfidence: bestSimilarity,
               tmPreferTitle: preferTMTitle,
               tmLastChecked: new Date(),

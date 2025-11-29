@@ -20,7 +20,6 @@ import {
   searchEvents, 
   getBestImageUrl, 
   getPrimaryClassification,
-  getStandardPriceRange,
   getSupportingActs,
   getExternalLinks,
   isConfigured 
@@ -110,7 +109,6 @@ async function main() {
   for (const { venueSlug, event } of allTMEvents) {
     try {
       const classification = getPrimaryClassification(event);
-      const prices = getStandardPriceRange(event);
       const supportingActs = getSupportingActs(event);
       const externalLinks = getExternalLinks(event);
       const mainAttraction = event._embedded?.attractions?.[0];
@@ -153,29 +151,44 @@ async function main() {
           venueSlug,
           tmVenueId: VENUE_TM_MAPPING[venueSlug].tmVenueId,
           name: event.name,
-          localDate, // YYYY-MM-DD for clean matching
+          url: event.url || null,
+          
+          // Dates
+          localDate,
           startDateTime,
           endDateTime,
-          url: event.url || null,
-          priceMin: prices.min,
-          priceMax: prices.max,
-          priceCurrency: prices.currency,
+          timezone: event.dates?.timezone || null,
+          spanMultipleDays: event.dates?.spanMultipleDays || false,
+          
+          // Sales
           onSaleStart,
           onSaleEnd,
-          presales: event.sales?.presales || null,
+          presales: event.sales?.presales ? JSON.parse(JSON.stringify(event.sales.presales)) : undefined,
+          
+          // Images
           imageUrl: getBestImageUrl(event),
+          seatmapUrl: event.seatmap?.staticUrl || null,
+          
+          // Artist info
           attractionId: mainAttraction?.id || null,
           attractionName: mainAttraction?.name || null,
+          supportingActs,
+          externalLinks: Object.keys(externalLinks).length > 0 ? externalLinks : undefined,
+          
+          // Classification
           genre: classification.genre,
           subGenre: classification.subGenre,
           segment: classification.segment,
-          supportingActs,
-          externalLinks: Object.keys(externalLinks).length > 0 ? externalLinks : null,
-          // Additional fields
+          
+          // Promoter
+          promoterId: event.promoter?.id || null,
+          promoterName: event.promoter?.name || null,
+          
+          // Status & notes
           status: event.dates?.status?.code || null,
-          seatmapUrl: event.seatmap?.staticUrl || null,
-          pleaseNote: event.pleaseNote || null,
           info: event.info || null,
+          pleaseNote: event.pleaseNote || null,
+          ticketLimit: event.accessibility?.ticketLimit || null,
         },
       });
       inserted++;

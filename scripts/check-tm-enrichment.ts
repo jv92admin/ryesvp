@@ -28,11 +28,6 @@ async function main() {
     where: { tmPreferTitle: true },
   });
 
-  // Events with prices
-  const withPrices = await prisma.enrichment.count({
-    where: { tmPriceMin: { not: null } },
-  });
-
   // Events with URLs
   const withUrls = await prisma.enrichment.count({
     where: { tmUrl: { not: null } },
@@ -42,7 +37,6 @@ async function main() {
   console.log(`  Total upcoming events:  ${totalEvents}`);
   console.log(`  With TM match:          ${withTM} (${((withTM/totalEvents)*100).toFixed(1)}%)`);
   console.log(`  With TM URL:            ${withUrls}`);
-  console.log(`  With TM prices:         ${withPrices}`);
   console.log(`  Prefer TM title:        ${preferTM}`);
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
@@ -62,8 +56,8 @@ async function main() {
     }
   }
 
-  // Show some matched events with prices
-  console.log('💰 Sample events with TM data:\n');
+  // Show some matched events
+  console.log('🎫 Sample events with TM data:\n');
   const samples = await prisma.enrichment.findMany({
     where: { tmEventId: { not: null } },
     include: { event: { select: { title: true, startDateTime: true, venue: { select: { name: true } } } } },
@@ -74,7 +68,6 @@ async function main() {
     console.log(`  ${e.event.title}`);
     console.log(`    Venue: ${e.event.venue.name}`);
     console.log(`    Date: ${e.event.startDateTime.toLocaleDateString()}`);
-    console.log(`    Price: ${e.tmPriceMin ? `From $${e.tmPriceMin}` : 'N/A'}`);
     console.log(`    TM URL: ${e.tmUrl ? 'Yes' : 'No'}`);
     console.log('');
   }

@@ -284,7 +284,6 @@ export function extractTMEnrichmentData(
   preferTMTitle: boolean = false
 ): TMEnrichmentData {
   const classification = getPrimaryClassification(tmEvent);
-  const prices = getStandardPriceRange(tmEvent);
   const supportingActs = getSupportingActs(tmEvent);
   const externalLinks = getExternalLinks(tmEvent);
   
@@ -306,9 +305,6 @@ export function extractTMEnrichmentData(
     tmEventId: tmEvent.id,
     tmEventName: tmEvent.name, // Full TM event title
     tmUrl: tmEvent.url || null,
-    tmPriceMin: prices.min,
-    tmPriceMax: prices.max,
-    tmPriceCurrency: prices.currency,
     tmOnSaleStart: onSaleStart,
     tmOnSaleEnd: onSaleEnd,
     tmPresales: tmEvent.sales?.presales || null,

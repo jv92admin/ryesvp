@@ -5,6 +5,7 @@
 Master tracker for all workstreams. Individual specs contain implementation details.
 
 **Spec Documents:**
+- `data-model-101.md` - **Canonical event types & access patterns (READ FIRST)**
 - `ui-polish-spec.md` - Visual improvements, event cards, layout, social sidebar
 - `social-layer-spec.md` - Friends, lists, communities
 - `social-layer-phase5-spec.md` - Invite codes, user discovery
@@ -17,33 +18,38 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 | # | Item | Spec | Est. Time | Status |
 |---|------|------|-----------|--------|
-| 1 | **Data Model Cleanup** | - | 2-3 hrs | 🔴 HIGH PRIORITY |
-| 2 | **Buy with TM UI** | - | 1-2 hrs | 🔲 Next |
+| 1 | **TM Data Display** | - | 1-2 hrs | 🔲 Next - scope what to show |
+| 2 | **Data Model Cleanup** | `data-model-101.md` | 2-3 hrs | ✅ Complete |
 | 3 | **SeatGeek API** | `data-enrichment-spec.md` | 2 hrs | 🔲 Pending API approval |
 | 4 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
 | 5 | **"Go Together" UX Design** | - | Design phase | 🔲 Think through |
 
-### Data Model Cleanup (HIGH PRIORITY)
-**Problem:** Event data is fragmented across multiple fetch patterns:
-- `EventCard` uses `EventWithSocial` with `EnrichmentPreview`
-- Event detail page fetches event + enrichment separately
-- `SocialSidebar` has its own API without enrichment
+### TM Data Display (NEXT)
+**Context:** We now capture reliable TM data that we're not yet surfacing:
+- **On-sale dates** (tmOnSaleStart/End) - show "On sale: Dec 1" or "On sale now"
+- **Presales** (tmPresales) - "Presale starts Nov 30"
+- **Supporting acts** (tmSupportingActs) - show openers on event detail
+- **Seatmap URL** (tmSeatmapUrl) - link to venue seatmap
+- **External links** (tmExternalLinks) - Spotify/YouTube artist links
+- **Genre/segment** (tmGenre, tmSegment) - could improve categorization
 
-**Solution:** Consolidate into a single canonical event type:
-```typescript
-type EventWithDisplay = Event & {
-  displayTitle: string; // Always computed once at data layer
-  venue: Venue;
-  enrichment?: EnrichmentPreview;
-  social?: SocialSignals;
-};
-```
-- Compute `displayTitle` ONCE in the data layer
-- All views consume the same shape
-- Document data model in schema/types
+**Scope:** Decide what's worth showing and where:
+- Event cards: on-sale status badge?
+- Event detail: supporting acts, presale info, seatmap link?
+- Use TM genres to improve auto-categorization?
+
+### Data Model Cleanup ✅ COMPLETE
+See `data-model-101.md` for full documentation.
+
+**What was done:**
+- Created `EventDisplay` as the canonical event type
+- `displayTitle` computed ONCE at data layer (never in components)
+- All views use same shape: list, detail, sidebar APIs
+- Fixed SocialSidebar bug (was using raw title, not TM-preferred)
+- Documented patterns and anti-patterns
 
 ### API Integration Status
-- ✅ **Ticketmaster Discovery API** - Complete (enrichment layer)
+- ✅ **Ticketmaster Discovery API** - Complete (cache + enrichment + UI)
 - 🔲 **SeatGeek API** - Pending API key approval
 
 ---
@@ -184,11 +190,13 @@ type EventWithDisplay = Event & {
 ### Sprint: Ticketmaster Integration (Complete ✅)
 - [x] TM Discovery API client with rate limiting
 - [x] TMEventCache for batch downloads (6 API calls for all venues)
-- [x] LLM-powered event matching (same venue + date)
-- [x] Captures: URLs, prices, presales, genres, supporting acts
+- [x] LLM-powered event matching (chain-of-thought prompting, gpt-4o)
+- [x] Schema cleanup: removed unreliable fields (price, source) from Discovery API
+- [x] Captures: URLs, presales, genres, supporting acts, seatmaps, on-sale dates
 - [x] `displayTitle` computed from enrichment (tmPreferTitle)
 - [x] Scripts: download-tm-cache, enrich-tm-from-cache, check-tm-enrichment
-- [ ] Buy with TM UI (next)
+- [x] Buy on Ticketmaster button (TM blue, with disclaimer)
+- [x] UI polish: back button, input text colors
 
 ### Sprint: API Integration (Next)
 - [ ] SeatGeek API integration (pending approval)
@@ -200,5 +208,5 @@ type EventWithDisplay = Event & {
 
 ---
 
-**Last Updated:** November 28, 2025
+**Last Updated:** November 29, 2025
 

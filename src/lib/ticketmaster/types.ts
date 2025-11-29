@@ -34,6 +34,10 @@ export interface TMEvent {
   additionalInfo?: string;
   info?: string;
   pleaseNote?: string;
+  
+  // Source indicates primary vs resale
+  // ticketmaster = primary, tmr = Ticketmaster Resale
+  source?: 'ticketmaster' | 'universe' | 'frontgate' | 'tmr';
 
   // Images
   images?: TMImage[];
@@ -302,9 +306,6 @@ export interface TMEnrichmentData {
   tmEventId: string;
   tmEventName: string; // Full TM event name (often more descriptive)
   tmUrl: string | null;
-  tmPriceMin: number | null;
-  tmPriceMax: number | null;
-  tmPriceCurrency: string | null;
   tmOnSaleStart: Date | null;
   tmOnSaleEnd: Date | null;
   tmPresales: TMPresale[] | null;

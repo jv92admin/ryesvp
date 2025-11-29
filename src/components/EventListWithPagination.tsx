@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { EventCard } from '@/components/EventCard';
 import { formatDateHeading, groupEventsByDateClient } from '@/lib/utils';
-import type { EventWithSocial } from '@/db/events';
+import type { EventDisplay } from '@/db/events';
 
 interface EventListWithPaginationProps {
-  initialEvents: EventWithSocial[];
+  initialEvents: EventDisplay[];
   initialHasMore: boolean;
   filters: {
     venueIds?: string;
@@ -25,7 +25,7 @@ export function EventListWithPagination({
   initialHasMore,
   filters,
 }: EventListWithPaginationProps) {
-  const [events, setEvents] = useState<EventWithSocial[]>(initialEvents);
+  const [events, setEvents] = useState<EventDisplay[]>(initialEvents);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [loading, setLoading] = useState(false);
 

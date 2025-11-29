@@ -105,11 +105,17 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
-          <Link href="/" className="hover:underline">
-            ← Back to events
+        <div className="text-center mt-4">
+          <Link 
+            href="/" 
+            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            All Events
           </Link>
-        </p>
+        </div>
       </div>
     </main>
   );
