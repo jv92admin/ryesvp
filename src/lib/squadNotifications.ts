@@ -109,25 +109,9 @@ export function countUnviewedRecentSquads(recentSquads: { id: string; isRecentSq
   const currentEventIds = new Set(recentSquads.map(s => s.id));
   const currentSquadIds = new Set(recentSquads.map(s => s.userSquad?.id).filter(Boolean));
   
-  // Clean up viewed squad IDs that no longer exist (user left squad, squad deleted, etc.)
-  const validViewedIds = viewedIds.filter(id => 
-    currentEventIds.has(id) || currentSquadIds.has(id) // Check both event and squad IDs
-  );
-  if (validViewedIds.length !== viewedIds.length) {
-    // Update localStorage to remove orphaned entries
-    const stored = localStorage.getItem(VIEWED_SQUADS_KEY);
-    if (stored) {
-      try {
-        const viewedSquads: ViewedSquad[] = JSON.parse(stored);
-        const cleanedSquads = viewedSquads.filter(squad => 
-          currentEventIds.has(squad.squadId) || currentSquadIds.has(squad.squadId)
-        );
-        localStorage.setItem(VIEWED_SQUADS_KEY, JSON.stringify(cleanedSquads));
-      } catch (error) {
-        console.error('Error cleaning viewed squads:', error);
-      }
-    }
-  }
+  // TEMPORARILY DISABLE CLEANUP - it's causing issues
+  // TODO: Fix cleanup logic properly later
+  const validViewedIds = viewedIds; // Don't clean anything for now
   
   const count = recentSquads.filter(squad => 
     squad.isRecentSquadAddition && !validViewedIds.includes(squad.id)
