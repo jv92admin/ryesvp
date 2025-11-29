@@ -38,7 +38,7 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
 export function DialogContent({ children, className = "max-w-md" }: DialogContentProps) {
   return (
     <div 
-      className={`bg-white rounded-xl w-full shadow-xl border border-gray-200 max-h-[90vh] overflow-y-auto ${className}`}
+      className={`bg-white rounded-xl w-full shadow-xl border border-gray-200 max-h-[85vh] overflow-y-auto m-4 sm:m-6 ${className}`}
       onClick={(e) => e.stopPropagation()}
     >
       {children}

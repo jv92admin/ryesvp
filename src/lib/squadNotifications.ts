@@ -42,8 +42,10 @@ export function getViewedSquadIds(): string[] {
  * Mark a squad as viewed
  */
 export function markSquadAsViewed(squadId: string): void {
+  console.log('🔍 markSquadAsViewed called with:', squadId);
   try {
     const stored = localStorage.getItem(VIEWED_SQUADS_KEY);
+    console.log('🔍 Current stored data:', stored);
     const viewedIds = JSON.parse(stored || '[]');
     
     // Convert existing entries to proper format
@@ -58,8 +60,9 @@ export function markSquadAsViewed(squadId: string): void {
     }
     
     localStorage.setItem(VIEWED_SQUADS_KEY, JSON.stringify(viewedSquads));
+    console.log('🔍 Successfully stored:', JSON.stringify(viewedSquads));
   } catch (error) {
-    console.error('Error marking squad as viewed:', error);
+    console.error('❌ Error marking squad as viewed:', error);
   }
 }
 
