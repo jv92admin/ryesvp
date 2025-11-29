@@ -243,9 +243,11 @@ enum EventCategory {
 }
 
 enum AttendanceStatus {
-  GOING
-  INTERESTED
-  NOT_GOING
+  INTERESTED      // On my radar, maybe
+  GOING           // Committed, have ticket or will get one
+  NEED_TICKETS    // Actively looking for tickets
+  HAVE_TICKETS    // Have extras to share/sell
+  NOT_GOING       // Explicitly not going
 }
 
 enum FriendshipStatus {

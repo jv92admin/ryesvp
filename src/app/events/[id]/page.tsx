@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getEventDisplay, getEventDetailedSocial } from '@/db/events';
 import { Header } from '@/components/Header';
 import { AttendanceButton } from '@/components/AttendanceButton';
+import { AttendanceSummary } from '@/components/AttendanceSummary';
 import { ShareButton } from '@/components/ShareButton';
 import { EventSocialSection } from '@/components/EventSocialSection';
 import { EventEnrichment } from '@/components/EventEnrichment';
@@ -227,13 +228,10 @@ export default async function EventPage({ params }: EventPageProps) {
 
         {/* Attendance section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-gray-900">Are you going?</h2>
-            {(attendance.going > 0 || attendance.interested > 0) && (
-              <p className="text-sm text-gray-600">
-                {attendance.going} going{attendance.going !== 1 ? '' : ''} • {attendance.interested} interested
-              </p>
-            )}
+          <div className="mb-4">
+            <h2 className="font-semibold text-gray-900 mb-2">What's your status?</h2>
+            {/* Attendance summary - tappable to see who */}
+            <AttendanceSummary eventId={id} attendance={attendance} />
           </div>
           
           {user ? (
@@ -244,24 +242,38 @@ export default async function EventPage({ params }: EventPageProps) {
             />
           ) : (
             <div className="space-y-3">
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <button
                   disabled
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed text-sm"
                 >
-                  ✓ Going
+                  ★ Interested
                 </button>
                 <button
                   disabled
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed text-sm"
                 >
-                  ★ Interested
+                  ✓ Going
+                </button>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  disabled
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed text-sm"
+                >
+                  🎫 Need Tickets
+                </button>
+                <button
+                  disabled
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed text-sm"
+                >
+                  🎟️ Have Tickets
                 </button>
               </div>
               <p className="text-xs text-gray-500 text-center">
                 <Link href="/login" className="text-blue-600 hover:underline">
                   Sign in
-                </Link> to mark your attendance
+                </Link> to mark your status
               </p>
             </div>
           )}

@@ -10,6 +10,25 @@ interface AttendanceButtonProps {
   onStatusChange?: () => void;
 }
 
+const STATUS_CONFIG = {
+  INTERESTED: {
+    label: '★ Interested',
+    activeClass: 'bg-yellow-500 text-white hover:bg-yellow-600',
+  },
+  GOING: {
+    label: '✓ Going',
+    activeClass: 'bg-green-600 text-white hover:bg-green-700',
+  },
+  NEED_TICKETS: {
+    label: '🎫 Need Tickets',
+    activeClass: 'bg-blue-600 text-white hover:bg-blue-700',
+  },
+  HAVE_TICKETS: {
+    label: '🎟️ Have Tickets',
+    activeClass: 'bg-purple-600 text-white hover:bg-purple-700',
+  },
+} as const;
+
 export function AttendanceButton({ 
   eventId, 
   currentStatus, 
@@ -33,7 +52,7 @@ export function AttendanceButton({
         setShowComment(false);
         setComment('');
       } else {
-        // Set new status
+        // Set new status (mutually exclusive - only one at a time)
         const response = await fetch(`/api/events/${eventId}/attendance`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -79,55 +98,64 @@ export function AttendanceButton({
     }
   };
 
+  const renderButton = (statusKey: keyof typeof STATUS_CONFIG) => {
+    const config = STATUS_CONFIG[statusKey];
+    const isActive = status === statusKey;
+    
+    return (
+      <button
+        onClick={() => handleStatusChange(statusKey)}
+        disabled={isLoading}
+        className={`
+          flex-1 px-3 py-2 rounded-lg font-medium transition-colors text-sm
+          ${isActive
+            ? config.activeClass
+            : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+          }
+          disabled:opacity-50 disabled:cursor-not-allowed
+        `}
+      >
+        {config.label}
+      </button>
+    );
+  };
+
   return (
     <div className="space-y-4">
-      <div className="flex gap-3">
-        <button
-          onClick={() => handleStatusChange('GOING')}
-          disabled={isLoading}
-          className={`
-            flex-1 px-4 py-2 rounded-lg font-medium transition-colors
-            ${status === 'GOING'
-              ? 'bg-green-600 text-white hover:bg-green-700'
-              : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-            }
-            disabled:opacity-50 disabled:cursor-not-allowed
-          `}
-        >
-          ✓ Going
-        </button>
-        <button
-          onClick={() => handleStatusChange('INTERESTED')}
-          disabled={isLoading}
-          className={`
-            flex-1 px-4 py-2 rounded-lg font-medium transition-colors
-            ${status === 'INTERESTED'
-              ? 'bg-yellow-500 text-white hover:bg-yellow-600'
-              : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
-            }
-            disabled:opacity-50 disabled:cursor-not-allowed
-          `}
-        >
-          ★ Interested
-        </button>
+      {/* Row 1: Attendance status */}
+      <div className="flex gap-2">
+        {renderButton('INTERESTED')}
+        {renderButton('GOING')}
+      </div>
+      
+      {/* Row 2: Ticket status */}
+      <div className="flex gap-2">
+        {renderButton('NEED_TICKETS')}
+        {renderButton('HAVE_TICKETS')}
       </div>
 
       {showComment && (
         <div>
           <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">
-            Add a comment (optional)
+            Add a note (optional)
           </label>
           <textarea
             id="comment"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             onBlur={handleCommentSave}
-            placeholder="e.g., Section 105, Row F, Seat 9"
+            placeholder={
+              status === 'HAVE_TICKETS' 
+                ? 'e.g., 2 GA tickets at face value'
+                : status === 'NEED_TICKETS'
+                ? 'e.g., Looking for 1 ticket, flexible on price'
+                : 'e.g., Section 105, Row F'
+            }
             rows={2}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm text-gray-900"
           />
-          <p className="text-xs text-gray-600 mt-1">
-            Comment saves automatically when you click away
+          <p className="text-xs text-gray-500 mt-1">
+            Saves automatically
           </p>
         </div>
       )}

@@ -6,9 +6,10 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 **Spec Documents:**
 - `data-model-101.md` - **Canonical event types & access patterns (READ FIRST)**
-- `ui-polish-spec.md` - Visual improvements, event cards, layout, social sidebar
-- `social-layer-spec.md` - Friends, lists, communities
-- `social-layer-phase5-spec.md` - Invite codes, user discovery
+- `squads-social-spec.md` - **Squads, Social Tab, Ticket Exchange (ACTIVE)**
+- `ui-polish-spec.md` - Visual improvements, event cards, layout
+- `social-layer-spec.md` - Friends, lists, communities (legacy)
+- `social-layer-phase5-spec.md` - Invite codes
 - `data-enrichment-spec.md` - Knowledge Graph, Spotify integration
 - `scheduled-jobs-spec.md` - Cron for scraping + enrichment
 
@@ -18,39 +19,42 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 | # | Item | Spec | Est. Time | Status |
 |---|------|------|-----------|--------|
-| 1 | **TM Data Display** | - | 1-2 hrs | 🔲 Next - scope what to show |
-| 2 | **Data Model Cleanup** | `data-model-101.md` | 2-3 hrs | ✅ Complete |
-| 3 | **SeatGeek API** | `data-enrichment-spec.md` | 2 hrs | 🔲 Pending API approval |
-| 4 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
-| 5 | **"Go Together" UX Design** | - | Design phase | 🔲 Think through |
+| 1 | **Phase 0: Ticket Statuses** | `squads-social-spec.md` | 1-2 days | 🔲 Next |
+| 2 | **Phase 1: Social Tab + Squads** | `squads-social-spec.md` | 2-3 weeks | 🔲 After Phase 0 |
+| 3 | **Phase 2: Communities Reimagined** | `squads-social-spec.md` | 2-3 weeks | 🔲 After Phase 1 |
+| 4 | **Phase 3: Soft Reputation** | `squads-social-spec.md` | 1 week | 🔲 After Phase 2 |
+| 5 | **TM Data Display** | - | 1-2 hrs | 🔲 When time permits |
+| 6 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
 
-### TM Data Display (NEXT)
-**Context:** We now capture reliable TM data that we're not yet surfacing:
-- **On-sale dates** (tmOnSaleStart/End) - show "On sale: Dec 1" or "On sale now"
-- **Presales** (tmPresales) - "Presale starts Nov 30"
-- **Supporting acts** (tmSupportingActs) - show openers on event detail
-- **Seatmap URL** (tmSeatmapUrl) - link to venue seatmap
-- **External links** (tmExternalLinks) - Spotify/YouTube artist links
-- **Genre/segment** (tmGenre, tmSegment) - could improve categorization
+### Phase 0: Ticket Statuses (NEXT)
+See `squads-social-spec.md` for full details.
 
-**Scope:** Decide what's worth showing and where:
-- Event cards: on-sale status badge?
-- Event detail: supporting acts, presale info, seatmap link?
-- Use TM genres to improve auto-categorization?
+**What we're adding:**
+- Expand UserEventStatus: `INTERESTED | GOING | NEED_TICKETS | HAVE_TICKETS`
+- Mutually exclusive statuses (one at a time)
+- Richer friend summary on event detail: "3 Going · 1 Needs tickets · 2 Have tickets"
+- Tappable lists for each status
+
+**Value:** "Oh, Alex needs a ticket, I'll DM him" - no marketplace needed.
+
+### Phase 1: Social Tab + Squads
+See `squads-social-spec.md` for full details.
+
+**What we're building:**
+- Kill SocialSidebar → New Social Tab toggle
+- Section A: Your Plans (Squads + Going)
+- Section B: Almost Plans (You + friends overlapping)
+- Section C: Ticket Activity (friends need/have)
+- Squad rooms with status, tickets, logistics
+- "Go Together" button creates Squads
+- Export "Share plan" text templates
 
 ### Data Model Cleanup ✅ COMPLETE
 See `data-model-101.md` for full documentation.
 
-**What was done:**
-- Created `EventDisplay` as the canonical event type
-- `displayTitle` computed ONCE at data layer (never in components)
-- All views use same shape: list, detail, sidebar APIs
-- Fixed SocialSidebar bug (was using raw title, not TM-preferred)
-- Documented patterns and anti-patterns
-
 ### API Integration Status
 - ✅ **Ticketmaster Discovery API** - Complete (cache + enrichment + UI)
-- 🔲 **SeatGeek API** - Pending API key approval
+- 🔲 **SeatGeek API** - Deprioritized
 
 ---
 
