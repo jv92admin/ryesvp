@@ -9,6 +9,11 @@ interface ViewedSquad {
   viewedAt: number;
 }
 
+interface CachedSquadData {
+  squads: { id: string }[];
+  cachedAt: number;
+}
+
 /**
  * Get list of viewed squad IDs (with cleanup of old entries)
  */
@@ -42,13 +47,13 @@ export function markSquadAsViewed(squadId: string): void {
     const viewedIds = JSON.parse(stored || '[]');
     
     // Convert existing entries to proper format
-    const viewedSquads = viewedIds.map((entry: any) => ({
+    const viewedSquads: ViewedSquad[] = viewedIds.map((entry: any) => ({
       squadId: typeof entry === 'string' ? entry : entry.squadId,
       viewedAt: typeof entry === 'string' ? Date.now() : entry.viewedAt
     }));
     
     // Add new squad if not already viewed
-    if (!viewedSquads.some(squad => squad.squadId === squadId)) {
+    if (!viewedSquads.some((squad: ViewedSquad) => squad.squadId === squadId)) {
       viewedSquads.push({ squadId, viewedAt: Date.now() });
     }
     
@@ -81,7 +86,7 @@ export function getInstantBadgeCount(): number {
     const recentData = localStorage.getItem(RECENT_SQUADS_KEY);
     if (!recentData) return 0;
     
-    const { squads: recentSquads, cachedAt } = JSON.parse(recentData);
+    const { squads: recentSquads, cachedAt }: CachedSquadData = JSON.parse(recentData);
     
     // Expire cached data after 1 hour
     if (Date.now() - cachedAt > 60 * 60 * 1000) return 0;
