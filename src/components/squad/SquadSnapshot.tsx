@@ -20,9 +20,11 @@ interface Squad {
 
 interface SquadSnapshotProps {
   squad: Squad;
+  onInviteFriends?: () => void;
+  isOrganizer?: boolean;
 }
 
-export function SquadSnapshot({ squad }: SquadSnapshotProps) {
+export function SquadSnapshot({ squad, onInviteFriends, isOrganizer }: SquadSnapshotProps) {
   const { members } = squad;
   
   // Calculate status counts
@@ -139,11 +141,11 @@ export function SquadSnapshot({ squad }: SquadSnapshotProps) {
                 return (
                   <div key={buyer.id} className="text-gray-600 bg-purple-50 p-2 rounded">
                     <span className="font-medium">
-                      {buyer.user.displayName || buyer.user.email}
+                      {buyer.user.displayName || buyer.user.email.split('@')[0]}
                     </span>
                     <span className="text-gray-500"> is buying tickets for </span>
                     <span className="font-medium">
-                      {buyingForMembers.map(m => m.user.displayName || m.user.email).join(', ')}
+                      {buyingForMembers.map(m => m.user.displayName || m.user.email.split('@')[0]).join(', ')}
                     </span>
                   </div>
                 );
@@ -160,10 +162,10 @@ export function SquadSnapshot({ squad }: SquadSnapshotProps) {
             <div key={member.id} className="flex items-center justify-between text-sm">
               <div className="flex items-center gap-2">
                 <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600">
-                  {(member.user.displayName || member.user.email).charAt(0).toUpperCase()}
+                  {(member.user.displayName || member.user.email.split('@')[0]).charAt(0).toUpperCase()}
                 </div>
                 <span className="text-gray-900">
-                  {member.user.displayName || member.user.email}
+                  {member.user.displayName || member.user.email.split('@')[0]}
                 </span>
                 {member.isOrganizer && (
                   <span className="text-xs px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded">
@@ -203,6 +205,18 @@ export function SquadSnapshot({ squad }: SquadSnapshotProps) {
             </div>
           ))}
         </div>
+        
+        {/* Invite Friends Button */}
+        {isOrganizer && onInviteFriends && (
+          <div className="mt-3 pt-3 border-t border-gray-100">
+            <button
+              onClick={onInviteFriends}
+              className="w-full px-3 py-2 text-sm font-medium text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-50 transition-colors"
+            >
+              + Invite Friends
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

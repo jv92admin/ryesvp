@@ -12,6 +12,9 @@ interface Friend {
   email: string;
   status: string | null;
   isInterested: boolean;
+  squadId: string | null;
+  squadMemberNames: string;
+  hasSquad: boolean;
 }
 
 interface Event {
@@ -36,6 +39,7 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [joiningSquad, setJoiningSquad] = useState<string | null>(null);
 
   // Fetch friends when modal opens
   useEffect(() => {
@@ -81,6 +85,33 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
       newSelected.add(friendId);
     }
     setSelectedFriends(newSelected);
+  };
+
+  const handleJoinSquad = async (squadId: string, friendName: string) => {
+    if (joiningSquad) return;
+    
+    setJoiningSquad(squadId);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/squads/${squadId}/members`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}), // Empty body for self-join
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to join squad');
+      }
+
+      // Close modal and redirect to squad
+      onClose();
+      onSquadCreated(squadId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to join squad');
+      setJoiningSquad(null);
+    }
   };
 
   const handleCreateSquad = async () => {
@@ -185,12 +216,21 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
                         </h5>
                         <div className="space-y-2">
                           {interestedFriends.map((friend) => (
-                            <FriendCheckbox
-                              key={friend.id}
-                              friend={friend}
-                              isSelected={selectedFriends.has(friend.id)}
-                              onToggle={() => handleFriendToggle(friend.id)}
-                            />
+                            friend.hasSquad ? (
+                              <FriendSquadCard
+                                key={friend.id}
+                                friend={friend}
+                                onJoinSquad={handleJoinSquad}
+                                isJoining={joiningSquad === friend.squadId}
+                              />
+                            ) : (
+                              <FriendCheckbox
+                                key={friend.id}
+                                friend={friend}
+                                isSelected={selectedFriends.has(friend.id)}
+                                onToggle={() => handleFriendToggle(friend.id)}
+                              />
+                            )
                           ))}
                         </div>
                       </div>
@@ -206,12 +246,21 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
                         )}
                         <div className="space-y-2">
                           {otherFriends.map((friend) => (
-                            <FriendCheckbox
-                              key={friend.id}
-                              friend={friend}
-                              isSelected={selectedFriends.has(friend.id)}
-                              onToggle={() => handleFriendToggle(friend.id)}
-                            />
+                            friend.hasSquad ? (
+                              <FriendSquadCard
+                                key={friend.id}
+                                friend={friend}
+                                onJoinSquad={handleJoinSquad}
+                                isJoining={joiningSquad === friend.squadId}
+                              />
+                            ) : (
+                              <FriendCheckbox
+                                key={friend.id}
+                                friend={friend}
+                                isSelected={selectedFriends.has(friend.id)}
+                                onToggle={() => handleFriendToggle(friend.id)}
+                              />
+                            )
                           ))}
                         </div>
                       </div>
@@ -249,6 +298,12 @@ interface FriendCheckboxProps {
   friend: Friend;
   isSelected: boolean;
   onToggle: () => void;
+}
+
+interface FriendSquadCardProps {
+  friend: Friend;
+  onJoinSquad: (squadId: string, friendName: string) => void;
+  isJoining: boolean;
 }
 
 function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
@@ -295,5 +350,57 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
         {getStatusBadge()}
       </div>
     </label>
+  );
+}
+
+function FriendSquadCard({ friend, onJoinSquad, isJoining }: FriendSquadCardProps) {
+  const getStatusBadge = () => {
+    if (!friend.status) return null;
+
+    const statusConfig = {
+      INTERESTED: { emoji: '★', color: 'bg-amber-100 text-amber-700' },
+      GOING: { emoji: '✓', color: 'bg-green-100 text-green-700' },
+      NEED_TICKETS: { emoji: '🔍', color: 'bg-blue-100 text-blue-700' },
+      HAVE_TICKETS: { emoji: '🎫', color: 'bg-purple-100 text-purple-700' },
+    };
+
+    const config = statusConfig[friend.status as keyof typeof statusConfig];
+    if (!config) return null;
+
+    return (
+      <span className={`text-xs px-1.5 py-0.5 rounded ${config.color}`}>
+        {config.emoji}
+      </span>
+    );
+  };
+
+  return (
+    <div className="flex items-center gap-3 p-2 rounded-lg bg-blue-50 border border-blue-200">
+      <div className="flex items-center gap-2 flex-1">
+        <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600">
+          {friend.displayName.charAt(0).toUpperCase()}
+        </div>
+        
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-900">
+              {friend.displayName}
+            </span>
+            {getStatusBadge()}
+          </div>
+          <div className="text-xs text-gray-600 mt-0.5">
+            👥 In squad with {friend.squadMemberNames}
+          </div>
+        </div>
+      </div>
+      
+      <button
+        onClick={() => friend.squadId && onJoinSquad(friend.squadId, friend.displayName)}
+        disabled={isJoining || !friend.squadId}
+        className="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        {isJoining ? 'Joining...' : 'Join Squad'}
+      </button>
+    </div>
   );
 }

@@ -218,7 +218,7 @@ export function SquadStatusControls({ squad, currentUserId, onStatusUpdate }: Sq
                   />
                   <div className="flex-1">
                     <div className="font-medium text-gray-900">
-                      {member.user.displayName || member.user.email}
+                      {member.user.displayName || member.user.email.split('@')[0]}
                     </div>
                     <div className="text-xs text-gray-600">
                       Status: {member.status === 'IN' ? '✅ In' : member.status === 'THINKING' ? '🤔 Thinking' : '❌ Out'}

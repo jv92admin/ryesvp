@@ -26,7 +26,7 @@ export async function GET(
       return NextResponse.json({ friends: [] });
     }
 
-    // Get friends with their status for this event
+    // Get friends with their status and squad info for this event
     const friends = await prisma.user.findMany({
       where: {
         id: { in: friendIds },
@@ -39,19 +39,52 @@ export async function GET(
           where: { eventId },
           select: { status: true },
         },
+        squadMembers: {
+          where: { 
+            squad: { eventId },
+          },
+          select: {
+            squadId: true,
+            squad: {
+              select: {
+                id: true,
+                members: {
+                  select: {
+                    user: {
+                      select: {
+                        displayName: true,
+                        email: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
-    const friendsWithStatus = friends.map(friend => ({
-      id: friend.id,
-      displayName: friend.displayName || friend.email,
-      email: friend.email,
-      status: friend.userEvents[0]?.status || null,
-      isInterested: friend.userEvents[0]?.status === AttendanceStatus.INTERESTED || 
-                   friend.userEvents[0]?.status === AttendanceStatus.GOING ||
-                   friend.userEvents[0]?.status === AttendanceStatus.NEED_TICKETS ||
-                   friend.userEvents[0]?.status === AttendanceStatus.HAVE_TICKETS,
-    }));
+    const friendsWithStatus = friends.map(friend => {
+      const squad = friend.squadMembers[0]; // User can only have one squad per event
+      const squadMemberNames = squad?.squad?.members
+        .map(m => m.user.displayName || m.user.email)
+        .join(', ') || '';
+
+      return {
+        id: friend.id,
+        displayName: friend.displayName || friend.email.split('@')[0],
+        email: friend.email,
+        status: friend.userEvents[0]?.status || null,
+        isInterested: friend.userEvents[0]?.status === AttendanceStatus.INTERESTED || 
+                     friend.userEvents[0]?.status === AttendanceStatus.GOING ||
+                     friend.userEvents[0]?.status === AttendanceStatus.NEED_TICKETS ||
+                     friend.userEvents[0]?.status === AttendanceStatus.HAVE_TICKETS,
+        squadId: squad?.squadId || null,
+        squadMemberNames: squadMemberNames,
+        hasSquad: !!squad,
+      };
+    });
 
     // Sort: interested friends first, then others alphabetically
     friendsWithStatus.sort((a, b) => {

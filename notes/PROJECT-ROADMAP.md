@@ -21,10 +21,37 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 |---|------|------|-----------|--------|
 | 1 | **Phase 0: Ticket Statuses** | `squads-social-spec.md` | 1-2 days | ✅ Complete |
 | 2 | **Phase 1: Social Tab + Squads** | `squads-social-spec.md` | 2-3 weeks | ✅ Complete |
-| 3 | **Phase 2: Communities Reimagined** | `squads-social-spec.md` | 2-3 weeks | 🔲 Next |
-| 4 | **Phase 3: Soft Reputation** | `squads-social-spec.md` | 1 week | 🔲 After Phase 2 |
-| 5 | **TM Data Display** | - | 1-2 hrs | 🔲 When time permits |
-| 6 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
+| 3 | **Phase 1.5: Security - Enable RLS** | - | 1-2 days | 🔥 **HIGH PRIORITY** |
+| 4 | **Phase 2: Communities Reimagined** | `squads-social-spec.md` | 2-3 weeks | 🔲 After RLS |
+| 5 | **Phase 3: Soft Reputation** | `squads-social-spec.md` | 1 week | 🔲 After Phase 2 |
+| 6 | **TM Data Display** | - | 1-2 hrs | 🔲 When time permits |
+| 7 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
+
+### Phase 1.5: Security - Enable RLS 🔥 HIGH PRIORITY
+
+**What:** Enable Row Level Security on all 15 Supabase tables.
+
+**Why Critical Now:**
+- Live production app with 10+ users and real personal data
+- Planning phone numbers + text blasts (highly sensitive PII)
+- Current setup: tables are public, only app-level security
+- Supabase best practice for any live application
+
+**What we're securing:**
+- User profiles, emails, display names
+- Friendships and social connections  
+- Event attendance and squad memberships
+- Private lists and community data
+- Invite codes and redemption history
+
+**Tasks:**
+1. Write RLS policies for all 13 models
+2. Test policies don't break existing functionality
+3. Enable RLS on all tables via Supabase dashboard
+4. Verify app still works with database-level security
+
+**Estimated Time:** 1-2 days
+**Blocker for:** Phone number collection, text blasts, public launch
 
 ### Phase 0: Ticket Statuses ✅ COMPLETE
 See `squads-social-spec.md` for full details.

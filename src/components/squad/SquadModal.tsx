@@ -6,6 +6,7 @@ import { SquadStatusControls } from './SquadStatusControls';
 import { SquadSnapshot } from './SquadSnapshot';
 import { SquadLogistics } from './SquadLogistics';
 import { generateSharePlanText, generateDayOfText } from '@/lib/squadShareText';
+import { SquadInviteModal } from './SquadInviteModal';
 import { formatInTimeZone } from 'date-fns-tz';
 
 const AUSTIN_TIMEZONE = 'America/Chicago';
@@ -58,6 +59,7 @@ export function SquadModal({ squadId, eventId, isOpen, onClose }: SquadModalProp
   const [error, setError] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [copying, setCopying] = useState<string | null>(null); // 'plan' | 'dayof' | null
+  const [showInviteModal, setShowInviteModal] = useState(false);
 
   // Fetch squad data when modal opens
   useEffect(() => {
@@ -323,7 +325,11 @@ export function SquadModal({ squadId, eventId, isOpen, onClose }: SquadModalProp
             />
 
             {/* Squad Snapshot */}
-            <SquadSnapshot squad={squad} />
+            <SquadSnapshot 
+              squad={squad} 
+              onInviteFriends={() => setShowInviteModal(true)}
+              isOrganizer={squad.members.find(m => m.userId === currentUserId)?.isOrganizer || false}
+            />
 
             {/* Logistics */}
             <SquadLogistics
@@ -366,6 +372,30 @@ export function SquadModal({ squadId, eventId, isOpen, onClose }: SquadModalProp
           </div>
         )}
       </DialogContent>
+      
+      {/* Squad Invite Modal */}
+      {showInviteModal && squad && (
+        <SquadInviteModal
+          squad={squad}
+          isOpen={showInviteModal}
+          onClose={() => setShowInviteModal(false)}
+          onMemberAdded={async () => {
+            setShowInviteModal(false);
+            // Refresh squad data
+            if (squadId) {
+              try {
+                const response = await fetch(`/api/squads/${squadId}`);
+                if (response.ok) {
+                  const updatedSquad = await response.json();
+                  setSquad(updatedSquad);
+                }
+              } catch (error) {
+                console.error('Failed to refresh squad:', error);
+              }
+            }
+          }}
+        />
+      )}
     </Dialog>
   );
 }

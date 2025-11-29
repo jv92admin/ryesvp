@@ -12,8 +12,16 @@ export function InviteRedemptionHandler() {
     show: false,
     inviterName: '',
   });
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch by only running after client mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
+    if (!mounted) return; // Wait for hydration to complete
+
     async function redeem() {
       const result = await redeemStoredInvite();
       
@@ -31,9 +39,9 @@ export function InviteRedemptionHandler() {
     }
 
     redeem();
-  }, []);
+  }, [mounted]);
 
-  if (!toast.show) return null;
+  if (!mounted || !toast.show) return null;
 
   return (
     <div className="fixed bottom-4 right-4 z-50 animate-in slide-in-from-bottom-4 fade-in duration-300">

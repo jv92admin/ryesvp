@@ -1,5 +1,6 @@
 import prisma from './prisma';
 import { SquadMemberStatus, SquadBudget, SquadTicketStatus } from '@prisma/client';
+import { getUserEventByEventId } from './userEvents';
 
 /**
  * Create a new Squad for an event
@@ -20,6 +21,15 @@ export async function createSquad(data: {
     throw new Error('You already have a squad for this event');
   }
   
+  // Check creator's existing event attendance to inherit status
+  const existingUserEvent = await getUserEventByEventId(data.createdById, data.eventId);
+  
+  const creatorStatus: SquadMemberStatus = existingUserEvent?.status === 'GOING' 
+    ? 'IN' 
+    : existingUserEvent?.status === 'INTERESTED' 
+      ? 'THINKING'
+      : 'IN'; // Default to IN for squad creators
+
   // Create squad with creator as organizer
   return prisma.squad.create({
     data: {
@@ -29,7 +39,7 @@ export async function createSquad(data: {
         create: {
           userId: data.createdById,
           isOrganizer: true,
-          status: 'IN',
+          status: creatorStatus,
         },
       },
     },
@@ -209,12 +219,21 @@ export async function addSquadMember(squadId: string, userId: string) {
   if (existing) {
     throw new Error('User already has a squad for this event');
   }
+
+  // Check user's existing event attendance to inherit status
+  const existingUserEvent = await getUserEventByEventId(userId, squad.eventId);
+  
+  const memberStatus: SquadMemberStatus = existingUserEvent?.status === 'GOING'
+    ? 'IN'
+    : existingUserEvent?.status === 'INTERESTED'
+      ? 'THINKING'
+      : 'THINKING'; // Default for new members
   
   return prisma.squadMember.create({
     data: {
       squadId,
       userId,
-      status: 'THINKING',
+      status: memberStatus,
     },
   });
 }
