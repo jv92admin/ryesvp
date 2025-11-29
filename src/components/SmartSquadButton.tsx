@@ -28,7 +28,7 @@ export function SmartSquadButton({
   friendsInterested = 0,
   event,
   className = "", 
-  variant = 'default' 
+  variant = 'default'
 }: SmartSquadButtonProps) {
   const [showSquadModal, setShowSquadModal] = useState(false);
   const [showCreationModal, setShowCreationModal] = useState(false);

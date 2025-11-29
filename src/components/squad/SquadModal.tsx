@@ -8,6 +8,7 @@ import { SquadLogistics } from './SquadLogistics';
 import { generateSharePlanText, generateDayOfText } from '@/lib/squadShareText';
 import { SquadInviteModal } from './SquadInviteModal';
 import { formatInTimeZone } from 'date-fns-tz';
+import { markSquadAsViewed } from '@/lib/squadNotifications';
 
 const AUSTIN_TIMEZONE = 'America/Chicago';
 
@@ -64,6 +65,9 @@ export function SquadModal({ squadId, eventId, isOpen, onClose }: SquadModalProp
   // Fetch squad data when modal opens
   useEffect(() => {
     if (!isOpen || !squadId) return;
+
+    // Mark squad as viewed when modal opens
+    markSquadAsViewed(squadId);
 
     async function fetchSquad() {
       setLoading(true);

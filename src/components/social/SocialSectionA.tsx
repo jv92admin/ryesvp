@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { formatInTimeZone } from 'date-fns-tz';
 import { EventDisplay } from '@/db/events';
+import { getViewedSquadIds } from '@/lib/squadNotifications';
 import { SmartSquadButton } from '../SmartSquadButton';
 
 const AUSTIN_TIMEZONE = 'America/Chicago';
@@ -16,12 +17,30 @@ export function SocialSectionA({ events }: SocialSectionAProps) {
   // Collapsible state (mobile only)
   const [collapsed, setCollapsed] = useState(false);
   
-  // Group events by time bucket
+  // Group events: recent squads first, then time buckets
   const twoWeeksOut = new Date();
   twoWeeksOut.setDate(twoWeeksOut.getDate() + 14);
   
-  const soonEvents = events.filter(event => new Date(event.startDateTime) <= twoWeeksOut);
-  const laterEvents = events.filter(event => new Date(event.startDateTime) > twoWeeksOut);
+  // Get viewed squad IDs to filter out viewed squads
+  const viewedSquadIds = getViewedSquadIds();
+  
+  const recentSquadEvents = events.filter(event => 
+    event.isRecentSquadAddition && 
+    new Date(event.startDateTime) >= new Date() &&
+    // Check both squad ID and event ID for compatibility (in case event ID was stored by mistake)
+    !viewedSquadIds.includes((event as any).userSquad?.id) && 
+    !viewedSquadIds.includes(event.id)
+  );
+  
+  // Include non-recent events AND viewed recent events (so they appear in regular sections)
+  const nonRecentEvents = events.filter(event => 
+    !event.isRecentSquadAddition || 
+    (event.isRecentSquadAddition && 
+     (viewedSquadIds.includes((event as any).userSquad?.id) || viewedSquadIds.includes(event.id)))
+  );
+  
+  const soonEvents = nonRecentEvents.filter(event => new Date(event.startDateTime) <= twoWeeksOut);
+  const laterEvents = nonRecentEvents.filter(event => new Date(event.startDateTime) > twoWeeksOut);
 
   const renderEventCard = (event: EventDisplay) => (
     <div
@@ -109,6 +128,22 @@ export function SocialSectionA({ events }: SocialSectionAProps) {
           </div>
         ) : (
           <div className="space-y-6">
+            {/* Recent Squad Additions */}
+            {recentSquadEvents.length > 0 && (
+              <div>
+                <h3 className="text-sm font-medium text-purple-700 mb-3 flex items-center gap-2">
+                  <span>🎉</span>
+                  New Squad Invites
+                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                    {recentSquadEvents.length}
+                  </span>
+                </h3>
+                <div className="space-y-3 pb-4 border-b border-purple-100">
+                  {recentSquadEvents.map(renderEventCard)}
+                </div>
+              </div>
+            )}
+
             {/* Soon Events (<14 days) */}
             {soonEvents.length > 0 && (
               <div>

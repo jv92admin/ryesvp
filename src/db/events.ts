@@ -50,6 +50,9 @@ export type EventDisplay = EventWithVenue & {
     id: string;
     hasSquad: boolean;
   } | null;
+  // Recent squad notification properties
+  isRecentSquadAddition?: boolean;
+  memberAddedAt?: Date;
 };
 
 // Legacy alias for backwards compatibility during migration

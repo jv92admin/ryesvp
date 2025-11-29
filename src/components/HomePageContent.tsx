@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ViewToggle } from './ViewToggle';
 import { SocialTab } from './SocialTab';
 import { EventListWithPagination } from './EventListWithPagination';
 import { CalendarSidebar } from './CalendarSidebar';
 import { EventDisplay } from '@/db/events';
+import { getInstantBadgeCount } from '@/lib/squadNotifications';
 
 interface HomePageContentProps {
   initialEvents: EventDisplay[];
@@ -25,6 +26,26 @@ interface HomePageContentProps {
 
 export function HomePageContent({ initialEvents, initialHasMore, isLoggedIn, filters }: HomePageContentProps) {
   const [currentView, setCurrentView] = useState<'calendar' | 'social'>('calendar');
+  const [socialBadgeCount, setSocialBadgeCount] = useState(0);
+
+  // Get instant badge count from localStorage on mount (no API call)
+  useEffect(() => {
+    if (isLoggedIn) {
+      const instantCount = getInstantBadgeCount();
+      setSocialBadgeCount(instantCount);
+    }
+  }, [isLoggedIn]);
+
+  // Add debug function to console (development only)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+      (window as any).clearSquadNotifications = () => {
+        localStorage.removeItem('ryesvp_viewed_squads');
+        console.log('✅ Cleared all squad notifications from localStorage');
+        window.location.reload(); // Auto-refresh to show changes
+      };
+    }
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -32,6 +53,7 @@ export function HomePageContent({ initialEvents, initialHasMore, isLoggedIn, fil
       <ViewToggle 
         defaultView="calendar" 
         onViewChange={setCurrentView}
+        socialBadgeCount={socialBadgeCount}
       />
 
       {/* Conditional Layout */}
@@ -57,7 +79,7 @@ export function HomePageContent({ initialEvents, initialHasMore, isLoggedIn, fil
       ) : (
         /* Social View: Full-width, no sidebar */
         <div className="w-full">
-          <SocialTab />
+          <SocialTab onBadgeCountChange={setSocialBadgeCount} />
         </div>
       )}
     </div>

@@ -26,6 +26,7 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 | 5 | **Phase 3: Soft Reputation** | `squads-social-spec.md` | 1 week | 🔲 After Phase 2 |
 | 6 | **TM Data Display** | - | 1-2 hrs | 🔲 When time permits |
 | 7 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
+| 8 | **Squad Notification Polish** | - | 1-2 hrs | 🔲 Later |
 
 ### Phase 1.5: Security - Enable RLS 🔥 HIGH PRIORITY
 
@@ -86,6 +87,27 @@ See `data-model-101.md` for full documentation.
 - 🔲 **SeatGeek API** - Deprioritized
 
 ---
+
+## Squad Notification Polish (Future Enhancement)
+
+**Current Limitation:** Badge count on fresh login relies on localStorage cache. If user gets squad invite while offline, badge won't show until they visit Social tab.
+
+**Solutions to Consider:**
+1. **Lightweight Badge API** (`/api/social/badge-count`)
+   - Returns just unviewed squad count
+   - Called on every login
+   - ~100ms response time
+   
+2. **Server-Sent Events (SSE)** 
+   - Real-time notifications when added to squads
+   - More complex but better UX
+   
+3. **Hybrid Approach**
+   - Use cache if < 30min old
+   - Fall back to API if stale
+   - Best of both worlds
+
+**Priority:** Low (current system works well for 90% of cases)
 
 ## Delete Account Feature ✅ COMPLETE
 

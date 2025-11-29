@@ -51,7 +51,11 @@ export async function getYourPlans(userId: string): Promise<EventDisplay[]> {
         },
         include: {
           members: {
-            include: { user: { select: { displayName: true, email: true } } },
+            select: {
+              userId: true,
+              createdAt: true,
+              isOrganizer: true,
+            },
           },
         },
       },
@@ -106,8 +110,22 @@ export async function getYourPlans(userId: string): Promise<EventDisplay[]> {
         id: userSquad.id,
         hasSquad: true,
       } : null,
-      // Metadata for sorting
-      _priority: timePriority + priority,
+      // Recent squad metadata
+      isRecentSquadAddition: (() => {
+        const currentUserMember = userSquad?.members?.find(m => m.userId === userId);
+        const memberAddedAt = currentUserMember?.createdAt;
+        return memberAddedAt && 
+          (new Date().getTime() - new Date(memberAddedAt).getTime()) < (48 * 60 * 60 * 1000);
+      })(),
+      memberAddedAt: userSquad?.members?.find(m => m.userId === userId)?.createdAt,
+      // Metadata for sorting (recent squads get priority boost)
+      _priority: (() => {
+        const currentUserMember = userSquad?.members?.find(m => m.userId === userId);
+        const memberAddedAt = currentUserMember?.createdAt;
+        const isRecent = memberAddedAt && 
+          (new Date().getTime() - new Date(memberAddedAt).getTime()) < (48 * 60 * 60 * 1000);
+        return isRecent ? -100 : (timePriority + priority);
+      })(),
       _hasSquad: hasSquad,
     };
   });

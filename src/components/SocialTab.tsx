@@ -6,6 +6,7 @@ import { SocialSectionB } from './social/SocialSectionB';
 import { SocialSectionC } from './social/SocialSectionC';
 import { CommunitySoonStub } from './social/CommunitySoonStub';
 import { EventDisplay } from '@/db/events';
+import { countUnviewedRecentSquads } from '@/lib/squadNotifications';
 
 interface SocialData {
   yourPlans: EventDisplay[];
@@ -21,7 +22,11 @@ interface SocialData {
   }>;
 }
 
-export function SocialTab() {
+interface SocialTabProps {
+  onBadgeCountChange?: (count: number) => void;
+}
+
+export function SocialTab({ onBadgeCountChange }: SocialTabProps = {}) {
   const [data, setData] = useState<SocialData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +46,12 @@ export function SocialTab() {
         
         const socialData = await response.json();
         setData(socialData);
+        
+        // Calculate and emit badge count for recent squads
+        if (onBadgeCountChange && socialData.yourPlans) {
+          const badgeCount = countUnviewedRecentSquads(socialData.yourPlans);
+          onBadgeCountChange(badgeCount);
+        }
       } catch (err) {
         console.error('Error fetching social data:', err);
         setError(err instanceof Error ? err.message : 'Failed to load social data');
