@@ -56,7 +56,7 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
         setFriends(data.friends);
 
         // Auto-select friends who are already interested
-        const interestedFriendIds = new Set(
+        const interestedFriendIds = new Set<string>(
           data.friends
             .filter((f: Friend) => f.isInterested)
             .map((f: Friend) => f.id)
