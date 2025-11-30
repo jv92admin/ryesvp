@@ -1,5 +1,5 @@
 import prisma from './prisma';
-import { SquadMemberStatus, SquadBudget, SquadTicketStatus } from '@prisma/client';
+import { SquadMemberStatus, SquadTicketStatus } from '@prisma/client';
 import { getUserEventByEventId } from './userEvents';
 
 /**
@@ -69,7 +69,16 @@ export async function getSquadById(squadId: string) {
         } 
       },
       members: {
-        include: { user: true },
+        include: { 
+          user: true,
+          coveredBy: {
+            select: {
+              id: true,
+              displayName: true,
+              email: true,
+            },
+          },
+        },
         orderBy: { createdAt: 'asc' },
       },
     },
@@ -119,7 +128,18 @@ export async function getUserSquadForEvent(userId: string, eventId: string) {
               },
             } 
           },
-          members: { include: { user: true } },
+          members: { 
+            include: { 
+              user: true,
+              coveredBy: {
+                select: {
+                  id: true,
+                  displayName: true,
+                  email: true,
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -155,27 +175,120 @@ export async function updateSquadMemberStatus(
   userId: string,
   data: {
     status?: SquadMemberStatus;
-    budget?: SquadBudget | null;
     ticketStatus?: SquadTicketStatus;
-    buyingForCount?: number | null;
+    coveredById?: string | null;
     buyingForIds?: string[];
+    guestCount?: number;
   }
 ) {
   // Only include defined values in the update
   const updateData: any = {};
   
   if (data.status !== undefined) updateData.status = data.status;
-  if (data.budget !== undefined) updateData.budget = data.budget;
   if (data.ticketStatus !== undefined) updateData.ticketStatus = data.ticketStatus;
-  if (data.buyingForCount !== undefined) updateData.buyingForCount = data.buyingForCount;
+  if (data.coveredById !== undefined) updateData.coveredById = data.coveredById;
   if (data.buyingForIds !== undefined) updateData.buyingForIds = data.buyingForIds;
-
+  if (data.guestCount !== undefined) updateData.guestCount = data.guestCount;
 
   return prisma.squadMember.update({
     where: {
       squadId_userId: { squadId, userId },
     },
     data: updateData,
+  });
+}
+
+/**
+ * Buy tickets for multiple squad members at once
+ * Sets their ticketStatus to COVERED and links them to the buyer
+ */
+export async function buyForSquadMembers(
+  squadId: string,
+  buyerId: string,
+  memberUserIds: string[]
+) {
+  if (memberUserIds.length === 0) return;
+
+  // Update all target members to COVERED status
+  await prisma.squadMember.updateMany({
+    where: {
+      squadId,
+      userId: { in: memberUserIds },
+    },
+    data: {
+      ticketStatus: 'COVERED',
+      coveredById: buyerId,
+    },
+  });
+
+  // Update buyer's buyingForIds
+  const buyer = await prisma.squadMember.findUnique({
+    where: { squadId_userId: { squadId, userId: buyerId } },
+  });
+
+  const existingBuyingFor = buyer?.buyingForIds || [];
+  const newBuyingFor = [...new Set([...existingBuyingFor, ...memberUserIds])];
+
+  await prisma.squadMember.update({
+    where: { squadId_userId: { squadId, userId: buyerId } },
+    data: {
+      ticketStatus: 'YES', // Buyer must have ticket = YES
+      buyingForIds: newBuyingFor,
+    },
+  });
+}
+
+/**
+ * Remove coverage from a squad member (uncover them)
+ * Clears their coveredById and reverts them to MAYBE status
+ */
+export async function uncoverSquadMember(
+  squadId: string,
+  memberId: string,
+  buyerId: string
+) {
+  // Clear coverage on the member
+  await prisma.squadMember.update({
+    where: { squadId_userId: { squadId, userId: memberId } },
+    data: {
+      ticketStatus: 'MAYBE',
+      coveredById: null,
+    },
+  });
+
+  // Remove from buyer's buyingForIds
+  const buyer = await prisma.squadMember.findUnique({
+    where: { squadId_userId: { squadId, userId: buyerId } },
+  });
+
+  if (buyer) {
+    const updatedBuyingFor = (buyer.buyingForIds || []).filter(id => id !== memberId);
+    await prisma.squadMember.update({
+      where: { squadId_userId: { squadId, userId: buyerId } },
+      data: { buyingForIds: updatedBuyingFor },
+    });
+  }
+}
+
+/**
+ * Get members who need tickets (MAYBE or NO status, not OUT, not already COVERED)
+ */
+export async function getMembersNeedingTickets(squadId: string) {
+  return prisma.squadMember.findMany({
+    where: {
+      squadId,
+      status: { not: 'OUT' },
+      ticketStatus: { in: ['MAYBE', 'NO'] },
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+          displayName: true,
+          email: true,
+        },
+      },
+    },
   });
 }
 

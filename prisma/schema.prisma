@@ -183,6 +183,8 @@ model User {
   // Squads
   squadsCreated          Squad[]       @relation("SquadCreator")
   squadMembers           SquadMember[]
+  membersCovered         SquadMember[] @relation("CoveredByUser")
+  priceGuidesAdded       SquadPriceGuide[]
 
   @@index([authProviderId])
 }
@@ -401,7 +403,7 @@ model Squad {
   createdById String
   createdBy   User     @relation("SquadCreator", fields: [createdById], references: [id])
   
-  // Logistics
+  // Logistics (deferred to Day-of mode)
   meetTime    DateTime?
   meetSpot    String?
   deadline    DateTime?  // For ticket purchase deadline
@@ -411,6 +413,7 @@ model Squad {
   updatedAt   DateTime @updatedAt
   
   members     SquadMember[]
+  priceGuides SquadPriceGuide[]
   
   @@index([eventId])
   @@index([createdById])
@@ -423,12 +426,17 @@ model SquadMember {
   userId         String
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  // Status within squad
+  // Attendance status within squad
   status         SquadMemberStatus @default(THINKING)
-  budget         SquadBudget?
-  ticketStatus   SquadTicketStatus @default(NOT_BOUGHT)
-  buyingForCount Int?     // If buying for others, how many
-  buyingForIds   String[] // Array of user IDs they're buying tickets for
+  
+  // Guests (+1, +2, etc. - non-squad members you're bringing)
+  guestCount     Int      @default(0)
+  
+  // Ticket status
+  ticketStatus   SquadTicketStatus @default(MAYBE)
+  coveredById    String?  // If COVERED, who is buying their ticket
+  coveredBy      User?    @relation("CoveredByUser", fields: [coveredById], references: [id])
+  buyingForIds   String[] // Array of user IDs this member is buying tickets for
   
   isOrganizer    Boolean  @default(false)
   
@@ -437,23 +445,38 @@ model SquadMember {
   
   @@unique([squadId, userId])  // One membership per user per squad
   @@index([userId])
+  @@index([coveredById])
+}
+
+// Squad-level ticket price guide (replaces per-person budget)
+model SquadPriceGuide {
+  id        String   @id @default(uuid())
+  squadId   String
+  squad     Squad    @relation(fields: [squadId], references: [id], onDelete: Cascade)
+  
+  label     String?  // "GA", "Balcony", "Section 108", etc.
+  priceMin  Int      // Minimum price seen
+  priceMax  Int?     // Maximum price (null if single price)
+  source    String?  // "Ticketmaster", "Venue site", etc.
+  
+  addedById String
+  addedBy   User     @relation(fields: [addedById], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([squadId])
 }
 
 enum SquadMemberStatus {
-  THINKING
-  IN
-  OUT
-}
-
-enum SquadBudget {
-  NO_PREFERENCE
-  UNDER_50
-  FIFTY_TO_100
-  OVER_100
+  THINKING  // Maybe
+  IN        // Yes, going
+  OUT       // Not going
 }
 
 enum SquadTicketStatus {
-  NOT_BOUGHT
-  BUYING_OWN
-  BUYING_FOR_OTHERS
+  YES      // Has/will get own ticket
+  MAYBE    // Open to getting one, not committed
+  NO       // Not planning to get a ticket
+  COVERED  // Someone else is buying their ticket
 }

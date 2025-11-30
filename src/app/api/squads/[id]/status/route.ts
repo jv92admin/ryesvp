@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { updateSquadMemberStatus, getSquadById } from '@/db/squads';
 import { upsertUserEvent, deleteUserEvent } from '@/db/userEvents';
-import { SquadMemberStatus, SquadBudget, SquadTicketStatus, AttendanceStatus } from '@prisma/client';
+import { SquadMemberStatus, SquadTicketStatus, AttendanceStatus } from '@prisma/client';
 
 // PUT /api/squads/[id]/status - Update member status
 export async function PUT(
@@ -20,7 +20,7 @@ export async function PUT(
       );
     }
 
-    const { status, budget, ticketStatus, buyingForCount, buyingForIds } = await req.json();
+    const { status, ticketStatus, coveredById, buyingForIds, guestCount } = await req.json();
 
     // Verify user is a member of this squad
     const squad = await getSquadById(id);
@@ -47,18 +47,22 @@ export async function PUT(
       );
     }
 
-    if (budget && !Object.values(SquadBudget).includes(budget)) {
-      return NextResponse.json(
-        { error: 'Invalid budget value' },
-        { status: 400 }
-      );
-    }
-
     if (ticketStatus && !Object.values(SquadTicketStatus).includes(ticketStatus)) {
       return NextResponse.json(
         { error: 'Invalid ticket status value' },
         { status: 400 }
       );
+    }
+
+    // Validate coveredById if provided - must be a squad member
+    if (coveredById) {
+      const coveringMember = squad.members.find(m => m.userId === coveredById);
+      if (!coveringMember) {
+        return NextResponse.json(
+          { error: 'Covering user is not a squad member' },
+          { status: 400 }
+        );
+      }
     }
 
     // Validate buyingForIds if provided
@@ -77,10 +81,9 @@ export async function PUT(
     // Update squad member status first
     const updatedMember = await updateSquadMemberStatus(id, user.dbUser.id, {
       status,
-      budget: budget === null ? null : budget,
       ticketStatus,
-      buyingForCount: buyingForCount === null ? null : buyingForCount,
-      buyingForIds: buyingForIds || [],
+      coveredById: coveredById === null ? null : coveredById,
+      buyingForIds: buyingForIds || undefined,
     });
 
     // Sync with event attendance status

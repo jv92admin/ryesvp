@@ -135,6 +135,7 @@ See `data-model-101.md` for full documentation.
 - [x] Share Button (native share API, clipboard fallback)
 - [x] Lazy Loading (50 events per page, "Load More" button)
 - [x] Social Sidebar (right column with network, events, friend activity)
+- [x] **Event Page Redesign** - Consolidated 4 separate cards into merged components (FriendsAndStatusCard, PrimaryCTACard, AboutCard). Moved share button to header, attendance pill next to status heading, prominent View Squad button. Ticketmaster and About cards side-by-side on desktop. Mobile-first layout with decisions above the fold.
 
 ### Social Layer ✅
 - [x] Friends Foundation (db, api, /friends page)

@@ -1,0 +1,264 @@
+This makes sense, and your ask is clear:
+**First: define the philosophy.
+Then: walk channel-by-channel with opportunities + why.**
+
+I’ll do exactly that, and keep it high-level enough that we can plug deeper UX details into it later.
+
+---
+
+## 1. RyesVP engagement philosophy
+
+*(How we decide what goes where)*
+
+Think of this as the “constitution” everything else has to follow.
+
+1. **Real-world plans > app time**
+
+   * The goal of engagement is *better nights out with people you care about*, not raw time-in-app.
+   * If a touchpoint doesn’t make someone’s planning or experience meaningfully better, we don’t ship it.
+
+2. **UI first, channels as escalations**
+
+   * Default: all activity is visible and actionable inside RyesVP (feeds, squad pages, notifications bar).
+   * Email and SMS exist to *extend* access when you’re not in the app, not to replace the core UX.
+
+3. **No “empty” or bait notifications**
+
+   * Every notification/email/SMS must be tied to something concrete:
+
+     * A friend/squad/community action,
+     * An event you’re attached to,
+     * A meaningful change to a plan.
+   * No generic “we miss you, come back” pings.
+
+4. **Respect the user’s current channel**
+
+   * If we ask you to do something in email, you should usually be able to complete that action *in email* (e.g., reply “I’m in, need 1 ticket” and we parse it).
+   * We *can* invite you into the app for richer context, but we don’t *force* that for simple actions.
+
+5. **We are not a messaging app**
+
+   * No full chat / DM system.
+   * No attempt to replace WhatsApp/iMessage/IG.
+   * Any “text” UX we add (Squad Notes, event notes) is for **sticky, shared context**, not live chatter.
+
+6. **SMS is last-mile, not a social channel**
+
+   * SMS is for “you are going somewhere soon; this will help you right now.”
+   * No inbound SMS flows (for now).
+   * No SMS for friend requests, invites, or general engagement.
+
+7. **Organic discovery over dark patterns**
+
+   * We make the most of organic “I clicked a link / got invited / got an email” moments.
+   * But we do not build loops whose only purpose is to maximize clicks or opens.
+   * The question is always: *“Is this genuinely useful for someone who likes going out?”*
+
+If we keep these in view, it becomes much easier to answer “should this live in the app, email, or SMS?”
+
+---
+
+## 2. Channels: roles + opportunities + why
+
+Now let’s walk channel by channel. Think of this as a skeleton—we’ll hang specific flows on it later.
+
+---
+
+### A. In-app (product UI, including notification bar)
+
+**Role**
+The *canonical brain* of RyesVP.
+If you open the app, you should be able to see and act on everything important without checking anything else.
+
+**What belongs here**
+
+* **Notification bar / bell list**
+
+  * Friend requests
+  * Community invites
+  * Squads you’ve been added to / invited to
+  * Key changes to events you’re attached to (time, venue, headcount decisions)
+
+* **Feeds / discovery surfaces**
+
+  * Calendar with events
+  * “Friends are going to…” / “Your orbit” style modules
+  * Communities and scenes (Austin Indie, Comedy, etc.)
+
+* **Squad pages**
+
+  * Structured state (Going / Maybe / Out, ticket status, guests, budget, etc.)
+  * **Squad Notes / Event Notes**:
+
+    * “Bringing my dad + 1 friend”
+    * “Host says BYOB”
+    * “We’re aiming for GA floor, not seats”
+    * Think bulletin, not chat.
+
+* **Friend / community lists**
+
+  * Who’s in your graph
+  * What they’re into / going to
+  * Simple actions: add, accept, join.
+
+**Why this matters**
+
+* It gives you a single, predictable place to understand “my nightlife graph + plans”.
+* It allows us to keep external channels polite and sparse, because *everything* is always visible here when you choose to come in.
+
+---
+
+### B. Email (outbound + reply-to-act)
+
+**Role**
+Recap + social reactivation + “concierge actions” when you’re not in the app.
+
+**De-prioritized / excluded**
+
+* No real-time “play-by-play” of every tiny change.
+* No “pure marketing” blasts with no clear user value.
+
+**Opportunities & why**
+
+1. **Social graph & invite summaries**
+
+   * Trigger: you’ve been inactive for X days and have meaningful social activity.
+   * Content:
+
+     * Friend requests
+     * Community invites
+     * New squads you were added to
+   * Why: keeps you aware of real social pull without hammering you with individual emails.
+
+2. **Squad / event invitation emails**
+
+   * Trigger: you’re added to or invited to a Squad for an event.
+   * Content:
+
+     * Clear summary: what event, who’s involved, key details.
+     * Ask: “Tell us how you feel about this event.”
+   * **Reply-to-act**:
+
+     * You can reply with natural language (“I’m in, need 1 ticket, don’t want to spend over $80”).
+     * LLM parses and updates Squad state.
+     * We send a confirmation email.
+   * Why: lets you participate in plans *from your inbox* without forcing a login just to toggle “Going.”
+
+3. **Weekly (or occasional) digest**
+
+   * Trigger: optional once the graph has some density.
+   * Content:
+
+     * Events coming up this week that involve your friends / squads.
+     * Maybe “just listed” / presale-ish items that match your existing tastes.
+   * Why:
+
+     * Gently keeps RyesVP in your mental rotation.
+     * Frames us as “your weekly heads up for what your people are doing,” not as a firehose.
+
+4. **Transactional confirmations**
+
+   * After reply parsing:
+
+     * “We’ve marked you as Going + 1 ticket needed.”
+   * After big changes:
+
+     * “Your Squad meetup time for [Event] is now 7:30pm.”
+   * Why: closes the loop and builds trust in the concierge behavior.
+
+---
+
+### C. SMS (outbound only, later; inbound explicitly out of scope for now)
+
+**Role**
+Day-of or near-day-of last-mile logistics. Only when timing matters.
+
+**What we *don’t* do**
+
+* No SMS for:
+
+  * friend requests
+  * community invites
+  * generic “come back” reminders
+  * inbound “text us back and we’ll parse it” (for now, explicitly out)
+
+**Opportunities & why**
+
+1. **Day-before / day-of event reminders**
+
+   * “You’re going to [Event] tomorrow with [Squad name].”
+   * “Doors in 2 hours. Meetup: [Spot].”
+   * Why: this is when people actually need timely info and might not be checking email/app.
+
+2. **Critical last-minute changes**
+
+   * “Venue changed.”
+   * “Door time moved by 1 hour.”
+   * Why: prevents “I didn’t see that” disasters.
+
+Everything else lives in email or in-app. SMS is the emergency lane.
+
+---
+
+### D. Off-site / deep links (shared links, invites from other channels)
+
+**Role**
+Handle organic discovery without being a wall.
+
+**Opportunities & why**
+
+1. **Event links shared in chats / socials**
+
+   * Landing: direct to event page (mobile web or app).
+   * Micro-copy:
+
+     * “This is an event on RyesVP — see who’s going, or just use it as a clean event page.”
+   * Why: honors the intent (“I clicked an event”) while lightly introducing the broader product.
+
+2. **Squad invite links**
+
+   * Landing: Squad preview with:
+
+     * Basic info
+     * Who’s in / invited
+     * CTA to respond (in app or, if from email, via reply).
+   * Why: makes joining a Squad feel simple and non-ceremonial.
+
+3. **Community / profile links**
+
+   * Less critical early, but same pattern:
+
+     * Show the object first (community description / user public profile).
+     * Then optional “this lives in RyesVP” explanation.
+   * Why: keeps “I clicked a link” moments feeling organic, not sales-y.
+
+---
+
+## 3. Where we go from here
+
+We now have:
+
+* A **philosophy** (the rules of what should go where, and why).
+* A **channel skeleton** with:
+
+  * Roles
+  * Engagement opportunities
+  * A clear “why” behind each, aligned to your values.
+
+Next logical steps (when you’re ready) could be:
+
+* Within **in-app**, go surface by surface:
+
+  * Feeds
+  * Squad pages (including Squad Notes)
+  * Friend lists
+  * Notification bar
+    and jot down “what are the meaningful engagement moments here?”
+
+* Or within **email**, draft 2–3 **example emails**:
+
+  * A Squad invite email with reply-to-act.
+  * A weekly digest skeleton.
+  * A “you have new friend/community activity” summary.
+
+We can treat each of those as separate little workstreams and refine them one by one without losing this overarching philosophy.

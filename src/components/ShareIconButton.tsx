@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-interface ShareButtonProps {
+interface ShareIconButtonProps {
   title: string;
   venueName: string;
   dateFormatted: string;
@@ -10,7 +10,7 @@ interface ShareButtonProps {
   isLoggedIn?: boolean;
 }
 
-export function ShareButton({ title, venueName, dateFormatted, eventUrl, isLoggedIn }: ShareButtonProps) {
+export function ShareIconButton({ title, venueName, dateFormatted, eventUrl, isLoggedIn }: ShareIconButtonProps) {
   const [copied, setCopied] = useState(false);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
 
@@ -63,7 +63,7 @@ ${shareUrl}`;
         await navigator.share({
           title: title,
           text: shareText,
-          url: shareUrl, // This already includes ref code
+          url: shareUrl,
         });
         return;
       } catch (e) {
@@ -71,7 +71,7 @@ ${shareUrl}`;
       }
     }
 
-    // Fall back to clipboard - use full shareText with context
+    // Fall back to clipboard
     try {
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
@@ -84,18 +84,13 @@ ${shareUrl}`;
   return (
     <button
       onClick={handleShare}
-      className="inline-flex items-center justify-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+      className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-600 hover:text-gray-900"
+      title="Share event"
     >
       {copied ? (
-        <>
-          <span className="text-emerald-600">✓</span>
-          Copied!
-        </>
+        <span className="text-emerald-600 text-lg">✓</span>
       ) : (
-        <>
-          <span>📤</span>
-          Share
-        </>
+        <span className="text-lg">📤</span>
       )}
     </button>
   );
