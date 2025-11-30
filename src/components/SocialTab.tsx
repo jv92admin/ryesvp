@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { SocialSectionA } from './social/SocialSectionA';
 import { SocialSectionB } from './social/SocialSectionB';
-import { SocialSectionC } from './social/SocialSectionC';
-import { CommunitySoonStub } from './social/CommunitySoonStub';
+import { SocialSummaryChips } from './social/SocialSummaryChips';
 import { EventDisplay } from '@/db/events';
 import { countUnviewedRecentSquads } from '@/lib/squadNotifications';
 
@@ -27,14 +27,44 @@ interface SocialTabProps {
 }
 
 export function SocialTab({ onBadgeCountChange }: SocialTabProps = {}) {
+  const searchParams = useSearchParams();
   const [data, setData] = useState<SocialData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<string>('plans');
+  
+  // Refs for section anchoring
+  const plansRef = useRef<HTMLDivElement>(null);
+  const almostRef = useRef<HTMLDivElement>(null);
+  
+  const scrollToSection = useCallback((sectionId: string) => {
+    setActiveSection(sectionId);
+    const ref = sectionId === 'plans' ? plansRef : almostRef;
+    if (ref.current) {
+      ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, []);
+  
+  // Build filter query string from URL params (shared with Calendar view)
+  const filterQuery = (() => {
+    const params = new URLSearchParams();
+    const venueIds = searchParams.get('venueIds');
+    const categories = searchParams.get('categories');
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
+    if (venueIds) params.set('venueIds', venueIds);
+    if (categories) params.set('categories', categories);
+    if (startDate) params.set('startDate', startDate);
+    if (endDate) params.set('endDate', endDate);
+    return params.toString();
+  })();
   
   useEffect(() => {
     async function fetchSocialData() {
       try {
-        const response = await fetch('/api/social');
+        setLoading(true);
+        const url = filterQuery ? `/api/social?${filterQuery}` : '/api/social';
+        const response = await fetch(url);
         if (!response.ok) {
           if (response.status === 401) {
             // Not logged in - this is ok, just show empty states
@@ -61,7 +91,7 @@ export function SocialTab({ onBadgeCountChange }: SocialTabProps = {}) {
     }
 
     fetchSocialData();
-  }, []);
+  }, [onBadgeCountChange, filterQuery]);
   
   if (loading) {
     return (
@@ -96,25 +126,51 @@ export function SocialTab({ onBadgeCountChange }: SocialTabProps = {}) {
 
   if (!data) return null;
   
+  // Build section counts for summary chips
+  // Labels: You (your plans), Friends (friend activity), Communities (future)
+  const sectionCounts = [
+    { id: 'plans', label: 'You', count: data.yourPlans.length },
+    { id: 'almost', label: 'Friends', count: data.almostPlans.length },
+    { id: 'communities', label: 'Communities', count: 0, isComingSoon: true },
+  ];
+  
+  const hasPlans = data.yourPlans.length > 0;
+  const hasAlmost = data.almostPlans.length > 0;
+  const hasAnyContent = hasPlans || hasAlmost;
+  
   return (
-    <div className="space-y-6">
-      {/* Desktop: 3-Column Layout, Mobile: Stacked */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Column 1: Your Plans */}
-        <div className="lg:col-span-1">
-          <SocialSectionA events={data.yourPlans} />
+    <div className="space-y-4">
+      {/* Summary Chips - sticky at top, shows counts */}
+      <SocialSummaryChips
+        sections={sectionCounts}
+        activeSection={activeSection}
+        onSectionClick={scrollToSection}
+      />
+      
+      {!hasAnyContent ? (
+        <div className="text-center py-12 bg-white border border-gray-200 rounded-lg">
+          <p className="text-gray-500">No plans yet! Mark events as "Going" or "Interested" to see them here.</p>
         </div>
-        
-        {/* Column 2: Almost Plans */}
-        <div className="lg:col-span-1">
-          <SocialSectionB events={data.almostPlans} />
+      ) : (
+        <div className="space-y-6">
+          {/* Your Plans Section */}
+          {hasPlans && (
+            <div ref={plansRef} className="scroll-mt-16">
+              <SocialSectionA events={data.yourPlans} />
+            </div>
+          )}
+          
+          {/* Almost Plans Section */}
+          {hasAlmost && (
+            <div ref={almostRef} className="scroll-mt-16">
+              <SocialSectionB events={data.almostPlans} />
+            </div>
+          )}
+          
+          {/* Community Section - future */}
+          {/* Will be added when community data is available */}
         </div>
-        
-        {/* Column 3: Coming Soon Stub */}
-        <div className="lg:col-span-1">
-          <CommunitySoonStub />
-        </div>
-      </div>
+      )}
     </div>
   );
 }

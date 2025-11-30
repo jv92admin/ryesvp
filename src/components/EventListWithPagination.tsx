@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { EventCard } from '@/components/EventCard';
-import { formatDateHeading, groupEventsByDateClient } from '@/lib/utils';
+import { DiscoveryStrip } from '@/components/DiscoveryStrip';
+import { formatDateHeading, groupEventsByDateClient, isNewListing } from '@/lib/utils';
 import type { EventDisplay } from '@/db/events';
 
 interface EventListWithPaginationProps {
@@ -28,6 +29,25 @@ export function EventListWithPagination({
   const [events, setEvents] = useState<EventDisplay[]>(initialEvents);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [loading, setLoading] = useState(false);
+  const [activeDiscoveryChip, setActiveDiscoveryChip] = useState<string | null>(null);
+
+  // Count new listings
+  const newListingsCount = useMemo(() => {
+    return events.filter(e => isNewListing(e.createdAt)).length;
+  }, [events]);
+
+  // Filter events based on active discovery chip
+  const displayEvents = useMemo(() => {
+    if (activeDiscoveryChip === 'new') {
+      return events.filter(e => isNewListing(e.createdAt));
+    }
+    return events;
+  }, [events, activeDiscoveryChip]);
+
+  const handleDiscoveryChipClick = (chipId: string) => {
+    // Toggle: if already active, deactivate
+    setActiveDiscoveryChip(prev => prev === chipId ? null : chipId);
+  };
 
   // Sync state when initialEvents changes (e.g., when filters are applied)
   useEffect(() => {
@@ -65,33 +85,65 @@ export function EventListWithPagination({
   };
 
   // Group events by date
-  const groupedEvents = groupEventsByDateClient(events);
+  const groupedEvents = groupEventsByDateClient(displayEvents);
   const sortedDates = Array.from(groupedEvents.keys()).sort();
-
-  if (sortedDates.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">No events found matching your filters.</p>
-      </div>
-    );
-  }
 
   return (
     <>
-      <div className="space-y-8">
-        {sortedDates.map((dateKey) => (
-          <section key={dateKey}>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 sticky top-0 bg-gray-50 py-2 z-10">
-              {formatDateHeading(dateKey)}
-            </h2>
-            <div className="space-y-3">
-              {groupedEvents.get(dateKey)!.map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
+      {/* Discovery Strip - compact chips for quick filters */}
+      <DiscoveryStrip
+        newListingsCount={newListingsCount}
+        activeChip={activeDiscoveryChip}
+        onChipClick={handleDiscoveryChipClick}
+      />
+
+      {sortedDates.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-500">
+            {activeDiscoveryChip === 'new' 
+              ? 'No new listings in the last 48 hours.'
+              : 'No events found matching your filters.'}
+          </p>
+          {activeDiscoveryChip && (
+            <button
+              onClick={() => setActiveDiscoveryChip(null)}
+              className="mt-2 text-purple-600 hover:text-purple-700 text-sm font-medium"
+            >
+              Clear filter
+            </button>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-8">
+          {/* Active filter indicator */}
+          {activeDiscoveryChip === 'new' && (
+            <div className="flex items-center justify-between bg-purple-50 border border-purple-200 rounded-lg px-4 py-2">
+              <span className="text-sm text-purple-700">
+                🆕 Showing {displayEvents.length} new listing{displayEvents.length !== 1 ? 's' : ''} from the last 48 hours
+              </span>
+              <button
+                onClick={() => setActiveDiscoveryChip(null)}
+                className="text-purple-600 hover:text-purple-800 text-sm font-medium"
+              >
+                Show all
+              </button>
             </div>
-          </section>
-        ))}
-      </div>
+          )}
+
+          {sortedDates.map((dateKey) => (
+            <section key={dateKey}>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 sticky top-0 bg-gray-50 py-2 z-10">
+                {formatDateHeading(dateKey)}
+              </h2>
+              <div className="space-y-3">
+                {groupedEvents.get(dateKey)!.map((event) => (
+                  <EventCard key={event.id} event={event} />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      )}
 
       {/* Load More / Status */}
       <div className="text-center mt-8">

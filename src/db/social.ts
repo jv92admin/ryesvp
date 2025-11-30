@@ -1,7 +1,14 @@
 import prisma from './prisma';
 import { getFriendIds } from './friends';
-import { EventDisplay, EventWithVenue, EnrichmentDisplay } from './events';
+import { EventDisplay, EnrichmentDisplay } from './events';
 import { AttendanceStatus } from '@prisma/client';
+
+export interface SocialFilters {
+  venueIds?: string[];
+  categories?: string[];
+  startDate?: Date;
+  endDate?: Date;
+}
 
 /**
  * Get events for Section A: Your Plans
@@ -10,15 +17,25 @@ import { AttendanceStatus } from '@prisma/client';
  * - Events where user has a Squad (regardless of personal status)  
  * - Events where user is Interested (no squad)
  */
-export async function getYourPlans(userId: string): Promise<EventDisplay[]> {
+export async function getYourPlans(userId: string, filters?: SocialFilters): Promise<EventDisplay[]> {
   const now = new Date();
   const twoWeeksOut = new Date();
   twoWeeksOut.setDate(twoWeeksOut.getDate() + 14);
 
+  // Build date filter
+  const dateFilter: { gte?: Date; lte?: Date } = { gte: filters?.startDate || now };
+  if (filters?.endDate) {
+    dateFilter.lte = filters.endDate;
+  }
+
   // Get all events where user has any involvement
   const allUserEvents = await prisma.event.findMany({
     where: {
-      startDateTime: { gte: now },
+      startDateTime: dateFilter,
+      // Apply venue filter
+      ...(filters?.venueIds?.length ? { venueId: { in: filters.venueIds } } : {}),
+      // Apply category filter
+      ...(filters?.categories?.length ? { category: { in: filters.categories } } : {}),
       OR: [
         // User has a squad
         {
@@ -146,7 +163,7 @@ export async function getYourPlans(userId: string): Promise<EventDisplay[]> {
  * 4. >2 weeks + I'm not involved
  * Within each tier: sorted by # mutual friends
  */
-export async function getAlmostPlans(userId: string): Promise<EventDisplay[]> {
+export async function getAlmostPlans(userId: string, filters?: SocialFilters): Promise<EventDisplay[]> {
   const now = new Date();
   const twoWeeksOut = new Date();
   twoWeeksOut.setDate(twoWeeksOut.getDate() + 14);
@@ -155,10 +172,20 @@ export async function getAlmostPlans(userId: string): Promise<EventDisplay[]> {
 
   if (friendIds.length === 0) return [];
 
+  // Build date filter
+  const dateFilter: { gte?: Date; lte?: Date } = { gte: filters?.startDate || now };
+  if (filters?.endDate) {
+    dateFilter.lte = filters.endDate;
+  }
+
   // Get all events where friends have activity
   const events = await prisma.event.findMany({
     where: {
-      startDateTime: { gte: now },
+      startDateTime: dateFilter,
+      // Apply venue filter
+      ...(filters?.venueIds?.length ? { venueId: { in: filters.venueIds } } : {}),
+      // Apply category filter
+      ...(filters?.categories?.length ? { category: { in: filters.categories } } : {}),
       // At least one friend has marked status
       userEvents: {
         some: {

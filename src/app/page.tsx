@@ -75,13 +75,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           {/* Invite Redemption Handler - redeems invite after login */}
           {user && <InviteRedemptionHandler />}
 
-          {/* Filters - Full Width */}
-          <EventFilters 
-            venues={venues} 
-            lists={lists.map(l => ({ id: l.id, name: l.name }))}
-            communities={communities.map(c => ({ id: c.id, name: c.name }))}
-            showFriendsFilter={!!user}
-          />
+          {/* Filters - Full Width (applies to both Calendar and Social views) */}
+          <EventFilters venues={venues} />
 
           {/* Home Page Content with Conditional Layout */}
           <HomePageContent

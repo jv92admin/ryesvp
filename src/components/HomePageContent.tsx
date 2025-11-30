@@ -58,17 +58,17 @@ export function HomePageContent({ initialEvents, initialHasMore, isLoggedIn, fil
 
       {/* Conditional Layout */}
       {currentView === 'calendar' ? (
-        /* Calendar View: Two-column with sidebar */
+        /* Calendar View: Two-column with sidebar on desktop only */
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Calendar Sidebar - Shows first on mobile, right column on desktop */}
-          <aside className="order-first lg:order-last lg:w-80 flex-shrink-0">
+          {/* Calendar Sidebar - Desktop only (hidden on mobile per UX charter) */}
+          <aside className="hidden lg:block lg:order-last lg:w-80 flex-shrink-0">
             <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:scrollbar-thin">
               <CalendarSidebar isLoggedIn={isLoggedIn} />
             </div>
           </aside>
 
-          {/* Events List - Main Column */}
-          <div className="flex-1 min-w-0 order-last lg:order-first">
+          {/* Events List - Main Column (has DiscoveryStrip for mobile) */}
+          <div className="flex-1 min-w-0">
             <EventListWithPagination
               initialEvents={initialEvents}
               initialHasMore={initialHasMore}

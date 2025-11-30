@@ -9,16 +9,6 @@ interface Venue {
   slug: string;
 }
 
-interface ListOption {
-  id: string;
-  name: string;
-}
-
-interface CommunityOption {
-  id: string;
-  name: string;
-}
-
 // Available categories
 const CATEGORIES = [
   { value: 'CONCERT', label: 'Concerts' },
@@ -32,21 +22,11 @@ const CATEGORIES = [
 
 interface EventFiltersProps {
   venues: Venue[];
-  lists?: ListOption[];
-  communities?: CommunityOption[];
-  showFriendsFilter?: boolean;
 }
 
-export function EventFilters({ venues, lists = [], communities = [], showFriendsFilter = false }: EventFiltersProps) {
+export function EventFilters({ venues }: EventFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
-  // Derive initial values from searchParams
-  const getInitialFriendsValue = () => {
-    if (searchParams.get('myEvents') === 'true') return '__my_events__';
-    if (searchParams.get('friendsGoing') === 'true') return '__all_friends__';
-    return searchParams.get('listId') || '';
-  };
 
   const getInitialVenues = () => {
     const param = searchParams.get('venueIds');
@@ -62,8 +42,6 @@ export function EventFilters({ venues, lists = [], communities = [], showFriends
   const [selectedCategories, setSelectedCategories] = useState<string[]>(getInitialCategories());
   const [startDate, setStartDate] = useState(searchParams.get('startDate') || '');
   const [endDate, setEndDate] = useState(searchParams.get('endDate') || '');
-  const [friendsValue, setFriendsValue] = useState(getInitialFriendsValue());
-  const [communityId, setCommunityId] = useState(searchParams.get('communityId') || '');
 
   // Sync state with URL params when they change
   useEffect(() => {
@@ -71,8 +49,6 @@ export function EventFilters({ venues, lists = [], communities = [], showFriends
     setSelectedCategories(getInitialCategories());
     setStartDate(searchParams.get('startDate') || '');
     setEndDate(searchParams.get('endDate') || '');
-    setFriendsValue(getInitialFriendsValue());
-    setCommunityId(searchParams.get('communityId') || '');
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
@@ -99,17 +75,6 @@ export function EventFilters({ venues, lists = [], communities = [], showFriends
     if (startDate) params.set('startDate', startDate);
     if (endDate) params.set('endDate', endDate);
     
-    // Handle friends filter
-    if (friendsValue === '__my_events__') {
-      params.set('myEvents', 'true');
-    } else if (friendsValue === '__all_friends__') {
-      params.set('friendsGoing', 'true');
-    } else if (friendsValue) {
-      params.set('listId', friendsValue);
-    }
-    
-    if (communityId) params.set('communityId', communityId);
-    
     const queryString = params.toString();
     router.push(queryString ? `/?${queryString}` : '/');
   };
@@ -119,12 +84,10 @@ export function EventFilters({ venues, lists = [], communities = [], showFriends
     setSelectedCategories([]);
     setStartDate('');
     setEndDate('');
-    setFriendsValue('');
-    setCommunityId('');
     router.push('/');
   };
 
-  const hasFilters = selectedVenues.length > 0 || selectedCategories.length > 0 || startDate || endDate || friendsValue || communityId;
+  const hasFilters = selectedVenues.length > 0 || selectedCategories.length > 0 || startDate || endDate;
 
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [venueOpen, setVenueOpen] = useState(false);
@@ -240,57 +203,6 @@ export function EventFilters({ venues, lists = [], communities = [], showFriends
             className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
           />
         </div>
-
-        {/* Show Events By Filter */}
-        {showFriendsFilter && (
-          <div className="flex-1 min-w-[120px]">
-            <label htmlFor="friends" className="block text-xs font-medium text-gray-600 mb-1">
-              Show
-            </label>
-            <select
-              id="friends"
-              value={friendsValue}
-              onChange={(e) => setFriendsValue(e.target.value)}
-              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-            >
-              <option value="">All Events</option>
-              <option value="__my_events__">My Events</option>
-              <option value="__all_friends__">Friends Going</option>
-              {lists.length > 0 && (
-                <>
-                  <option disabled>── Lists ──</option>
-                  {lists.map((list) => (
-                    <option key={list.id} value={list.id}>
-                      {list.name}
-                    </option>
-                  ))}
-                </>
-              )}
-            </select>
-          </div>
-        )}
-
-        {/* Communities Filter */}
-        {showFriendsFilter && communities.length > 0 && (
-          <div className="flex-1 min-w-[120px]">
-            <label htmlFor="community" className="block text-xs font-medium text-gray-600 mb-1">
-              Community
-            </label>
-            <select
-              id="community"
-              value={communityId}
-              onChange={(e) => setCommunityId(e.target.value)}
-              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-            >
-              <option value="">All</option>
-              {communities.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
 
         {/* Action Buttons */}
         <div className="flex gap-1.5">

@@ -405,12 +405,61 @@ Full squad experience rendered in a modal (same as page):
 ## Home Page / Event List
 
 **Route:** `/`  
-**Status:** ✅ Updated November 2025
+**Status:** 🔄 Redesign planned (UX Charter)
+
+### UX Charter Principles
+
+> **Main content first.** The core event list should be visible as early as possible.  
+> **Progressive discovery.** Extra sections feel like "oh nice" moments, not mandatory steps.  
+> **No UI for non-existent capabilities.** Only show chips with real backing data.
+
+### Target Layout (Mobile)
+
+```
+┌─────────────────────────────┐
+│ Events        [Filters ▾]   │  ← Title/filters
+├─────────────────────────────┤
+│ [🆕 New] [🎫 Presales ◌]    │  ← Discovery strip (compact)
+├─────────────────────────────┤
+│ ┌─────────────────────────┐ │  ← Main event list starts
+│ │ Event Card              │ │     IMMEDIATELY
+│ └─────────────────────────┘ │
+│ ┌─────────────────────────┐ │
+│ │ Event Card              │ │
+│ └─────────────────────────┘ │
+```
+
+### Discovery Strip
+
+**Purpose:** Compact row of chips for special subsets (New, Presales, For You)
+
+**Behavior:**
+- Chips are small, tappable pills
+- Tap → Opens focused filtered view (bottom sheet or full-screen)
+- Only show chips with **real backing data**
+- "Coming soon" chips can be greyed out (executor's choice)
+
+**Chips (v1):**
+| Chip | Status | Backing Data |
+|------|--------|--------------|
+| 🆕 New | Ready when logic exists | `createdAt` < X days |
+| 🎫 Presales | Future | TM presale windows |
+| ✨ For You | Future | Recommendation signal |
+
+**Design:**
+```css
+/* Active chip */
+px-3 py-1 text-sm font-medium rounded-full bg-purple-100 text-purple-700
+
+/* Disabled/coming soon chip */
+px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-400
+```
 
 ### Components
 
 | Component | File | Purpose |
 |-----------|------|---------|
+| `DiscoveryStrip` | `src/components/DiscoveryStrip.tsx` | Chips row above event list |
 | `EventCard` | `src/components/EventCard.tsx` | Event card in list view |
 | `EventFilters` | `src/components/EventFilters.tsx` | Category + venue multi-select |
 | `SocialTab` | `src/components/SocialTab.tsx` | Your Plans, Almost Plans |
@@ -480,16 +529,76 @@ Full squad experience rendered in a modal (same as page):
 ## Social Tab
 
 **File:** `src/components/SocialTab.tsx`  
-**Status:** ✅ Existing design
+**Status:** 🔄 Redesign planned (UX Charter)
 
-### Layout
+### UX Charter Principles
+
+> **One scrollable story.** Single vertical feed with smart anchors, not fragmented tabs.  
+> **Summary chips communicate.** Show counts per section, let user jump with a tap.  
+> **Only show sections with genuine content.** Hide empty sections entirely.
+
+### Target Layout (Mobile)
+
+```
+┌─────────────────────────────┐
+│ [Plans • 3] [Almost • 5]    │  ← Summary chips (sticky)
+├─────────────────────────────┤
+│ Your Plans                  │
+│ ┌─────────────────────────┐ │
+│ │ Plan Card               │ │
+│ └─────────────────────────┘ │
+│ ┌─────────────────────────┐ │
+│ │ Plan Card               │ │
+│ └─────────────────────────┘ │
+├─────────────────────────────┤
+│ Almost Plans                │  ← Chip tap anchors here
+│ ┌─────────────────────────┐ │
+│ │ Almost Card             │ │
+│ └─────────────────────────┘ │
+├─────────────────────────────┤
+│ Community                   │  ← Only if content exists
+│ ...                         │
+└─────────────────────────────┘
+```
+
+### Summary Chips
+
+**Purpose:** Scannable overview + jump-to navigation
+
+**Behavior:**
+- Show counts per section: `Plans • 3`
+- Tap → Scrolls/anchors to that section (same screen)
+- Sticky at top as user scrolls (optional v1)
+- Only show chips for sections that have content
+
+**Sections:**
+| Section | Status | Definition |
+|---------|--------|------------|
+| Your Plans | Ready | Events you're "Going" to, or have Squad |
+| Almost Plans | Ready when defined | Interested events with friend overlap |
+| Community | Future | Community-level content |
+
+**Design:**
+```css
+/* Summary chip */
+px-3 py-1.5 text-sm font-medium rounded-full bg-gray-100 text-gray-700
+
+/* Active/selected chip */
+px-3 py-1.5 text-sm font-medium rounded-full bg-purple-600 text-white
+```
+
+### Vertical Order
+
+1. **Your Plans** — Always first (if any)
+2. **Almost Plans** — Second (if any)
+3. **Community** — Third (if any)
+
+### Current State (Before Redesign)
 
 3-column grid on desktop, stacked on mobile:
 1. **Your Plans** — Squads + events you're going to
 2. **Almost Plans** — Events where you + friends overlap
 3. **Community & Tickets** — Stubbed, "Coming Soon"
-
-*Full documentation to be added when redesigned*
 
 ---
 
@@ -567,6 +676,8 @@ bg-white border border-gray-300 text-gray-700 hover:bg-gray-50
 | Nov 2025 | Squad Day-of | Itinerary (SquadStops), Weather card, KBYG from TM, Quick actions |
 | Nov 2025 | Weather | Fixed Google API pagination (pageSize param) |
 | Nov 2025 | Event Card | Redesigned layout — 2-row structure, social/actions in bottom row |
+| Nov 2025 | Event List | UX Charter — Discovery strip pattern, main content first |
+| Nov 2025 | Social Tab | UX Charter — Summary chips + anchored sections pattern |
 
 ---
 
