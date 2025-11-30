@@ -287,18 +287,67 @@ const categoryColors = {
 
 ### Day-of Mode
 
-**Status:** 🔲 Pending implementation
+**Status:** ✅ Implemented  
+**File:** `src/components/squad/DayOfModeView.tsx`
 
-Placeholder currently shows:
-- Weather icon
-- "Weather, logistics, and 'know before you go' info will appear here"
+```
+┌─────────────────────────────────┐
+│ Event Title                     │  ← Compact header
+│ Sat, Dec 14 • 8PM • Moody Ctr  │
+├─────────────────────────────────┤
+│ 📋 Itinerary                   │  ← SquadStops
+│ ───────────────────────────    │
+│ 6:00 PM  Pre-drinks @ Bar      │
+│ 7:30 PM  Head to venue         │
+│ 8:00 PM  Concert!              │
+│ [+ Add stop]                   │
+├─────────────────────────────────┤
+│ 🌤️ Weather for Dec 14         │  ← Blue gradient card
+│ 72°F (feels 70°) • Partly Cloudy│
+│ High: 75° Low: 58°             │
+│ 💧 10% rain • 💨 8mph          │
+├─────────────────────────────────┤
+│ 📋 Know before you go          │  ← From TM enrichment
+│ Event Info: ...                │     (tmInfo, tmPleaseNote)
+│ Please Note: No bags > 12"...  │
+├─────────────────────────────────┤
+│ ⚡ Quick actions               │
+│ [🗺️ Maps]  [🚗 Uber]          │  ← External links
+└─────────────────────────────────┘
+```
 
-Planned content:
-- Weather widget (temp, rain chance)
-- Doors/set times
-- Entry requirements (ID, bag policy)
-- Meet time/spot display
-- Action buttons: Open tickets, Get a ride, Maps
+#### Components
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| `DayOfModeView` | `src/components/squad/DayOfModeView.tsx` | Day-of layout container |
+| `SquadStops` | `src/components/squad/SquadStops.tsx` | Itinerary CRUD |
+| Weather Card | Inline in DayOfModeView | Google Weather API display |
+
+#### Design Decisions
+
+**Itinerary (SquadStops):**
+- Editable by any squad member
+- Fields: Label, Time (optional), Location (optional), Notes (optional)
+- Drag to reorder (sortOrder field)
+- Flavor text encourages adding meetup points
+
+**Weather Card:**
+- Blue gradient background (`from-blue-50 to-blue-100`)
+- Shows: High/Low temps, feels like, condition, precip chance, humidity, UV, wind
+- Cached 1 hour per lat/lng/date
+- Falls back gracefully if no data (shows "Forecast not available")
+- Google Weather API with `pageSize` param to get all forecast days
+
+**Know Before You Go:**
+- Only shows if TM enrichment has `tmInfo` or `tmPleaseNote`
+- Pulled from Ticketmaster event data
+- White card, standard styling
+
+**Quick Actions:**
+- 2-column grid
+- Maps: Google Maps search for venue
+- Uber: Deep link with venue as destination
 
 ### Modal vs Page Behavior
 
@@ -356,7 +405,7 @@ Full squad experience rendered in a modal (same as page):
 ## Home Page / Event List
 
 **Route:** `/`  
-**Status:** ✅ Existing design (not recently changed)
+**Status:** ✅ Updated November 2025
 
 ### Components
 
@@ -367,7 +416,64 @@ Full squad experience rendered in a modal (same as page):
 | `SocialTab` | `src/components/SocialTab.tsx` | Your Plans, Almost Plans |
 | `ViewToggle` | `src/components/ViewToggle.tsx` | Calendar/Social toggle |
 
-*Full documentation to be added when this page is redesigned*
+---
+
+## Event Card
+
+**File:** `src/components/EventCard.tsx`  
+**Last updated:** November 2025
+
+### Layout
+
+```
+┌─────────────────────────────────────────────────┐
+│ [Image]  Title Here (up to 2 lines)  [NEW][CAT] │
+│          Venue Name • Sat, Dec 14 at 8PM       │
+├─────────────────────────────────────────────────┤
+│ [✓ Going] [👥 2 going]        [🎵] [Go Together]│
+└─────────────────────────────────────────────────┘
+```
+
+### Structure
+
+**Top section (clickable → event page):**
+- Image: `w-16 h-16 sm:w-20 sm:h-20` (smaller than before)
+- Title: `line-clamp-2`, with badges inline on right
+- Venue + Date: Single line, truncated
+
+**Bottom section (border-t separator):**
+- Left: Social signals (your status, friends, communities)
+- Right: Spotify icon + Go Together button
+
+### Design Decisions
+
+**Cleaner layout:**
+- Previous design had 4 horizontal columns fighting for space
+- New design: 2-row layout with clear separation
+- Social signals + actions in dedicated bottom row
+
+**Smaller image:**
+- Reduced from `w-20/w-24` to `w-16/w-20` to give more room to title
+
+**Inline badges:**
+- Category badge moved to same line as title (right-aligned)
+- Smaller badge text: `text-[10px]`
+
+**Compact social signals:**
+- Shortened labels: "✓ Going" instead of "✓ You're going"
+- "👥 2 going" instead of "👥 2 friends going"
+- Max 1 community shown (previously 2)
+
+**Actions grouped:**
+- Spotify + Go Together button together on right
+- Consistent placement regardless of social signals
+
+### Why This Works
+
+- Title gets proper space to breathe
+- "Go Together" button has consistent position
+- Social context visible but not overwhelming
+- Clear visual hierarchy: Content → Social → Actions
 
 ---
 
@@ -458,6 +564,9 @@ bg-white border border-gray-300 text-gray-700 hover:bg-gray-50
 | Nov 2025 | Squad Page | Simplified UX — inline pills, Cover others with picker, no Yes/No buttons |
 | Nov 2025 | Squad | Smart modal/page behavior — modal on desktop, direct navigation on mobile |
 | Nov 2025 | Squad Modal | Replaced barebones preview with full SquadPageModal (same UI as page) |
+| Nov 2025 | Squad Day-of | Itinerary (SquadStops), Weather card, KBYG from TM, Quick actions |
+| Nov 2025 | Weather | Fixed Google API pagination (pageSize param) |
+| Nov 2025 | Event Card | Redesigned layout — 2-row structure, social/actions in bottom row |
 
 ---
 

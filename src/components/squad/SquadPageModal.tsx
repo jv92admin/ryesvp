@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { PlanModeView } from './PlanModeView';
+import { DayOfModeView } from './DayOfModeView';
 import { SquadInviteModal } from './SquadInviteModal';
 import { generateSharePlanText, generateDayOfText } from '@/lib/squadShareText';
 import { markSquadAsViewed } from '@/lib/squadNotifications';
@@ -43,6 +44,8 @@ interface Squad {
       name: string;
       city: string | null;
       state: string | null;
+      lat: number | null;
+      lng: number | null;
     };
   };
   members: SquadMember[];
@@ -254,13 +257,12 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
                 copying={copying}
               />
             ) : (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-                <div className="text-4xl mb-3">🌤️</div>
-                <h3 className="font-medium text-gray-900 mb-2">Day-of Mode</h3>
-                <p className="text-gray-500 text-sm">
-                  Weather, logistics, and "know before you go" info will appear here closer to the event.
-                </p>
-              </div>
+              <DayOfModeView
+                squad={squad}
+                currentUserId={currentUserId}
+                onSquadRefresh={refreshSquad}
+                enrichment={null}  // Modal doesn't fetch enrichment, KBYG shows on full page
+              />
             )}
           </div>
         )}

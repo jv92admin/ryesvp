@@ -319,5 +319,8 @@ export interface TMEnrichmentData {
   tmExternalLinks: Record<string, string> | null;
   tmMatchConfidence: number;
   preferTMTitle: boolean; // LLM recommends using TM title over venue title
+  // "Know before you go" fields
+  tmInfo: string | null; // Additional event info from TM
+  tmPleaseNote: string | null; // Important notes (bag policy, age restrictions, etc.)
 }
 

@@ -193,6 +193,8 @@ See `data-model-101.md` for full documentation.
 
 | Item | Spec | Notes |
 |------|------|-------|
+| Venue Lat/Lng Backfill | - | Geocode venue addresses to populate lat/lng. Required for weather + improves Maps/Uber links. Use Google Geocoding API or manual entry. |
+| Squad Notes (Bulletin Board) | - | Freeform notes for squads ("BYOB", "Meet at east entrance"). Deferred — Price Guide covers structured case. Could combine later for more flexibility. |
 | Activity Feed | `ui-polish-spec.md` | Real-time friend/community activity in sidebar. Requires activity logging. |
 | Invite-Gated Signup | `social-layer-phase5-spec.md` | Email-first flow, require invite for new users. **Deprioritized** - current soft invite approach works well for now. |
 | "New to You" Tracking | `ui-polish-spec.md` | Requires `lastVisitAt` on User |
@@ -283,6 +285,27 @@ See `data-model-101.md` for full documentation.
 - [x] Added `src/middleware.ts` for Supabase SSR session handling
 - [x] Fixed "first login fails, refresh works" bug
 - [x] Proper cookie handling in auth callback
+
+### Day-of Mode + Weather (Complete ✅)
+- [x] SquadStop model for itinerary
+- [x] SquadStops component (add/edit/delete/reorder)
+- [x] DayOfModeView layout with itinerary, weather, quick actions
+- [x] WeatherCache model + Google Weather API integration
+- [x] User-triggered weather with 1-hour cache TTL
+- [x] Maps + Uber quick action buttons
+
+**Note on Weather Caching:**
+- Cache is at (lat, lng, date) level — one entry per venue location per forecast date
+- ~10 Austin venues × dates users view = reasonable API usage
+- May need optimization if usage grows (e.g., scheduled pre-caching for popular dates)
+- See `notes/scheduled-jobs-spec.md` for future async weather refresh
+
+**Note on Venue Lat/Lng:**
+- Venue lat/lng is currently NULL for existing venues (not populated in seed)
+- Weather feature requires lat/lng — need to backfill existing venues
+- Options: Manual entry in seed, or use Google Geocoding API to convert address → lat/lng
+- Maps and Uber quick actions also benefit from accurate lat/lng
+- **TODO:** Create script to geocode venue addresses and populate lat/lng
 
 ### Sprint: API Integration (Next)
 - [ ] SeatGeek API integration (pending approval)  

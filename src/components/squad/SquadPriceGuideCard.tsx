@@ -242,7 +242,7 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 placeholder="e.g. GA, Balcony"
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -252,7 +252,7 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
                 placeholder="e.g. Ticketmaster"
-                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -269,7 +269,7 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
                   placeholder="50"
                   min="0"
                   required
-                  className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full pl-7 pr-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -283,7 +283,7 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
                   onChange={(e) => setPriceMax(e.target.value)}
                   placeholder="75"
                   min="0"
-                  className="w-full pl-7 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full pl-7 pr-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
               </div>
             </div>

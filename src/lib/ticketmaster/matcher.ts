@@ -318,6 +318,9 @@ export function extractTMEnrichmentData(
     tmExternalLinks: Object.keys(externalLinks).length > 0 ? externalLinks : null,
     tmMatchConfidence: matchConfidence,
     preferTMTitle,
+    // "Know before you go" fields
+    tmInfo: tmEvent.info || null,
+    tmPleaseNote: tmEvent.pleaseNote || null,
   };
 }
 

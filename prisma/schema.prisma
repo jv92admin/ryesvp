@@ -185,6 +185,7 @@ model User {
   squadMembers           SquadMember[]
   membersCovered         SquadMember[] @relation("CoveredByUser")
   priceGuidesAdded       SquadPriceGuide[]
+  stopsAdded             SquadStop[]
 
   @@index([authProviderId])
 }
@@ -414,6 +415,7 @@ model Squad {
   
   members     SquadMember[]
   priceGuides SquadPriceGuide[]
+  stops       SquadStop[]
   
   @@index([eventId])
   @@index([createdById])
@@ -468,6 +470,28 @@ model SquadPriceGuide {
   @@index([squadId])
 }
 
+// Squad Stop - An itinerary item for Day-of mode
+model SquadStop {
+  id          String    @id @default(uuid())
+  squadId     String
+  squad       Squad     @relation(fields: [squadId], references: [id], onDelete: Cascade)
+  
+  label       String    // "Pre-drinks", "Concert", "After-party"
+  time        DateTime? // When this stop happens
+  location    String?   // Venue name or address
+  notes       String?   // Additional info about this stop
+  sortOrder   Int       // For ordering stops in the itinerary
+  
+  addedById   String
+  addedBy     User      @relation(fields: [addedById], references: [id])
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  @@index([squadId])
+  @@index([addedById])
+}
+
 enum SquadMemberStatus {
   THINKING  // Maybe
   IN        // Yes, going
@@ -479,4 +503,35 @@ enum SquadTicketStatus {
   MAYBE    // Open to getting one, not committed
   NO       // Not planning to get a ticket
   COVERED  // Someone else is buying their ticket
+}
+
+// Weather cache - store weather data by location + date
+model WeatherCache {
+  id              String   @id @default(uuid())
+  
+  // Location (rounded to ~1km precision for cache efficiency)
+  lat             Float
+  lng             Float
+  
+  // Date this forecast is for (YYYY-MM-DD)
+  forecastDate    String
+  
+  // Weather data (imperial units)
+  tempHigh        Int      // Fahrenheit
+  tempLow         Int
+  feelsLikeHigh   Int
+  feelsLikeLow    Int
+  precipChance    Int      // Percentage
+  humidity        Int      // Percentage
+  uvIndex         Int
+  windSpeed       Int      // MPH
+  condition       String   // "Sunny", "Cloudy", "Rain", etc.
+  conditionIcon   String   // Icon URL from Google
+  
+  // Metadata
+  fetchedAt       DateTime @default(now())
+  
+  // Unique constraint: one cache entry per location + date
+  @@unique([lat, lng, forecastDate])
+  @@index([forecastDate])
 }

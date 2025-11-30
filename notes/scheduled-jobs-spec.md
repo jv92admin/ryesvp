@@ -35,7 +35,26 @@ All jobs follow the same pattern: run periodically, process in batches, handle f
 
 **Batch Size:** 50 events per run (to respect API rate limits)
 
-### 3. Ticketmaster Data Refresh (Future)
+### 3. Weather Cache Refresh (Future)
+
+**Purpose:** Pre-cache weather data for Austin venues
+
+**Current State:** User-triggered with 1-hour cache TTL
+
+**Frequency:** Daily at 6 AM (before users wake up)
+
+**What it does:**
+- Fetch 10-day forecast for each distinct Austin venue location
+- Cache in `WeatherCache` table
+- Ensures fast page loads without hitting Google Weather API
+
+**Implementation Notes:**
+- Use `forecast/days:lookup` endpoint with `days=10`
+- Round lat/lng to ~1km precision to reduce cache entries
+- ~10 distinct Austin venue locations means ~10 API calls daily
+- Could extend to hourly refresh closer to events
+
+### 4. Ticketmaster Data Refresh (Future)
 
 **Purpose:** Keep TM-sourced data fresh (prices change, presales end, events sell out)
 

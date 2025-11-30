@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { PlanModeView } from './PlanModeView';
+import { DayOfModeView } from './DayOfModeView';
 import { SquadInviteModal } from './SquadInviteModal';
 import { generateSharePlanText, generateDayOfText } from '@/lib/squadShareText';
 
@@ -42,15 +43,24 @@ interface Squad {
       name: string;
       city: string | null;
       state: string | null;
+      lat: number | null;
+      lng: number | null;
     };
   };
   members: SquadMember[];
 }
 
+interface Enrichment {
+  tmInfo?: string | null;
+  tmPleaseNote?: string | null;
+  tmTicketLimit?: number | null;
+  tmUrl?: string | null;
+}
+
 interface SquadPageProps {
   squad: Squad;
   currentUserId: string;
-  enrichment?: unknown;
+  enrichment?: Enrichment | null;
 }
 
 export function SquadPage({ squad: initialSquad, currentUserId, enrichment }: SquadPageProps) {
@@ -195,13 +205,12 @@ export function SquadPage({ squad: initialSquad, currentUserId, enrichment }: Sq
             copying={copying}
           />
         ) : (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-            <div className="text-4xl mb-3">🌤️</div>
-            <h3 className="font-medium text-gray-900 mb-2">Day-of Mode</h3>
-            <p className="text-gray-500 text-sm">
-              Weather, logistics, and "know before you go" info will appear here closer to the event.
-            </p>
-          </div>
+          <DayOfModeView
+            squad={squad}
+            currentUserId={currentUserId}
+            onSquadRefresh={refreshSquad}
+            enrichment={enrichment}
+          />
         )}
       </div>
 
