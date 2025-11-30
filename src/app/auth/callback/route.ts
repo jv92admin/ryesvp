@@ -1,4 +1,5 @@
-import { createClient } from '@/lib/supabase/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { getUserByAuthId } from '@/db/users';
 
@@ -8,7 +9,29 @@ export async function GET(request: Request) {
   const next = requestUrl.searchParams.get('next') || '/';
 
   if (code) {
-    const supabase = await createClient();
+    const cookieStore = await cookies();
+    
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookiesToSet) {
+            try {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            } catch {
+              // Called from Server Component - the cookies will be set by middleware
+            }
+          },
+        },
+      }
+    );
+
     const { error, data } = await supabase.auth.exchangeCodeForSession(code);
     
     if (!error && data.user) {
@@ -36,4 +59,3 @@ export async function GET(request: Request) {
   // Return the user to an error page with instructions
   return NextResponse.redirect(new URL('/auth/error', requestUrl.origin));
 }
-

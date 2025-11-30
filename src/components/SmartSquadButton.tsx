@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { SquadModal } from './squad/SquadModal';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { SquadPageModal } from './squad/SquadPageModal';
 import { SquadCreationModal } from './squad/SquadCreationModal';
 
 interface SmartSquadButtonProps {
@@ -21,6 +22,20 @@ interface SmartSquadButtonProps {
   variant?: 'default' | 'compact';
 }
 
+// Hook to detect mobile (< 768px)
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  return isMobile;
+}
+
 export function SmartSquadButton({ 
   eventId, 
   userSquadId = null,
@@ -30,6 +45,8 @@ export function SmartSquadButton({
   className = "", 
   variant = 'default'
 }: SmartSquadButtonProps) {
+  const router = useRouter();
+  const isMobile = useIsMobile();
   const [showSquadModal, setShowSquadModal] = useState(false);
   const [showCreationModal, setShowCreationModal] = useState(false);
   const [currentSquadId, setCurrentSquadId] = useState(userSquadId);
@@ -46,17 +63,29 @@ export function SmartSquadButton({
 
   const handleClick = () => {
     if (currentSquadId) {
-      // User has existing squad - show squad modal
-      setShowSquadModal(true);
+      // User has existing squad
+      if (isMobile) {
+        // Mobile: Navigate directly to squad page
+        router.push(`/squads/${currentSquadId}`);
+      } else {
+        // Desktop: Show modal (with link to full page)
+        setShowSquadModal(true);
+      }
     } else {
-      // No existing squad - show creation modal
+      // No existing squad - show creation modal (same on both)
       setShowCreationModal(true);
     }
   };
 
   const handleSquadCreated = (squadId: string) => {
     setCurrentSquadId(squadId);
-    setShowSquadModal(true);
+    if (isMobile) {
+      // Mobile: Navigate directly to new squad
+      router.push(`/squads/${squadId}`);
+    } else {
+      // Desktop: Show modal
+      setShowSquadModal(true);
+    }
   };
 
   // Clean button text - no friend context clutter
@@ -87,16 +116,16 @@ export function SmartSquadButton({
         {buttonText}
       </button>
 
-      {/* Squad Modal - for viewing/editing existing squad */}
-      {showSquadModal && currentSquadId && (
-        <SquadModal
+      {/* Squad Modal - Desktop only, full squad experience */}
+      {showSquadModal && currentSquadId && !isMobile && (
+        <SquadPageModal
           squadId={currentSquadId}
           isOpen={showSquadModal}
           onClose={() => setShowSquadModal(false)}
         />
       )}
 
-      {/* Squad Creation Modal */}
+      {/* Squad Creation Modal - Both platforms */}
       {showCreationModal && (
         <SquadCreationModal
           event={eventData}

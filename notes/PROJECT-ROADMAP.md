@@ -136,6 +136,7 @@ See `data-model-101.md` for full documentation.
 - [x] Lazy Loading (50 events per page, "Load More" button)
 - [x] Social Sidebar (right column with network, events, friend activity)
 - [x] **Event Page Redesign** - Consolidated 4 separate cards into merged components (FriendsAndStatusCard, PrimaryCTACard, AboutCard). Moved share button to header, attendance pill next to status heading, prominent View Squad button. Ticketmaster and About cards side-by-side on desktop. Mobile-first layout with decisions above the fold.
+- [x] **Squad Page Redesign** - Full page at `/squads/[id]` with Plan/Day-of toggle. New ticket model (YES/MAYBE/NO/COVERED), squad-level price guide, guests (+1/+2), compact member list with column headers. Inline pill UX for status/tickets/guests. Cover others flow with picker. Slimmed SquadModal to preview.
 
 ### Social Layer ✅
 - [x] Friends Foundation (db, api, /friends page)
@@ -264,6 +265,25 @@ See `data-model-101.md` for full documentation.
 - [x] Profile invite link functionality
 - [x] Invite/referral system consistency
 
+### Sprint: Squad Page Refactor (Complete ✅)
+- [x] Full squad page at `/squads/[id]` with Plan/Day-of mode toggle
+- [x] Schema: SquadTicketStatus enum (YES/MAYBE/NO/COVERED), coveredById, guestCount
+- [x] Schema: SquadPriceGuide model (squad-level ticket pricing, replaces per-person budget)
+- [x] Removed per-person budget field
+- [x] New ticket flow: Have/Getting vs Need, Cover others with Add picker
+- [x] Compact member list with column headers (Going/Ticket)
+- [x] Guests section (+1/+2/custom)
+- [x] Apple-style Plan/Day-of toggle with sliding background
+- [x] Slimmed SquadModal to preview with "View Squad Details" link
+- [x] Share Squad / Share Day-of buttons
+- [x] API routes: buy-for, price-guide CRUD
+- [x] Data layer: buyForSquadMembers, uncoverSquadMember functions
+
+### Auth Middleware Fix (Complete ✅)
+- [x] Added `src/middleware.ts` for Supabase SSR session handling
+- [x] Fixed "first login fails, refresh works" bug
+- [x] Proper cookie handling in auth callback
+
 ### Sprint: API Integration (Next)
 - [ ] SeatGeek API integration (pending approval)  
 - [ ] Artist entity model (foundation for "follow artist")
@@ -274,5 +294,5 @@ See `data-model-101.md` for full documentation.
 
 ---
 
-**Last Updated:** November 29, 2025
+**Last Updated:** November 30, 2025
 

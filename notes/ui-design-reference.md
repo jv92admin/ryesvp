@@ -172,43 +172,184 @@ const categoryColors = {
 ## Squad Page
 
 **Route:** `/squads/[id]`  
-**Status:** 🔲 Not yet implemented
+**File:** `src/app/squads/[id]/page.tsx`  
+**Last updated:** November 2025
 
-### Planned Layout
+### Layout Overview (Mobile)
 
-*To be documented after implementation*
+```
+┌─────────────────────────────────┐
+│ ┌─────────────┬───────────────┐ │  ← Apple-style toggle
+│ │    Plan     │    Day-of     │ │     (sliding background)
+│ └─────────────┴───────────────┘ │
+├─────────────────────────────────┤
+│ Event Title                     │  ← Compact header, no image
+│ Sat, Dec 14 • 8PM • Moody Ctr  │     Links to event page
+├─────────────────────────────────┤
+│ Going?  [Yes] [Maybe] [No]     │  ← Inline pill buttons
+│                                 │
+│ Guests? [+1] [+2] [3+]         │  ← Toggle pills (click to deselect)
+│                                 │
+│ Ticket? [Have/Getting] [Need]  │  ← Two options only
+│                                 │
+│ Cover others? [Name ×] [+ Add] │  ← Pills for covered + Add button
+│ ┌─────────────────────────────┐│     Picker dropdown when Add clicked
+│ │ ☑ PersonA  ☑ PersonB       ││
+│ │ [Cover 2 selected]          ││
+│ └─────────────────────────────┘│
+├─────────────────────────────────┤
+│ Ticket Price Guide             │  ← Squad-level, not per-person
+│ GA: ~$75-90 (added by Alex)    │
+│ [+ Add price info]             │
+├─────────────────────────────────┤
+│ Member | Going | Ticket        │  ← Column headers
+│ ───────────────────────────    │
+│ [👤] Alex (Org)    ✓    🎫    │  ← Compact rows
+│ [👤] Maya          ?    (A)   │  ← (A) = covered by Alex
+│ [👤] Jordan        ✓    🎫    │
+│                                 │
+│ [+ Invite friends]             │  ← Opens invite modal
+├─────────────────────────────────┤
+│ [Share Squad] [Share Day-of]   │  ← Copy text buttons
+├─────────────────────────────────┤
+│ ┌─────────────────────────────┐│
+│ │       Leave Squad           ││  ← Red button, prominent
+│ └─────────────────────────────┘│
+└─────────────────────────────────┘
+```
 
 ### Components
 
-*To be documented after implementation*
+| Component | File | Purpose |
+|-----------|------|---------|
+| `SquadPage` | `src/components/squad/SquadPage.tsx` | Client wrapper, mode toggle, state |
+| `PlanModeView` | `src/components/squad/PlanModeView.tsx` | Plan mode layout |
+| `SquadStatusControls` | `src/components/squad/SquadStatusControls.tsx` | Going? Yes/Maybe/No pills |
+| `SquadGuestsSection` | `src/components/squad/SquadGuestsSection.tsx` | Guests? +1/+2/3+ pills |
+| `SquadTicketsSection` | `src/components/squad/SquadTicketsSection.tsx` | Ticket status + Cover others |
+| `SquadPriceGuideCard` | `src/components/squad/SquadPriceGuideCard.tsx` | Squad-level price info |
+| `SquadMemberList` | `src/components/squad/SquadMemberList.tsx` | Compact member table |
+| `SquadInviteModal` | `src/components/squad/SquadInviteModal.tsx` | Invite friends to squad |
 
 ### Design Decisions
 
-*To be documented after implementation*
+#### Mode Toggle (Plan / Day-of)
+- **Style:** Apple-style segmented control with sliding white background
+- **Full-width** at top of page, rounded-full
+- **Colors:** Gray-100 background, white pill for selected
+
+#### Event Header
+- **No image/logo** — Save real estate, just text
+- **Compact:** Title + date/time/venue on one line
+- **Links to event page** on click
+
+#### Status/Guests/Ticket Pills
+- **Inline format:** `Label?  [Option1] [Option2] [Option3]`
+- **Pill style:** `rounded-full`, `text-xs`, colored when selected
+- **Colors:**
+  - Yes/Going: Green (`bg-green-100 text-green-700`)
+  - Maybe: Amber (`bg-amber-100 text-amber-700`)
+  - No/Out: Red (`bg-red-100 text-red-700`)
+  - Ticket Have: Green
+  - Ticket Need: Amber
+  - Guests: Purple when selected
+- **Toggle behavior:** Guests pills can be clicked again to deselect (returns to 0)
+
+#### Cover Others Flow
+- **No Yes/No buttons** — Just show covered people + Add button
+- **Covered people:** Inline pills with × to remove
+- **Add button:** Opens picker, checkboxes for remaining people
+- **Picker:** Shows only people who need tickets (not already covered)
+
+#### Ticket Price Guide
+- **Squad-level, not per-person** — Avoids social awkwardness of showing budgets
+- **Crowdsourced:** Any member can add price info
+- **Shows:** Label (GA, Balcony), price range, who added, when
+- **Editable:** Creator can edit/delete their entries
+
+#### Member List
+- **Column headers:** Member | Going | Ticket
+- **Compact rows:** Avatar + Name + badges on left, status icons on right
+- **Going icon:** ✓ (green), ? (amber), ✗ (red)
+- **Ticket icon:** 🎫 (has), — (needs), (X) = covered by X's initial
+- **Org badge:** Small purple "Org" pill
+- **No +N badge:** Removed — covered status shown via ticket column
+
+#### Share Buttons
+- **Two buttons side-by-side:** Share Squad | Share Day-of
+- **Share Squad:** Copies invite text with link
+- **Share Day-of:** Copies logistics text (disabled if no meetTime/meetSpot set)
+
+#### Leave Squad Button
+- **Prominent red button** with border
+- **In its own card** at bottom
+- **Confirms before leaving**
+
+### Day-of Mode
+
+**Status:** 🔲 Pending implementation
+
+Placeholder currently shows:
+- Weather icon
+- "Weather, logistics, and 'know before you go' info will appear here"
+
+Planned content:
+- Weather widget (temp, rain chance)
+- Doors/set times
+- Entry requirements (ID, bag policy)
+- Meet time/spot display
+- Action buttons: Open tickets, Get a ride, Maps
+
+### Modal vs Page Behavior
+
+**Key Principle:** Squad has a canonical URL (`/squads/[id]`) that works as both entry point AND destination.
+
+**Desktop Behavior:**
+- From event page → Opens as modal (via `SmartSquadButton`)
+- Modal has "View Squad Details →" link to full page
+- Direct URL / email / notification → Lands on full page
+- Same `SquadPage` component, different container
+
+**Mobile Behavior:**
+- Always navigates to full page (no modal)
+- Relies on native back (iOS swipe, Android back button)
+- Natural for notifications, links, Plan My Day entry
+
+**Implementation:**
+- `SmartSquadButton` uses `useIsMobile()` hook (< 768px)
+- Mobile: `router.push('/squads/[id]')` directly
+- Desktop: Opens `SquadModal` (click outside to dismiss) which has "View Squad Details" link
+
+**Why:**
+- Browser back/forward works
+- Can refresh without losing context
+- Copy/paste shareable URL
+- Notification deep links work naturally
 
 ---
 
-## Squad Modal
+## Squad Modal (Desktop)
 
-**File:** `src/components/squad/SquadModal.tsx`  
-**Status:** 🔲 Pending slim-down refactor
+**File:** `src/components/squad/SquadPageModal.tsx`  
+**Status:** ✅ Full experience in modal
 
 ### Current State
 
-Full-featured modal with:
+Full squad experience rendered in a modal (same as page):
+- Plan/Day-of toggle
 - Event header
-- Status controls
-- Squad snapshot (members, ticket status)
-- Logistics (meetTime, meetSpot)
+- Status/Guests/Tickets controls
+- Cover others flow
+- Member list
 - Share buttons
-- Leave Squad
+- Leave squad
 
-### Planned Changes
+### Design Decisions
 
-After Squad page is built, modal becomes a "quick preview":
-- Keep: Event header, your status, member summary
-- Add: "View Full Squad →" button
-- Remove: Detailed member list, logistics editing, share buttons
+- **Full experience:** Same UI as squad page, not a slimmed-down preview
+- **Reuses `PlanModeView`:** Single source of truth for squad UI
+- **Click outside to dismiss:** Standard modal behavior
+- **Deleted old `SquadModal.tsx`:** Was a barebones preview, now deprecated
 
 ---
 
@@ -312,6 +453,11 @@ bg-white border border-gray-300 text-gray-700 hover:bg-gray-50
 | Nov 2025 | Event Detail | Combined attendance modal (going + interested in one view, color-coded) |
 | Nov 2025 | Event Detail | CTA reorganization — Buy + Explore side-by-side, About moved to last |
 | Nov 2025 | Event Detail | ExploreCard with artist image + listen layout when image available |
+| Nov 2025 | Squad Page | Full page refactor — new ticket model, price guide, guests, compact member list |
+| Nov 2025 | Squad Page | Apple-style Plan/Day-of toggle |
+| Nov 2025 | Squad Page | Simplified UX — inline pills, Cover others with picker, no Yes/No buttons |
+| Nov 2025 | Squad | Smart modal/page behavior — modal on desktop, direct navigation on mobile |
+| Nov 2025 | Squad Modal | Replaced barebones preview with full SquadPageModal (same UI as page) |
 
 ---
 
