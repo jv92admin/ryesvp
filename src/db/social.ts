@@ -1,7 +1,7 @@
 import prisma from './prisma';
 import { getFriendIds } from './friends';
 import { EventDisplay, EnrichmentDisplay } from './events';
-import { AttendanceStatus } from '@prisma/client';
+import { AttendanceStatus, EventCategory } from '@prisma/client';
 
 export interface SocialFilters {
   venueIds?: string[];
@@ -34,8 +34,8 @@ export async function getYourPlans(userId: string, filters?: SocialFilters): Pro
       startDateTime: dateFilter,
       // Apply venue filter
       ...(filters?.venueIds?.length ? { venueId: { in: filters.venueIds } } : {}),
-      // Apply category filter
-      ...(filters?.categories?.length ? { category: { in: filters.categories } } : {}),
+      // Apply category filter (cast to EventCategory enum)
+      ...(filters?.categories?.length ? { category: { in: filters.categories as EventCategory[] } } : {}),
       OR: [
         // User has a squad
         {
@@ -184,8 +184,8 @@ export async function getAlmostPlans(userId: string, filters?: SocialFilters): P
       startDateTime: dateFilter,
       // Apply venue filter
       ...(filters?.venueIds?.length ? { venueId: { in: filters.venueIds } } : {}),
-      // Apply category filter
-      ...(filters?.categories?.length ? { category: { in: filters.categories } } : {}),
+      // Apply category filter (cast to EventCategory enum)
+      ...(filters?.categories?.length ? { category: { in: filters.categories as EventCategory[] } } : {}),
       // At least one friend has marked status
       userEvents: {
         some: {
