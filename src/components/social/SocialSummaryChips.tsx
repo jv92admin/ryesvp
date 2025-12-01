@@ -40,7 +40,7 @@ export function SocialSummaryChips({
               inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium
               whitespace-nowrap transition-colors
               ${isSelected
-                ? 'bg-purple-600 text-white'
+                ? 'bg-[var(--brand-primary)] text-white'
                 : isActive
                   ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 cursor-pointer'
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'
@@ -53,7 +53,7 @@ export function SocialSummaryChips({
               <span className={`
                 px-1.5 py-0.5 text-xs rounded-full
                 ${isSelected
-                  ? 'bg-purple-500 text-white'
+                  ? 'bg-green-500 text-white'
                   : 'bg-gray-200 text-gray-600'
                 }
               `}>

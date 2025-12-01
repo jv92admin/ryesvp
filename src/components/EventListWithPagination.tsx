@@ -114,16 +114,16 @@ export function EventListWithPagination({
           )}
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-4">
           {/* Active filter indicator */}
           {activeDiscoveryChip === 'new' && (
-            <div className="flex items-center justify-between bg-purple-50 border border-purple-200 rounded-lg px-4 py-2">
-              <span className="text-sm text-purple-700">
-                🆕 Showing {displayEvents.length} new listing{displayEvents.length !== 1 ? 's' : ''} from the last 48 hours
+            <div className="flex items-center justify-between bg-[var(--brand-primary-light)] border border-green-200 rounded-lg px-3 py-1.5">
+              <span className="text-sm text-[var(--brand-primary)]">
+                Showing {displayEvents.length} new listing{displayEvents.length !== 1 ? 's' : ''} from the last 48 hours
               </span>
               <button
                 onClick={() => setActiveDiscoveryChip(null)}
-                className="text-purple-600 hover:text-purple-800 text-sm font-medium"
+                className="text-[var(--brand-primary)] hover:text-green-800 text-sm font-medium"
               >
                 Show all
               </button>
@@ -132,10 +132,10 @@ export function EventListWithPagination({
 
           {sortedDates.map((dateKey) => (
             <section key={dateKey}>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4 sticky top-0 bg-gray-50 py-2 z-10">
+              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2 sticky top-0 bg-gray-50 py-1 z-10">
                 {formatDateHeading(dateKey)}
               </h2>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {groupedEvents.get(dateKey)!.map((event) => (
                   <EventCard key={event.id} event={event} />
                 ))}

@@ -22,28 +22,28 @@ export function ViewToggle({ defaultView = 'calendar', onViewChange, socialBadge
   };
 
   return (
-    <div className="flex bg-gray-100 rounded-lg p-1 mb-6">
+    <div className="flex bg-gray-100 rounded-lg p-1 mb-4">
       <button
         onClick={() => handleChange('calendar')}
-        className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+        className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
           view === 'calendar'
             ? 'bg-white text-gray-900 shadow-sm'
             : 'text-gray-600 hover:text-gray-900'
         }`}
       >
-        📅 Calendar
+        All Events
       </button>
       <button
         onClick={() => handleChange('social')}
-        className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors relative ${
+        className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-md transition-colors relative ${
           view === 'social'
             ? 'bg-white text-gray-900 shadow-sm'
             : 'text-gray-600 hover:text-gray-900'
         }`}
       >
-        👥 Social
+        Your Events
         {socialBadgeCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+          <span className="absolute -top-1 -right-1 bg-[var(--brand-primary)] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
             {socialBadgeCount > 9 ? '9+' : socialBadgeCount}
           </span>
         )}

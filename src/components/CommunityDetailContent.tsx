@@ -160,7 +160,7 @@ export function CommunityDetailContent({ communityId }: CommunityDetailContentPr
     return (
       <div className="max-w-2xl mx-auto px-4 py-8">
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--brand-primary)] mx-auto"></div>
           <p className="text-gray-500 mt-4">Loading...</p>
         </div>
       </div>
@@ -173,7 +173,7 @@ export function CommunityDetailContent({ communityId }: CommunityDetailContentPr
         <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-4">
           {error || 'Community not found'}
         </div>
-        <Link href="/communities" className="text-blue-600 hover:underline">
+        <Link href="/communities" className="text-[var(--brand-primary)] hover:underline">
           ← Back to Communities
         </Link>
       </div>
@@ -210,7 +210,7 @@ export function CommunityDetailContent({ communityId }: CommunityDetailContentPr
         <div className="flex flex-wrap gap-2 mt-6">
           <button
             onClick={() => setShowInviteModal(true)}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            className="btn-primary px-4 py-2 text-sm font-medium rounded-lg transition-colors"
           >
             Invite Friends
           </button>
@@ -314,7 +314,7 @@ export function CommunityDetailContent({ communityId }: CommunityDetailContentPr
                           <p className="text-green-600 font-medium">{event.goingCount} going</p>
                         )}
                         {event.interestedCount > 0 && (
-                          <p className="text-blue-600">{event.interestedCount} interested</p>
+                          <p className="text-amber-600">{event.interestedCount} interested</p>
                         )}
                       </div>
                     </div>
@@ -372,7 +372,7 @@ export function CommunityDetailContent({ communityId }: CommunityDetailContentPr
                 </p>
                 <p className="text-xs text-gray-500">{community.owner.email}</p>
               </div>
-              <span className="text-xs font-medium text-purple-600 bg-purple-100 px-2 py-1 rounded">
+              <span className="text-xs font-medium text-[var(--brand-primary)] bg-[var(--brand-primary-light)] px-2 py-1 rounded">
                 Owner
               </span>
             </div>

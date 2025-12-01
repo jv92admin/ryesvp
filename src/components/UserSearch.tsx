@@ -61,12 +61,12 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Enter exact email address..."
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
         />
         <button
           onClick={handleSearch}
           disabled={query.length < 3 || loading}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-primary px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Searching...' : 'Search'}
         </button>
@@ -118,7 +118,7 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
                 {state === 'add' && (
                   <button
                     onClick={() => onSendRequest(user.id)}
-                    className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                    className="btn-primary px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
                   >
                     Add Friend
                   </button>

@@ -13,19 +13,19 @@ interface AttendanceButtonProps {
 const STATUS_CONFIG = {
   INTERESTED: {
     label: '★ Interested',
-    activeClass: 'bg-yellow-500 text-white hover:bg-yellow-600',
+    activeClass: 'bg-amber-500 text-white hover:bg-amber-600',
   },
   GOING: {
     label: '✓ Going',
-    activeClass: 'bg-green-600 text-white hover:bg-green-700',
+    activeClass: 'bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)]',
   },
   NEED_TICKETS: {
     label: '🎫 Need Tickets',
-    activeClass: 'bg-blue-600 text-white hover:bg-blue-700',
+    activeClass: 'bg-amber-500 text-white hover:bg-amber-600',
   },
   HAVE_TICKETS: {
     label: '🎟️ Have Tickets',
-    activeClass: 'bg-purple-600 text-white hover:bg-purple-700',
+    activeClass: 'bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)]',
   },
 } as const;
 
@@ -152,7 +152,7 @@ export function AttendanceButton({
                 : 'e.g., Section 105, Row F'
             }
             rows={2}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none text-sm text-gray-900"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none text-sm text-gray-900"
           />
           <p className="text-xs text-gray-500 mt-1">
             Saves automatically

@@ -41,7 +41,7 @@ export function CommunityInviteCard({ invitation, onAccept, onDecline }: Communi
       <div className="flex gap-2 mt-4">
         <button
           onClick={onAccept}
-          className="flex-1 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex-1 btn-primary px-4 py-2 text-sm font-medium rounded-lg transition-colors"
         >
           Accept
         </button>

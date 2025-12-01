@@ -1,5 +1,7 @@
 'use client';
 
+import { Button } from '@/components/ui';
+
 interface Squad {
   id: string;
   members: Array<{
@@ -56,17 +58,16 @@ export function SquadSnapshot({ squad, onInviteFriends, isOrganizer }: SquadSnap
 
   return (
     <div className="space-y-4">
-      <h4 className="font-medium text-gray-900">Squad Snapshot</h4>
+      <h4 className="font-medium text-gray-900">Plan overview</h4>
       
-      {/* Solo Squad Onboarding */}
+      {/* Solo Plan Onboarding */}
       {members.length === 1 && (
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+        <div className="bg-[var(--brand-primary-light)] border border-green-200 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <span className="text-purple-600 text-lg">👋</span>
             <div>
-              <h5 className="font-medium text-purple-900 mb-1">You're the first one here!</h5>
-              <p className="text-sm text-purple-700">
-                Use the <strong>Share Plan</strong> button below to invite friends to your squad.
+              <h5 className="font-medium text-green-900 mb-1">You&apos;re the first one here!</h5>
+              <p className="text-sm text-green-700">
+                Use the <strong>Share Plan</strong> button to invite friends.
               </p>
             </div>
           </div>
@@ -139,7 +140,7 @@ export function SquadSnapshot({ squad, onInviteFriends, isOrganizer }: SquadSnap
               .map((buyer) => {
                 const buyingForMembers = members.filter(m => buyer.buyingForIds?.includes(m.userId));
                 return (
-                  <div key={buyer.id} className="text-gray-600 bg-purple-50 p-2 rounded">
+                  <div key={buyer.id} className="text-gray-600 bg-[var(--brand-primary-light)] p-2 rounded">
                     <span className="font-medium">
                       {buyer.user.displayName || buyer.user.email.split('@')[0]}
                     </span>
@@ -168,7 +169,7 @@ export function SquadSnapshot({ squad, onInviteFriends, isOrganizer }: SquadSnap
                   {member.user.displayName || member.user.email.split('@')[0]}
                 </span>
                 {member.isOrganizer && (
-                  <span className="text-xs px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded">
+                  <span className="text-xs px-1.5 py-0.5 bg-[var(--brand-primary-light)] text-[var(--brand-primary)] rounded">
                     Organizer
                   </span>
                 )}
@@ -188,9 +189,9 @@ export function SquadSnapshot({ squad, onInviteFriends, isOrganizer }: SquadSnap
                 {member.status === 'IN' && (
                   <span className={`text-xs px-1.5 py-0.5 rounded ${
                     member.ticketStatus === 'BUYING_FOR_OTHERS'
-                      ? 'bg-blue-100 text-blue-700'
+                      ? 'bg-green-100 text-green-700'
                       : member.ticketStatus === 'BUYING_OWN'
-                      ? 'bg-purple-100 text-purple-700'
+                      ? 'bg-[var(--brand-primary-light)] text-[var(--brand-primary)]'
                       : 'bg-gray-100 text-gray-700'
                   }`}>
                     {member.ticketStatus === 'BUYING_FOR_OTHERS' 
@@ -209,12 +210,15 @@ export function SquadSnapshot({ squad, onInviteFriends, isOrganizer }: SquadSnap
         {/* Invite Friends Button */}
         {isOrganizer && onInviteFriends && (
           <div className="mt-3 pt-3 border-t border-gray-100">
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={onInviteFriends}
-              className="w-full px-3 py-2 text-sm font-medium text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-50 transition-colors"
+              fullWidth
+              className="text-[var(--brand-primary)] border-green-200 hover:bg-[var(--brand-primary-light)]"
             >
               + Invite Friends
-            </button>
+            </Button>
           </div>
         )}
       </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui';
 import { SquadPageModal } from './squad/SquadPageModal';
 import { SquadCreationModal } from './squad/SquadCreationModal';
 
@@ -20,6 +21,7 @@ interface SmartSquadButtonProps {
   };
   className?: string;
   variant?: 'default' | 'compact';
+  alwaysShow?: boolean; // Always show button regardless of friends (for Social tab)
 }
 
 // Hook to detect mobile (< 768px)
@@ -43,7 +45,8 @@ export function SmartSquadButton({
   friendsInterested = 0,
   event,
   className = "", 
-  variant = 'default'
+  variant = 'default',
+  alwaysShow = false
 }: SmartSquadButtonProps) {
   const router = useRouter();
   const isMobile = useIsMobile();
@@ -54,8 +57,8 @@ export function SmartSquadButton({
   const hasSquad = !!currentSquadId;
   const totalFriends = friendsGoing + friendsInterested;
   
-  // Only show "Go Together" if there are friends interested/going OR user already has a squad
-  const shouldShow = hasSquad || totalFriends > 0;
+  // Show button if: alwaysShow is true, OR friends interested/going, OR user already has a squad
+  const shouldShow = alwaysShow || hasSquad || totalFriends > 0;
   
   if (!shouldShow) {
     return null; // Don't render anything
@@ -88,15 +91,8 @@ export function SmartSquadButton({
     }
   };
 
-  // Clean button text - no friend context clutter
-  const buttonText = hasSquad ? 'View Squad' : 'Go Together';
-  const buttonIcon = hasSquad ? '👥' : '✨';
-
-  const baseClasses = "font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2";
-  
-  const variantClasses = variant === 'compact' 
-    ? "px-3 py-1.5 text-sm bg-purple-600 text-white hover:bg-purple-700"
-    : "px-4 py-2 bg-purple-600 text-white hover:bg-purple-700";
+  // Title Case for CTAs - human language, no jargon
+  const buttonText = hasSquad ? 'View Plan' : 'Start Plan';
 
   // Default event object if not provided (for compatibility)
   const eventData = event || {
@@ -110,9 +106,15 @@ export function SmartSquadButton({
     <>
       <button
         onClick={handleClick}
-        className={`${baseClasses} ${variantClasses} ${className}`}
+        className={`
+          min-w-[5.5rem] px-2.5 py-1 text-xs font-semibold rounded-md
+          text-[var(--brand-primary)] bg-white
+          border-2 border-green-300
+          hover:bg-[var(--brand-primary-light)] hover:border-green-400
+          transition-colors
+          ${className}
+        `}
       >
-        <span className="mr-1">{buttonIcon}</span>
         {buttonText}
       </button>
 

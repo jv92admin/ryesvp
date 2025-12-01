@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getDisplayName } from '@/lib/avatar';
+import { Button } from '@/components/ui';
 
 interface PriceGuide {
   id: string;
@@ -165,7 +166,7 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
         {!isAdding && guides.length > 0 && (
           <button
             onClick={() => setIsAdding(true)}
-            className="text-sm text-purple-600 hover:text-purple-700"
+            className="text-sm text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)]"
           >
             + Add
           </button>
@@ -180,7 +181,7 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
           </p>
           <button
             onClick={() => setIsAdding(true)}
-            className="text-purple-600 hover:text-purple-700 text-sm font-medium"
+            className="text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)] text-sm font-medium"
           >
             + Add price info
           </button>
@@ -242,7 +243,7 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 placeholder="e.g. GA, Balcony"
-                className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
             </div>
             <div>
@@ -252,7 +253,7 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
                 placeholder="e.g. Ticketmaster"
-                className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -269,7 +270,7 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
                   placeholder="50"
                   min="0"
                   required
-                  className="w-full pl-7 pr-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full pl-7 pr-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -283,7 +284,7 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
                   onChange={(e) => setPriceMax(e.target.value)}
                   placeholder="75"
                   min="0"
-                  className="w-full pl-7 pr-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full pl-7 pr-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -294,19 +295,22 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
           </p>
 
           <div className="flex gap-2">
-            <button
+            <Button
+              variant="primary"
+              size="sm"
               type="submit"
-              className="flex-1 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium"
+              className="flex-1"
             >
               {editingId ? 'Update' : 'Add'}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
               type="button"
               onClick={resetForm}
-              className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </form>
       )}

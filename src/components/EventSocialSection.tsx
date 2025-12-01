@@ -56,12 +56,12 @@ export function EventSocialSection({ social }: EventSocialSectionProps) {
           {/* Friends Interested */}
           {friendsInterested.length > 0 && (
             <div>
-              <p className="text-xs text-blue-600 font-medium mb-2">Interested</p>
+              <p className="text-xs text-amber-600 font-medium mb-2">Interested</p>
               <div className="flex flex-wrap gap-2">
                 {friendsInterested.map(friend => (
                   <div
                     key={friend.id}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-full"
+                    className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 rounded-full"
                   >
                     <div
                       className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-medium"
@@ -121,12 +121,12 @@ export function EventSocialSection({ social }: EventSocialSectionProps) {
                 
                 {communityInterested.length > 0 && (
                   <div>
-                    <p className="text-xs text-blue-600 font-medium mb-2">Interested</p>
+                    <p className="text-xs text-amber-600 font-medium mb-2">Interested</p>
                     <div className="flex flex-wrap gap-2">
                       {communityInterested.map(member => (
                         <div
                           key={member.id}
-                          className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-full"
+                          className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 rounded-full"
                         >
                           <div
                             className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-medium"

@@ -144,7 +144,7 @@ export function CommunitiesContent() {
 
       {loading && (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--brand-primary)] mx-auto"></div>
           <p className="text-gray-500 mt-4">Loading...</p>
         </div>
       )}
@@ -162,7 +162,7 @@ export function CommunitiesContent() {
             <div className="space-y-4">
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="w-full px-4 py-3 text-sm font-medium text-blue-600 bg-blue-50 border-2 border-dashed border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                className="w-full px-4 py-3 text-sm font-medium text-[var(--brand-primary)] bg-[var(--brand-primary-light)] border-2 border-dashed border-green-200 rounded-lg hover:bg-green-100 transition-colors"
               >
                 + Create New Community
               </button>

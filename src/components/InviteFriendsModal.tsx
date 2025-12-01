@@ -83,7 +83,7 @@ export function InviteFriendsModal({ communityId, communityName, onClose }: Invi
         <div className="flex-1 overflow-auto p-6">
           {loading ? (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--brand-primary)] mx-auto"></div>
             </div>
           ) : friends.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
@@ -118,7 +118,7 @@ export function InviteFriendsModal({ communityId, communityName, onClose }: Invi
                     <button
                       onClick={() => handleInvite(friend.id)}
                       disabled={inviting.has(friend.id)}
-                      className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                      className="btn-primary px-3 py-1.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
                     >
                       {inviting.has(friend.id) ? '...' : 'Invite'}
                     </button>

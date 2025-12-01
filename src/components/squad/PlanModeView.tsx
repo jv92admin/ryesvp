@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { formatInTimeZone } from 'date-fns-tz';
+import { Button } from '@/components/ui';
 import { SquadStatusControls } from './SquadStatusControls';
 import { SquadGuestsSection } from './SquadGuestsSection';
 import { SquadTicketsSection } from './SquadTicketsSection';
@@ -157,36 +158,38 @@ export function PlanModeView({
       {/* Share Options */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
         <div className="flex gap-2">
-          <button
+          <Button
+            variant="primary"
+            size="sm"
             onClick={onSharePlan}
             disabled={copying === 'plan'}
-            className={`flex-1 px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-              squad.members.length === 1
-                ? 'bg-purple-600 text-white hover:bg-purple-700 ring-2 ring-purple-300 ring-offset-1'
-                : 'bg-purple-600 text-white hover:bg-purple-700'
-            } disabled:opacity-50`}
+            className={`flex-1 ${squad.members.length === 1 ? 'ring-2 ring-green-300 ring-offset-1' : ''}`}
           >
-            {copying === 'plan' ? '✓ Copied!' : 'Share Squad'}
-          </button>
-          <button
+            {copying === 'plan' ? '✓ Copied!' : 'Share Plan'}
+          </Button>
+          <Button
+            variant="secondary"
+            size="sm"
             onClick={onShareDayOf}
             disabled={copying === 'dayof' || (!squad.meetTime && !squad.meetSpot)}
-            className="flex-1 px-3 py-2 text-sm font-medium border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+            className="flex-1"
             title={(!squad.meetTime && !squad.meetSpot) ? 'Set meetup details first' : ''}
           >
             {copying === 'dayof' ? '✓ Copied!' : 'Share Day-of'}
-          </button>
+          </Button>
         </div>
       </div>
 
-      {/* Leave Squad */}
+      {/* Leave Plan */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
-        <button
+        <Button
+          variant="danger"
+          size="sm"
           onClick={onLeaveSquad}
-          className="w-full px-4 py-2.5 text-sm font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+          fullWidth
         >
-          Leave Squad
-        </button>
+          Leave Plan
+        </Button>
       </div>
     </div>
   );

@@ -38,21 +38,21 @@ export function SetNameBanner() {
   if (!show || dismissed) return null;
 
   return (
-    <div className="bg-blue-50 border-b border-blue-100">
+    <div className="bg-green-50 border-b border-green-100">
       <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-        <p className="text-sm text-blue-800">
+        <p className="text-sm text-green-800">
           <span className="font-medium">👋 Add your name</span> so friends can recognize you!
         </p>
         <div className="flex items-center gap-2">
           <Link
             href="/profile"
-            className="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            className="btn-primary px-3 py-1 text-sm font-medium rounded-lg transition-colors"
           >
             Set Name
           </Link>
           <button
             onClick={handleDismiss}
-            className="text-blue-600 hover:text-blue-800 text-lg leading-none"
+            className="text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)] text-lg leading-none"
           >
             ×
           </button>

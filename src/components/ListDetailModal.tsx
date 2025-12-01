@@ -126,7 +126,7 @@ export function ListDetailModal({ listId, onClose }: ListDetailModalProps) {
         <div className="flex-1 overflow-auto p-6">
           {loading ? (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--brand-primary)] mx-auto"></div>
             </div>
           ) : (
             <>
@@ -134,7 +134,7 @@ export function ListDetailModal({ listId, onClose }: ListDetailModalProps) {
               <div className="mb-6">
                 <button
                   onClick={() => setShowAddFriend(!showAddFriend)}
-                  className="text-sm font-medium text-blue-600 hover:text-blue-700"
+                  className="text-sm font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)]"
                 >
                   {showAddFriend ? '− Hide' : '+ Add Friends'}
                 </button>
@@ -161,7 +161,7 @@ export function ListDetailModal({ listId, onClose }: ListDetailModalProps) {
                           </div>
                           <button
                             onClick={() => handleAddMember(friend.id)}
-                            className="text-xs font-medium text-blue-600 hover:text-blue-700"
+                            className="text-xs font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)]"
                           >
                             Add
                           </button>
@@ -188,7 +188,7 @@ export function ListDetailModal({ listId, onClose }: ListDetailModalProps) {
                         className="flex items-center justify-between p-3 bg-white border border-gray-200 rounded-lg"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium">
+                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white text-xs font-medium">
                             {getInitials(member.user)}
                           </div>
                           <div>

@@ -22,6 +22,9 @@ export async function getYourPlans(userId: string, filters?: SocialFilters): Pro
   const twoWeeksOut = new Date();
   twoWeeksOut.setDate(twoWeeksOut.getDate() + 14);
 
+  // Get friend IDs for social signals
+  const friendIds = await getFriendIds(userId);
+
   // Build date filter
   const dateFilter: { gte?: Date; lte?: Date } = { gte: filters?.startDate || now };
   if (filters?.endDate) {
@@ -59,8 +62,13 @@ export async function getYourPlans(userId: string, filters?: SocialFilters): Pro
     include: {
       venue: true,
       userEvents: {
-        where: { userId },
-        select: { status: true },
+        where: {
+          OR: [
+            { userId }, // User's status
+            { userId: { in: friendIds } }, // Friend statuses for social signals
+          ],
+        },
+        select: { userId: true, status: true },
       },
       squads: {
         where: {
@@ -91,10 +99,15 @@ export async function getYourPlans(userId: string, filters?: SocialFilters): Pro
 
   // Process and prioritize events
   const processedEvents = allUserEvents.map(event => {
-    const userEvent = event.userEvents[0];
+    const userEvent = event.userEvents.find(ue => ue.userId === userId);
+    const friendEvents = event.userEvents.filter(ue => friendIds.includes(ue.userId));
     const userSquad = event.squads.length > 0 ? event.squads[0] : null;
     const hasSquad = !!userSquad;
     const status = userEvent?.status;
+    
+    // Calculate friend counts
+    const friendsGoingCount = friendEvents.filter(fe => fe.status === AttendanceStatus.GOING).length;
+    const friendsInterestedCount = friendEvents.filter(fe => fe.status === AttendanceStatus.INTERESTED).length;
     
     // Determine priority level (lower number = higher priority)
     let priority = 5; // default
@@ -118,8 +131,8 @@ export async function getYourPlans(userId: string, filters?: SocialFilters): Pro
       enrichment: event.enrichment ? mapEnrichmentForDisplay(event.enrichment) : undefined,
       social: {
         userStatus: status as 'GOING' | 'INTERESTED' || null,
-        friendsGoing: 0,
-        friendsInterested: 0,
+        friendsGoing: friendsGoingCount,
+        friendsInterested: friendsInterestedCount,
         communitiesGoing: [],
       },
       // Squad information for smart buttons

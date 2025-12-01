@@ -91,7 +91,7 @@ export function ListsContent() {
       <div className="mb-6">
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+          className="btn-primary px-4 py-2 text-sm font-medium rounded-lg transition-colors"
         >
           + Create List
         </button>
@@ -99,7 +99,7 @@ export function ListsContent() {
 
       {loading && (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--brand-primary)] mx-auto"></div>
           <p className="text-gray-500 mt-4">Loading...</p>
         </div>
       )}
@@ -120,7 +120,7 @@ export function ListsContent() {
               </p>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                className="btn-primary px-4 py-2 text-sm font-medium rounded-lg transition-colors"
               >
                 Create Your First List
               </button>

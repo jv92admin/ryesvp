@@ -157,13 +157,13 @@ export function DayOfModeView({ squad, enrichment }: DayOfModeViewProps) {
       )}
 
       {/* Weather */}
-      <div className="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200 p-4">
+      <div className="bg-gradient-to-r from-sky-50 to-sky-100 rounded-lg border border-sky-200 p-4">
         {weatherLoading ? (
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-200 rounded-full animate-pulse" />
+            <div className="w-10 h-10 bg-sky-200 rounded-full animate-pulse" />
             <div className="flex-1">
-              <div className="h-4 bg-blue-200 rounded w-24 animate-pulse mb-2" />
-              <div className="h-3 bg-blue-200 rounded w-32 animate-pulse" />
+              <div className="h-4 bg-sky-200 rounded w-24 animate-pulse mb-2" />
+              <div className="h-3 bg-sky-200 rounded w-32 animate-pulse" />
             </div>
           </div>
         ) : weather ? (

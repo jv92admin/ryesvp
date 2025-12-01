@@ -48,66 +48,72 @@ export function SocialSectionC({ ticketActivity }: SocialSectionCProps) {
   }, {} as Record<string, any>);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">🎫 Ticket Activity</h2>
+    <div className="bg-white border border-gray-200 rounded-lg h-fit">
+      {/* Header */}
+      <div className="px-4 py-3 border-b border-gray-100">
+        <h2 className="text-sm font-bold text-[var(--brand-primary)] uppercase tracking-wide">
+          Ticket activity
+        </h2>
+      </div>
       
-      {ticketActivity.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          <p className="text-sm mb-2">No ticket activity in your network.</p>
-          <p className="text-xs">Connect with friends to see who needs or has tickets.</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {Object.entries(groupedActivity).map(([eventId, event]) => (
-            <div key={eventId} className="p-4 border border-gray-100 rounded-lg">
-              <Link
-                href={`/events/${eventId}`}
-                className="font-medium text-gray-900 hover:text-blue-600 block mb-2"
-              >
-                {event.eventTitle}
-              </Link>
-              <p className="text-sm text-gray-600 mb-3">
-                {formatInTimeZone(new Date(event.eventDate), AUSTIN_TIMEZONE, 'EEE, MMM d • h:mm a')}
-                {' • '}
-                {event.venueName}
-              </p>
-              
-              {/* Ticket status summary */}
-              <div className="space-y-2">
-                {event.needTickets.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-1 rounded bg-amber-100 text-amber-700 font-medium">
-                      🔍 Need Tickets
-                    </span>
-                    <span className="text-sm text-gray-600">
-                      {event.needTickets.map((friend: any) => friend.friendName).join(', ')}
-                    </span>
-                  </div>
-                )}
+      {/* Content */}
+      <div className="divide-y divide-gray-100">
+        {ticketActivity.length === 0 ? (
+          <div className="text-center py-8 text-gray-500 px-4">
+            <p className="text-sm mb-2">No ticket activity in your network.</p>
+            <p className="text-xs">Connect with friends to see who needs or has tickets.</p>
+          </div>
+        ) : (
+          <>
+            {Object.entries(groupedActivity).map(([eventId, event]) => (
+              <div key={eventId} className="px-4 py-3 hover:bg-gray-50 transition-colors">
+                <Link
+                  href={`/events/${eventId}`}
+                  className="font-medium text-gray-900 text-sm hover:text-[var(--brand-primary)] block"
+                >
+                  {event.eventTitle}
+                </Link>
+                <p className="text-xs text-gray-500 mt-0.5 mb-2">
+                  {formatInTimeZone(new Date(event.eventDate), AUSTIN_TIMEZONE, 'EEE, MMM d • h:mm a')} • {event.venueName}
+                </p>
                 
-                {event.haveTickets.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-700 font-medium">
-                      ✅ Have Tickets
-                    </span>
-                    <span className="text-sm text-gray-600">
-                      {event.haveTickets.map((friend: any) => friend.friendName).join(', ')}
-                    </span>
-                  </div>
-                )}
+                {/* Ticket status summary */}
+                <div className="flex flex-wrap gap-2">
+                  {event.needTickets.length > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-medium">
+                        Need
+                      </span>
+                      <span className="text-xs text-gray-600">
+                        {event.needTickets.map((friend: any) => friend.friendName).join(', ')}
+                      </span>
+                    </div>
+                  )}
+                  
+                  {event.haveTickets.length > 0 && (
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-green-100 text-green-700 font-medium">
+                        Have
+                      </span>
+                      <span className="text-xs text-gray-600">
+                        {event.haveTickets.map((friend: any) => friend.friendName).join(', ')}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-          
-          {ticketActivity.length >= 20 && (
-            <div className="text-center pt-4">
-              <p className="text-sm text-gray-500">
-                Showing recent activity from the next 2 weeks
-              </p>
-            </div>
-          )}
-        </div>
-      )}
+            ))}
+            
+            {ticketActivity.length >= 20 && (
+              <div className="text-center py-3 px-4">
+                <p className="text-xs text-gray-500">
+                  Showing recent activity from the next 2 weeks
+                </p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

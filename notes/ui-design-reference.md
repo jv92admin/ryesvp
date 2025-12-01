@@ -19,6 +19,33 @@ From `product-vision.md`:
 
 ---
 
+## Terminology & Copy Conventions
+
+### "Plan" vs "Squad"
+
+**Internal (code):** "Squad" — used in database, API routes, file names, types  
+**User-facing (UI):** "Plan" — used in all visible copy, buttons, headers
+
+| Context | Example |
+|---------|---------|
+| Button CTA | "Start Plan", "View Plan", "Join Plan" |
+| Modal title | "Start a plan", "Invite friends to your plan" |
+| Body copy | "You joined Maya's plan for Mt Joy" |
+| Notification | "Alex invited you to their plan for Mt Joy on Dec 4" |
+
+### Title Case Convention
+
+**Buttons/CTAs:** Title Case  
+- Start Plan, View Plan, Join Plan, Share Plan, Leave Plan
+
+**Headers/labels:** Sentence case  
+- "Your plans", "Friends' plans", "Plan overview"
+
+**Body copy/notifications:** Natural sentences  
+- "Alex invited you to their plan for Mt Joy on Dec 4."
+
+---
+
 ## Event Detail Page
 
 **Route:** `/events/[id]`  
@@ -48,10 +75,9 @@ From `product-vision.md`:
 │ │🎫 Need  │ │🎟️ Have │        │
 │ └─────────┘ └─────────┘        │
 │                                 │
-│ ┌─────────────────────────────┐│
-│ │    👥 View Squad / Go       ││  ← Prominent, full-width
-│ │       Together              ││
-│ └─────────────────────────────┘│
+│                                 │
+│ [Start Plan] or [View Plan]    │  ← Subtle outline button
+│                                 │
 ├─────────────────────────────────┤
 │ Buy                            │
 │ [Buy on Ticketmaster]          │  ← Full-width, TM blue
@@ -110,10 +136,11 @@ Same order, but:
 - **Modal design:** Color-coded sections — green dot + "X going" header, yellow dot + "Y interested" header
 - **Rationale:** Originally planned as separate row with avatars. Simplified to pill for compactness. Combined modal reduces friction vs. separate modals per status.
 
-#### View Squad Button
-- **Placement:** Full-width, centered, between status section and CTAs
-- **Styling:** Prominent, matches importance of status selection
-- **Rationale:** Originally planned as Row 3 in a stacked layout. Made more prominent as it's a key action.
+#### Plan Button (SmartSquadButton)
+- **Placement:** Inline with social signals in event cards; below status section on detail page
+- **Text:** "Start Plan" (no plan exists) / "View Plan" (user has plan)
+- **Styling:** Subtle outline button (see Common Patterns > Plan Button Style)
+- **Rationale:** Less prominent than before — doesn't compete with primary actions like Buy. Outline style feels clickable but minimal.
 
 #### Primary CTAs (Buy + Explore)
 - **Layout:** 2-column grid on desktop (`lg` breakpoint), stacked on mobile
@@ -169,11 +196,13 @@ const categoryColors = {
 
 ---
 
-## Squad Page
+## Squad Page (Plan)
 
 **Route:** `/squads/[id]`  
 **File:** `src/app/squads/[id]/page.tsx`  
-**Last updated:** November 2025
+**Last updated:** December 2025
+
+> **Note:** Internal name is "Squad" but user-facing copy says "Plan" everywhere. See Terminology section.
 
 ### Layout Overview (Mobile)
 
@@ -210,10 +239,10 @@ const categoryColors = {
 │                                 │
 │ [+ Invite friends]             │  ← Opens invite modal
 ├─────────────────────────────────┤
-│ [Share Squad] [Share Day-of]   │  ← Copy text buttons
+│ [Share Plan] [Share Day-of]    │  ← Copy text buttons
 ├─────────────────────────────────┤
 │ ┌─────────────────────────────┐│
-│ │       Leave Squad           ││  ← Red button, prominent
+│ │       Leave Plan            ││  ← Red button, prominent
 │ └─────────────────────────────┘│
 └─────────────────────────────────┘
 ```
@@ -276,14 +305,14 @@ const categoryColors = {
 - **No +N badge:** Removed — covered status shown via ticket column
 
 #### Share Buttons
-- **Two buttons side-by-side:** Share Squad | Share Day-of
-- **Share Squad:** Copies invite text with link
+- **Two buttons side-by-side:** Share Plan | Share Day-of
+- **Share Plan:** Copies invite text with link
 - **Share Day-of:** Copies logistics text (disabled if no meetTime/meetSpot set)
 
-#### Leave Squad Button
+#### Leave Plan Button
 - **Prominent red button** with border
 - **In its own card** at bottom
-- **Confirms before leaving**
+- **Confirms before leaving** ("Are you sure you want to leave this plan?")
 
 ### Day-of Mode
 
@@ -479,7 +508,7 @@ px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-400
 │ [Image]  Title Here (up to 2 lines)  [NEW][CAT] │
 │          Venue Name • Sat, Dec 14 at 8PM       │
 ├─────────────────────────────────────────────────┤
-│ [✓ Going] [👥 2 going]        [🎵] [Go Together]│
+│ [✓ Going] [👥 2 going]        [🎵] [Start Plan] │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -621,6 +650,18 @@ px-6 py-3 text-white font-medium rounded-lg transition-colors hover:opacity-90
 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50
 ```
 
+**Plan Button (SmartSquadButton):**
+```css
+min-w-[5.5rem] px-2.5 py-1 text-xs font-semibold rounded-md
+text-[var(--brand-primary)] bg-white
+border-2 border-green-300
+hover:bg-[var(--brand-primary-light)] hover:border-green-400
+```
+- Consistent width via `min-w-[5.5rem]` (both "Start Plan" and "View Plan" same size)
+- Outline style with brand green border
+- Semibold text for clickability
+- Subtle hover: light green background + darker border
+
 **Status toggle (inactive):**
 ```css
 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50
@@ -678,8 +719,11 @@ bg-white border border-gray-300 text-gray-700 hover:bg-gray-50
 | Nov 2025 | Event Card | Redesigned layout — 2-row structure, social/actions in bottom row |
 | Nov 2025 | Event List | UX Charter — Discovery strip pattern, main content first |
 | Nov 2025 | Social Tab | UX Charter — Summary chips + anchored sections pattern |
+| Dec 2025 | Terminology | "Squad" → "Plan" in all user-facing copy (internal code stays "Squad") |
+| Dec 2025 | Copy | Title Case for button CTAs, sentence case for headers |
+| Dec 2025 | Plan Button | Redesigned — subtle outline style, consistent min-width, semibold text |
 
 ---
 
-*Last Updated: November 2025*
+*Last Updated: December 2025*
 

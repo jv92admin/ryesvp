@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Button } from '@/components/ui';
 
 interface SocialStats {
   friendCount: number;
@@ -78,17 +79,17 @@ export function SocialEngagementPanel({ isLoggedIn }: SocialEngagementPanelProps
   // Not logged in - prompt to sign in
   if (!isLoggedIn) {
     return (
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <div className="bg-[var(--brand-primary-light)] border border-green-200 rounded-lg p-4 mb-6">
         <div className="flex items-center gap-3">
           <span className="text-2xl">👋</span>
           <div>
-            <p className="text-blue-900 font-medium">
+            <p className="text-green-900 font-medium">
               <Link href="/login" className="underline hover:no-underline">
                 Sign in
               </Link>{' '}
               to see who&apos;s going
             </p>
-            <p className="text-sm text-blue-700">
+            <p className="text-sm text-green-700">
               Connect with friends and discover events together
             </p>
           </div>
@@ -112,7 +113,7 @@ export function SocialEngagementPanel({ isLoggedIn }: SocialEngagementPanelProps
   // New user with no friends - encourage adding friends
   if (stats.friendCount === 0) {
     return (
-      <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4 mb-6">
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 mb-6">
         <div className="flex items-start gap-3">
           <span className="text-2xl">👋</span>
           <div className="flex-1">
@@ -125,16 +126,18 @@ export function SocialEngagementPanel({ isLoggedIn }: SocialEngagementPanelProps
             <div className="flex flex-wrap gap-2">
               <Link
                 href="/friends"
-                className="px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors"
+                className="btn-primary px-4 py-2 text-sm font-medium rounded-lg transition-colors"
               >
                 Add Friends
               </Link>
-              <button
+              <Button
+                variant="secondary"
+                size="sm"
                 onClick={handleCopyInvite}
-                className="px-4 py-2 border border-purple-300 text-purple-700 text-sm font-medium rounded-lg hover:bg-purple-50 transition-colors"
+                className="text-[var(--brand-primary)] border-green-300 hover:bg-[var(--brand-primary-light)]"
               >
                 {copied ? '✓ Copied!' : '🔗 Copy Invite Link'}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -155,7 +158,7 @@ export function SocialEngagementPanel({ isLoggedIn }: SocialEngagementPanelProps
           {stats.pendingRequests > 0 && (
             <Link
               href="/friends"
-              className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 font-medium"
+              className="flex items-center gap-1 text-sm text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)] font-medium"
             >
               📬 {stats.pendingRequests} request{stats.pendingRequests !== 1 ? 's' : ''} →
             </Link>
@@ -166,7 +169,7 @@ export function SocialEngagementPanel({ isLoggedIn }: SocialEngagementPanelProps
         <div className="flex items-center gap-2">
           <button
             onClick={handleCopyInvite}
-            className="px-3 py-1.5 text-sm text-purple-700 hover:text-purple-900 font-medium transition-colors"
+            className="px-3 py-1.5 text-sm text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)] font-medium transition-colors"
           >
             {copied ? '✓ Copied!' : '🔗 Invite Friends'}
           </button>

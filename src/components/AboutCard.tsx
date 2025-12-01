@@ -41,7 +41,7 @@ export function AboutCard({ description, venue }: AboutCardProps) {
           {shouldTruncate && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="mt-2 text-sm text-blue-600 hover:text-blue-800 hover:underline"
+              className="mt-2 text-sm text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)] hover:underline"
             >
               {isExpanded ? 'Read less' : 'Read more'}
             </button>

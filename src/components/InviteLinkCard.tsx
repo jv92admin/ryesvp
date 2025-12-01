@@ -51,9 +51,9 @@ Sign up with my link and we'll be automatically connected 🎵`;
 
   if (loading) {
     return (
-      <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-100 rounded-lg p-4 mb-6 animate-pulse">
-        <div className="h-5 bg-purple-200 rounded w-32 mb-2"></div>
-        <div className="h-4 bg-purple-100 rounded w-48"></div>
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-100 rounded-lg p-4 mb-6 animate-pulse">
+        <div className="h-5 bg-green-200 rounded w-32 mb-2"></div>
+        <div className="h-4 bg-green-100 rounded w-48"></div>
       </div>
     );
   }
@@ -61,14 +61,14 @@ Sign up with my link and we'll be automatically connected 🎵`;
   if (!inviteCode) return null;
 
   return (
-    <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4 mb-6">
+    <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 mb-6">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-lg">🔗</span>
             <h3 className="font-semibold text-gray-900">Your Invite Link</h3>
             {usedCount > 0 && (
-              <span className="px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-700 rounded-full">
+              <span className="px-2 py-0.5 text-xs font-medium bg-[var(--brand-primary-light)] text-[var(--brand-primary)] rounded-full">
                 {usedCount} friend{usedCount !== 1 ? 's' : ''} joined
               </span>
             )}
@@ -85,7 +85,7 @@ Sign up with my link and we'll be automatically connected 🎵`;
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
                 copied
                   ? 'bg-emerald-100 text-emerald-700'
-                  : 'bg-purple-600 text-white hover:bg-purple-700'
+                  : 'bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)]'
               }`}
             >
               {copied ? '✓ Copied!' : 'Copy'}

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { EventDisplay } from '@/db/events';
 import { SmartSquadButton } from './SmartSquadButton';
+import { StatusBadge, FriendCountBadge } from './ui/StatusBadge';
 import { formatEventDate, isNewListing } from '@/lib/utils';
 
 interface EventCardProps {
@@ -18,7 +19,7 @@ export function EventCard({ event }: EventCardProps) {
   const { displayTitle } = event;
   
   const categoryColors: Record<string, string> = {
-    CONCERT: 'bg-purple-100 text-purple-800',
+    CONCERT: 'bg-violet-100 text-violet-800',
     COMEDY: 'bg-yellow-100 text-yellow-800',
     THEATER: 'bg-pink-100 text-pink-800',
     MOVIE: 'bg-red-100 text-red-800',
@@ -106,30 +107,15 @@ export function EventCard({ event }: EventCardProps) {
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
           {/* Social Signals - left side */}
           <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
-            {/* User's own status */}
-            {social?.userStatus && (
-              <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${
-                social.userStatus === 'GOING' 
-                  ? 'bg-emerald-100 text-emerald-700' 
-                  : 'bg-amber-100 text-amber-700'
-              }`}>
-                {social.userStatus === 'GOING' ? '✓ Going' : '★ Interested'}
-              </span>
-            )}
-            {social && social.friendsGoing > 0 && (
-              <span className="inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">
-                👥 {social.friendsGoing} going
-              </span>
-            )}
-            {social && social.friendsInterested > 0 && !social.friendsGoing && (
-              <span className="inline-flex items-center px-2 py-0.5 bg-blue-50 text-blue-600 text-xs font-medium rounded-full">
-                👥 {social.friendsInterested} interested
-              </span>
-            )}
+            <StatusBadge status={social?.userStatus} />
+            <FriendCountBadge 
+              goingCount={social?.friendsGoing} 
+              interestedCount={social?.friendsInterested}
+            />
             {social?.communitiesGoing.slice(0, 1).map((c) => (
               <span 
                 key={c.communityId}
-                className="inline-flex items-center px-2 py-0.5 bg-purple-50 text-purple-700 text-xs font-medium rounded-full"
+                className="inline-flex items-center px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-full"
               >
                 {c.count} from {c.communityName}
               </span>

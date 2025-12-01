@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Button, ToggleChip } from '@/components/ui';
 
 interface SquadGuestsSectionProps {
   squadId: string;
@@ -43,28 +44,22 @@ export function SquadGuestsSection({ squadId, currentGuestCount, onUpdate }: Squ
     <div className="flex items-center gap-3">
       <span className="text-sm text-gray-600 flex-shrink-0">Guests?</span>
       <div className="flex gap-1 flex-1">
-        <button
+        <ToggleChip
+          active={currentGuestCount === 1}
           onClick={() => updateGuestCount(currentGuestCount === 1 ? 0 : 1)}
           disabled={isUpdating}
-          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-            currentGuestCount === 1
-              ? 'bg-purple-100 text-purple-700'
-              : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-          } disabled:opacity-50`}
+          color="primary"
         >
           +1
-        </button>
-        <button
+        </ToggleChip>
+        <ToggleChip
+          active={currentGuestCount === 2}
           onClick={() => updateGuestCount(currentGuestCount === 2 ? 0 : 2)}
           disabled={isUpdating}
-          className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-            currentGuestCount === 2
-              ? 'bg-purple-100 text-purple-700'
-              : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-          } disabled:opacity-50`}
+          color="primary"
         >
           +2
-        </button>
+        </ToggleChip>
         
         {showCustom ? (
           <div className="flex items-center gap-1">
@@ -74,34 +69,33 @@ export function SquadGuestsSection({ squadId, currentGuestCount, onUpdate }: Squ
               max="99"
               value={customCount}
               onChange={(e) => setCustomCount(e.target.value)}
-              className="w-12 px-2 py-1 text-xs border border-gray-300 rounded-lg focus:ring-1 focus:ring-purple-500"
+              className="w-12 px-2 py-1 text-xs border border-gray-300 rounded-lg focus:ring-1 focus:ring-green-500 text-gray-900"
               placeholder="3+"
             />
-            <button
+            <Button
+              variant="primary"
+              size="xs"
               onClick={handleCustomSubmit}
               disabled={isUpdating}
-              className="px-2 py-1 text-xs bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
             >
               ✓
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
+              size="xs"
               onClick={() => setShowCustom(false)}
-              className="px-2 py-1 text-xs text-gray-500 hover:text-gray-700"
             >
               ✗
-            </button>
+            </Button>
           </div>
         ) : (
-          <button
+          <ToggleChip
+            active={currentGuestCount > 2}
             onClick={() => setShowCustom(true)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-              currentGuestCount > 2
-                ? 'bg-purple-100 text-purple-700'
-                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-            }`}
+            color="primary"
           >
             {currentGuestCount > 2 ? `+${currentGuestCount}` : '3+'}
-          </button>
+          </ToggleChip>
         )}
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { formatInTimeZone } from 'date-fns-tz';
+import { Button } from '@/components/ui';
 
 const AUSTIN_TIMEZONE = 'America/Chicago';
 
@@ -82,7 +83,7 @@ export function SquadLogistics({ squad, onLogisticsUpdate }: SquadLogisticsProps
         {!editing && (
           <button
             onClick={() => setEditing(true)}
-            className="text-sm text-purple-600 hover:text-purple-800"
+            className="text-sm text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)]"
           >
             Edit
           </button>
@@ -100,7 +101,7 @@ export function SquadLogistics({ squad, onLogisticsUpdate }: SquadLogisticsProps
               type="time"
               value={meetTime}
               onChange={(e) => setMeetTime(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
               placeholder="e.g. 19:30"
             />
             <p className="text-xs text-gray-500 mt-1">
@@ -117,7 +118,7 @@ export function SquadLogistics({ squad, onLogisticsUpdate }: SquadLogisticsProps
               type="text"
               value={meetSpot}
               onChange={(e) => setMeetSpot(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
               placeholder="e.g. Lazarus Brewing, East 6th"
             />
             <p className="text-xs text-gray-500 mt-1">
@@ -127,20 +128,25 @@ export function SquadLogistics({ squad, onLogisticsUpdate }: SquadLogisticsProps
 
           {/* Action Buttons */}
           <div className="flex gap-2">
-            <button
+            <Button
+              variant="primary"
+              size="sm"
               onClick={handleSave}
               disabled={saving}
-              className="flex-1 px-3 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              loading={saving}
+              className="flex-1"
             >
               {saving ? 'Saving...' : 'Save'}
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={handleCancel}
               disabled={saving}
-              className="flex-1 px-3 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1"
             >
               Cancel
-            </button>
+            </Button>
           </div>
         </div>
       ) : (

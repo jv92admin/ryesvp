@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { TagChip } from '@/components/ui';
 
 interface Venue {
   id: string;
@@ -94,48 +95,90 @@ export function EventFilters({ venues }: EventFiltersProps) {
 
   // Helper to get display text for multi-select
   const getCategoryLabel = () => {
-    if (selectedCategories.length === 0) return 'All';
+    if (selectedCategories.length === 0) return 'Category';
     if (selectedCategories.length === 1) {
-      return CATEGORIES.find(c => c.value === selectedCategories[0])?.label || 'All';
+      return CATEGORIES.find(c => c.value === selectedCategories[0])?.label || 'Category';
     }
-    return `${selectedCategories.length} selected`;
+    return `${selectedCategories.length} categories`;
   };
 
   const getVenueLabel = () => {
-    if (selectedVenues.length === 0) return 'All';
+    if (selectedVenues.length === 0) return 'Venue';
     if (selectedVenues.length === 1) {
-      return venues.find(v => v.id === selectedVenues[0])?.name || 'All';
+      return venues.find(v => v.id === selectedVenues[0])?.name || 'Venue';
     }
-    return `${selectedVenues.length} selected`;
+    return `${selectedVenues.length} venues`;
+  };
+
+  // Quick date helpers
+  const getThisWeekDates = () => {
+    const today = new Date();
+    const endOfWeek = new Date(today);
+    endOfWeek.setDate(today.getDate() + (7 - today.getDay())); // Next Sunday
+    return {
+      start: today.toISOString().split('T')[0],
+      end: endOfWeek.toISOString().split('T')[0],
+    };
+  };
+
+  const getNextWeekDates = () => {
+    const today = new Date();
+    const nextSunday = new Date(today);
+    nextSunday.setDate(today.getDate() + (7 - today.getDay()) + 1); // Monday next week
+    const nextSaturday = new Date(nextSunday);
+    nextSaturday.setDate(nextSunday.getDate() + 6);
+    return {
+      start: nextSunday.toISOString().split('T')[0],
+      end: nextSaturday.toISOString().split('T')[0],
+    };
+  };
+
+  const setQuickDate = (preset: 'thisWeek' | 'nextWeek') => {
+    const dates = preset === 'thisWeek' ? getThisWeekDates() : getNextWeekDates();
+    setStartDate(dates.start);
+    setEndDate(dates.end);
+  };
+
+  // Check if current date selection matches a preset
+  const isThisWeek = () => {
+    const dates = getThisWeekDates();
+    return startDate === dates.start && endDate === dates.end;
+  };
+
+  const isNextWeek = () => {
+    const dates = getNextWeekDates();
+    return startDate === dates.start && endDate === dates.end;
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 mb-4">
-      <div className="flex flex-wrap gap-2 items-end">
-        {/* Category Filter (multi-select dropdown) */}
-        <div className="relative flex-1 min-w-[120px]">
-          <label className="block text-xs font-medium text-gray-600 mb-1">
-            Category
-          </label>
+    <div className="space-y-3 mb-4">
+      {/* Row 1: Filter Pills - evenly distributed */}
+      <div className="flex items-center gap-3">
+        {/* Category Dropdown */}
+        <div className="relative">
           <button
             type="button"
             onClick={() => { setCategoryOpen(!categoryOpen); setVenueOpen(false); }}
-            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded bg-white text-gray-900 hover:border-gray-400 flex items-center justify-between text-left"
+            className={`px-2.5 py-1 text-xs rounded-full border transition-colors flex items-center gap-0.5 ${
+              selectedCategories.length > 0
+                ? 'bg-[var(--brand-primary-light)] border-green-300 text-[var(--brand-primary)]'
+                : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'
+            }`}
           >
-            <span className="truncate">{getCategoryLabel()}</span>
-            <svg className={`w-3 h-3 text-gray-500 ml-1 flex-shrink-0 transition-transform ${categoryOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span>{getCategoryLabel()}</span>
+            <svg className={`w-2.5 h-2.5 transition-transform ${categoryOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
           {categoryOpen && (
-            <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg py-1 max-h-48 overflow-y-auto">
+            <div className="absolute z-20 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-1 max-h-48 overflow-y-auto">
               {CATEGORIES.map((cat) => (
-                <label key={cat.value} className="flex items-center px-2 py-1 hover:bg-gray-50 cursor-pointer">
+                <label key={cat.value} className="flex items-center px-3 py-1.5 hover:bg-gray-50 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={selectedCategories.includes(cat.value)}
                     onChange={() => toggleCategory(cat.value)}
-                    className="rounded border-gray-300 text-blue-600 mr-2 h-3.5 w-3.5"
+                    className="rounded border-gray-300 text-[var(--brand-primary)] mr-2 h-3.5 w-3.5"
                   />
                   <span className="text-sm text-gray-700">{cat.label}</span>
                 </label>
@@ -144,30 +187,31 @@ export function EventFilters({ venues }: EventFiltersProps) {
           )}
         </div>
 
-        {/* Venue Filter (multi-select dropdown) */}
-        <div className="relative flex-1 min-w-[120px]">
-          <label className="block text-xs font-medium text-gray-600 mb-1">
-            Venue
-          </label>
+        {/* Venue Dropdown */}
+        <div className="relative">
           <button
             type="button"
             onClick={() => { setVenueOpen(!venueOpen); setCategoryOpen(false); }}
-            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded bg-white text-gray-900 hover:border-gray-400 flex items-center justify-between text-left"
+            className={`px-2.5 py-1 text-xs rounded-full border transition-colors flex items-center gap-0.5 ${
+              selectedVenues.length > 0
+                ? 'bg-[var(--brand-primary-light)] border-green-300 text-[var(--brand-primary)]'
+                : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'
+            }`}
           >
-            <span className="truncate">{getVenueLabel()}</span>
-            <svg className={`w-3 h-3 text-gray-500 ml-1 flex-shrink-0 transition-transform ${venueOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span>{getVenueLabel()}</span>
+            <svg className={`w-2.5 h-2.5 transition-transform ${venueOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </button>
           {venueOpen && (
-            <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg py-1 max-h-48 overflow-y-auto">
+            <div className="absolute z-20 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 max-h-48 overflow-y-auto">
               {venues.map((venue) => (
-                <label key={venue.id} className="flex items-center px-2 py-1 hover:bg-gray-50 cursor-pointer">
+                <label key={venue.id} className="flex items-center px-3 py-1.5 hover:bg-gray-50 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={selectedVenues.includes(venue.id)}
                     onChange={() => toggleVenue(venue.id)}
-                    className="rounded border-gray-300 text-blue-600 mr-2 h-3.5 w-3.5"
+                    className="rounded border-gray-300 text-[var(--brand-primary)] mr-2 h-3.5 w-3.5"
                   />
                   <span className="text-sm text-gray-700">{venue.name}</span>
                 </label>
@@ -176,85 +220,107 @@ export function EventFilters({ venues }: EventFiltersProps) {
           )}
         </div>
 
-        {/* Start Date */}
-        <div className="flex-1 min-w-[110px]">
-          <label htmlFor="startDate" className="block text-xs font-medium text-gray-600 mb-1">
-            From
-          </label>
-          <input
-            id="startDate"
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-          />
+        {/* Separator */}
+        <span className="text-gray-300">|</span>
+
+        {/* Quick Date Pills */}
+        <button
+          type="button"
+          onClick={() => setQuickDate('thisWeek')}
+          className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+            isThisWeek()
+              ? 'bg-[var(--brand-primary-light)] border-green-300 text-[var(--brand-primary)]'
+              : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'
+          }`}
+        >
+          This Week
+        </button>
+        <button
+          type="button"
+          onClick={() => setQuickDate('nextWeek')}
+          className={`px-2.5 py-1 text-xs rounded-full border transition-colors ${
+            isNextWeek()
+              ? 'bg-[var(--brand-primary-light)] border-green-300 text-[var(--brand-primary)]'
+              : 'bg-white border-gray-300 text-gray-700 hover:border-gray-400'
+          }`}
+        >
+          Next Week
+        </button>
+      </div>
+
+      {/* Row 2: Date Range (left) + Apply (right) */}
+      <div className="flex items-center justify-between">
+        {/* Date Range - Left */}
+        <div className="flex items-center gap-1.5">
+          <div className="relative">
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className={`px-2 py-1 text-xs border border-gray-300 rounded-full hover:border-gray-400 focus:ring-1 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] w-[90px] date-input-small ${
+                startDate ? 'text-gray-700' : 'text-transparent'
+              }`}
+            />
+            {!startDate && (
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">
+                From
+              </span>
+            )}
+          </div>
+          <span className="text-gray-300 text-xs">–</span>
+          <div className="relative">
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className={`px-2 py-1 text-xs border border-gray-300 rounded-full hover:border-gray-400 focus:ring-1 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)] w-[90px] date-input-small ${
+                endDate ? 'text-gray-700' : 'text-transparent'
+              }`}
+            />
+            {!endDate && (
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">
+                To
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* End Date */}
-        <div className="flex-1 min-w-[110px]">
-          <label htmlFor="endDate" className="block text-xs font-medium text-gray-600 mb-1">
-            To
-          </label>
-          <input
-            id="endDate"
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-          />
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-1.5">
+        {/* Apply / Clear - Right */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => { clearFilters(); setCategoryOpen(false); setVenueOpen(false); }}
+            disabled={!hasFilters}
+            className={`text-xs transition-colors ${
+              hasFilters 
+                ? 'text-gray-500 hover:text-gray-700 cursor-pointer' 
+                : 'text-gray-300 cursor-default'
+            }`}
+          >
+            Clear
+          </button>
           <button
             onClick={() => { applyFilters(); setCategoryOpen(false); setVenueOpen(false); }}
-            className="px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
+            className="px-4 py-1 text-xs font-medium rounded-full bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)] transition-colors min-w-[75px]"
           >
             Apply
           </button>
-          {hasFilters && (
-            <button
-              onClick={() => { clearFilters(); setCategoryOpen(false); setVenueOpen(false); }}
-              className="px-3 py-1.5 text-gray-600 text-sm font-medium hover:text-gray-900 transition-colors"
-            >
-              Clear
-            </button>
-          )}
         </div>
       </div>
 
-      {/* Selected filters display */}
+      {/* Selected filters as removable chips */}
       {(selectedCategories.length > 0 || selectedVenues.length > 0) && (
-        <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-gray-100">
+        <>
           {selectedCategories.map(cat => (
-            <span 
-              key={cat}
-              className="inline-flex items-center px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded-full"
-            >
+            <TagChip key={cat} color="category" onRemove={() => toggleCategory(cat)}>
               {CATEGORIES.find(c => c.value === cat)?.label}
-              <button
-                onClick={() => toggleCategory(cat)}
-                className="ml-1 hover:text-blue-600"
-              >
-                ×
-              </button>
-            </span>
+            </TagChip>
           ))}
           {selectedVenues.map(venueId => (
-            <span 
-              key={venueId}
-              className="inline-flex items-center px-2 py-0.5 text-xs bg-gray-100 text-gray-800 rounded-full"
-            >
+            <TagChip key={venueId} color="default" onRemove={() => toggleVenue(venueId)}>
               {venues.find(v => v.id === venueId)?.name}
-              <button
-                onClick={() => toggleVenue(venueId)}
-                className="ml-1 hover:text-gray-600"
-              >
-                ×
-              </button>
-            </span>
+            </TagChip>
           ))}
-        </div>
+        </>
       )}
     </div>
   );

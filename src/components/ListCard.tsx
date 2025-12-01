@@ -18,7 +18,7 @@ export function ListCard({ list, onView, onDelete }: ListCardProps) {
         className="flex items-center gap-3 flex-1 cursor-pointer"
         onClick={onView}
       >
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-medium text-sm">
+        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white font-medium text-sm">
           {list.name[0].toUpperCase()}
         </div>
         <div>
@@ -32,7 +32,7 @@ export function ListCard({ list, onView, onDelete }: ListCardProps) {
       <div className="flex gap-2">
         <button
           onClick={onView}
-          className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+          className="px-3 py-1.5 text-sm font-medium text-[var(--brand-primary)] hover:bg-green-50 rounded-lg transition-colors"
         >
           View
         </button>

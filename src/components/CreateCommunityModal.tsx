@@ -37,7 +37,7 @@ export function CreateCommunityModal({ onClose, onCreate }: CreateCommunityModal
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., EDM Lovers, Austin FC Fans"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               autoFocus
             />
           </div>
@@ -52,7 +52,7 @@ export function CreateCommunityModal({ onClose, onCreate }: CreateCommunityModal
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What's this community about?"
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
             />
           </div>
 
@@ -71,7 +71,7 @@ export function CreateCommunityModal({ onClose, onCreate }: CreateCommunityModal
             <button
               type="submit"
               disabled={!name.trim() || loading}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="btn-primary px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
             >
               {loading ? 'Creating...' : 'Create Community'}
             </button>

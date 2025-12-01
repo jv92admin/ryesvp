@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { getDisplayName } from '@/lib/avatar';
+import { Button, ToggleChip, Chip } from '@/components/ui';
 
 // Ticket status type (matches Prisma enum)
 type TicketStatus = 'YES' | 'MAYBE' | 'NO' | 'COVERED';
@@ -143,9 +144,9 @@ export function SquadTicketsSection({ squadId, members, currentUserId, onUpdate 
   // If covered by someone else
   if (isCovered && coveredByMember) {
     return (
-      <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-        <span className="text-purple-600">✓</span>
-        <span className="text-purple-900 ml-2 text-sm">
+      <div className="bg-[var(--brand-primary-light)] border border-green-200 rounded-lg p-3">
+        <span className="text-[var(--brand-primary)]">✓</span>
+        <span className="text-green-900 ml-2 text-sm">
           <strong>{getDisplayName(coveredByMember.user.displayName, coveredByMember.user.email)}</strong> is getting your ticket
         </span>
       </div>
@@ -158,28 +159,24 @@ export function SquadTicketsSection({ squadId, members, currentUserId, onUpdate 
       <div className="flex items-center gap-3">
         <span className="text-sm text-gray-600 flex-shrink-0">Ticket?</span>
         <div className="flex gap-1 flex-1">
-          <button
+          <ToggleChip
+            active={hasTicket}
             onClick={() => updateMyTicketStatus('YES')}
             disabled={isUpdating}
-            className={`flex-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-              hasTicket
-                ? 'bg-green-100 text-green-700'
-                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-            } disabled:opacity-50`}
+            color="success"
+            className="flex-1 justify-center"
           >
             Have / Getting
-          </button>
-          <button
+          </ToggleChip>
+          <ToggleChip
+            active={currentMember.ticketStatus === 'MAYBE'}
             onClick={() => updateMyTicketStatus('MAYBE')}
             disabled={isUpdating}
-            className={`flex-1 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-              currentMember.ticketStatus === 'MAYBE'
-                ? 'bg-amber-100 text-amber-700'
-                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-            } disabled:opacity-50`}
+            color="warning"
+            className="flex-1 justify-center"
           >
             Need
-          </button>
+          </ToggleChip>
         </div>
       </div>
 
@@ -190,34 +187,28 @@ export function SquadTicketsSection({ squadId, members, currentUserId, onUpdate 
           <div className="flex gap-1 flex-1 flex-wrap items-center">
             {/* People I'm covering - inline pills with × */}
             {membersCovering.map(m => (
-              <span 
+              <Chip
                 key={m.userId}
-                className="inline-flex items-center gap-1 px-2 py-1.5 bg-purple-100 rounded-full text-xs text-purple-700"
+                variant="tag"
+                color="primary"
+                active
+                removable
+                onRemove={() => handleUncover(m.userId)}
+                disabled={isUpdating}
               >
                 {getDisplayName(m.user.displayName, m.user.email)}
-                <button
-                  onClick={() => handleUncover(m.userId)}
-                  disabled={isUpdating}
-                  className="text-purple-400 hover:text-red-500 disabled:opacity-50 ml-0.5"
-                  title="Remove"
-                >
-                  ×
-                </button>
-              </span>
+              </Chip>
             ))}
             
             {/* Add button - only if there are people who need tickets */}
             {membersNeedingTickets.length > 0 && (
-              <button
+              <ToggleChip
+                active={showPicker}
                 onClick={() => setShowPicker(!showPicker)}
-                className={`px-2 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  showPicker 
-                    ? 'bg-purple-600 text-white' 
-                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                }`}
+                color="accent"
               >
                 + Add
-              </button>
+              </ToggleChip>
             )}
           </div>
         </div>
@@ -235,7 +226,7 @@ export function SquadTicketsSection({ squadId, members, currentUserId, onUpdate 
                 type="checkbox"
                 checked={selectedMembers.includes(member.userId)}
                 onChange={() => toggleMemberSelection(member.userId)}
-                className="w-3.5 h-3.5 text-purple-600 rounded border-gray-300"
+                className="w-3.5 h-3.5 text-[var(--brand-primary)] rounded border-gray-300"
               />
               <span className="text-gray-900">
                 {getDisplayName(member.user.displayName, member.user.email)}
@@ -243,13 +234,16 @@ export function SquadTicketsSection({ squadId, members, currentUserId, onUpdate 
             </label>
           ))}
           {selectedMembers.length > 0 && (
-            <button
+            <Button
+              variant="primary"
+              size="xs"
               onClick={handleCoverSelected}
               disabled={isUpdating}
-              className="w-full mt-2 px-3 py-1.5 bg-purple-600 text-white rounded text-xs font-medium hover:bg-purple-700 disabled:opacity-50"
+              fullWidth
+              className="mt-2"
             >
               Cover {selectedMembers.length} selected
-            </button>
+            </Button>
           )}
         </div>
       )}

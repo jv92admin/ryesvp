@@ -116,7 +116,7 @@ export function CalendarSidebar({ isLoggedIn }: CalendarSidebarProps) {
       </div>
 
       {/* Recommendations/Discover */}
-      <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 border-2 border-dashed border-indigo-200 rounded-lg p-4">
+      <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-2 border-dashed border-green-200 rounded-lg p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <span>🎯</span>
           Recommendations
@@ -149,23 +149,23 @@ export function CalendarSidebar({ isLoggedIn }: CalendarSidebarProps) {
         </div>
 
         {/* Timeline */}
-        <div className="pt-3 mt-3 border-t border-indigo-200/50">
+        <div className="pt-3 mt-3 border-t border-green-200/50">
           <div className="text-xs text-gray-500 text-center">
-            <strong className="text-indigo-600">Smart Discovery</strong> • Coming Q1 2025
+            <strong className="text-[var(--brand-primary)]">Smart Discovery</strong> • Coming Q1 2025
           </div>
         </div>
       </div>
 
       {/* Not logged in CTA */}
       {!isLoggedIn && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-semibold text-blue-900 mb-2">👋 Join RyesVP</h3>
-          <p className="text-sm text-blue-800 mb-3">
+        <div className="bg-[var(--brand-primary-light)] border border-green-200 rounded-lg p-4">
+          <h3 className="font-semibold text-green-900 mb-2">👋 Join RyesVP</h3>
+          <p className="text-sm text-green-800 mb-3">
             Sign in to track your events and see social features
           </p>
           <Link
             href="/login"
-            className="block w-full text-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            className="btn-primary block w-full text-center px-4 py-2 text-sm font-medium rounded-lg transition-colors"
           >
             Sign In
           </Link>

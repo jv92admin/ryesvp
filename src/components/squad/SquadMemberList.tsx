@@ -1,6 +1,7 @@
 'use client';
 
 import { getAvatarStyle, getInitials, getDisplayName } from '@/lib/avatar';
+import { Button } from '@/components/ui';
 
 // Ticket status type (matches Prisma enum)
 type TicketStatus = 'YES' | 'MAYBE' | 'NO' | 'COVERED';
@@ -44,7 +45,7 @@ const TICKET_DISPLAY: Record<TicketStatus, { icon: string; color: string }> = {
   YES: { icon: '🎫', color: '' },
   MAYBE: { icon: '—', color: 'text-gray-400' },
   NO: { icon: '—', color: 'text-gray-400' },
-  COVERED: { icon: '✓', color: 'text-purple-600' },
+  COVERED: { icon: '✓', color: 'text-[var(--brand-primary)]' },
 };
 
 export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite }: SquadMemberListProps) {
@@ -90,7 +91,7 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite }:
                   {displayName}
                 </span>
                 {member.isOrganizer && (
-                  <span className="text-[9px] px-1 py-0.5 bg-purple-100 text-purple-700 rounded flex-shrink-0">
+                  <span className="text-[9px] px-1 py-0.5 bg-[var(--brand-primary-light)] text-[var(--brand-primary)] rounded flex-shrink-0">
                     Org
                   </span>
                 )}
@@ -105,7 +106,7 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite }:
               <div className={`w-10 text-center text-sm ${ticketInfo.color}`}>
                 {isCovered && coveredByMember ? (
                   <span 
-                    className="text-purple-600 text-[10px] font-medium"
+                    className="text-[var(--brand-primary)] text-[10px] font-medium"
                     title={`Covered by ${getDisplayName(coveredByMember.user.displayName, coveredByMember.user.email)}`}
                   >
                     ({getDisplayName(coveredByMember.user.displayName, coveredByMember.user.email).charAt(0)})
@@ -123,12 +124,15 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite }:
 
       {/* Invite button */}
       {onInvite && (
-        <button
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={onInvite}
-          className="w-full mt-2 px-3 py-2 text-sm text-purple-600 border border-purple-200 rounded-lg hover:bg-purple-50 transition-colors"
+          fullWidth
+          className="mt-2 text-[var(--brand-primary)] border-green-200 hover:bg-[var(--brand-primary-light)]"
         >
           + Invite friends
-        </button>
+        </Button>
       )}
     </div>
   );

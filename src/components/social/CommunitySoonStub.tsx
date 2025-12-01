@@ -17,13 +17,13 @@ export function CommunitySoonStub() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 border-2 border-dashed border-purple-200 rounded-lg p-6">
+    <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-2 border-dashed border-green-200 rounded-lg p-6">
       <div className="text-center space-y-4">
         {/* Header */}
         <div>
           <span className="text-2xl mb-2 block">🚧</span>
           <h3 className="font-semibold text-gray-900 mb-2">Coming Soon</h3>
-          <h4 className="text-lg font-medium text-purple-700 mb-1">Community & Tickets</h4>
+          <h4 className="text-lg font-medium text-[var(--brand-primary)] mb-1">Community & Tickets</h4>
         </div>
 
         {/* Features Preview */}
@@ -61,12 +61,12 @@ export function CommunitySoonStub() {
               value={notifyEmail}
               onChange={(e) => setNotifyEmail(e.target.value)}
               placeholder="Get notified when ready"
-              className="w-full px-3 py-2 text-sm border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white/80"
+              className="w-full px-3 py-2 text-sm border border-green-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white/80"
               required
             />
             <button
               type="submit"
-              className="w-full px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-colors"
+              className="w-full px-4 py-2 bg-[var(--brand-primary)] text-white text-sm font-medium rounded-lg hover:bg-[var(--brand-primary-hover)] transition-colors"
             >
               Notify Me
             </button>
@@ -81,9 +81,9 @@ export function CommunitySoonStub() {
         )}
 
         {/* Timeline */}
-        <div className="pt-4 border-t border-purple-200/50">
+        <div className="pt-4 border-t border-green-200/50">
           <div className="text-xs text-gray-500">
-            <strong className="text-purple-600">Phase 2</strong> • Expected: Early 2025
+            <strong className="text-[var(--brand-primary)]">Phase 2</strong> • Expected: Early 2025
           </div>
         </div>
       </div>

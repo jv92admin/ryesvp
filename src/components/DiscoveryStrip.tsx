@@ -68,9 +68,9 @@ export function DiscoveryStrip({
             inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium
             whitespace-nowrap transition-colors
             ${activeChip === chip.id
-              ? 'bg-purple-600 text-white'
+              ? 'bg-[var(--brand-primary)] text-white'
               : chip.isActive
-                ? 'bg-purple-100 text-purple-700 hover:bg-purple-200 cursor-pointer'
+                ? 'bg-[var(--brand-primary-light)] text-[var(--brand-primary)] hover:bg-green-200 cursor-pointer'
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
             }
           `}
@@ -81,8 +81,8 @@ export function DiscoveryStrip({
             <span className={`
               px-1.5 py-0.5 text-xs rounded-full
               ${activeChip === chip.id
-                ? 'bg-purple-500 text-white'
-                : 'bg-purple-200 text-purple-800'
+                ? 'bg-green-500 text-white'
+                : 'bg-green-200 text-green-800'
               }
             `}>
               {chip.count}

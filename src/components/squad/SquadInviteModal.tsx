@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui';
 
 interface Friend {
   id: string;
@@ -122,7 +123,7 @@ export function SquadInviteModal({ squad, isOpen, onClose, onMemberAdded }: Squa
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-sm sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Invite Friends to Squad</DialogTitle>
+          <DialogTitle>Invite friends to your plan</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -147,15 +148,14 @@ export function SquadInviteModal({ squad, isOpen, onClose, onMemberAdded }: Squa
               {friends.length === 0 ? (
                 <div className="text-center py-6 text-gray-500">
                   <p className="text-sm">No more friends to invite!</p>
-                  <p className="text-xs mt-1">Everyone is already in the squad or not friends yet.</p>
+                  <p className="text-xs mt-1">Everyone is already in the plan or not friends yet.</p>
                 </div>
               ) : (
                 <div className="space-y-3 max-h-60 overflow-y-auto">
                   {/* Interested Friends First */}
                   {interestedFriends.length > 0 && (
                     <div>
-                      <h5 className="text-sm font-medium text-green-700 mb-2 flex items-center gap-1">
-                        <span>✨</span>
+                      <h5 className="text-sm font-medium text-green-700 mb-2">
                         Already Interested
                       </h5>
                       <div className="space-y-2">
@@ -198,20 +198,25 @@ export function SquadInviteModal({ squad, isOpen, onClose, onMemberAdded }: Squa
 
           {/* Action Buttons */}
           <div className="flex gap-2 pt-4 border-t border-gray-200">
-            <button
+            <Button
+              variant="secondary"
+              size="sm"
               onClick={onClose}
               disabled={inviting}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex-1"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
               onClick={handleInvite}
               disabled={inviting || selectedFriends.size === 0}
-              className="flex-1 px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              loading={inviting}
+              className="flex-1"
             >
               {inviting ? 'Inviting...' : `Invite${selectedFriends.size > 0 ? ` (${selectedFriends.size})` : ''}`}
-            </button>
+            </Button>
           </div>
         </div>
       </DialogContent>
@@ -232,8 +237,8 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
     const statusConfig = {
       INTERESTED: { emoji: '★', color: 'bg-amber-100 text-amber-700' },
       GOING: { emoji: '✓', color: 'bg-green-100 text-green-700' },
-      NEED_TICKETS: { emoji: '🔍', color: 'bg-blue-100 text-blue-700' },
-      HAVE_TICKETS: { emoji: '🎫', color: 'bg-purple-100 text-purple-700' },
+      NEED_TICKETS: { emoji: '🔍', color: 'bg-amber-50 text-amber-600' },
+      HAVE_TICKETS: { emoji: '🎫', color: 'bg-green-100 text-green-700' },
     };
 
     const config = statusConfig[friend.status as keyof typeof statusConfig];
@@ -248,13 +253,13 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
 
   return (
     <label className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${
-      isSelected ? 'bg-purple-50 border border-purple-200' : 'hover:bg-gray-50'
+      isSelected ? 'bg-[var(--brand-primary-light)] border border-green-200' : 'hover:bg-gray-50'
     }`}>
       <input
         type="checkbox"
         checked={isSelected}
         onChange={onToggle}
-        className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+        className="w-4 h-4 text-[var(--brand-primary)] border-gray-300 rounded focus:ring-green-500"
       />
       
       <div className="flex items-center gap-2 flex-1">

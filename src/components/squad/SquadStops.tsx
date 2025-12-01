@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { formatInTimeZone } from 'date-fns-tz';
 import { getDisplayName } from '@/lib/avatar';
+import { Button } from '@/components/ui';
 
 const AUSTIN_TIMEZONE = 'America/Chicago';
 
@@ -196,7 +197,7 @@ export function SquadStops({ squadId, stops, onRefresh }: SquadStopsProps) {
         value={formLabel}
         onChange={(e) => setFormLabel(e.target.value)}
         placeholder="Stop name (e.g., Pre-drinks, Concert, After-party)"
-        className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
         autoFocus
       />
       <div className="grid grid-cols-2 gap-2">
@@ -204,14 +205,14 @@ export function SquadStops({ squadId, stops, onRefresh }: SquadStopsProps) {
           type="datetime-local"
           value={formTime}
           onChange={(e) => setFormTime(e.target.value)}
-          className="px-3 py-2 text-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="px-3 py-2 text-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
         />
         <input
           type="text"
           value={formLocation}
           onChange={(e) => setFormLocation(e.target.value)}
           placeholder="Location"
-          className="px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          className="px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
         />
       </div>
       <input
@@ -219,23 +220,27 @@ export function SquadStops({ squadId, stops, onRefresh }: SquadStopsProps) {
         value={formNotes}
         onChange={(e) => setFormNotes(e.target.value)}
         placeholder="Notes (optional)"
-        className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
       />
       <div className="flex gap-2">
-        <button
+        <Button
+          variant="primary"
+          size="sm"
           onClick={editingId ? handleUpdate : handleAdd}
           disabled={loading || !formLabel.trim()}
-          className="flex-1 px-3 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 disabled:opacity-50"
+          loading={loading}
+          className="flex-1"
         >
           {loading ? 'Saving...' : (editingId ? 'Update' : 'Add Stop')}
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="secondary"
+          size="sm"
           onClick={cancelEdit}
           disabled={loading}
-          className="px-3 py-2 text-sm font-medium text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300"
         >
           Cancel
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -250,7 +255,7 @@ export function SquadStops({ squadId, stops, onRefresh }: SquadStopsProps) {
               setIsAdding(true);
               resetForm();
             }}
-            className="text-xs text-purple-600 hover:text-purple-700 font-medium"
+            className="text-xs text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)] font-medium"
           >
             + Add stop
           </button>
@@ -274,7 +279,7 @@ export function SquadStops({ squadId, stops, onRefresh }: SquadStopsProps) {
                 <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 group">
                   {/* Timeline dot */}
                   <div className="flex flex-col items-center pt-1">
-                    <div className="w-3 h-3 rounded-full bg-purple-500" />
+                    <div className="w-3 h-3 rounded-full bg-[var(--brand-primary)]" />
                     {index < stops.length - 1 && (
                       <div className="w-0.5 h-8 bg-gray-200 mt-1" />
                     )}

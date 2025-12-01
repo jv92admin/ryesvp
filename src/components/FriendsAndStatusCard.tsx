@@ -38,19 +38,19 @@ interface FriendsAndStatusCardProps {
 const STATUS_CONFIG = {
   INTERESTED: {
     label: '★ Interested',
-    activeClass: 'bg-yellow-500 text-white hover:bg-yellow-600',
+    activeClass: 'bg-amber-500 text-white hover:bg-amber-600',
   },
   GOING: {
     label: '✓ Going',
-    activeClass: 'bg-green-600 text-white hover:bg-green-700',
+    activeClass: 'bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)]',
   },
   NEED_TICKETS: {
     label: '🎫 Need Tickets',
-    activeClass: 'bg-blue-600 text-white hover:bg-blue-700',
+    activeClass: 'bg-amber-500 text-white hover:bg-amber-600',
   },
   HAVE_TICKETS: {
     label: '🎟️ Have Tickets',
-    activeClass: 'bg-purple-600 text-white hover:bg-purple-700',
+    activeClass: 'bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)]',
   },
 } as const;
 
@@ -235,7 +235,7 @@ export function FriendsAndStatusCard({
               </button>
             </div>
             <p className="text-xs text-gray-500 text-center mt-3">
-              <Link href="/login" className="text-blue-600 hover:underline">
+              <Link href="/login" className="text-[var(--brand-primary)] hover:underline">
                 Sign in
               </Link> to mark your status
             </p>

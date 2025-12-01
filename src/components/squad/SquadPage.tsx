@@ -103,7 +103,7 @@ export function SquadPage({ squad: initialSquad, currentUserId, enrichment }: Sq
   };
 
   const handleLeaveSquad = async () => {
-    const confirmed = window.confirm('Are you sure you want to leave this squad?');
+    const confirmed = window.confirm('Are you sure you want to leave this plan?');
     if (!confirmed) return;
 
     try {

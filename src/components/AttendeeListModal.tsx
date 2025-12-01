@@ -12,10 +12,10 @@ interface AttendeeListModalProps {
 }
 
 const STATUS_STYLES = {
-  GOING: { bg: 'bg-green-50', text: 'text-green-800', border: 'border-green-200' },
-  INTERESTED: { bg: 'bg-yellow-50', text: 'text-yellow-800', border: 'border-yellow-200' },
-  NEED_TICKETS: { bg: 'bg-blue-50', text: 'text-blue-800', border: 'border-blue-200' },
-  HAVE_TICKETS: { bg: 'bg-purple-50', text: 'text-purple-800', border: 'border-purple-200' },
+  GOING: { bg: 'bg-[var(--brand-primary-light)]', text: 'text-[var(--brand-primary)]', border: 'border-green-200' },
+  INTERESTED: { bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-200' },
+  NEED_TICKETS: { bg: 'bg-amber-50', text: 'text-amber-800', border: 'border-amber-200' },
+  HAVE_TICKETS: { bg: 'bg-[var(--brand-primary-light)]', text: 'text-[var(--brand-primary)]', border: 'border-green-200' },
   NOT_GOING: { bg: 'bg-gray-50', text: 'text-gray-800', border: 'border-gray-200' },
 };
 

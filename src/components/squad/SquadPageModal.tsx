@@ -135,7 +135,7 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
   const handleLeaveSquad = async () => {
     if (!squad) return;
     
-    const confirmed = window.confirm('Are you sure you want to leave this squad?');
+    const confirmed = window.confirm('Are you sure you want to leave this plan?');
     if (!confirmed) return;
 
     try {
