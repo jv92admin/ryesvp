@@ -3,6 +3,7 @@ import { getCurrentUser } from '@/lib/auth';
 import { UserMenu } from './UserMenu';
 import { getPendingRequestCount } from '@/db/friends';
 import { getPendingInvitationCount } from '@/db/communities';
+import { RyesVPLogo, RyesVPWordmark } from './brand/RyesVPLogo';
 
 export async function Header() {
   const user = await getCurrentUser();
@@ -14,21 +15,15 @@ export async function Header() {
     : [0, 0];
 
   return (
-    <header className="bg-white border-b border-gray-200">
-      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        {/* Logo + Tagline */}
+    <header className="bg-white border-b" style={{ borderColor: 'var(--brand-border)' }}>
+      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+        {/* Logo + Wordmark + Tagline */}
         <div className="flex items-center gap-4">
-          <Link href="/" className="group">
-            <div className="p-[2px] rounded-xl bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 transition-all">
-              <div className="flex items-center gap-2.5 px-3 py-1.5 bg-white rounded-[10px]">
-                <span className="text-2xl">🎟️</span>
-                <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent group-hover:from-purple-700 group-hover:to-blue-700">
-                  RyesVP
-                </span>
-              </div>
-            </div>
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <RyesVPLogo size={40} />
+            <RyesVPWordmark className="text-2xl" />
           </Link>
-          <span className="hidden sm:inline text-gray-500 text-base">
+          <span className="hidden md:inline text-gray-500 text-sm">
             <em className="font-semibold">See</em> what&apos;s happening. <em className="font-semibold">Go</em> with friends.
           </span>
         </div>
@@ -42,7 +37,10 @@ export async function Header() {
               >
                 Friends
                 {friendRequests > 0 && (
-                  <span className="absolute -top-1 -right-3 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
+                  <span 
+                    className="absolute -top-1 -right-3 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white rounded-full"
+                    style={{ backgroundColor: 'var(--brand-danger)' }}
+                  >
                     {friendRequests}
                   </span>
                 )}
@@ -53,7 +51,10 @@ export async function Header() {
               >
                 Communities
                 {communityInvites > 0 && (
-                  <span className="absolute -top-1 -right-3 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
+                  <span 
+                    className="absolute -top-1 -right-3 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white rounded-full"
+                    style={{ backgroundColor: 'var(--brand-danger)' }}
+                  >
                     {communityInvites}
                   </span>
                 )}
@@ -69,7 +70,7 @@ export async function Header() {
           ) : (
             <Link
               href="/login"
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              className="btn-primary px-4 py-2 text-sm font-medium rounded-lg transition-colors"
             >
               Sign in
             </Link>

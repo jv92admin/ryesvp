@@ -3,6 +3,32 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  /* ========================================
+     RYESVP BRAND DESIGN TOKENS
+     ======================================== */
+  
+  /* THE ACTION COLOR - "Go" / "Yes" */
+  /* Used for: Primary buttons, active states, Logo checkmark */
+  --brand-primary: #16A34A;        /* Tailwind green-600 */
+  --brand-primary-hover: #15803D;  /* Tailwind green-700 */
+  --brand-primary-light: #DCFCE7;  /* Tailwind green-100 - for backgrounds */
+  
+  /* THE GROUNDING COLOR */
+  /* Used for: Wordmark text, headers, body text */
+  --brand-black: #171717;          /* Tailwind neutral-900 */
+  
+  /* THE CANVAS */
+  /* Used for: Card backgrounds, subtle containers */
+  --brand-gray: #FAFAFA;           /* Tailwind neutral-50 */
+  --brand-gray-100: #F5F5F5;       /* Tailwind neutral-100 */
+  --brand-border: #E5E5E5;         /* Tailwind neutral-200 */
+  
+  /* SEMANTIC COLORS */
+  --brand-danger: #DC2626;         /* Tailwind red-600 */
+  --brand-danger-hover: #B91C1C;   /* Tailwind red-700 */
+  --brand-warning: #F59E0B;        /* Tailwind amber-500 */
+  --brand-info: #3B82F6;           /* Tailwind blue-500 */
 }
 
 @theme inline {
@@ -10,6 +36,16 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* Expose brand colors to Tailwind */
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-primary-hover: var(--brand-primary-hover);
+  --color-brand-primary-light: var(--brand-primary-light);
+  --color-brand-black: var(--brand-black);
+  --color-brand-gray: var(--brand-gray);
+  --color-brand-border: var(--brand-border);
+  --color-brand-danger: var(--brand-danger);
+  --color-brand-danger-hover: var(--brand-danger-hover);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,4 +59,26 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ========================================
+   BRAND UTILITY CLASSES
+   ======================================== */
+
+/* Primary button - green "Go" action */
+.btn-primary {
+  background-color: var(--brand-primary);
+  color: white;
+}
+.btn-primary:hover {
+  background-color: var(--brand-primary-hover);
+}
+
+/* Danger button - red destructive action */
+.btn-danger {
+  background-color: var(--brand-danger);
+  color: white;
+}
+.btn-danger:hover {
+  background-color: var(--brand-danger-hover);
 }
