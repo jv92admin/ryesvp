@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { sendFriendRequest } from '@/db/friends';
 import prisma from '@/db/prisma';
+import { createNotification } from '@/db/notifications';
 
 // POST /api/friends/request - Send a friend request
 export async function POST(request: NextRequest) {
@@ -37,6 +38,12 @@ export async function POST(request: NextRequest) {
     }
 
     const friendship = await sendFriendRequest(user.dbUser.id, addresseeId);
+
+    // Send notification to the addressee
+    await createNotification(addresseeId, 'FRIEND_REQUEST_RECEIVED', {
+      actorId: user.dbUser.id,
+      actorName: user.dbUser.displayName || user.supabaseUser.email.split('@')[0],
+    });
 
     return NextResponse.json({ friendship });
   } catch (error) {

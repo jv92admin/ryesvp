@@ -134,17 +134,24 @@ export const Chip = forwardRef<HTMLButtonElement, ChipProps>(
         {icon && <span className="flex-shrink-0">{icon}</span>}
         <span>{children}</span>
         {removable && onRemove && (
-          <button
-            type="button"
+          <span
+            role="button"
+            tabIndex={0}
             onClick={handleRemove}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleRemove(e as unknown as React.MouseEvent);
+              }
+            }}
             className={clsx(
-              'ml-0.5 flex-shrink-0 hover:text-red-500 transition-colors',
+              'ml-0.5 flex-shrink-0 hover:text-red-500 transition-colors cursor-pointer',
               active ? 'text-current opacity-60' : 'text-gray-400'
             )}
             aria-label="Remove"
           >
             ×
-          </button>
+          </span>
         )}
       </button>
     );

@@ -19,6 +19,54 @@ From `product-vision.md`:
 
 ---
 
+## Design System & Shared Components
+
+### Brand Color Tokens
+
+All brand colors are defined as CSS variables in `src/app/globals.css`. Use these for consistent theming:
+
+```css
+--brand-primary: #16A34A;        /* Green "Go" action - buttons, active states */
+--brand-primary-hover: #15803D;  /* Hover state */
+--brand-primary-light: #DCFCE7;  /* Light backgrounds, highlights */
+--brand-black: #171717;          /* Headers, body text */
+--brand-gray: #FAFAFA;           /* Card backgrounds */
+--brand-border: #E5E5E5;         /* Borders, dividers */
+--brand-danger: #DC2626;         /* Destructive actions */
+```
+
+**Usage:** Always reference via `var(--brand-primary)` rather than hardcoding hex values. This enables future theme changes from a single file.
+
+### Shared UI Components
+
+Located in `src/components/ui/`:
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| `Button` | `ui/Button.tsx` | Primary, secondary, ghost, danger variants |
+| `StatusBadge` | `ui/StatusBadge.tsx` | User status (Going, Interested, Need/Have Tickets) |
+| `FriendCountBadge` | `ui/StatusBadge.tsx` | Friend counts with pill/text variants |
+| `TagChip` | `ui/TagChip.tsx` | Removable filter chips |
+| `Chip` | `ui/Chip.tsx` | Generic chip component |
+| `Badge` | `ui/Badge.tsx` | Category and status badges |
+
+**Usage Guidelines:**
+- Import shared components: `import { StatusBadge, FriendCountBadge } from '@/components/ui/StatusBadge'`
+- Use `StatusBadge` for all user status displays (EventCard, SocialSectionA/B)
+- Use `FriendCountBadge` for friend activity counts (variant="pill" for cards, variant="text" for compact)
+- Extend shared components rather than creating one-off styled elements
+
+### Brand Assets
+
+Located in `src/components/brand/`:
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| `RyesVPLogo` | `brand/RyesVPLogo.tsx` | SVG logo mark (accepts `size` prop) |
+| `RyesVPWordmark` | `brand/RyesVPLogo.tsx` | Text wordmark (accepts `className`) |
+
+---
+
 ## Terminology & Copy Conventions
 
 ### "Plan" vs "Squad"
@@ -722,6 +770,12 @@ bg-white border border-gray-300 text-gray-700 hover:bg-gray-50
 | Dec 2025 | Terminology | "Squad" → "Plan" in all user-facing copy (internal code stays "Squad") |
 | Dec 2025 | Copy | Title Case for button CTAs, sentence case for headers |
 | Dec 2025 | Plan Button | Redesigned — subtle outline style, consistent min-width, semibold text |
+| Dec 2025 | Design System | Brand color tokens in CSS variables for single-file theming |
+| Dec 2025 | Design System | Shared StatusBadge and FriendCountBadge components |
+| Dec 2025 | Home Page | Two-row filter layout with quick date pills (This Week, Next Week) |
+| Dec 2025 | Home Page | ViewToggle renamed to "All Events" / "Your Events" |
+| Dec 2025 | Social Sections | Green bold uppercase headers, full-width cards, removed double framing |
+| Dec 2025 | Header | Notification bell icon, tightened logo/wordmark spacing |
 
 ---
 

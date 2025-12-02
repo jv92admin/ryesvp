@@ -6,7 +6,6 @@ import { SocialSectionA } from './social/SocialSectionA';
 import { SocialSectionB } from './social/SocialSectionB';
 import { SocialSummaryChips } from './social/SocialSummaryChips';
 import { EventDisplay } from '@/db/events';
-import { countUnviewedRecentSquads } from '@/lib/squadNotifications';
 
 interface SocialData {
   yourPlans: EventDisplay[];
@@ -22,16 +21,20 @@ interface SocialData {
   }>;
 }
 
-interface SocialTabProps {
-  onBadgeCountChange?: (count: number) => void;
+interface NotificationData {
+  id: string;
+  type: string;
+  payload: { squadId?: string };
+  readAt: string | null;
 }
 
-export function SocialTab({ onBadgeCountChange }: SocialTabProps = {}) {
+export function SocialTab() {
   const searchParams = useSearchParams();
   const [data, setData] = useState<SocialData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string>('plans');
+  const [recentSquadIds, setRecentSquadIds] = useState<string[]>([]);
   
   // Refs for section anchoring
   const plansRef = useRef<HTMLDivElement>(null);
@@ -60,27 +63,39 @@ export function SocialTab({ onBadgeCountChange }: SocialTabProps = {}) {
   })();
   
   useEffect(() => {
-    async function fetchSocialData() {
+    async function fetchData() {
       try {
         setLoading(true);
-        const url = filterQuery ? `/api/social?${filterQuery}` : '/api/social';
-        const response = await fetch(url);
-        if (!response.ok) {
-          if (response.status === 401) {
+        
+        // Fetch social data and notifications in parallel
+        const socialUrl = filterQuery ? `/api/social?${filterQuery}` : '/api/social';
+        const [socialResponse, notifResponse] = await Promise.all([
+          fetch(socialUrl),
+          fetch('/api/notifications'),
+        ]);
+        
+        if (!socialResponse.ok) {
+          if (socialResponse.status === 401) {
             // Not logged in - this is ok, just show empty states
             setData({ yourPlans: [], almostPlans: [], ticketActivity: [] });
             return;
           }
-          throw new Error(`Failed to fetch social data: ${response.statusText}`);
+          throw new Error(`Failed to fetch social data: ${socialResponse.statusText}`);
         }
         
-        const socialData = await response.json();
+        const socialData = await socialResponse.json();
         setData(socialData);
         
-        // Calculate and emit badge count for recent squads
-        if (onBadgeCountChange && socialData.yourPlans) {
-          const badgeCount = countUnviewedRecentSquads(socialData.yourPlans);
-          onBadgeCountChange(badgeCount);
+        // Extract squad IDs from unread ADDED_TO_PLAN notifications
+        if (notifResponse.ok) {
+          const notifData = await notifResponse.json();
+          const unreadPlanNotifs = (notifData.notifications || []).filter(
+            (n: NotificationData) => n.type === 'ADDED_TO_PLAN' && !n.readAt
+          );
+          const squadIds = unreadPlanNotifs
+            .map((n: NotificationData) => n.payload?.squadId)
+            .filter(Boolean) as string[];
+          setRecentSquadIds(squadIds);
         }
       } catch (err) {
         console.error('Error fetching social data:', err);
@@ -90,8 +105,8 @@ export function SocialTab({ onBadgeCountChange }: SocialTabProps = {}) {
       }
     }
 
-    fetchSocialData();
-  }, [onBadgeCountChange, filterQuery]);
+    fetchData();
+  }, [filterQuery]);
   
   if (loading) {
     return (
@@ -156,7 +171,7 @@ export function SocialTab({ onBadgeCountChange }: SocialTabProps = {}) {
           {/* Your Plans Section */}
           {hasPlans && (
             <div ref={plansRef} className="scroll-mt-16">
-              <SocialSectionA events={data.yourPlans} />
+              <SocialSectionA events={data.yourPlans} recentSquadIds={recentSquadIds} />
             </div>
           )}
           

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { addSquadMember, getSquadById } from '@/db/squads';
 import prisma from '@/db/prisma';
+import { createNotification, createNotifications } from '@/db/notifications';
+import { format } from 'date-fns';
 
 // POST /api/squads/[id]/members - Join squad or add member (if organizer)
 export async function POST(
@@ -52,6 +54,44 @@ export async function POST(
     }
 
     const newMember = await addSquadMember(id, targetUserId);
+
+    // Get event details for notification
+    const eventTitle = squad.event.enrichment?.tmPreferTitle && squad.event.enrichment?.tmEventName
+      ? squad.event.enrichment.tmEventName
+      : squad.event.title;
+    const eventDate = format(squad.event.startDateTime, 'MMM d');
+    const actorName = user.dbUser.displayName || 'Someone';
+
+    // If someone else added this user, notify the new member
+    if (targetUserId !== user.dbUser.id) {
+      await createNotification(targetUserId, 'ADDED_TO_PLAN', {
+        actorId: user.dbUser.id,
+        actorName,
+        squadId: id,
+        eventId: squad.eventId,
+        eventTitle,
+        eventDate,
+      });
+    }
+
+    // Notify the organizer if someone joined (and they're not the organizer themselves)
+    const organizer = squad.members.find(m => m.isOrganizer);
+    if (organizer && organizer.userId !== targetUserId) {
+      // Get the new member's name
+      const newMemberUser = await prisma.user.findUnique({
+        where: { id: targetUserId },
+        select: { displayName: true },
+      });
+      const newMemberName = newMemberUser?.displayName || 'Someone';
+
+      await createNotification(organizer.userId, 'PLAN_MEMBER_JOINED', {
+        actorId: targetUserId,
+        actorName: newMemberName,
+        squadId: id,
+        eventId: squad.eventId,
+        eventTitle,
+      });
+    }
 
     return NextResponse.json({ member: newMember });
   } catch (error: any) {
@@ -119,6 +159,17 @@ export async function DELETE(
       );
     }
 
+    // Get event details for notifications before removing member
+    const eventTitle = squad.event.enrichment?.tmPreferTitle && squad.event.enrichment?.tmEventName
+      ? squad.event.enrichment.tmEventName
+      : squad.event.title;
+    const eventDate = format(squad.event.startDateTime, 'MMM d');
+    const leavingMemberUser = await prisma.user.findUnique({
+      where: { id: targetUserId },
+      select: { displayName: true },
+    });
+    const leavingMemberName = leavingMemberUser?.displayName || 'Someone';
+
     // Remove the member
     await prisma.squadMember.delete({
       where: { id: memberToRemove.id },
@@ -135,12 +186,25 @@ export async function DELETE(
       }
     }
 
-    // If this was the last member, delete the squad
+    // If this was the last member, delete the squad and notify all previous members
     if (squad.members.length === 1) {
       await prisma.squad.delete({
         where: { id },
       });
+      // No one to notify since this was the last member
       return NextResponse.json({ squadDeleted: true });
+    }
+
+    // Notify the organizer that someone left (if they're not the one leaving)
+    const organizer = squad.members.find(m => m.isOrganizer);
+    if (organizer && organizer.userId !== targetUserId) {
+      await createNotification(organizer.userId, 'PLAN_MEMBER_LEFT', {
+        actorId: targetUserId,
+        actorName: leavingMemberName,
+        squadId: id,
+        eventId: squad.eventId,
+        eventTitle,
+      });
     }
 
     return NextResponse.json({ success: true });

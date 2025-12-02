@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { formatInTimeZone } from 'date-fns-tz';
 import { EventDisplay } from '@/db/events';
-import { getViewedSquadIds } from '@/lib/squadNotifications';
 import { SmartSquadButton } from '../SmartSquadButton';
 import { StatusBadge, FriendCountBadge } from '../ui/StatusBadge';
 
@@ -11,30 +10,27 @@ const AUSTIN_TIMEZONE = 'America/Chicago';
 
 interface SocialSectionAProps {
   events: EventDisplay[];
+  recentSquadIds?: string[]; // Squad IDs with unread ADDED_TO_PLAN notifications
 }
 
-export function SocialSectionA({ events }: SocialSectionAProps) {
-  // Group events: recent squads first, then time buckets
+export function SocialSectionA({ events, recentSquadIds = [] }: SocialSectionAProps) {
+  // Group events: recent squads first (based on unread notifications), then time buckets
   const twoWeeksOut = new Date();
   twoWeeksOut.setDate(twoWeeksOut.getDate() + 14);
   
-  // Get viewed squad IDs to filter out viewed squads
-  const viewedSquadIds = getViewedSquadIds();
+  // Events with unread notifications show at top
+  const recentSquadEvents = events.filter(event => {
+    const squadId = (event as any).userSquad?.id;
+    return squadId && 
+      recentSquadIds.includes(squadId) && 
+      new Date(event.startDateTime) >= new Date();
+  });
   
-  const recentSquadEvents = events.filter(event => 
-    event.isRecentSquadAddition && 
-    new Date(event.startDateTime) >= new Date() &&
-    // Check both squad ID and event ID for compatibility (in case event ID was stored by mistake)
-    !viewedSquadIds.includes((event as any).userSquad?.id) && 
-    !viewedSquadIds.includes(event.id)
-  );
-  
-  // Include non-recent events AND viewed recent events (so they appear in regular sections)
-  const nonRecentEvents = events.filter(event => 
-    !event.isRecentSquadAddition || 
-    (event.isRecentSquadAddition && 
-     (viewedSquadIds.includes((event as any).userSquad?.id) || viewedSquadIds.includes(event.id)))
-  );
+  // All other events go in regular sections
+  const nonRecentEvents = events.filter(event => {
+    const squadId = (event as any).userSquad?.id;
+    return !squadId || !recentSquadIds.includes(squadId);
+  });
   
   const soonEvents = nonRecentEvents.filter(event => new Date(event.startDateTime) <= twoWeeksOut);
   const laterEvents = nonRecentEvents.filter(event => new Date(event.startDateTime) > twoWeeksOut);

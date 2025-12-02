@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { getSquadById, buyForSquadMembers, uncoverSquadMember } from '@/db/squads';
+import { createNotifications } from '@/db/notifications';
+import { format } from 'date-fns';
 
 // POST /api/squads/[id]/buy-for - Buy tickets for multiple squad members
 export async function POST(
@@ -56,6 +58,26 @@ export async function POST(
 
     // Execute the buy-for operation
     await buyForSquadMembers(id, user.dbUser.id, memberIds);
+
+    // Get event details for notification
+    const eventTitle = squad.event.enrichment?.tmPreferTitle && squad.event.enrichment?.tmEventName
+      ? squad.event.enrichment.tmEventName
+      : squad.event.title;
+    const eventDate = format(squad.event.startDateTime, 'MMM d');
+    const actorName = user.dbUser.displayName || 'Someone';
+
+    // Notify covered members (except the buyer)
+    const coveredMemberIds = memberIds.filter((memberId: string) => memberId !== user.dbUser.id);
+    if (coveredMemberIds.length > 0) {
+      await createNotifications(coveredMemberIds, 'TICKET_COVERED_FOR_YOU', {
+        actorId: user.dbUser.id,
+        actorName,
+        squadId: id,
+        eventId: squad.eventId,
+        eventTitle,
+        eventDate,
+      });
+    }
 
     // Return updated squad
     const updatedSquad = await getSquadById(id);

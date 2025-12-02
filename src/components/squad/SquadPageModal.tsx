@@ -6,7 +6,6 @@ import { PlanModeView } from './PlanModeView';
 import { DayOfModeView } from './DayOfModeView';
 import { SquadInviteModal } from './SquadInviteModal';
 import { generateSharePlanText, generateDayOfText } from '@/lib/squadShareText';
-import { markSquadAsViewed } from '@/lib/squadNotifications';
 
 // Ticket status type (matches Prisma enum)
 type TicketStatus = 'YES' | 'MAYBE' | 'NO' | 'COVERED';
@@ -70,7 +69,25 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
   useEffect(() => {
     if (!isOpen || !squadId) return;
 
-    markSquadAsViewed(squadId);
+    // Mark any ADDED_TO_PLAN notification for this squad as read
+    async function markNotificationRead() {
+      try {
+        const response = await fetch('/api/notifications');
+        if (response.ok) {
+          const data = await response.json();
+          const notification = data.notifications?.find(
+            (n: { type: string; payload: { squadId?: string }; readAt: string | null }) =>
+              n.type === 'ADDED_TO_PLAN' && n.payload?.squadId === squadId && !n.readAt
+          );
+          if (notification) {
+            await fetch(`/api/notifications/${notification.id}`, { method: 'PATCH' });
+          }
+        }
+      } catch (error) {
+        console.error('Error marking notification as read:', error);
+      }
+    }
+    markNotificationRead();
 
     async function fetchSquad() {
       setLoading(true);

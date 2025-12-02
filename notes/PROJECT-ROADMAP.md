@@ -21,38 +21,35 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 |---|------|------|-----------|--------|
 | 1 | **Phase 0: Ticket Statuses** | `squads-social-spec.md` | 1-2 days | ✅ Complete |
 | 2 | **Phase 1: Social Tab + Squads** | `squads-social-spec.md` | 2-3 weeks | ✅ Complete |
-| 3 | **Phase 1.5: Security - Enable RLS** | - | 1-2 days | 🔥 **HIGH PRIORITY** |
-| 4 | **Phase 2: Communities Reimagined** | `squads-social-spec.md` | 2-3 weeks | 🔲 After RLS |
-| 5 | **Phase 3: Soft Reputation** | `squads-social-spec.md` | 1 week | 🔲 After Phase 2 |
-| 6 | **TM Data Display** | - | 1-2 hrs | 🔲 When time permits |
-| 7 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
-| 8 | **Squad Notification Polish** | - | 1-2 hrs | 🔲 Later |
+| 3 | **Phase 1.5: Security - Enable RLS** | - | 1-2 days | ✅ Complete |
+| 4 | **Phase 1.6: In-App Notifications** | - | 1 day | ✅ Complete |
+| 5 | **Phase 2: Communities Reimagined** | `squads-social-spec.md` | 2-3 weeks | 🔲 Next |
+| 6 | **Phase 3: Soft Reputation** | `squads-social-spec.md` | 1 week | 🔲 After Phase 2 |
+| 7 | **TM Data Display** | - | 1-2 hrs | 🔲 When time permits |
+| 8 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
 
-### Phase 1.5: Security - Enable RLS 🔥 HIGH PRIORITY
+### Phase 1.5: Security - Enable RLS ✅ COMPLETE
 
-**What:** Enable Row Level Security on all 15 Supabase tables.
+**What:** Enabled Row Level Security on all 16 Supabase tables.
 
-**Why Critical Now:**
-- Live production app with 10+ users and real personal data
-- Planning phone numbers + text blasts (highly sensitive PII)
-- Current setup: tables are public, only app-level security
-- Supabase best practice for any live application
+**Migration:** `prisma/migrations/20251202000000_enable_rls/migration.sql`
 
-**What we're securing:**
-- User profiles, emails, display names
-- Friendships and social connections  
-- Event attendance and squad memberships
-- Private lists and community data
-- Invite codes and redemption history
+**What's protected:**
+- User profiles (displayName public, email self-only)
+- Friendships (participants only)
+- UserEvent attendance (self + friends)
+- Private lists (owner only)
+- Invite codes (self only)
+- Squads (members see full, friends see existence)
+- Squad members, price guides, stops (squad members)
+- Public data (Venue, Event, Enrichment, Weather) — read-only for users
 
-**Tasks:**
-1. Write RLS policies for all 13 models
-2. Test policies don't break existing functionality
-3. Enable RLS on all tables via Supabase dashboard
-4. Verify app still works with database-level security
+**Helper functions created:**
+- `get_user_id()` — Maps auth.uid() to User.id
+- `are_friends(user1, user2)` — Checks ACCEPTED friendship
+- `is_squad_member(squad_id, user_id)` — Checks squad membership
 
-**Estimated Time:** 1-2 days
-**Blocker for:** Phone number collection, text blasts, public launch
+**Note:** App uses Prisma (direct DB connection), so RLS is defense-in-depth. Primary access control remains in API routes.
 
 ### Phase 0: Ticket Statuses ✅ COMPLETE
 See `squads-social-spec.md` for full details.
@@ -88,26 +85,31 @@ See `data-model-101.md` for full documentation.
 
 ---
 
-## Squad Notification Polish (Future Enhancement)
+## In-App Notifications ✅ COMPLETE
 
-**Current Limitation:** Badge count on fresh login relies on localStorage cache. If user gets squad invite while offline, badge won't show until they visit Social tab.
+**What:** Full in-app notification system with bell dropdown, replacing localStorage-based squad tracking.
 
-**Solutions to Consider:**
-1. **Lightweight Badge API** (`/api/social/badge-count`)
-   - Returns just unviewed squad count
-   - Called on every login
-   - ~100ms response time
-   
-2. **Server-Sent Events (SSE)** 
-   - Real-time notifications when added to squads
-   - More complex but better UX
-   
-3. **Hybrid Approach**
-   - Use cache if < 30min old
-   - Fall back to API if stale
-   - Best of both worlds
+**Schema:** `Notification` model with 8 notification types:
+- `FRIEND_REQUEST_RECEIVED` / `FRIEND_REQUEST_ACCEPTED`
+- `ADDED_TO_PLAN` / `PLAN_CANCELLED` / `PLAN_MEMBER_JOINED` / `PLAN_MEMBER_LEFT`
+- `TICKET_COVERED_FOR_YOU` / `PLAN_MEETUP_CREATED`
 
-**Priority:** Low (current system works well for 90% of cases)
+**Components:**
+- `NotificationBell` — Header dropdown with unread badge, scrollable list, mark-as-read
+- API routes: `GET /api/notifications`, `POST /api/notifications` (mark all), `PATCH /api/notifications/[id]`
+
+**Triggers:** Notifications created automatically on:
+- Friend requests sent/accepted
+- Added to plan, member joined/left plan
+- Ticket coverage ("X is handling your ticket")
+
+**Deprecated:**
+- `src/lib/squadNotifications.ts` — Deleted (was localStorage-based)
+- `src/lib/clearNotificationStuck.ts` — Deleted
+- `isRecentSquadAddition` field — Removed from data layer
+- Badge on ViewToggle — Removed (bell icon is the notification center)
+
+**Migration:** `prisma/migrations/20251202000002_add_notifications/migration.sql`
 
 ## Delete Account Feature ✅ COMPLETE
 
@@ -307,6 +309,61 @@ See `data-model-101.md` for full documentation.
 - Maps and Uber quick actions also benefit from accurate lat/lng
 - **TODO:** Create script to geocode venue addresses and populate lat/lng
 
+### Sprint: Design System Foundation + Home Page Polish (Complete ✅)
+
+**Design System Infrastructure:**
+- [x] **Brand Color Tokens**: CSS variables in `globals.css` for single-file theming
+  - `--brand-primary`, `--brand-primary-hover`, `--brand-primary-light`
+  - `--brand-black`, `--brand-gray`, `--brand-border`, `--brand-danger`
+  - All components reference variables, not hardcoded hex values
+- [x] **Shared UI Components**: Centralized in `src/components/ui/`
+  - `StatusBadge` — User status (Going, Interested, Need/Have Tickets)
+  - `FriendCountBadge` — Friend activity with pill/text variants
+  - `Button` — Primary, secondary, ghost, danger variants
+  - `TagChip`, `Chip`, `Badge` — Consistent styling across app
+- [x] **Brand Assets**: `src/components/brand/RyesVPLogo.tsx` (logo + wordmark)
+
+**Terminology & Copy Standards:**
+- [x] **"Plan" Terminology**: "Squad" → "Plan" in all user-facing UI
+- [x] **Case Conventions**: Title Case for CTAs, sentence case for headers
+
+**Component Updates:**
+- [x] **SmartSquadButton**: Subtle outline style, consistent min-width
+- [x] **Social Sections**: Green bold headers, full-width cards, shared badges
+- [x] **Header**: Notification bell (SVG), tightened logo spacing
+- [x] **ViewToggle**: "All Events" / "Your Events", no emojis
+- [x] **EventFilters**: Two-row pill layout with quick date filters
+
+**Bug Fixes:**
+- [x] Fixed `getYourPlans()` to fetch friend activity data
+
+**Documentation:**
+- [x] `ui-design-reference.md` — Design system section with usage guidelines
+- [x] Component inventory with file paths and purposes
+
+### Sprint: Security - RLS (Complete ✅)
+- [x] Helper functions (get_user_id, are_friends, is_squad_member)
+- [x] Public tables: Venue, Event, Enrichment, WeatherCache (read-only)
+- [x] User: displayName public, email self-only
+- [x] Friendship: participants only
+- [x] UserEvent: self + friends
+- [x] List/ListMember: owner + self
+- [x] InviteCode/InviteRedemption: self only
+- [x] Squad family: members access, friends see existence
+- [x] TMEventCache: service role only
+- [x] Notification: self only
+
+### Sprint: In-App Notifications (Complete ✅)
+- [x] Notification model + NotificationType enum (8 types)
+- [x] Data layer: createNotification, getNotifications, markAsRead, getUnreadCount
+- [x] API routes: GET/POST /api/notifications, PATCH /api/notifications/[id]
+- [x] NotificationBell component with dropdown UI
+- [x] Triggers: friend requests, plan invites, member join/leave, ticket coverage
+- [x] Deprecated localStorage-based squadNotifications system
+- [x] Removed isRecentSquadAddition from data layer
+- [x] Recent plans now bubble via unread ADDED_TO_PLAN notifications
+- [x] Fixed nested button hydration error in Chip component
+
 ### Sprint: API Integration (Next)
 - [ ] SeatGeek API integration (pending approval)  
 - [ ] Artist entity model (foundation for "follow artist")
@@ -317,5 +374,5 @@ See `data-model-101.md` for full documentation.
 
 ---
 
-**Last Updated:** November 30, 2025
+**Last Updated:** December 2, 2025
 

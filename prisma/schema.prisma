@@ -186,6 +186,9 @@ model User {
   membersCovered         SquadMember[] @relation("CoveredByUser")
   priceGuidesAdded       SquadPriceGuide[]
   stopsAdded             SquadStop[]
+  
+  // Notifications
+  notifications          Notification[]
 
   @@index([authProviderId])
 }
@@ -534,4 +537,40 @@ model WeatherCache {
   // Unique constraint: one cache entry per location + date
   @@unique([lat, lng, forecastDate])
   @@index([forecastDate])
+}
+
+// Notification - In-app notifications for user actions
+model Notification {
+  id            String           @id @default(uuid())
+  recipientId   String
+  recipient     User             @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  type          NotificationType
+  
+  // Flexible payload for different notification types
+  // Contains: actorId, actorName, squadId, eventId, eventTitle, eventDate, etc.
+  payload       Json
+  
+  createdAt     DateTime         @default(now())
+  readAt        DateTime?
+  
+  @@index([recipientId, createdAt])
+  @@index([recipientId, readAt])
+}
+
+enum NotificationType {
+  // Friend graph
+  FRIEND_REQUEST_RECEIVED  // Someone sent you a friend request
+  FRIEND_REQUEST_ACCEPTED  // Your friend request was accepted
+  
+  // Plan lifecycle
+  ADDED_TO_PLAN            // You were added to a plan
+  PLAN_CANCELLED           // A plan you're in was cancelled
+  PLAN_MEMBER_JOINED       // Someone joined your plan (host only)
+  PLAN_MEMBER_LEFT         // Someone left your plan (host only)
+  
+  // Tickets
+  TICKET_COVERED_FOR_YOU   // Someone is covering your ticket
+  
+  // Plan details
+  PLAN_MEETUP_CREATED      // Meetup time/location set for a plan
 }

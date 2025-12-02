@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAuth } from '@/lib/auth';
 import { acceptFriendRequest } from '@/db/friends';
+import { createNotification } from '@/db/notifications';
 
 // POST /api/friends/accept - Accept a friend request
 export async function POST(request: NextRequest) {
@@ -17,6 +18,12 @@ export async function POST(request: NextRequest) {
     }
 
     const friendship = await acceptFriendRequest(friendshipId, user.dbUser.id);
+
+    // Send notification to the requester that their request was accepted
+    await createNotification(friendship.requesterId, 'FRIEND_REQUEST_ACCEPTED', {
+      actorId: user.dbUser.id,
+      actorName: user.dbUser.displayName || user.supabaseUser.email.split('@')[0],
+    });
 
     return NextResponse.json({ friendship });
   } catch (error) {
