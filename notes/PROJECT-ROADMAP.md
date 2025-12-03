@@ -17,16 +17,154 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 ## Current Priority Order
 
-| # | Item | Spec | Est. Time | Status |
-|---|------|------|-----------|--------|
-| 1 | **Phase 0: Ticket Statuses** | `squads-social-spec.md` | 1-2 days | ✅ Complete |
-| 2 | **Phase 1: Social Tab + Squads** | `squads-social-spec.md` | 2-3 weeks | ✅ Complete |
-| 3 | **Phase 1.5: Security - Enable RLS** | - | 1-2 days | ✅ Complete |
-| 4 | **Phase 1.6: In-App Notifications** | - | 1 day | ✅ Complete |
-| 5 | **Phase 2: Communities Reimagined** | `squads-social-spec.md` | 2-3 weeks | 🔲 Next |
-| 6 | **Phase 3: Soft Reputation** | `squads-social-spec.md` | 1 week | 🔲 After Phase 2 |
-| 7 | **TM Data Display** | - | 1-2 hrs | 🔲 When time permits |
-| 8 | **Scheduled Jobs** | `scheduled-jobs-spec.md` | 2-3 hrs | 🔲 Later |
+Based on strategic review: **Infra → Core Loop → Surfaces → Flavor → Social Graph**
+
+| # | Phase | Description | Est. Time | Status |
+|---|-------|-------------|-----------|--------|
+| 0 | **Ticket Statuses** | Expand UserEventStatus | 1-2 days | ✅ Complete |
+| 1 | **Social Tab + Squads** | Plans, social signals | 2-3 weeks | ✅ Complete |
+| 1.5 | **Security - RLS** | Row Level Security | 1-2 days | ✅ Complete |
+| 1.6 | **In-App Notifications** | Bell, triggers | 1 day | ✅ Complete |
+| **2** | **Backend Reliability** | Async jobs, logging | 2-3 days | 🔲 **Next** |
+| **3** | **Core Planning Loop** | More ingresses + emails | 1 week | 🔲 After Phase 2 |
+| **4** | **Event + Social Surfaces** | Create event, profiles | 1-2 weeks | 🔲 After Phase 3 |
+| **5** | **Artist Foundation** | Data model, event links | 3-5 days | 🔲 After Phase 4 |
+| **6** | **Spotify v1** | OAuth, top artists | 1 week | 🔲 After Phase 5 |
+| **7** | **Communities v1** | Reimagined communities | 2-3 weeks | 🔲 Last |
+
+---
+
+## Next Up: Phase 2-7 Details
+
+### Phase 2: Backend Reliability 🔲 NEXT
+
+**Goal:** Make the app stop feeling "dev-manually-powered" before widening usage.
+
+**Async Jobs:**
+- [ ] Scheduled event refresh (daily)
+- [ ] Weather enrichment job (pre-cache popular dates)
+- [ ] Data enrichment / cleanup job
+- [ ] TM cache refresh
+
+**Job Requirements:**
+- Idempotent (safe to re-run)
+- Start with daily; tighten later if needed
+- Log job runs somewhere inspectable
+
+**Logging/Monitoring:**
+- [ ] Basic error logging for jobs & key flows
+- [ ] Job run history (when, success/fail, duration)
+
+**See:** `scheduled-jobs-spec.md` for implementation details.
+
+---
+
+### Phase 3: Core Planning Loop 🔲
+
+**Goal:** Make "start a plan" the obvious, easy action everywhere.
+
+**More Ingresses to "Start a Plan":**
+- [ ] On event cards: Promote Going/Interested buttons → morph to "Start Plan"
+- [ ] Global CTA: Persistent "Start a Plan" button (header or FAB)
+- [ ] From your profile: Start plan → pick event + friends
+- [ ] From friend's profile: Start plan with them pre-selected
+- [ ] Friend avatar popover: "Start plan with X", "View profile"
+
+**Basic Emails (ready now):**
+- [ ] Welcome email (on signup)
+  - "This is a small community project"
+  - How to start a plan, how to invite friends
+  - Privacy reassurance
+- [ ] "You were added to a plan" transactional email
+- [ ] "Your event is tomorrow" reminder email
+
+**Email Philosophy:**
+- Low risk, high clarity
+- Reply-to-act where possible (parse "I'm in, need 1 ticket")
+- No journeys/drip campaigns yet — just transactional
+
+---
+
+### Phase 4: Event + Social Surfaces 🔲
+
+**Goal:** Create-your-own events + minimal profiles = unlock for real usage.
+
+**4A. Create-Your-Own Event Page:**
+- [ ] `/events/new` page
+- [ ] Fields: Title, Date/time, Location (text + optional map), URL (optional), Description
+- [ ] Creates event with `source: 'USER'` or similar
+- [ ] Event page IS the plan (like Partiful)
+- [ ] Invite friends flow
+
+**4B. Minimal Friend Profile Page:**
+- [ ] `/users/[id]` or `/profile/[username]` page
+- [ ] Shows: Name, photo, short blurb
+- [ ] "Add friend" or "Friends since..."
+- [ ] Their upcoming events/plans
+- [ ] "Start plan with X" CTA
+
+**4C. Friend Avatar Popover (desktop):**
+- [ ] Hover on any friend avatar → popover
+- [ ] Quick actions: "Start plan with X", "View profile"
+
+---
+
+### Phase 5: Artist Foundation 🔲
+
+**Goal:** Make artists first-class entities (groundwork for Spotify + follows).
+
+**Data Model:**
+- [ ] `Artist` table: id, name, spotifyId, image, bio, genres
+- [ ] `EventPerformer` table: eventId, artistId, role (headliner/opener)
+- [ ] Migration + seed data
+
+**Populate Artists:**
+- [ ] Extract from existing enrichment data
+- [ ] Script to backfill from events
+- [ ] Link events to artists via `EventPerformer`
+
+**Optional: Artist Stub Page:**
+- [ ] `/artists/[id]` page
+- [ ] Name, image, upcoming Austin shows
+- [ ] "Follow" button (stores UserArtistFollow)
+- [ ] Links to Spotify
+
+---
+
+### Phase 6: Spotify v1 🔲
+
+**Goal:** Personalized discovery via music taste.
+
+**OAuth + Storage:**
+- [ ] Spotify OAuth flow
+- [ ] Store refresh tokens securely
+- [ ] Fetch user's top artists
+
+**Simple Discovery Surfaces:**
+- [ ] "Your top artists playing in the next 30 days"
+- [ ] "Top artists in Austin among your friends" (if enough data)
+
+**Keep v1 small and opinionated.**
+
+---
+
+### Phase 7: Communities v1 🔲
+
+**Goal:** Communities need people to show up — ship last.
+
+**Data Model (sketch now):**
+- [ ] `Community` table (exists)
+- [ ] `CommunityMember` table (exists)
+- [ ] Optional: Plan → Community relation (so a plan can belong to a community)
+
+**UI:**
+- [ ] Create/join community
+- [ ] Start plan from community
+- [ ] Simple community feed (events & plans in that community)
+
+**Prerequisites:** Core planning loop + reasonable event coverage + some friend graph.
+
+---
 
 ### Phase 1.5: Security - Enable RLS ✅ COMPLETE
 
@@ -191,19 +329,18 @@ See `data-model-101.md` for full documentation.
 
 ---
 
-## Backlog (Future)
+## Backlog (Future / Unscheduled)
 
-| Item | Spec | Notes |
-|------|------|-------|
-| Venue Lat/Lng Backfill | - | Geocode venue addresses to populate lat/lng. Required for weather + improves Maps/Uber links. Use Google Geocoding API or manual entry. |
-| Squad Notes (Bulletin Board) | - | Freeform notes for squads ("BYOB", "Meet at east entrance"). Deferred — Price Guide covers structured case. Could combine later for more flexibility. |
-| Activity Feed | `ui-polish-spec.md` | Real-time friend/community activity in sidebar. Requires activity logging. |
-| Invite-Gated Signup | `social-layer-phase5-spec.md` | Email-first flow, require invite for new users. **Deprioritized** - current soft invite approach works well for now. |
-| "New to You" Tracking | `ui-polish-spec.md` | Requires `lastVisitAt` on User |
-| User Discovery | `social-layer-phase5-spec.md` | Find friends without email |
-| "Go Together" | `social-layer-phase5-spec.md` | Coordinate attendance |
-| Dark Mode Polish | - | Exists but not styled |
-| Search Functionality | - | Not scoped yet |
+| Item | Notes |
+|------|-------|
+| Venue Lat/Lng Backfill | Geocode venue addresses. Required for weather. Use Google Geocoding API or manual entry. |
+| Plan Notes (Bulletin Board) | Freeform notes ("BYOB", "Meet at east entrance"). Price Guide covers structured case for now. |
+| Activity Feed | Real-time friend/community activity in sidebar. Requires activity logging. |
+| "New to You" Tracking | Requires `lastVisitAt` on User. |
+| Search Functionality | Not scoped yet. |
+| Dark Mode Polish | Exists but not styled. |
+| Soft Reputation | Show-up signals, ticket trust. After communities. |
+| Email Journeys | Multi-step flows, re-engagement. After transactional emails prove out. |
 
 ---
 
@@ -363,14 +500,6 @@ See `data-model-101.md` for full documentation.
 - [x] Removed isRecentSquadAddition from data layer
 - [x] Recent plans now bubble via unread ADDED_TO_PLAN notifications
 - [x] Fixed nested button hydration error in Chip component
-
-### Sprint: API Integration (Next)
-- [ ] SeatGeek API integration (pending approval)  
-- [ ] Artist entity model (foundation for "follow artist")
-
-### Sprint: Infrastructure (Future)
-- [ ] Scheduled jobs (cron)
-- [ ] Artist caching
 
 ---
 

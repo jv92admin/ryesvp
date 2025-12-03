@@ -92,10 +92,13 @@ export async function upsertEvents(events: NormalizedEvent[]): Promise<{
       };
 
       if (existingEvent) {
-        // Update existing event
+        // Update existing event, but preserve category if it was set by LLM enrichment
+        // (scrapers often default to OTHER, which would overwrite better LLM categorization)
+        const { category: _scrapedCategory, ...updateData } = eventData;
+        
         await prisma.event.update({
           where: { id: existingEvent.id },
-          data: eventData,
+          data: updateData,  // Don't overwrite category on existing events
         });
         results.updated++;
       } else {

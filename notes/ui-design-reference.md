@@ -749,6 +749,144 @@ bg-white border border-gray-300 text-gray-700 hover:bg-gray-50
 
 ---
 
+## Planned Pages (Phase 4+)
+
+These pages don't exist yet. Document design decisions here as they're built.
+
+### Create Event Page (Phase 4)
+
+**Route:** `/events/new`  
+**Status:** 🔲 Not started
+
+**Target Layout:**
+
+```
+┌─────────────────────────────────┐
+│ Create Event                    │  ← Header
+├─────────────────────────────────┤
+│ Title *                         │
+│ [________________________]      │
+│                                 │
+│ Date *            Time          │
+│ [__________]      [______]      │
+│                                 │
+│ Location                        │
+│ [________________________]      │  ← Text + optional map search
+│                                 │
+│ Link (optional)                 │
+│ [________________________]      │  ← TM, restaurant, etc.
+│                                 │
+│ Description                     │
+│ [________________________]      │
+│ [________________________]      │
+│                                 │
+│ Visibility                      │
+│ (●) Public  ( ) Friends  ( ) Invite │
+│                                 │
+│ [Create Event]                  │  ← Primary CTA
+└─────────────────────────────────┘
+```
+
+**Design Decisions (TBD):**
+- Minimal fields, no friction
+- Event page IS the plan for user-created events
+- Consider: image upload? Cover photo?
+- Consider: recurring events?
+
+---
+
+### Friend Profile Page (Phase 4)
+
+**Route:** `/users/[id]` or `/u/[username]`  
+**Status:** 🔲 Not started
+
+**Target Layout:**
+
+```
+┌─────────────────────────────────┐
+│ [← Back]                        │
+├─────────────────────────────────┤
+│ [Avatar]  Alex Chen             │
+│           @alexc                │  ← Username if set
+│           "Live music enthusiast"│  ← Bio
+│                                 │
+│ [Add Friend] or [Friends ✓]    │
+│ Friends since Oct 2024          │
+├─────────────────────────────────┤
+│ Upcoming Plans                  │
+│ ┌─────────────────────────────┐│
+│ │ Mt Joy @ Moody • Dec 14    ││  ← Compact event cards
+│ └─────────────────────────────┘│
+│ ┌─────────────────────────────┐│
+│ │ Comedy Show @ Creek • Dec 20││
+│ └─────────────────────────────┘│
+├─────────────────────────────────┤
+│ [Start Plan with Alex]          │  ← Primary CTA
+└─────────────────────────────────┘
+```
+
+**Design Decisions (TBD):**
+- Keep minimal, action-oriented
+- "Start Plan with X" is the main CTA
+- Show mutual friends?
+- Show shared communities?
+
+---
+
+### Friend Avatar Popover (Phase 4)
+
+**Trigger:** Hover on friend avatar (desktop only)  
+**Status:** 🔲 Not started
+
+**Target Layout:**
+
+```
+┌─────────────────────────┐
+│ [Avatar] Alex Chen      │
+│ @alexc                  │
+├─────────────────────────┤
+│ [Start Plan with Alex]  │
+│ [View Profile]          │
+└─────────────────────────┘
+```
+
+**Design Decisions:**
+- Small, non-intrusive popover
+- 2 quick actions max
+- Delay on hover (300ms?) to avoid accidental triggers
+- Click avatar on mobile goes directly to profile
+
+---
+
+### Artist Page (Phase 5)
+
+**Route:** `/artists/[id]`  
+**Status:** 🔲 Future (after Artist data model)
+
+**Target Layout:**
+
+```
+┌─────────────────────────────────┐
+│ [← Back]                        │
+├─────────────────────────────────┤
+│ [Artist Image]                  │
+│ Artist Name                     │
+│ [Rock] [Alternative]            │  ← Genres
+│                                 │
+│ [♡ Follow] or [Following ✓]    │
+│                                 │
+│ [Listen on Spotify]             │
+├─────────────────────────────────┤
+│ Upcoming Austin Shows           │
+│ ┌─────────────────────────────┐│
+│ │ Dec 14 @ Moody Center       ││
+│ │ [3 friends going]           ││
+│ └─────────────────────────────┘│
+└─────────────────────────────────┘
+```
+
+---
+
 ## Changelog
 
 | Date | Page | Change |
@@ -776,6 +914,7 @@ bg-white border border-gray-300 text-gray-700 hover:bg-gray-50
 | Dec 2025 | Home Page | ViewToggle renamed to "All Events" / "Your Events" |
 | Dec 2025 | Social Sections | Green bold uppercase headers, full-width cards, removed double framing |
 | Dec 2025 | Header | Notification bell icon, tightened logo/wordmark spacing |
+| Dec 2025 | Planned | Added Create Event, Friend Profile, Avatar Popover, Artist Page specs |
 
 ---
 

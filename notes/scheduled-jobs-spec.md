@@ -1,324 +1,580 @@
 # Scheduled Jobs Specification
 
-> **See also:** `PROJECT-ROADMAP.md` for overall project priorities
+> **Phase 2 Priority** — See `PROJECT-ROADMAP.md` for overall project priorities
 
 ## Overview
 
-This document covers the scheduled/async job infrastructure for RyesVP, including:
-1. Event scraping from venue websites
-2. Data enrichment (Knowledge Graph, Spotify, LLM)
-3. Ticketmaster data refresh (pricing, presales, availability)
-
-All jobs follow the same pattern: run periodically, process in batches, handle failures gracefully.
+This document is the **definitive reference** for RyesVP's job infrastructure:
+1. Complete inventory of all data jobs
+2. Data sources and storage patterns
+3. Job dependencies and execution order
+4. Implementation plan for automation
 
 ---
 
-## Jobs to Schedule
+## Job Inventory
 
-### 1. Event Scraping
+### Summary Table
 
-**Purpose:** Fetch new events from venue websites
+| # | Job | Script | API Route | Frequency | Dependencies |
+|---|-----|--------|-----------|-----------|--------------|
+| 1 | **Venue Scraping** | `ingest-offline.ts` | `POST /api/ingest/all` | Daily 2 AM | None |
+| 2 | **LLM + KG + Spotify Enrichment** | `enrich-events.ts` | (none yet) | Daily 4 AM | After Job 1 |
+| 3 | **TM Cache Download** | `download-tm-cache.ts` | (none yet) | Daily 3 AM | None |
+| 4 | **TM Event Matching** | `enrich-tm-from-cache.ts` | (none yet) | Daily 5 AM | After Job 2 & 3 |
+| 5 | **Weather Pre-Cache** | (not built) | `GET /api/weather` | Daily 6 AM | None |
+| 6 | **Data Cleanup** | (not built) | (none) | Weekly | None |
 
-**Current State:** Manual script execution (`scripts/scrape-*.ts`)
+---
 
-**Frequency:** Daily at 2 AM (low traffic, venues update overnight)
+## Job 1: Venue Scraping
 
-**Batch Size:** All venues, but process sequentially with delays
+**Purpose:** Fetch new events from venue websites and update the database.
 
-### 2. Data Enrichment
+### Data Sources (6 Venues)
 
-**Purpose:** Enrich events with Knowledge Graph and Spotify data
+| Venue | Scraper | Method | Data Format |
+|-------|---------|--------|-------------|
+| Moody Center | `moodyCenter.ts` | HTTP + JSON-LD | Schema.org Event |
+| ACL Live | `aclLive.ts` | HTTP + HTML | Cheerio parsing |
+| Stubb's BBQ | `stubbs.ts` | HTTP + HTML | Cheerio parsing |
+| Paramount Theatre | `paramount.ts` | Puppeteer | JS-rendered page |
+| Texas Performing Arts | `texasPerformingArts.ts` | HTTP + JSON-LD | Schema.org Event |
+| Long Center | `longCenter.ts` | HTTP + JSON-LD | Schema.org Event |
 
-**Current State:** Manual script execution (`scripts/enrich-events.ts`)
-
-**Frequency:** Daily at 4 AM (after scraping completes)
-
-**Batch Size:** 50 events per run (to respect API rate limits)
-
-### 3. Weather Cache Refresh (Future)
-
-**Purpose:** Pre-cache weather data for Austin venues
-
-**Current State:** User-triggered with 1-hour cache TTL
-
-**Frequency:** Daily at 6 AM (before users wake up)
-
-**What it does:**
-- Fetch 10-day forecast for each distinct Austin venue location
-- Cache in `WeatherCache` table
-- Ensures fast page loads without hitting Google Weather API
-
-**Implementation Notes:**
-- Use `forecast/days:lookup` endpoint with `days=10`
-- Round lat/lng to ~1km precision to reduce cache entries
-- ~10 distinct Austin venue locations means ~10 API calls daily
-- Could extend to hourly refresh closer to events
-
-### 4. Ticketmaster Data Refresh (Future)
-
-**Purpose:** Keep TM-sourced data fresh (prices change, presales end, events sell out)
-
-**Current State:** Manual script execution (`scripts/enrich-tm.ts`)
-
-**Frequency:** Varies by event proximity (see Staleness Strategy below)
-
-**Batch Size:** 50 events per run
-
-#### Staleness Strategy
-
-TM data changes over time - prices fluctuate, presales end, events sell out. 
-Refresh frequency should be based on how soon the event is:
-
-| Event Timeframe | Refresh Frequency | Rationale |
-|-----------------|-------------------|-----------|
-| Next 7 days | Daily | Prices most volatile, availability critical |
-| 8-30 days | Weekly | Moderate changes |
-| 30+ days | On-demand | Refresh when user views event detail |
-
-#### What Changes in TM Data
-
-- **Prices**: Dynamic pricing means prices rise as events approach
-- **Availability**: Events go from "On Sale" → "Low Availability" → "Sold Out"
-- **Presale Status**: Presales end, general sale starts
-- **Event Status**: Cancelled, postponed, rescheduled
-- **Supporting Acts**: Openers announced closer to show date
-
-#### Implementation Notes
-
-- Track `tmLastChecked` timestamp on each enrichment record
-- Query: events where `tmLastChecked` is stale based on `startDateTime`
-- API budget is generous (5K calls/day), so can be aggressive with refresh
-- Consider: only refresh events that users have marked "Going" or "Interested"
-
-#### Batch Download Strategy (Recommended)
-
-Instead of per-event API calls, download all TM events for our venues in batch:
+### Data Flow
 
 ```
-Daily at 3 AM:
-  For each venue (6 total):
-    → 1 API call: "All events at venue X, next 6 months"
-    → Store in TMEventCache table
+Venue Website → Scraper → NormalizedEvent[] → upsertEvents() → Event table
+```
+
+### Storage Pattern: **Live Pull + Upsert**
+
+- No caching layer; scrapes go directly to database
+- Deduplication by `(source, sourceEventId)` or `(venueId, startDateTime, normalizedTitle)`
+- Creates new events, updates existing ones
+- Never deletes (events stay even if removed from venue site)
+
+### Current State
+
+| Item | Status |
+|------|--------|
+| Scrapers | ✅ All 6 working |
+| Orchestrator | ✅ `runAllScrapers()` |
+| API Route | ✅ `POST /api/ingest/all` |
+| Auth | ⚠️ No protection (commented out) |
+| Scheduling | ❌ Manual only |
+
+### Tables Touched
+
+- **Event** — Created/updated
+- **Venue** — Read only (must pre-exist)
+
+### Scripts
+
+```bash
+# Run all scrapers locally
+npm run ingest:all
+# or
+npx tsx scripts/ingest-offline.ts
+
+# Run single scraper
+npm run ingest:offline -- --venue=moody-center
+```
+
+---
+
+## Job 2: LLM + KG + Spotify Enrichment
+
+**Purpose:** Enrich events with categorization, performer info, artist data, and media links.
+
+### Data Sources (3 APIs)
+
+| API | Purpose | Rate Limit | Cost |
+|-----|---------|------------|------|
+| **OpenAI GPT-4o-mini** | Categorization, performer extraction | None (pay per token) | ~$0.001/event |
+| **Google Knowledge Graph** | Bio, image, Wikipedia link | 100K/day free | Free |
+| **Spotify Web API** | Artist link, genres, popularity | Very generous | Free |
+
+### Data Flow
+
+```
+Event (no enrichment)
+  → LLM: categorize + extract performer
+  → If CONCERT: Spotify lookup
+  → If COMEDY/THEATER: KG lookup
+  → Enrichment record saved
+  → Event.category updated if LLM confident
+```
+
+### Storage Pattern: **Process-Once + Store**
+
+- Events without Enrichment record are candidates
+- Failed events retry up to 3 times
+- Results stored in `Enrichment` table (1:1 with Event)
+- `EnrichmentStatus`: PENDING → PROCESSING → COMPLETED/PARTIAL/FAILED
+
+### Enrichment Data Captured
+
+| Source | Fields |
+|--------|--------|
+| **LLM** | `llmCategory`, `llmPerformer`, `llmDescription`, `llmConfidence` |
+| **Knowledge Graph** | `kgEntityId`, `kgName`, `kgDescription`, `kgBio`, `kgImageUrl`, `kgWikiUrl`, `kgTypes`, `kgScore` |
+| **Spotify** | `spotifyId`, `spotifyName`, `spotifyUrl`, `spotifyGenres`, `spotifyPopularity`, `spotifyImageUrl` |
+
+### Current State
+
+| Item | Status |
+|------|--------|
+| Enrichment logic | ✅ `src/lib/enrichment/index.ts` |
+| Script | ✅ `scripts/enrich-events.ts` |
+| API Route | ❌ None |
+| Scheduling | ❌ Manual only |
+
+### Tables Touched
+
+- **Event** — Read, category updated
+- **Enrichment** — Created/updated
+
+### Scripts
+
+```bash
+# Enrich up to 50 events
+npx dotenvx run -- npx tsx scripts/enrich-events.ts
+
+# Enrich 100 events
+npx dotenvx run -- npx tsx scripts/enrich-events.ts --limit=100
+
+# Force re-enrich all
+npx dotenvx run -- npx tsx scripts/enrich-events.ts --force
+```
+
+---
+
+## Job 3: TM Cache Download
+
+**Purpose:** Batch download all Ticketmaster events for our venues (6 API calls total).
+
+### Data Source
+
+| API | Endpoint | Rate Limit | Cost |
+|-----|----------|------------|------|
+| **TM Discovery API** | `GET /discovery/v2/events` | 5,000/day | Free |
+
+### Venue Mapping
+
+| Our Venue | TM Venue ID | TM Venue Name |
+|-----------|-------------|---------------|
+| moody-center | `KovZ917ANwG` | Moody Center ATX |
+| acl-live | `KovZpZAJJlvA` | Austin City Limits Live |
+| stubbs | `KovZ917AxzU` | Stubb's Waller Creek |
+| paramount-theatre | `KovZpZAaa1nA` | Paramount Theatre |
+| bass-concert-hall | `KovZpZAJJ7AA` | Bass Concert Hall |
+| long-center | `KovZpZAJEFvA` | Long Center |
+
+### Data Flow
+
+```
+For each venue:
+  TM API → events for next 6 months
   
-  Then match offline:
-    → Compare our events vs cache (no API calls)
-    → Update Enrichment records
+All TM events → Clear old cache → Insert to TMEventCache
 ```
 
-**Benefits:**
-- 6 API calls vs 100+ per-event calls
-- No rate limiting issues
-- Instant offline matching
-- Prices/URLs up to 24h stale (acceptable with disclaimer)
+### Storage Pattern: **Full Replace Cache**
+
+- Deletes all existing cache entries
+- Inserts fresh data from TM
+- No incremental updates (simpler, ensures freshness)
+
+### TM Data Captured
+
+| Category | Fields |
+|----------|--------|
+| **Core** | `id`, `name`, `url`, `localDate`, `startDateTime` |
+| **Sales** | `onSaleStart`, `onSaleEnd`, `presales` (JSON) |
+| **Media** | `imageUrl`, `seatmapUrl` |
+| **Artist** | `attractionId`, `attractionName`, `supportingActs`, `externalLinks` |
+| **Classification** | `genre`, `subGenre`, `segment` |
+| **Status** | `status`, `info`, `pleaseNote`, `ticketLimit` |
+
+### Current State
+
+| Item | Status |
+|------|--------|
+| TM Client | ✅ `src/lib/ticketmaster/client.ts` |
+| Script | ✅ `scripts/download-tm-cache.ts` |
+| API Route | ❌ None |
+| Scheduling | ❌ Manual only |
+
+### Tables Touched
+
+- **TMEventCache** — Cleared and repopulated
+
+### Scripts
+
+```bash
+# Download next 6 months
+npx tsx scripts/download-tm-cache.ts
+
+# Download next 3 months
+npx tsx scripts/download-tm-cache.ts --months=3
+```
 
 ---
 
-## Implementation Options
+## Job 4: TM Event Matching
 
-### Option A: Vercel Cron Jobs (Recommended)
+**Purpose:** Match our events against cached TM data to add buy links, presales, and ticket info.
 
-**Pros:**
-- Built into Vercel, no external service
-- Simple configuration via `vercel.json`
-- Free tier: 2 cron jobs
+### Data Sources
 
-**Cons:**
-- Limited to once per day on free tier
-- Max execution time: 10s (hobby) / 60s (pro)
+| Source | Purpose |
+|--------|---------|
+| **TMEventCache** | Candidate TM events for matching |
+| **OpenAI GPT-4o** | Disambiguate fuzzy matches |
 
-**Setup:**
+### Matching Algorithm
+
+```
+For each our event:
+  1. Find TMEventCache entries with same venue + date
+  2. Calculate similarity score (Levenshtein + normalization)
+  3. If similarity ≥ 85%: Auto-match
+  4. If similarity < 85% but candidates exist: Ask LLM to pick
+  5. Update Enrichment record with TM data
+```
+
+### Storage Pattern: **Incremental Update**
+
+- Reads from TMEventCache (no API calls)
+- Updates existing Enrichment records
+- Tracks `tmLastChecked` for staleness
+- Reuses previous matches to skip redundant LLM calls
+
+### TM Enrichment Fields
+
+| Field | Purpose |
+|-------|---------|
+| `tmEventId` | TM event ID (for future API calls) |
+| `tmEventName` | TM title (often more descriptive) |
+| `tmUrl` | **Buy tickets link** (main value!) |
+| `tmOnSaleStart/End` | Public sale window |
+| `tmPresales` | Presale windows (JSON) |
+| `tmImageUrl` | High-quality image |
+| `tmStatus` | onsale, offsale, cancelled |
+| `tmPreferTitle` | Use TM title instead of venue title |
+| `tmMatchConfidence` | 0-1 confidence score |
+| `tmLastChecked` | When we last matched |
+
+### Current State
+
+| Item | Status |
+|------|--------|
+| Matcher | ✅ `src/lib/ticketmaster/matcher.ts` |
+| Script | ✅ `scripts/enrich-tm-from-cache.ts` |
+| API Route | ❌ None |
+| Scheduling | ❌ Manual only |
+
+### Tables Touched
+
+- **TMEventCache** — Read only
+- **Enrichment** — Updated with TM fields
+
+### Scripts
+
+```bash
+# Match all upcoming events
+npx tsx scripts/enrich-tm-from-cache.ts
+
+# Dry run (no saves)
+npx tsx scripts/enrich-tm-from-cache.ts --dry-run
+
+# Force re-evaluate all (skip cached matches)
+npx tsx scripts/enrich-tm-from-cache.ts --fresh
+
+# Filter by venue
+npx tsx scripts/enrich-tm-from-cache.ts --venue=moody-center
+```
+
+---
+
+## Job 5: Weather Pre-Cache
+
+**Purpose:** Pre-cache weather forecasts for upcoming events so Day-of mode loads instantly.
+
+### Data Source
+
+| API | Endpoint | Rate Limit | Cost |
+|-----|----------|------------|------|
+| **Google Weather API** | `forecast/days:lookup` | 25K/day free | Free |
+
+### Current Behavior
+
+Weather is fetched **on-demand** when user views Day-of mode:
+- Check `WeatherCache` for (lat, lng, date)
+- If cache miss or stale (>1 hour): fetch from Google
+- Store result in cache
+
+### Proposed Pre-Cache Strategy
+
+```
+Daily at 6 AM:
+  For each distinct venue lat/lng:
+    For each date in next 10 days with events:
+      If no fresh cache entry:
+        Fetch forecast
+        Store in WeatherCache
+```
+
+### Storage Pattern: **Upsert Cache**
+
+- Cache key: `(lat, lng, forecastDate)`
+- Coordinates rounded to ~1km precision
+- TTL: 1 hour (current), could extend for pre-cache
+
+### Current State
+
+| Item | Status |
+|------|--------|
+| Weather client | ✅ `src/lib/weather.ts` |
+| API route | ✅ `GET /api/weather` |
+| Cache model | ✅ `WeatherCache` |
+| Venue lat/lng | ✅ All 9 venues have coordinates in seed |
+| Pre-cache script | ❌ Not built |
+| Scheduling | ❌ Not built |
+
+### Tables Touched
+
+- **Venue** — Read lat/lng
+- **Event** — Read dates
+- **WeatherCache** — Created/updated
+
+### No Blockers
+
+All venues have lat/lng populated via `prisma/seed.ts`:
+- moody-center: 30.2820, -97.7328
+- acl-live: 30.2652, -97.7519
+- stubbs: 30.2694, -97.7368
+- paramount-theatre: 30.2672, -97.7417
+- bass-concert-hall: 30.2859, -97.7304
+- long-center: 30.2594, -97.7505
+- (and 3 more)
+
+---
+
+## Job 6: Data Cleanup (Future)
+
+**Purpose:** Maintain data hygiene.
+
+### Potential Tasks
+
+| Task | Frequency | Priority |
+|------|-----------|----------|
+| Delete past events (>30 days old) | Weekly | Low |
+| Clear orphaned Enrichment records | Weekly | Low |
+| Expire old WeatherCache entries | Daily | Low |
+| Clear old TMEventCache entries | Daily | Low |
+| Prune old notifications | Weekly | Medium |
+
+### Current State
+
+Not built. Low priority until data volume grows.
+
+---
+
+## Execution Order & Dependencies
+
+```
+Daily Job Sequence:
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│   2:00 AM ─── Job 1: Venue Scraping ───────────────────┐    │
+│                                                         │    │
+│   3:00 AM ─── Job 3: TM Cache Download ────────────────┼──┐ │
+│                                                         │  │ │
+│   4:00 AM ─── Job 2: LLM/KG/Spotify Enrichment ────────┘  │ │
+│               (needs new events from Job 1)               │ │
+│                                                           │ │
+│   5:00 AM ─── Job 4: TM Matching ─────────────────────────┘ │
+│               (needs enrichment records from Job 2,         │
+│                TM cache from Job 3)                         │
+│                                                             │
+│   6:00 AM ─── Job 5: Weather Pre-Cache                      │
+│               (independent)                                 │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Dependency Matrix
+
+| Job | Depends On | Blocks |
+|-----|------------|--------|
+| 1. Scraping | — | 2 (new events) |
+| 2. LLM/KG/Spotify | 1 | 4 (enrichment records) |
+| 3. TM Cache | — | 4 (cache data) |
+| 4. TM Matching | 2, 3 | — |
+| 5. Weather | — | — |
+| 6. Cleanup | — | — |
+
+---
+
+## Implementation Plan
+
+### Phase 2A: API Routes (1-2 hours each)
+
+Create API routes for scripts that don't have them:
+
+```
+POST /api/cron/enrich       → runs LLM/KG/Spotify enrichment
+POST /api/cron/tm-download  → downloads TM cache
+POST /api/cron/tm-match     → runs TM matching
+POST /api/cron/weather      → pre-caches weather
+```
+
+**All cron routes require:** `Authorization: Bearer {CRON_SECRET}`
+
+### Phase 2B: Vercel Cron Setup
+
 ```json
 // vercel.json
 {
   "crons": [
     {
       "path": "/api/cron/scrape",
-      "schedule": "0 2 * * *"
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/tm-download",
+      "schedule": "0 9 * * *"
     },
     {
       "path": "/api/cron/enrich",
-      "schedule": "0 4 * * *"
+      "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/tm-match",
+      "schedule": "0 11 * * *"
+    },
+    {
+      "path": "/api/cron/weather",
+      "schedule": "0 12 * * *"
     }
   ]
 }
 ```
 
-### Option B: External Cron Service
+Note: Times in UTC. Adjust for Central Time (UTC-6).
 
-**Options:**
-- [cron-job.org](https://cron-job.org) - Free
-- [EasyCron](https://easycron.com) - Free tier
-- GitHub Actions - Free for public repos
+### Phase 2C: Job Logging
 
-**Pros:**
-- More flexibility
-- Longer execution times
-- More frequent runs available
+Create `JobRun` table to track executions:
 
-**Cons:**
-- External dependency
-- Need to secure API endpoints
-
-### Option C: Supabase Edge Functions + pg_cron
-
-**Pros:**
-- Database-native scheduling
-- No external HTTP calls
-
-**Cons:**
-- More complex setup
-- Tied to Supabase
-
----
-
-## API Endpoints
-
-### POST /api/cron/scrape
-
-**Auth:** Bearer token (`CRON_SECRET` env var)
-
-**Response:**
-```json
-{
-  "success": true,
-  "venues": 5,
-  "eventsAdded": 12,
-  "eventsUpdated": 3,
-  "errors": []
+```prisma
+model JobRun {
+  id          String   @id @default(uuid())
+  jobName     String   // "scrape", "enrich", "tm-download", etc.
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  status      String   // "running", "success", "failed"
+  summary     Json?    // { processed: 50, errors: 2, ... }
+  errorLog    String?  // Error details if failed
+  durationMs  Int?
+  
+  @@index([jobName, startedAt])
 }
 ```
-
-### POST /api/cron/enrich
-
-**Auth:** Bearer token (`CRON_SECRET` env var)
-
-**Body (optional):**
-```json
-{
-  "limit": 50,
-  "force": false
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "processed": 50,
-  "completed": 45,
-  "partial": 3,
-  "failed": 2,
-  "skipped": 0,
-  "categoriesUpdated": 5
-}
-```
-
----
-
-## Security
-
-1. **Secret Token:** All cron endpoints require `Authorization: Bearer {CRON_SECRET}`
-2. **Rate Limiting:** Built-in delays between API calls
-3. **Idempotency:** Jobs can be re-run safely (upsert logic)
-
----
-
-## Monitoring & Alerts
-
-### Logging
-- Log start/end of each job
-- Log summary stats (processed, failed, etc.)
-- Log errors with event IDs for debugging
-
-### Alerts (Future)
-- Slack/Discord webhook on failures
-- Email digest of scrape results
-- Dashboard for job history
 
 ---
 
 ## Environment Variables
 
 ```bash
-# Cron job authentication
-CRON_SECRET=random_secure_string
-
-# Already configured for enrichment
-GOOGLE_API_KEY=...
-SPOTIFY_CLIENT_ID=...
+# Already configured
+GOOGLE_API_KEY=...           # Knowledge Graph + Weather
+SPOTIFY_CLIENT_ID=...        # Spotify Web API
 SPOTIFY_CLIENT_SECRET=...
-OPENAI_API_KEY=...
+OPENAI_API_KEY=...           # GPT-4o-mini for categorization
+TICKETMASTER_API_KEY=...     # Discovery API
 
-# Ticketmaster Discovery API
-TICKETMASTER_API_KEY=...
+# New for cron
+CRON_SECRET=random_secure_string
 ```
 
 ---
 
-## Implementation Tasks
+## API Rate Limits & Budgets
 
-### Phase 1: API Routes (1-2 hours)
-1. Create `POST /api/cron/scrape`
-2. Create `POST /api/cron/enrich`
-3. Add auth middleware for cron routes
-4. Test endpoints manually
-
-### Phase 2: Vercel Cron Setup (30 min)
-1. Add `vercel.json` cron config
-2. Add `CRON_SECRET` to Vercel env
-3. Deploy and verify scheduled runs
-
-### Phase 3: Monitoring (Future)
-1. Add logging to database or external service
-2. Set up alerts for failures
-3. Create admin dashboard for job history
+| API | Limit | Our Usage | Safety Margin |
+|-----|-------|-----------|---------------|
+| TM Discovery | 5,000/day | ~6 calls/day | ✅ Excellent |
+| Google KG | 100,000/day | ~50 calls/day | ✅ Excellent |
+| Spotify | Very generous | ~50 calls/day | ✅ Excellent |
+| Google Weather | 25,000/day | ~100 calls/day | ✅ Excellent |
+| OpenAI | Pay per token | ~$0.05/day | ✅ Cheap |
 
 ---
 
-## Rollback Plan
+## Monitoring & Alerts (Future)
 
-If scheduled jobs cause issues:
-1. Remove cron config from `vercel.json`
-2. Redeploy
-3. Jobs stop running
-4. Can still run manually via scripts
+### Basic (Phase 2)
+- Log job runs to database
+- `/admin/jobs` page showing recent runs
 
----
-
-**Last Updated:** November 2024
-**Status:** Scoped, ready when needed
+### Advanced (Later)
+- Slack webhook on failures
+- Email digest of daily job results
+- Grafana dashboard
 
 ---
 
-## Appendix: Ticketmaster Integration
+## Appendix: File Reference
 
-### Current Implementation
+### Scripts (`/scripts/`)
 
-Ticketmaster is used as an **enrichment layer**, not a primary event source.
-Our venue scrapers remain the source of truth for event schedules.
+| File | Purpose |
+|------|---------|
+| `ingest-offline.ts` | Run all/single scrapers locally |
+| `enrich-events.ts` | Run LLM/KG/Spotify enrichment |
+| `download-tm-cache.ts` | Batch download TM events |
+| `enrich-tm-from-cache.ts` | Match events to TM cache |
+| `lookup-tm-venues.ts` | Find TM venue IDs (one-time setup) |
+| `check-tm-enrichment.ts` | Debug TM enrichment status |
+| `debug-tm-status.ts` | Debug TM matching |
+| `delete-mock-events.ts` | Cleanup mock data |
+| `delete-seed-events.ts` | Cleanup seed data |
 
-**What TM provides:**
-- Direct buy links (`tmUrl`)
-- Pricing (`tmPriceMin` - displayed as "From $XX")
-- Presale windows (`tmPresales`)
-- High-quality images (fallback only)
-- Opening acts (`tmSupportingActs`)
-- Genre/classification data
+### Ingestion (`/src/ingestion/`)
 
-**Manual scripts:**
-- `scripts/lookup-tm-venues.ts` - Find TM venue IDs
-- `scripts/enrich-tm.ts` - Match events to TM and enrich
+| File | Purpose |
+|------|---------|
+| `orchestrator.ts` | Coordinates all scrapers |
+| `upsert.ts` | Dedup + insert logic |
+| `types.ts` | `NormalizedEvent`, `ScraperResult` |
+| `sources/*.ts` | Individual venue scrapers |
 
-### Venue Mapping
+### Libraries (`/src/lib/`)
 
-Venues must be manually mapped in `src/lib/ticketmaster/venues.ts`.
-Run `lookup-tm-venues.ts` to get TM venue IDs for new venues.
+| File | Purpose |
+|------|---------|
+| `enrichment/index.ts` | Main enrichment orchestrator |
+| `enrichment/llm.ts` | OpenAI categorization |
+| `enrichment/knowledgeGraph.ts` | Google KG client |
+| `enrichment/spotify.ts` | Spotify client |
+| `ticketmaster/client.ts` | TM API client |
+| `ticketmaster/matcher.ts` | Fuzzy matching logic |
+| `ticketmaster/venues.ts` | Venue ID mappings |
+| `weather.ts` | Google Weather client |
 
-### Match Algorithm
+### API Routes (`/src/app/api/`)
 
-1. Query TM for events at same venue on same date
-2. Compare titles using fuzzy matching (Levenshtein + normalization)
-3. ≥85% similarity → auto-accept
-4. 50-84% similarity → LLM confirmation (yes/no)
-5. <50% → no match
+| Route | Purpose |
+|-------|---------|
+| `POST /api/ingest/all` | Trigger all scrapers |
+| `POST /api/ingest/[source]` | Trigger single scraper |
+| `GET /api/weather` | Fetch/cache weather |
 
+---
+
+**Last Updated:** December 2, 2025
+**Status:** Audit complete. Ready for Phase 2 implementation.

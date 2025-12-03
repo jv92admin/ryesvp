@@ -38,123 +38,154 @@ RyesVP is not "all events everywhere." It's:
 
 > **The easiest way for me and my friends to say yes to going out in Austin.**
 
-To support that, we distinguish three event types:
+We recognize three distinct event types, each with different characteristics and strategic focus:
 
-### Large Events — The Anchor
+### Large Events — The Backbone
 
 Big shows. Arenas. Major venues. Ticketed concerts, comedy tours, theatre, sports.
 
 **Why they matter:**
 - They're the anchor of many nights out
-- They're where Squads naturally form
+- They're where Plans naturally form
 - They're where "Plan the Day" shines — pregame, show, afterparty
+- They're the least controversial to source and easiest to keep accurate
 
-**Data source:** Venue website scrapers + Ticketmaster Discovery API
+**Product focus:** This is the backbone. Already working. Lowest strategic risk, lowest PM attention needed once solid.
 
-**Product focus:** This is the backbone. It works first. Lowest strategic risk, lowest PM attention needed once solid.
-
-**"New to You" Personalization:**
-Events added since your last visit are highlighted. The feed shows you what's genuinely new, not just what's upcoming. This simple signal ("12 new events since Tuesday") keeps the calendar fresh without manufactured urgency.
-
-**Search:**
-Find events by artist, venue, or keyword. Search surfaces results with social context attached — "Khruangbin (3 friends going)".
-
-### Hosted Events — Unique Data
-
-Events created and hosted by users:
-- Thanksgiving dinner
-- Wine night
-- Halloween party
-- House show
-- Watch party
-- Birthday
-
-**Why this matters:**
-This is where RyesVP stops being "events + social overlay" and becomes **"where my people host and plan nights."**
-
-This is unique data. Nobody else has "wine night at V's place with these 8 friends." This builds true retention and social gravity.
-
-**How Hosted Events differ:**
-- **Host-centric:** "Hosted by Maya," not "at Moody Center"
-- **Social graph-centric:** Friends, communities, invite-only
-- **The event page is the Squad:** No separate planning overlay needed
-
-**Architectural note:** Reuse Squad infrastructure with modifications. A user gets a "personal venue" or one is generated per event. The fundamental feature set for Large Events has to work first — but architectural choices along the way keep Hosted Events in mind.
-
-### Around-Town Events — Future Flavor
+### Medium Events — "Around Town" (Future)
 
 Smaller shows at bars, local comedy clubs, indie rooms. Creek & Cave sets, small music stages, neighborhood venues.
 
 **Why they matter:**
 - They make the feed feel alive and Austin-specific
 - They add "what's happening around town" beyond just big tours
+- They support the "go deep in Austin" thesis
 
-**Why we're waiting:**
-- Highest effort / maintenance per unit value (janky sites, IG-only announcements)
-- We treat this as curated, not comprehensive
-- Architecture doesn't change; scraping is the challenge
+**Realistic tradeoffs:**
+- Highest effort/maintenance per unit value (janky sites, IG-only announcements)
+- Medium reward — nice flavor, but not the primary reason people use RyesVP
 
-**Status:** Acknowledged as future expansion. Not core for now.
+**Strategy:** Curated, not comprehensive. A small, opinionated list of culturally relevant venues. V2+ enhancement once core flows are solid.
+
+### People-Created Events — The Big Bet
+
+Events fully created and hosted by users:
+- Thanksgiving dinner
+- Wine night
+- Halloween party
+- House show
+- Watch party
+- Birthday
+- "Let's try this new bar"
+- Brunch, poker night, game night
+
+**Why this is a strategic focus:**
+This is where RyesVP stops being "events + social overlay" and becomes **"where my people host and plan nights."**
+
+This is unique data. Nobody else has "wine night at V's place with these 8 friends." This builds true retention and social gravity.
+
+**The unlock:** It makes "Start a Plan" useful even when the catalog doesn't have the thing. It reduces the "empty shelf" feeling when scraped listings don't match what people actually want to do this weekend.
+
+**How they differ:**
+- **Host-centric:** "Hosted by Maya," not "at Moody Center"
+- **Social graph-centric:** Friends, communities, invite-only
+- **The event page is the Plan:** No separate planning overlay needed — RSVPs, logistics, and coordination are baked into the event itself
+
+**Minimum viable create-event:**
+- Title
+- Date/time
+- Location (text + optional map search)
+- Optional URL (Ticketmaster, restaurant link, whatever)
+- Description / notes
+
+**Positioning:** We're happy to compete in the Partiful space. We differentiate by tying into existing friends/plans, living in the same ecosystem as big shows, and reusing our planning and comms stack.
+
+**Priority:** This is a near-term unlock, not a "someday" feature.
 
 ---
 
-## 3. The Squad Model
+## 3. The Plan Model
 
-The Squad is the **atomic unit of planning**.
+The Plan (internally: "Squad") is the **atomic unit of coordination**.
 
 The event page answers: *"What is this, when, and where?"*
 
-The Squad answers: *"Who's actually in, what's the plan, and what do I need to know?"*
+The Plan answers: *"Who's actually in, what's the logistics, and what do I need to know?"*
 
-### What Squads Hold
+### What Plans Hold
 
-- **Who's in / thinking / out** — clear stance from each person
-- **Ticket status** — who needs tickets, who has extras, who's buying for others
-- **Guests** — +1s, +2s
-- **Budget signals** — rough alignment on spend
-- **Seat/section info** — lightweight coordination
+**Who's in:**
+- Status: Yes / Maybe / No
+- Clear stance from each person
 
-### Two Windows Into the Squad
+**Tickets:**
+- Have/Getting vs. Need
+- "Cover others" — who's buying for whom
+- Squad-level price guide (crowdsourced ticket info)
 
-**Plan the Event** — Are we going? Who's in? Who needs tickets?
-- Member status
-- Ticket coordination
-- Invite friends to the Squad
+**Guests:**
+- +1, +2, or more
+- Tracked at the person level
 
-**Plan the Day** — What do I need today to actually get there?
-- Weather at event time
-- "Know before you go" (bag policy, etc.)
-- Squad Stops (the itinerary)
-- Pinned notes
+**Day-of Logistics:**
+- Itinerary (Squad Stops): freeform timeline of pregame, show, afterparty
+- Weather forecast for event day
+- "Know before you go" info (bag policy, etc.)
+- Quick actions (Maps, Uber)
+
+### Two Modes: Plan vs. Day-of
+
+**Plan Mode** — Are we going? Who's in? Who needs tickets?
+- Member status and tickets
+- Invite friends
+- Price guide
+
+**Day-of Mode** — What do I need today to actually get there?
+- Itinerary
+- Weather
+- Venue info
+- Quick links
 
 This keeps pre-event decisions and day-of execution both clean and low-stress.
+
+### Entry Points — "Start a Plan"
+
+The core loop of the app is starting a plan. We surface this action in multiple places:
+
+**From Events:**
+- On event cards: Going/Interested buttons that morph into "Start Plan" / "Join Plan"
+- On event detail page: Prominent "Start Plan" CTA
+
+**From People:**
+- From your own profile: Start a plan → pick event + friends
+- From a friend's profile: Start a plan with them pre-selected
+- From friend icon/avatar popover: "Start plan with X"
+
+**Global:**
+- Persistent "Start a Plan" button (header, FAB, or profile)
+- Works even without an event selected (pick event later, or create your own)
+
+**Philosophy:** Make the core loop easy. Every surface should make it obvious how to turn "I want to do something" into an actual plan with friends.
 
 ### Squad Stops — The Itinerary
 
 A lightweight timeline of freeform stops:
 
 ```
-5:30 — Drinks at Lazarus (link)
+5:30 — Drinks at Lazarus
 7:15 — Walk to Moody Center
 8:00 — Show starts
 After — Tacos at Tyson's
 ```
 
 **Design:**
-- Each stop is just `time` (optional) + `text` (freeform)
-- Users can paste links, add notes, keep it loose
+- Each stop is `time` (optional) + `label` + `notes` (optional)
+- Users can add locations, paste links, keep it loose
 - Auto-arrange by time
-- No over-modeling — this is intentionally simple
+- Intentionally simple — not a calendar app
 
 **Why this matters:**
-The "Plan the Day" section becomes the source of truth for time-based messaging:
-- Day-of emails
-- SMS summaries
-- "Here's the plan" exports to group chats
-
-### For Hosted Events
-
-The event page *is* the Squad. You don't need a separate planning overlay — RSVPs, logistics, and coordination are baked into the event itself.
+The itinerary becomes the source of truth for time-based messaging and exports.
 
 ---
 
@@ -167,13 +198,30 @@ Friends are the backbone of how people decide to go out. For most people, the qu
 > "Which of these would be fun with my people?"
 
 **What Friends power:**
-- A clear lens over the calendar: events that intersect with people you know
+- A lens over the calendar: events that intersect with people you know
 - Simple, high-trust signals: "3 friends going," "2 interested"
-- Obvious coordination: who to reach out to, without exposing you to the whole world
-- Friends-of-friends discovery: see events where mutual connections are going, creating opportunities to link up
+- Obvious coordination: who to reach out to
+- Friends-of-friends discovery: see events where mutual connections are going
 
 **Philosophy:**
-The Friends graph is a lightweight layer that makes nights out easier — not a social network leaderboard. We place "Add Friend" where it unlocks real value (Squads, shared events, invites), not everywhere for its own sake.
+The Friends graph is a lightweight layer that makes nights out easier — not a social network leaderboard. We place "Add Friend" where it unlocks real value (Plans, shared events, invites), not everywhere for its own sake.
+
+### Friend Profiles
+
+A minimal profile makes "start a plan from a friend" and "add friend" feel real.
+
+**What a friend profile shows:**
+- Name + photo
+- Short blurb / username (optional)
+- "Add friend" or "Friends since…"
+- Their upcoming events / plans (what they're going to)
+- Mutual friends
+
+**Entry points:**
+- Tap on friend avatar/name anywhere → profile
+- Popover on hover (desktop): "Start plan with X", "View profile"
+
+**Philosophy:** Profiles exist to facilitate plans, not to be destinations. Keep them minimal and action-oriented.
 
 ### Communities — The Second Ring
 
@@ -182,199 +230,221 @@ Friends are your first ring. Communities are the second ring:
 > "People like me, in my city, who like the same types of nights out."
 
 **What Communities enable:**
-- Gently expand your circle around shared scenes: "Austin Indie Nights," "East Side Comedy," "Queer Dance Parties"
+- Gently expand your circle around shared scenes: "Austin Indie Nights," "East Side Comedy"
 - Discovery anchored in events, not abstract groups
 - A way for early users to shape what RyesVP feels like
 
 **Philosophy:**
-Curated, invite-based pockets rather than a giant, anonymous feed. A community feed shows real human signals — who's going, recent events, highlights — not an infinite scroll designed to trap you.
-
-**Self-Moderation (future):**
-Community-driven tools for groups to self-govern: report issues, manage membership, maintain positive vibes without heavy-handed platform intervention.
+Curated, invite-based pockets rather than a giant, anonymous feed.
 
 ---
 
-## 5. The Ticket Network
+## 5. Ticket Signals
 
-A trusted buy/sell layer within your communities and friend graph.
+A lightweight layer for ticket coordination within your network.
 
 ### The Problem It Solves
 
 "Alex needs a ticket" is visible to friends. No marketplace needed — just signal and trust.
 
-### How It Works
+### Ticket Statuses
 
-- **Friends-of-friends discovery:** Expand the ticket search circle safely
-- **Within communities:** Trusted exchange among people who share a scene
-- **Soft reputation signals (future):** Did this person actually show up? Simple trust indicators built over time
+Users can signal their ticket situation:
+- **Have/Getting** — I'm covered
+- **Need** — Looking for a ticket
+- **Covered** — Someone in my Plan is buying for me
 
-### Why It's Distinct
+### Within Plans
 
-The ticket network scales with communities but solves a different problem than coordination. It's about **access and trust** — getting into shows through your people, not through scalpers.
+- See who needs tickets at a glance
+- "Cover others" flow: Mark that you're buying for specific people
+- Squad-level price guide: Crowdsourced info on what tickets cost
+
+### Future: Ticket Network
+
+- Friends-of-friends discovery: Expand the ticket search circle safely
+- Within communities: Trusted exchange among people who share a scene
+- Soft reputation signals: Did this person actually show up?
 
 ---
 
-## 6. Explore & Playlists
+## 6. Explore & Discovery
 
-Discovery and curation through music.
+### Artists as Entities
 
-### Inside Squads
+Artists are first-class objects in the data model, not just event metadata.
 
-Create or link a YouTube/Spotify playlist for the event:
+**Why this matters:**
+- Enables "follow artist" → get notified when they play Austin
+- Powers personalized discovery ("Artists you listen to are coming to town")
+- Links events to performers cleanly (an event can have multiple artists)
+- Foundation for Spotify integration
+
+**What an Artist holds:**
+- Name, image, bio
+- Spotify link, genres
+- Events they're performing at (via `event_performers` link)
+- Followers (users who follow this artist)
+
+**Artist profiles (future):**
+- Simple stub page: name, image, upcoming Austin shows
+- "Follow" button
+- Links to Spotify
+
+### Music Discovery
+
+**On Event Pages:**
+- One-click "Listen on Spotify" to preview artists
+- Artist info, genres, images when available
+
+**Future — Inside Plans:**
+- Create or link a playlist for the event
 - "Here's what we're listening to before the show"
 - Shared taste-building before you even get there
 
-### Inside Communities
+### Event Discovery
 
-Community-level playlists curate a scene:
-- "Austin Indie Nights playlist"
-- Maintained by community members
-- Discovery through taste, not just event listings
+**"New to You" Signals:**
+- Events added since your last visit are highlighted
+- The feed shows what's genuinely new, not just what's upcoming
+- Simple signal keeps the calendar fresh without manufactured urgency
 
-### On Your Profile
+**Search:**
+- Find events by artist, venue, or keyword
+- Results surface with social context: "Khruangbin (3 friends going)"
 
-Your playlists as a signal of taste:
-- What you're into
-- Shows you've been to
-- A way to connect with like-minded people
-
-### Artist Following (future)
-
-Follow artists and get notified when they announce Austin shows:
-- Connected to Spotify listening history
-- "Artists you listen to are coming to town"
+**Future — Artist Following:**
+- Follow artists and get notified when they announce Austin shows
+- Connected to listening history
 - Taste graph that powers smarter recommendations
 
 ---
 
-## 7. Comms: Meet Them Where They Are
+## 7. Engagement & Communications
 
 > "We don't win by trying to pull gravity into RyesVP. We win by fitting around it."
 
-### Export to Group Chats
+### The Seven Principles
 
-Clean summaries that paste neatly:
-- "Share Plan" → structured text for iMessage/WhatsApp
-- "Share Day-of" → logistics snapshot for the morning of
+These rules govern every notification, email, SMS, and nudge we build:
 
-### Reply-by-Email
+1. **Real-world plans > app time.**
+   The goal of engagement is *better nights out with people you care about*, not raw time-in-app. If a touchpoint doesn't make someone's planning or experience meaningfully better, we don't ship it.
 
-For people who don't want to log in:
-- "You've been added to a Squad — reply with your status"
-- We parse the reply, update their status, confirm back
-- "Reply YES to confirm you're in"
+2. **UI first, channels as escalations.**
+   Default: all activity is visible and actionable inside RyesVP (feeds, plan pages, notification bell). Email and SMS exist to *extend* access when you're not in the app, not to replace the core UX.
 
-### Day-of SMS
+3. **No empty or bait notifications.**
+   Every notification must be tied to something concrete: a friend action, an event you're attached to, a meaningful change to a plan. No generic "we miss you, come back" pings. No vanity metrics. No "X is also looking at this event."
 
-Reserved for logistics, not marketing:
-- "Tonight: [Artist @ Venue]. Plan: 5:30 Drinks → 8:00 Show. Details: [link]"
+4. **Respect the user's current channel.**
+   If we ask you to do something in email, you should be able to complete that action *in email* (e.g., reply "I'm in, need 1 ticket" and we parse it). We invite into the app for richer context, but don't force it for simple actions.
+
+5. **We are not a messaging app.**
+   No full chat/DM system. No attempt to replace WhatsApp/iMessage/Discord. Any "notes" UX we add (Plan notes, event notes) is for **sticky, shared context**, not live chatter.
+
+6. **SMS is last-mile, not a social channel.**
+   SMS is for "you are going somewhere soon; this will help you right now." No SMS for friend requests, invites, or general engagement. Day-of logistics only.
+
+7. **Organic discovery over dark patterns.**
+   We make the most of organic moments ("I clicked a link / got invited / got an email"). But we do not build loops whose only purpose is to maximize clicks or opens.
+
+### The Test
+
+Every notification, every nudge, every surface should answer:
+
+> **"Would this feel like a helpful nudge to someone who actually likes going out?"**
+
+If not, we don't ship it.
+
+---
+
+### Channel: In-App
+
+The *canonical brain* of RyesVP. If you open the app, you can see and act on everything important.
+
+**Notification Bell:**
+- Friend requests sent/accepted
+- Added to a Plan
+- Plan member joined/left
+- Ticket coverage updates ("Alex is handling your ticket")
+- Meaningful changes to plans you're in
+
+**Feeds & Discovery:**
+- Event calendar with social signals
+- "Friends going to…" overlays
+- Communities and scenes
+
+**Plan Pages:**
+- Structured state (Going/Maybe/Out, tickets, guests)
+- Plan Notes: "Bringing my dad + 1 friend", "Host says BYOB", "Aiming for GA floor"
+- Think bulletin board, not chat
+
+---
+
+### Channel: Export to Group Chats
+
+Clean summaries that paste neatly into iMessage/WhatsApp:
+- **"Share Plan"** → Invite text with event + who's in + link
+- **"Share Day-of"** → Logistics snapshot: meetup time, itinerary, weather
+
+---
+
+### Channel: Email (Future)
+
+**Squad/Event Invitations:**
+- Clear summary: event, who's involved, key details
+- **Reply-to-act:** Reply with "I'm in, need 1 ticket" → we parse and update your status
+- Confirmation email closes the loop
+
+**Weekly Digest (optional):**
+- Events this week involving your friends/plans
+- "Just listed" items matching your tastes
+- Frames us as "your weekly heads up" — not a firehose
+
+**Social Graph Summaries:**
+- Batched: friend requests, community invites, new plans
+- Only when you've been inactive and have meaningful activity waiting
+
+---
+
+### Channel: SMS (Future)
+
+Reserved for day-of logistics only:
+- "Tonight: [Event]. Plan: 5:30 Drinks → 8:00 Show"
 - Weather alerts if conditions change
-- Sent only when there's something to act on
+- Critical last-minute changes (venue, time)
+
+Not for: friend requests, community invites, engagement bait.
+
+---
+
+### Channel: Shared Links & Deep Links
+
+Handle organic discovery without being a wall.
+
+**Event Links:**
+- Land directly on event page (mobile web or app)
+- Show the event first, lightly introduce the broader product
+- "This is an event on RyesVP — see who's going, or just use it as a clean event page"
+
+**Plan Invite Links:**
+- Land on Plan preview: event info, who's in, CTA to join
+- Simple and non-ceremonial
+
+**Philosophy:** Keep "I clicked a link" moments feeling organic, not sales-y. Show the object first, explain later.
+
+---
 
 ### Calendar Export
 
 One-click export to your calendar:
-- Add individual events to Google Calendar / Apple Calendar
+- Add individual events to Google/Apple Calendar
 - Subscribe to your "Going" events as a live feed
-- Squad plans sync to calendars with all logistics attached
-
-### LLM-Powered Intelligence
-
-Turn structured data into human-feeling messages:
-- Weather, stops, policies, tickets → a natural-sounding email
-- Parse email replies into status updates
-- Generate "Share Plan" text that sounds like you wrote it
-- Day-of summaries with personality
 
 ---
 
-## 8. Data Pipeline
-
-How events enter the system.
-
-### Venue Scrapers
-
-We scrape event data from major Austin venues:
-- Moody Center, ACL Live, Stubb's, Paramount Theatre, Long Center, Texas Performing Arts
-- Each venue has a dedicated scraper
-- Events are upserted with deduplication by source + external ID
-
-### Enrichment Layer
-
-Raw events go through multi-source enrichment:
-
-**LLM Classification:**
-- Extract performer name from messy titles
-- Categorize event (Concert, Comedy, Theater, Sports, etc.)
-- Generate clean descriptions
-
-**Knowledge Graph:**
-- Artist bio, image, Wikipedia link
-- Entity types for category inference
-
-**Spotify:**
-- Artist link, genres, popularity
-- One-click "listen before you go"
-
-### Ticketmaster Integration
-
-TM is an enrichment layer, not a primary source:
-
-**Batch Download:**
-- Daily download of all TM events for our venues
-- Stored in cache table for offline matching
-
-**LLM Matching:**
-- Compare our events vs. TM cache
-- Fuzzy title matching + LLM confirmation for ambiguous cases
-- Resolve "Is 'Taylor Swift | The Eras Tour' the same as 'Taylor Swift'?"
-
-**What TM Provides:**
-- Direct buy links (the main value)
-- Presale windows
-- Supporting acts
-- Genre/classification
-- High-quality images (fallback)
-
-### Canonical Data Model
-
-**displayTitle:** Computed once at the data layer, never in components. TM title preferred if marked, else venue title.
-
-**Enrichment subset:** UI only gets what it needs (links, genres). Full enrichment (bios, presales, etc.) fetched on demand.
-
-**Social signals:** Friends going, communities attending, user status — attached to events at query time.
-
----
-
-## 9. Technical Foundation
-
-### Stack
-
-- **Frontend:** Next.js (App Router) on Vercel — fast, serverless, edge-ready
-- **Database:** PostgreSQL on Supabase — managed, with built-in auth
-- **ORM:** Prisma — type-safe queries, clean migrations
-- **AI:** OpenAI (gpt-4o-mini for classification, gpt-4o for matching) — smart enrichment without breaking the bank
-- **Auth:** Supabase Auth with Google OAuth — simple, trusted, no password friction
-
-### UI Philosophy
-
-The UI serves the night out. It's not trying to be a destination.
-
-**Principles:**
-- **Mobile-first:** Most decisions about going out happen on phones
-- **Scannable:** Event cards, friend signals, and plans should be glanceable
-- **Fast:** No loading spinners for core flows — optimistic updates, prefetching
-- **Exportable:** Everything important can be copied, shared, or sent elsewhere
-
-**Aesthetic:**
-- Clean typography (Geist Sans)
-- Image-forward event cards
-- Visual badges for social signals (friends going, presales, new)
-- Subtle, not flashy — the event is the star, not the app
-
----
-
-## 10. Moonshots
+## 8. Moonshots
 
 Ideas that push beyond incremental improvements.
 
@@ -395,26 +465,9 @@ This isn't about replacing human judgment — it's about removing friction. The 
 ### Conversational Planning via Text
 
 For people who never want to open the app:
-- "Add me to the Khruangbin squad" → parsed and executed
+- "Add me to the Khruangbin plan" → parsed and executed
 - "What's happening this weekend?" → curated summary via SMS
 - "I need 2 tickets for Saturday" → surfaces friends who have extras
-
-LLM-powered intent parsing meets the planning layer. The app becomes invisible for users who prefer text.
-
-### Scaled Scraping Infrastructure
-
-As we add venues, scraping becomes a bottleneck. The vision:
-
-**MCP (Model Context Protocol) Orchestration:**
-- Puppeteer-based scrapers that handle JavaScript-heavy venue sites
-- LLM-assisted parsing for inconsistent formats
-- Self-healing scrapers that adapt when site structures change
-- New venue onboarding in hours, not days
-
-**Around-Town at Scale:**
-- Instagram parsing for smaller venues
-- Community-submitted events with verification
-- "Teach the system" flows where users help classify edge cases
 
 ### Taste Graph
 
@@ -427,36 +480,7 @@ Not a filter bubble — a lens that helps you find your people.
 
 ---
 
-## 11. Engagement Philosophy
-
-> "Use engagement to support real plans and real relationships — not to manufacture fake urgency."
-
-### What We Surface
-
-Real actions:
-- A friend added you
-- You were added to a Squad
-- The plan changed
-- Someone needs a ticket you might have
-
-### What We Don't Do
-
-- Vanity metrics
-- "X is also looking at this event"
-- Engagement bait
-- Notifications that exist to drive opens, not inform
-
-### The Test
-
-Every notification, every nudge, every surface should answer:
-
-> "Would this feel like a helpful nudge to someone who actually likes going out?"
-
-If not, we don't ship it.
-
----
-
-## 12. What Success Looks Like
+## 9. What Success Looks Like
 
 Not DAU. Not time-in-app.
 
@@ -464,7 +488,7 @@ Not DAU. Not time-in-app.
 The calendar surfaced something they wouldn't have found. Friends made it feel doable.
 
 **More plans that actually happen.**
-Squads turned "we should go" into "we went."
+Plans turned "we should go" into "we went."
 
 **Fewer logistics lost in group chats.**
 The structured bits live in RyesVP. The vibes stay in iMessage.
@@ -474,5 +498,42 @@ People bring their friends because it makes their nights out better — not beca
 
 ---
 
-*Last Updated: November 2025*
+## 10. Current Capabilities (December 2025)
 
+### What's Built and Working
+
+| Capability | Status |
+|------------|--------|
+| Event calendar (Large Events) | ✅ Live |
+| Event enrichment (images, Spotify, genres) | ✅ Live |
+| Friends & friend requests | ✅ Live |
+| Communities (basic) | ✅ Live |
+| Ticket status signals (Have/Need) | ✅ Live |
+| Plans (Squads) with invites | ✅ Live |
+| Plan member status (Yes/Maybe/No) | ✅ Live |
+| Cover others / ticket coordination | ✅ Live |
+| Guests (+1, +2) | ✅ Live |
+| Squad-level price guide | ✅ Live |
+| Day-of mode with itinerary | ✅ Live |
+| Weather forecast | ✅ Live |
+| In-app notifications | ✅ Live |
+| Invite codes & auto-friend | ✅ Live |
+| Share Plan / Share Day-of exports | ✅ Live |
+| Row Level Security | ✅ Live |
+
+### What's Next (Priority Order)
+
+| Phase | Capability | Notes |
+|-------|------------|-------|
+| 2 | Async jobs / backend reliability | Daily refresh, logging |
+| 3 | More "Start Plan" ingresses | From cards, profiles, global CTA |
+| 3 | Basic emails | Welcome, "added to plan", reminders |
+| 4 | Create-your-own events | User-hosted events (Partiful lane) |
+| 4 | Friend profile pages | Minimal profiles with "start plan" |
+| 5 | Artist data model | First-class artist entities |
+| 6 | Spotify integration | OAuth, top artists, discovery |
+| 7 | Communities reimagined | Plans within communities |
+
+---
+
+*Last Updated: December 2025*

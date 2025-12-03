@@ -1,0 +1,26 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/cron/scrape",
+      "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/tm-download",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/enrich",
+      "schedule": "0 10 * * *"
+    },
+    {
+      "path": "/api/cron/tm-match",
+      "schedule": "0 11 * * *"
+    },
+    {
+      "path": "/api/cron/weather-precache",
+      "schedule": "0 12 * * *"
+    }
+  ]
+}
+
