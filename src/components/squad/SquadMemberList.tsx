@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { getAvatarStyle, getInitials, getDisplayName } from '@/lib/avatar';
 import { Button } from '@/components/ui';
 
@@ -76,20 +77,24 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite }:
               key={member.id}
               className="flex items-center gap-2 py-2"
             >
-              {/* Avatar */}
-              <div
-                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-medium flex-shrink-0"
+              {/* Avatar - clickable link to profile */}
+              <Link
+                href={`/users/${member.userId}`}
+                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-medium flex-shrink-0 hover:ring-2 hover:ring-[var(--brand-primary)] hover:ring-offset-1 transition-shadow"
                 style={getAvatarStyle(member.userId)}
-                title={displayName}
+                title={`View ${displayName}'s profile`}
               >
                 {getInitials(member.user.displayName, member.user.email)}
-              </div>
+              </Link>
 
-              {/* Name + badges */}
+              {/* Name + badges - clickable link to profile */}
               <div className="flex-1 min-w-0 flex items-center gap-1.5">
-                <span className="text-sm text-gray-900 truncate">
+                <Link 
+                  href={`/users/${member.userId}`}
+                  className="text-sm text-gray-900 truncate hover:text-[var(--brand-primary)] transition-colors"
+                >
                   {displayName}
-                </span>
+                </Link>
                 {member.isOrganizer && (
                   <span className="text-[9px] px-1 py-0.5 bg-[var(--brand-primary-light)] text-[var(--brand-primary)] rounded flex-shrink-0">
                     Org

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { getAvatarStyle, getInitials, getDisplayName } from '@/lib/avatar';
 
 interface CombinedAttendanceModalProps {
@@ -93,14 +94,19 @@ export function CombinedAttendanceModal({ eventId, goingCount, interestedCount, 
                   ) : (
                     <ul className="space-y-2 pl-4">
                       {goingAttendees.map((a) => (
-                        <li key={a.userId} className="flex items-center gap-3 py-1">
-                          <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium"
-                            style={getAvatarStyle(a.userId)}
+                        <li key={a.userId}>
+                          <Link 
+                            href={`/users/${a.userId}`}
+                            className="flex items-center gap-3 py-1 hover:bg-gray-50 rounded-lg -ml-2 px-2 transition-colors"
                           >
-                            {getInitials(a.displayName, a.email)}
-                          </div>
-                          <span className="text-gray-900 text-sm">{getDisplayName(a.displayName, a.email)}</span>
+                            <div
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium"
+                              style={getAvatarStyle(a.userId)}
+                            >
+                              {getInitials(a.displayName, a.email)}
+                            </div>
+                            <span className="text-gray-900 text-sm">{getDisplayName(a.displayName, a.email)}</span>
+                          </Link>
                         </li>
                       ))}
                     </ul>
@@ -120,14 +126,19 @@ export function CombinedAttendanceModal({ eventId, goingCount, interestedCount, 
                   ) : (
                     <ul className="space-y-2 pl-4">
                       {interestedAttendees.map((a) => (
-                        <li key={a.userId} className="flex items-center gap-3 py-1">
-                          <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium"
-                            style={getAvatarStyle(a.userId)}
+                        <li key={a.userId}>
+                          <Link 
+                            href={`/users/${a.userId}`}
+                            className="flex items-center gap-3 py-1 hover:bg-gray-50 rounded-lg -ml-2 px-2 transition-colors"
                           >
-                            {getInitials(a.displayName, a.email)}
-                          </div>
-                          <span className="text-gray-900 text-sm">{getDisplayName(a.displayName, a.email)}</span>
+                            <div
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium"
+                              style={getAvatarStyle(a.userId)}
+                            >
+                              {getInitials(a.displayName, a.email)}
+                            </div>
+                            <span className="text-gray-900 text-sm">{getDisplayName(a.displayName, a.email)}</span>
+                          </Link>
                         </li>
                       ))}
                     </ul>

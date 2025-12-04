@@ -27,8 +27,10 @@ Based on strategic review: **Infra → Core Loop → Surfaces → Flavor → Soc
 | 1.6 | **In-App Notifications** | Bell, triggers | 1 day | ✅ Complete |
 | 2 | **Backend Reliability** | Async jobs, cron | 2-3 days | ✅ Complete |
 | 3A | **Start Plan Ingresses** | Multiple entry points | 1-2 days | ✅ Complete |
-| **3B** | **Transactional Emails** | Welcome, invites, reminders | 2-3 days | 🔲 **Next** |
-| **4** | **Event + Social Surfaces** | Create event, profiles | 1-2 weeks | 🔲 After Phase 3B |
+| 3B | Transactional Emails | Welcome, invites, reminders | 2-3 days | 🔲 Deferred |
+| 4A | Create-Your-Own Event | User-generated events | 3-5 days | 🔲 Deferred |
+| **4B** | **Friend Profile Page** | `/users/[id]`, "Start plan with X" | 2-3 days | 🔲 **Next** |
+| 4C | Friend Avatar Popover | Hover quick actions (desktop) | 1 day | 🔲 After 4B |
 | **5** | **Artist Foundation** | Data model, event links | 3-5 days | 🔲 After Phase 4 |
 | **6** | **Spotify v1** | OAuth, top artists | 1 week | 🔲 After Phase 5 |
 | **7** | **Communities v1** | Reimagined communities | 2-3 weeks | 🔲 Last |
@@ -109,27 +111,58 @@ Based on strategic review: **Infra → Core Loop → Surfaces → Flavor → Soc
 
 ---
 
-### Phase 4: Event + Social Surfaces 🔲
+### Phase 4B: Friend Profile Page 🔲 NEXT
 
-**Goal:** Create-your-own events + minimal profiles = unlock for real usage.
+**Goal:** Let users discover what friends are up to and start plans with them.
 
-**4A. Create-Your-Own Event Page:**
-- [ ] `/events/new` page
-- [ ] Fields: Title, Date/time, Location (text + optional map), URL (optional), Description
-- [ ] Creates event with `source: 'USER'` or similar
-- [ ] Event page IS the plan (like Partiful)
-- [ ] Invite friends flow
+**Route:** `/users/[id]` (or `/profile/[username]` if we add usernames later)
 
-**4B. Minimal Friend Profile Page:**
-- [ ] `/users/[id]` or `/profile/[username]` page
-- [ ] Shows: Name, photo, short blurb
-- [ ] "Add friend" or "Friends since..."
-- [ ] Their upcoming events/plans
-- [ ] "Start plan with X" CTA
+**Page Layout:**
+- [ ] Header: Avatar (large), Display Name, short blurb (future: editable bio)
+- [ ] Friendship status: "Add Friend" button OR "Friends since [date]"
+- [ ] **Their Plans section:** Upcoming plans they're in (events they're Going to)
+- [ ] **Their Interests section:** Events they're Interested in
+- [ ] **"Start plan with X" CTA:** Opens StartPlanModal with this friend pre-added
 
-**4C. Friend Avatar Popover (desktop):**
+**Data Requirements:**
+- [ ] API: `GET /api/users/[id]` — profile data + friendship status
+- [ ] API: `GET /api/users/[id]/events` — their Going + Interested events (respect privacy: only show if friends)
+- [ ] Privacy: Non-friends see limited profile (name, avatar). Friends see events.
+
+**Components:**
+- [ ] `UserProfilePage` — Main page component
+- [ ] `UserProfileHeader` — Avatar, name, friend status
+- [ ] `UserEventList` — Their plans/interests (reuse EventCard styles)
+
+**Entry Points:**
+- [ ] Click friend avatar/name anywhere in app → goes to profile
+- [ ] `/friends` page friend list → links to profiles
+- [ ] Notification click ("X joined your plan") → links to profile
+
+---
+
+### Phase 4A: Create-Your-Own Event 🔲 DEFERRED
+
+**Goal:** Let users create custom events (house parties, dinners, etc.)
+
+**Deferred because:** Core loop works well with scraped events. User events add complexity (moderation, spam, visibility). Will revisit after profile pages prove useful.
+
+**When ready:**
+- `/events/new` page
+- Fields: Title, Date/time, Location (text + optional map), URL (optional), Description
+- Creates event with `source: 'USER'`
+- Event page IS the plan (like Partiful)
+- Invite friends flow
+
+---
+
+### Phase 4C: Friend Avatar Popover 🔲 AFTER 4B
+
+**Goal:** Quick actions on hover (desktop) without leaving current context.
+
 - [ ] Hover on any friend avatar → popover
 - [ ] Quick actions: "Start plan with X", "View profile"
+- [ ] Desktop only (touch devices go straight to profile)
 
 ---
 

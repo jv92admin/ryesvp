@@ -70,7 +70,14 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
       if (checkRes.ok) {
         const data = await checkRes.json();
         if (data.squad) {
-          // Already has a squad - navigate to it
+          // Already has a squad - add friend (if any) and navigate to it
+          if (preSelectedFriendId) {
+            await fetch(`/api/squads/${data.squad.id}/members`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: preSelectedFriendId }),
+            });
+          }
           router.push(`/squads/${data.squad.id}`);
           onClose();
           return;
@@ -91,8 +98,28 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
         const data = await createRes.json();
         router.push(`/squads/${data.squad.id}`);
         onClose();
+      } else if (createRes.status === 409) {
+        // User already has a squad - add friend to it and navigate
+        const existingRes = await fetch(`/api/events/${eventId}/squad`);
+        if (existingRes.ok) {
+          const existingData = await existingRes.json();
+          if (existingData.squad) {
+            // If we have a friend to add, add them to the existing squad
+            if (preSelectedFriendId) {
+              await fetch(`/api/squads/${existingData.squad.id}/members`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: preSelectedFriendId }),
+              });
+            }
+            router.push(`/squads/${existingData.squad.id}`);
+            onClose();
+            return;
+          }
+        }
       } else {
-        console.error('Failed to create squad');
+        const errorData = await createRes.json().catch(() => ({}));
+        console.error('Failed to create squad:', errorData.error || 'Unknown error');
       }
     } catch (err) {
       console.error('Error creating plan:', err);

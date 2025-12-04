@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { createSquad } from '@/db/squads';
+import { createNotification } from '@/db/notifications';
+import { format } from 'date-fns';
 
 // POST /api/squads - Create a new squad
 export async function POST(req: NextRequest) {
@@ -14,7 +16,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { eventId } = await req.json();
+    const { eventId, inviteFriendIds } = await req.json();
 
     if (!eventId) {
       return NextResponse.json(
@@ -26,7 +28,30 @@ export async function POST(req: NextRequest) {
     const squad = await createSquad({
       eventId,
       createdById: user.dbUser.id,
+      inviteFriendIds: inviteFriendIds || [],
     });
+
+    // Send notifications to invited friends
+    const invitedMembers = squad.members.filter(
+      m => m.userId !== user.dbUser.id
+    );
+
+    if (invitedMembers.length > 0) {
+      const eventTitle = squad.event.title;
+      const eventDate = format(squad.event.startDateTime, 'MMM d');
+      const actorName = user.dbUser.displayName || 'Someone';
+
+      for (const member of invitedMembers) {
+        await createNotification(member.userId, 'ADDED_TO_PLAN', {
+          actorId: user.dbUser.id,
+          actorName,
+          squadId: squad.id,
+          eventId: squad.eventId,
+          eventTitle,
+          eventDate,
+        });
+      }
+    }
 
     return NextResponse.json({ squad });
   } catch (error: any) {

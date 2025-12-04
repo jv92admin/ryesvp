@@ -4,10 +4,12 @@ import { getUserEventByEventId } from './userEvents';
 
 /**
  * Create a new Squad for an event
+ * Optionally invite friends at creation time
  */
 export async function createSquad(data: {
   eventId: string;
   createdById: string;
+  inviteFriendIds?: string[];
 }) {
   // Check if user already has a squad for this event
   const existing = await prisma.squadMember.findFirst({
@@ -30,17 +32,47 @@ export async function createSquad(data: {
       ? 'THINKING'
       : 'IN'; // Default to IN for squad creators
 
-  // Create squad with creator as organizer
+  // Build member create data: creator + invited friends
+  const memberCreates: { userId: string; isOrganizer: boolean; status: SquadMemberStatus }[] = [
+    {
+      userId: data.createdById,
+      isOrganizer: true,
+      status: creatorStatus,
+    },
+  ];
+
+  // Add invited friends as THINKING members
+  if (data.inviteFriendIds && data.inviteFriendIds.length > 0) {
+    for (const friendId of data.inviteFriendIds) {
+      // Skip if friend is the creator
+      if (friendId === data.createdById) continue;
+      
+      // Check if friend already has a squad for this event
+      const friendExisting = await prisma.squadMember.findFirst({
+        where: {
+          userId: friendId,
+          squad: { eventId: data.eventId },
+        },
+      });
+      
+      // Only add if they don't already have a squad
+      if (!friendExisting) {
+        memberCreates.push({
+          userId: friendId,
+          isOrganizer: false,
+          status: 'THINKING',
+        });
+      }
+    }
+  }
+
+  // Create squad with all members
   return prisma.squad.create({
     data: {
       eventId: data.eventId,
       createdById: data.createdById,
       members: {
-        create: {
-          userId: data.createdById,
-          isOrganizer: true,
-          status: creatorStatus,
-        },
+        create: memberCreates,
       },
     },
     include: {
