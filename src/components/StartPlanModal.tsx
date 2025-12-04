@@ -194,7 +194,7 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
                         {event.displayTitle}
                       </p>
                       <p className="text-sm text-gray-500 truncate">
-                        {event.venue.name} • {formatEventDate(event.startDateTime)}
+                        {event.venue.name} • {formatEventDate(new Date(event.startDateTime))}
                       </p>
                     </div>
 
