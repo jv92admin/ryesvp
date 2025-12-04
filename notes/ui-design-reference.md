@@ -547,7 +547,7 @@ px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-400
 ## Event Card
 
 **File:** `src/components/EventCard.tsx`  
-**Last updated:** November 2025
+**Last updated:** December 2025
 
 ### Layout
 
@@ -556,7 +556,7 @@ px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-400
 │ [Image]  Title Here (up to 2 lines)  [NEW][CAT] │
 │          Venue Name • Sat, Dec 14 at 8PM       │
 ├─────────────────────────────────────────────────┤
-│ [✓ Going] [👥 2 going]        [🎵] [Start Plan] │
+│ [👥 2 going]              [🎵] [✓] [★] [Plan?] │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -568,10 +568,30 @@ px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-400
 - Venue + Date: Single line, truncated
 
 **Bottom section (border-t separator):**
-- Left: Social signals (your status, friends, communities)
-- Right: Spotify icon + Go Together button
+- Left: Social signals (friends going/interested, communities)
+- Right: Spotify icon + `EventCardActions` (Going ✓, Interested ★, conditional Start Plan)
+
+### Components
+
+| Component | File | Purpose |
+|-----------|------|---------|
+| `EventCard` | `src/components/EventCard.tsx` | Main card layout |
+| `EventCardActions` | `src/components/EventCardActions.tsx` | Compact ✓/★ buttons + Start Plan |
+| `FriendCountBadge` | `src/components/ui/StatusBadge.tsx` | "2 going" pill |
 
 ### Design Decisions
+
+**Progressive disclosure for Start Plan:**
+- ✓ (Going) and ★ (Interested) shown as compact icon buttons
+- "Start Plan" button ONLY appears after user clicks one of them
+- Reduces visual clutter — doesn't overwhelm with CTAs
+- User shows intent first, then sees action
+
+**EventCardActions component:**
+- Self-contained client component
+- Handles status toggle API calls
+- Manages optimistic state for immediate feedback
+- Shows "Start Plan" inline after selection
 
 **Cleaner layout:**
 - Previous design had 4 horizontal columns fighting for space
@@ -586,19 +606,15 @@ px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-400
 - Smaller badge text: `text-[10px]`
 
 **Compact social signals:**
-- Shortened labels: "✓ Going" instead of "✓ You're going"
 - "👥 2 going" instead of "👥 2 friends going"
 - Max 1 community shown (previously 2)
-
-**Actions grouped:**
-- Spotify + Go Together button together on right
-- Consistent placement regardless of social signals
+- User's own status shown via EventCardActions buttons (green/yellow when active)
 
 ### Why This Works
 
 - Title gets proper space to breathe
-- "Go Together" button has consistent position
-- Social context visible but not overwhelming
+- Start Plan appears contextually (after intent shown)
+- Less visual noise — buttons don't compete for attention
 - Clear visual hierarchy: Content → Social → Actions
 
 ---
@@ -914,6 +930,8 @@ These pages don't exist yet. Document design decisions here as they're built.
 | Dec 2025 | Home Page | ViewToggle renamed to "All Events" / "Your Events" |
 | Dec 2025 | Social Sections | Green bold uppercase headers, full-width cards, removed double framing |
 | Dec 2025 | Header | Notification bell icon, tightened logo/wordmark spacing |
+| Dec 2025 | Header | "Start a Plan" CTA added; Friends moved to UserMenu dropdown |
+| Dec 2025 | Event Card | EventCardActions: ✓/★ buttons → conditional Start Plan (progressive disclosure) |
 | Dec 2025 | Planned | Added Create Event, Friend Profile, Avatar Popover, Artist Page specs |
 
 ---

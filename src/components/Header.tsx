@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getCurrentUser } from '@/lib/auth';
 import { UserMenu } from './UserMenu';
 import { NotificationBell } from './NotificationBell';
+import { StartPlanButton } from './StartPlanButton';
 import { RyesVPLogo, RyesVPWordmark } from './brand/RyesVPLogo';
 
 export async function Header() {
@@ -24,16 +25,11 @@ export async function Header() {
         <nav className="flex items-center gap-3">
           {user && (
             <>
+              {/* Start a Plan CTA */}
+              <StartPlanButton variant="header" />
+              
               {/* Notification Bell with Dropdown */}
               <NotificationBell />
-              
-              {/* Friends */}
-              <Link
-                href="/friends"
-                className="text-sm font-medium text-gray-600 hover:text-[var(--brand-primary)] transition-colors"
-              >
-                Friends
-              </Link>
             </>
           )}
           {user ? (

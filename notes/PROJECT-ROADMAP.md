@@ -25,9 +25,10 @@ Based on strategic review: **Infra → Core Loop → Surfaces → Flavor → Soc
 | 1 | **Social Tab + Squads** | Plans, social signals | 2-3 weeks | ✅ Complete |
 | 1.5 | **Security - RLS** | Row Level Security | 1-2 days | ✅ Complete |
 | 1.6 | **In-App Notifications** | Bell, triggers | 1 day | ✅ Complete |
-| **2** | **Backend Reliability** | Async jobs, logging | 2-3 days | 🔲 **Next** |
-| **3** | **Core Planning Loop** | More ingresses + emails | 1 week | 🔲 After Phase 2 |
-| **4** | **Event + Social Surfaces** | Create event, profiles | 1-2 weeks | 🔲 After Phase 3 |
+| 2 | **Backend Reliability** | Async jobs, cron | 2-3 days | ✅ Complete |
+| 3A | **Start Plan Ingresses** | Multiple entry points | 1-2 days | ✅ Complete |
+| **3B** | **Transactional Emails** | Welcome, invites, reminders | 2-3 days | 🔲 **Next** |
+| **4** | **Event + Social Surfaces** | Create event, profiles | 1-2 weeks | 🔲 After Phase 3B |
 | **5** | **Artist Foundation** | Data model, event links | 3-5 days | 🔲 After Phase 4 |
 | **6** | **Spotify v1** | OAuth, top artists | 1 week | 🔲 After Phase 5 |
 | **7** | **Communities v1** | Reimagined communities | 2-3 weeks | 🔲 Last |
@@ -36,46 +37,69 @@ Based on strategic review: **Infra → Core Loop → Surfaces → Flavor → Soc
 
 ## Next Up: Phase 2-7 Details
 
-### Phase 2: Backend Reliability 🔲 NEXT
+### Phase 2: Backend Reliability ✅ COMPLETE
 
 **Goal:** Make the app stop feeling "dev-manually-powered" before widening usage.
 
-**Async Jobs:**
-- [ ] Scheduled event refresh (daily)
-- [ ] Weather enrichment job (pre-cache popular dates)
-- [ ] Data enrichment / cleanup job
-- [ ] TM cache refresh
+**Cron Jobs Built:**
+- [x] `/api/cron/scrape` — Daily venue scraping (6 venues)
+- [x] `/api/cron/enrich` — LLM + KG + Spotify enrichment (with `force` option)
+- [x] `/api/cron/tm-download` — Ticketmaster cache download
+- [x] `/api/cron/tm-match` — TM event matching for buy links
+- [x] `/api/cron/weather-precache` — Weather pre-caching
 
-**Job Requirements:**
-- Idempotent (safe to re-run)
-- Start with daily; tighten later if needed
-- Log job runs somewhere inspectable
+**Infrastructure:**
+- [x] `src/lib/cron/auth.ts` — CRON_SECRET validation
+- [x] `vercel.json` — Daily schedule (2-6 AM Central)
+- [x] All routes authenticated with Bearer token
+- [x] Console logging for job results (visible in Vercel logs)
 
-**Logging/Monitoring:**
-- [ ] Basic error logging for jobs & key flows
-- [ ] Job run history (when, success/fail, duration)
+**Bug Fixes:**
+- [x] Scrape no longer overwrites LLM-assigned categories
+- [x] Prisma config works on Vercel (process.env fallback)
 
-**See:** `scheduled-jobs-spec.md` for implementation details.
+**See:** `docs/phase2-backend-reliability-plan.md` and `notes/scheduled-jobs-spec.md`
 
 ---
 
-### Phase 3: Core Planning Loop 🔲
+### Phase 3A: Start Plan Ingresses ✅ COMPLETE
 
 **Goal:** Make "start a plan" the obvious, easy action everywhere.
 
-**More Ingresses to "Start a Plan":**
-- [ ] On event cards: Promote Going/Interested buttons → morph to "Start Plan"
-- [ ] Global CTA: Persistent "Start a Plan" button (header or FAB)
-- [ ] From your profile: Start plan → pick event + friends
-- [ ] From friend's profile: Start plan with them pre-selected
-- [ ] Friend avatar popover: "Start plan with X", "View profile"
+**Ingresses Built:**
+- [x] Global header CTA: "Start a Plan" button opens modal → search events → create plan
+- [x] Event cards: Going/Interested buttons → "Start Plan" appears after selection
+- [x] Profile page: Quick Actions section with "Start a Plan" CTA
+- [x] StartPlanModal: Search ~500 events, select, proceed to squad creation
 
-**Basic Emails (ready now):**
+**Architectural Improvements (based on feedback):**
+- [x] DRY: `EventCardActions` component handles attendance + conditional Start Plan
+- [x] Simplified header: Friends link moved into UserMenu dropdown
+- [x] Header CTA: Outline button style matches SmartSquadButton for consistency
+- [x] Progressive disclosure: Start Plan only appears after user shows intent (Going/Interested)
+
+**Components Created/Modified:**
+- `src/components/EventCardActions.tsx` — Compact ✓/★ buttons + conditional Start Plan
+- `src/components/StartPlanButton.tsx` — Reusable header/profile CTA
+- `src/components/StartPlanModal.tsx` — Event search → squad creation flow
+- `src/components/UserMenu.tsx` — Added Friends link
+
+**Deferred:**
+- Friend profile "Start plan with X" (Phase 4B)
+- Friend avatar popover (Phase 4C)
+
+---
+
+### Phase 3B: Transactional Emails 🔲 NEXT
+
+**Goal:** Basic transactional emails for key moments.
+
+**Emails to Build:**
 - [ ] Welcome email (on signup)
   - "This is a small community project"
   - How to start a plan, how to invite friends
   - Privacy reassurance
-- [ ] "You were added to a plan" transactional email
+- [ ] "You were added to a plan" email
 - [ ] "Your event is tomorrow" reminder email
 
 **Email Philosophy:**
@@ -333,7 +357,6 @@ See `data-model-101.md` for full documentation.
 
 | Item | Notes |
 |------|-------|
-| Venue Lat/Lng Backfill | Geocode venue addresses. Required for weather. Use Google Geocoding API or manual entry. |
 | Plan Notes (Bulletin Board) | Freeform notes ("BYOB", "Meet at east entrance"). Price Guide covers structured case for now. |
 | Activity Feed | Real-time friend/community activity in sidebar. Requires activity logging. |
 | "New to You" Tracking | Requires `lastVisitAt` on User. |
@@ -341,6 +364,7 @@ See `data-model-101.md` for full documentation.
 | Dark Mode Polish | Exists but not styled. |
 | Soft Reputation | Show-up signals, ticket trust. After communities. |
 | Email Journeys | Multi-step flows, re-engagement. After transactional emails prove out. |
+| Job Run Database Logging | Store job results in `JobRun` table for admin dashboard. |
 
 ---
 
@@ -440,11 +464,8 @@ See `data-model-101.md` for full documentation.
 - See `notes/scheduled-jobs-spec.md` for future async weather refresh
 
 **Note on Venue Lat/Lng:**
-- Venue lat/lng is currently NULL for existing venues (not populated in seed)
-- Weather feature requires lat/lng — need to backfill existing venues
-- Options: Manual entry in seed, or use Google Geocoding API to convert address → lat/lng
-- Maps and Uber quick actions also benefit from accurate lat/lng
-- **TODO:** Create script to geocode venue addresses and populate lat/lng
+- ✅ All 9 venues have lat/lng populated in `prisma/seed.ts`
+- Weather, Maps, and Uber quick actions all work correctly
 
 ### Sprint: Design System Foundation + Home Page Polish (Complete ✅)
 
@@ -501,7 +522,17 @@ See `data-model-101.md` for full documentation.
 - [x] Recent plans now bubble via unread ADDED_TO_PLAN notifications
 - [x] Fixed nested button hydration error in Chip component
 
+### Sprint: Backend Reliability / Cron Jobs (Complete ✅)
+- [x] 5 cron API routes: scrape, enrich, tm-download, tm-match, weather-precache
+- [x] `src/lib/cron/auth.ts` — CRON_SECRET bearer token validation
+- [x] `vercel.json` — Daily schedule (staggered 2-6 AM Central)
+- [x] Enrich route `force` option to re-process all events
+- [x] Fix: Scrape no longer overwrites LLM-assigned categories
+- [x] Fix: `prisma.config.ts` works on Vercel (process.env fallback)
+- [x] All jobs tested locally and verified working
+- [x] Docs: `docs/phase2-backend-reliability-plan.md`
+
 ---
 
-**Last Updated:** December 2, 2025
+**Last Updated:** December 3, 2025
 

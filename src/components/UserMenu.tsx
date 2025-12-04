@@ -60,6 +60,13 @@ export function UserMenu({ userId, displayName, email }: UserMenuProps) {
             >
               My Profile
             </Link>
+            <Link
+              href="/friends"
+              onClick={() => setIsOpen(false)}
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              Friends
+            </Link>
             <hr className="my-1 border-gray-200" />
             <button
               onClick={handleLogout}

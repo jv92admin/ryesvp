@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { EventDisplay } from '@/db/events';
-import { SmartSquadButton } from './SmartSquadButton';
-import { StatusBadge, FriendCountBadge } from './ui/StatusBadge';
+import { EventCardActions } from './EventCardActions';
+import { FriendCountBadge } from './ui/StatusBadge';
 import { formatEventDate, isNewListing } from '@/lib/utils';
 
 interface EventCardProps {
@@ -96,67 +96,58 @@ export function EventCard({ event }: EventCardProps) {
         </div>
       </Link>
       
-      {/* Bottom row: Social signals + Actions - only show if there's content */}
-      {(social?.userStatus || 
-        (social?.friendsGoing && social.friendsGoing > 0) || 
-        (social?.friendsInterested && social.friendsInterested > 0) || 
-        (social?.communitiesGoing && social.communitiesGoing.length > 0) ||
-        enrichment?.spotifyUrl ||
-        event.userSquad?.id
-      ) && (
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-          {/* Social Signals - left side */}
-          <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
-            <StatusBadge status={social?.userStatus} />
-            <FriendCountBadge 
-              goingCount={social?.friendsGoing} 
-              interestedCount={social?.friendsInterested}
-            />
-            {social?.communitiesGoing.slice(0, 1).map((c) => (
-              <span 
-                key={c.communityId}
-                className="inline-flex items-center px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-full"
-              >
-                {c.count} from {c.communityName}
-              </span>
-            ))}
-          </div>
-          
-          {/* Actions - right side */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Spotify icon */}
-            {enrichment?.spotifyUrl && (
-              <a 
-                href={enrichment.spotifyUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-                className="w-7 h-7 rounded-full bg-[#1DB954] hover:bg-[#1ed760] flex items-center justify-center transition-colors"
-                title="Listen on Spotify"
-              >
-                <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-                </svg>
-              </a>
-            )}
-            
-            {/* Go Together button */}
-            <SmartSquadButton
-              eventId={event.id}
-              userSquadId={event.userSquad?.id}
-              friendsGoing={social?.friendsGoing || 0}
-              friendsInterested={social?.friendsInterested || 0}
-              event={{
-                id: event.id,
-                title: displayTitle,
-                startDateTime: typeof event.startDateTime === 'string' ? event.startDateTime : event.startDateTime.toISOString(),
-                venue: { name: event.venue.name }
-              }}
-              variant="compact"
-            />
-          </div>
+      {/* Bottom row: Social signals + Actions */}
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+        {/* Social Signals - left side */}
+        <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
+          <FriendCountBadge 
+            goingCount={social?.friendsGoing} 
+            interestedCount={social?.friendsInterested}
+          />
+          {social?.communitiesGoing.slice(0, 1).map((c) => (
+            <span 
+              key={c.communityId}
+              className="inline-flex items-center px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-full"
+            >
+              {c.count} from {c.communityName}
+            </span>
+          ))}
         </div>
-      )}
+        
+        {/* Actions - right side: Spotify + Going/Interested + Start Plan */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {/* Spotify icon */}
+          {enrichment?.spotifyUrl && (
+            <a 
+              href={enrichment.spotifyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="w-7 h-7 rounded-full bg-[#1DB954] hover:bg-[#1ed760] flex items-center justify-center transition-colors"
+              title="Listen on Spotify"
+            >
+              <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+              </svg>
+            </a>
+          )}
+          
+          {/* Going/Interested buttons + Start Plan (appears after selection) */}
+          <EventCardActions
+            eventId={event.id}
+            userStatus={social?.userStatus}
+            userSquadId={event.userSquad?.id}
+            friendsGoing={social?.friendsGoing || 0}
+            friendsInterested={social?.friendsInterested || 0}
+            event={{
+              id: event.id,
+              title: displayTitle,
+              startDateTime: typeof event.startDateTime === 'string' ? event.startDateTime : event.startDateTime.toISOString(),
+              venue: { name: event.venue.name }
+            }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
