@@ -61,9 +61,10 @@ interface SquadPageProps {
   squad: Squad;
   currentUserId: string;
   enrichment?: Enrichment | null;
+  calendarPreference?: string | null;
 }
 
-export function SquadPage({ squad: initialSquad, currentUserId, enrichment }: SquadPageProps) {
+export function SquadPage({ squad: initialSquad, currentUserId, enrichment, calendarPreference }: SquadPageProps) {
   const [squad, setSquad] = useState<Squad>(initialSquad);
   const [mode, setMode] = useState<'plan' | 'dayof'>('plan');
   const [copying, setCopying] = useState<string | null>(null);
@@ -128,10 +129,32 @@ export function SquadPage({ squad: initialSquad, currentUserId, enrichment }: Sq
     setCopying('plan');
     try {
       const shareText = generateSharePlanText(squad, currentUserId);
+      const shareUrl = `${window.location.origin}/squads/${squad.id}`;
+      
+      // Try native share first (mobile)
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: squad.event.displayTitle,
+            text: shareText,
+            url: shareUrl,
+          });
+          setCopying(null);
+          return;
+        } catch (e) {
+          // User cancelled or not supported
+          if ((e as Error).name === 'AbortError') {
+            setCopying(null);
+            return;
+          }
+        }
+      }
+      
+      // Fall back to clipboard
       await navigator.clipboard.writeText(shareText);
       setTimeout(() => setCopying(null), 1000);
     } catch (err) {
-      console.error('Error copying share text:', err);
+      console.error('Error sharing plan:', err);
       setCopying(null);
     }
   };
@@ -140,10 +163,30 @@ export function SquadPage({ squad: initialSquad, currentUserId, enrichment }: Sq
     setCopying('dayof');
     try {
       const shareText = generateDayOfText(squad);
+      
+      // Try native share first (mobile)
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: `Day-of: ${squad.event.displayTitle}`,
+            text: shareText,
+          });
+          setCopying(null);
+          return;
+        } catch (e) {
+          // User cancelled or not supported
+          if ((e as Error).name === 'AbortError') {
+            setCopying(null);
+            return;
+          }
+        }
+      }
+      
+      // Fall back to clipboard
       await navigator.clipboard.writeText(shareText);
       setTimeout(() => setCopying(null), 1000);
     } catch (err) {
-      console.error('Error copying day-of text:', err);
+      console.error('Error sharing day-of:', err);
       setCopying(null);
     }
   };
@@ -225,6 +268,7 @@ export function SquadPage({ squad: initialSquad, currentUserId, enrichment }: Sq
             onInvite={handleInvite}
             onLeaveSquad={handleLeaveSquad}
             copying={copying}
+            calendarPreference={calendarPreference}
           />
         ) : (
           <DayOfModeView

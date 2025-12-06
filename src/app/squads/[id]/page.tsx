@@ -57,6 +57,7 @@ export default async function SquadPageRoute({ params }: SquadPageProps) {
       squad={serializedSquad}
       currentUserId={user.dbUser.id}
       enrichment={enrichment}
+      calendarPreference={user.dbUser.calendarPreference}
     />
   );
 }

@@ -61,12 +61,27 @@ export function SocialEngagementPanel({ isLoggedIn }: SocialEngagementPanelProps
     fetchStats();
   }, [isLoggedIn]);
 
-  const handleCopyInvite = async () => {
+  const handleShareInvite = async () => {
     if (!stats?.inviteCode) return;
     
     const inviteUrl = `${window.location.origin}?ref=${stats.inviteCode}`;
     const shareText = `Join me on RyesVP to discover Austin events! ${inviteUrl}`;
     
+    // Try native share first (mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Join me on RyesVP',
+          text: shareText,
+        });
+        return;
+      } catch (e) {
+        // User cancelled or not supported
+        if ((e as Error).name === 'AbortError') return;
+      }
+    }
+    
+    // Fall back to clipboard
     try {
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
@@ -133,7 +148,7 @@ export function SocialEngagementPanel({ isLoggedIn }: SocialEngagementPanelProps
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={handleCopyInvite}
+                onClick={handleShareInvite}
                 className="text-[var(--brand-primary)] border-green-300 hover:bg-[var(--brand-primary-light)]"
               >
                 {copied ? '✓ Copied!' : '🔗 Copy Invite Link'}
@@ -168,7 +183,7 @@ export function SocialEngagementPanel({ isLoggedIn }: SocialEngagementPanelProps
         {/* Right: Quick actions */}
         <div className="flex items-center gap-2">
           <button
-            onClick={handleCopyInvite}
+            onClick={handleShareInvite}
             className="px-3 py-1.5 text-sm text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)] font-medium transition-colors"
           >
             {copied ? '✓ Copied!' : '🔗 Invite Friends'}

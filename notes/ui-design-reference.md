@@ -17,6 +17,28 @@ From `product-vision.md`:
 **Typography:** Geist Sans  
 **Color approach:** Image-forward event cards, visual badges for social signals
 
+### Clean UI Guidelines
+
+**Minimize decorative emojis:**
+- ❌ Avoid random emojis as visual decoration
+- ✅ Use SVG icons for consistent styling and better accessibility
+- ✅ Emojis acceptable for: category badges, user-generated content
+- ✅ Icons should be monochrome (gray → green on hover)
+
+**Navigation elements should be text links, not buttons:**
+- ❌ `bg-white border border-gray-300 rounded-lg` (boxy, dated)
+- ✅ `text-gray-600 hover:text-gray-900` (clean, minimal)
+
+**Interaction patterns:**
+- Hover: Text color change (gray → green or gray → dark)
+- Active: Green text/icon color
+- Copied/Success: Green checkmark icon
+
+**Why this matters:**
+- Cleaner aesthetic keeps focus on content
+- SVG icons scale better and match brand colors
+- Consistent interaction language across the app
+
 ---
 
 ## Design System & Shared Components
@@ -104,7 +126,7 @@ Located in `src/components/brand/`:
 
 ```
 ┌─────────────────────────────────┐
-│ [← All Events]     [Share 📤]  │  ← Navigation bar
+│ ← All Events           Share   │  ← Clean text links
 ├─────────────────────────────────┤
 │                                 │
 │         [Hero Image]            │  ← Full-width, rounded
@@ -164,9 +186,21 @@ Same order, but:
 
 ### Design Decisions
 
+#### Navigation Bar
+- **Back button:** Clean text link with left chevron, animated on hover
+- **Share button:** Clean text link with share icon (no border, no background)
+- **Styling:** `text-sm font-medium text-gray-600 hover:text-green-600`
+- **Rationale:** Minimal UI keeps focus on event content. Matches squad page aesthetic.
+
 #### Share Button
 - **Location:** Top navigation bar, next to "All Events" back button
-- **Rationale:** Prominent placement for easy sharing. Originally planned as icon in AboutCard header, but moved for visibility.
+- **Style:** Minimal text link with SVG share icon
+- **States:** 
+  - Default: Gray text + share icon
+  - Hover: Green text
+  - Copied: Green checkmark + "Copied!" text
+- **Mobile:** Opens native share sheet (Web Share API)
+- **Desktop:** Falls back to clipboard copy
 
 #### Status Toggles
 - **Layout:** 2x2 grid, all 4 always visible
@@ -256,7 +290,7 @@ const categoryColors = {
 
 ```
 ┌─────────────────────────────────┐
-│ [← Back to Event]         Home  │  ← Navigation header
+│ ← Back to Event           Home  │  ← Navigation header (text links)
 ├─────────────────────────────────┤
 │ ┌─────────────┬───────────────┐ │  ← Apple-style toggle
 │ │    Plan     │    Day-of     │ │     (sliding background)
@@ -264,6 +298,8 @@ const categoryColors = {
 ├─────────────────────────────────┤
 │ Event Title                     │  ← Compact header, no image
 │ Sat, Dec 14 • 8PM • Moody Ctr  │     Links to event page
+├─────────────────────────────────┤
+│ Share            Add to Calendar▾│  ← Quick actions (text links)
 ├─────────────────────────────────┤
 │ Going?  [Yes] [Maybe] [No]     │  ← Inline pill buttons
 │                                 │
@@ -309,8 +345,21 @@ const categoryColors = {
 | `SquadPriceGuideCard` | `src/components/squad/SquadPriceGuideCard.tsx` | Squad-level price info |
 | `SquadMemberList` | `src/components/squad/SquadMemberList.tsx` | Compact member table |
 | `SquadInviteModal` | `src/components/squad/SquadInviteModal.tsx` | Invite friends to squad |
+| `CalendarDropdown` | `src/components/CalendarDropdown.tsx` | Export to Google/Apple/Outlook calendar |
 
 ### Design Decisions
+
+#### Quick Actions Row
+- **Layout:** Flex row with space-between, positioned below event header
+- **Share:** Text link with share icon, green on hover
+- **Calendar:** Text link with dropdown arrow, remembers preference
+- **Styling:** Matches navigation header (clean text links, no borders)
+
+#### Calendar Export
+- **First use:** Dropdown with Google/Apple/Outlook options
+- **After preference set:** Direct action button showing "Google Calendar" etc.
+- **Dropdown arrow:** Separate tap target for changing preference
+- **No emojis in dropdown:** Clean text labels only
 
 #### Navigation Header
 - **Layout:** Flex container with space-between
@@ -1022,6 +1071,12 @@ These pages don't exist yet. Document design decisions here as they're built.
 | Dec 6, 2025 | Modals | Custom branded checkboxes — green when selected, replaces browser default |
 | Dec 6, 2025 | Squad Page | Navigation header with "Back to Event" and "Home" links |
 | Dec 6, 2025 | Squad Page | Empty state callout for solo plans — "Add your first friend" |
+| Dec 6, 2025 | Squad Page | Quick actions row: Share + Calendar export (text link style) |
+| Dec 6, 2025 | Calendar | CalendarDropdown component with Google/Apple/Outlook support |
+| Dec 6, 2025 | Calendar | User preference stored in DB, direct action after first use |
+| Dec 6, 2025 | Share | Web Share API for mobile native share sheet |
+| Dec 6, 2025 | Event Page | Back button and share button redesigned to minimal text links |
+| Dec 6, 2025 | Design System | Clean UI guidelines: minimize emojis, prefer SVG icons, text link navigation |
 
 ---
 

@@ -162,6 +162,7 @@ model User {
   authProviderId String   @unique // Supabase Auth user ID
   email          String   @unique
   displayName    String?
+  calendarPreference String? // 'GOOGLE' | 'APPLE' | 'OUTLOOK'
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

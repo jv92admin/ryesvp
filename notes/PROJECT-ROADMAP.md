@@ -599,6 +599,51 @@ See `data-model-101.md` for full documentation.
 - [x] Members section: prominent "Add your first friend" callout when solo
 - [x] Clean CTA without misleading affordances
 
+### Sprint: Calendar Export & Share Improvements (Complete ✅)
+
+**Calendar Export Feature:**
+- [x] `calendarPreference` field added to User model
+- [x] `src/lib/calendar.ts` — ICS generation + Google Calendar URLs
+- [x] `CalendarDropdown` component with preference memory
+- [x] API endpoint: `PATCH /api/users/me/calendar-preference`
+- [x] Export options: Google Calendar (URL), Apple Calendar (ICS), Outlook (ICS)
+- [x] First-time dropdown, then direct action button with change option
+
+**Web Share API (Mobile Native Share):**
+- [x] Smart share utility: `src/lib/share.ts`
+- [x] Mobile: Opens native share sheet (Messages, WhatsApp, etc.)
+- [x] Desktop: Falls back to clipboard copy
+- [x] Implemented across: SquadPage, InviteLinkCard, SocialEngagementPanel, SquadPageModal
+
+**UI Consistency Pass:**
+- [x] Event page back button: Clean text link style (matches squad page)
+- [x] ShareButton: Minimal text + icon (no borders, no background)
+- [x] ShareIconButton: SVG icons, green hover states
+- [x] CalendarDropdown: Clean dropdown without emoji icons
+- [x] Unified styling: gray-600 text, green hover, `text-sm font-medium`
+
+### Migration & Shadow Database Fix (Complete ✅)
+
+**Issue Discovered:**
+- Prisma shadow database fails on Supabase projects using `auth.uid()` 
+- Additional issue: Enabling RLS on `_prisma_migrations` table breaks shadow DB
+
+**Root Causes:**
+1. RLS migration (`enable_rls`) uses `auth.uid()` — doesn't exist in shadow DB
+2. `fix_rls_search_path` migration has `ALTER TABLE "_prisma_migrations" ENABLE ROW LEVEL SECURITY;` — breaks Prisma's migration tracking in shadow DB
+
+**Solution Implemented:**
+- [x] Created auth stub migration: `20251201235959_shadow_db_auth_stub`
+  - Creates dummy `auth` schema and `auth.uid()` function for shadow DB
+  - Production ignores it (uses real Supabase auth)
+- [x] Commented out `_prisma_migrations` RLS line (already applied to prod)
+- [x] Fixed checksum mismatches with `migrate resolve --applied`
+- [x] Documented in migration file for future developers
+
+**Lesson Learned:**
+- Never modify Prisma's internal `_prisma_migrations` table in migrations
+- Supabase-specific SQL (auth.uid(), etc.) needs stub migrations for shadow DB compatibility
+
 ---
 
 **Last Updated:** December 6, 2025

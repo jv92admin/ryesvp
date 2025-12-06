@@ -2,7 +2,9 @@
 -- This prevents potential schema injection attacks
 
 -- Also enable RLS on Prisma's internal migrations table (service-role only)
-ALTER TABLE "_prisma_migrations" ENABLE ROW LEVEL SECURITY;
+-- NOTE: Commented out because it breaks Prisma's shadow database during migrate dev
+-- This was already applied to production on Dec 2, 2025. Do not uncomment.
+-- ALTER TABLE "_prisma_migrations" ENABLE ROW LEVEL SECURITY;
 
 -- Fix helper function with search_path AND optimized auth.uid() call
 CREATE OR REPLACE FUNCTION get_user_id()

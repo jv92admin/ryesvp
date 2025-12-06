@@ -31,7 +31,7 @@ export function InviteLinkCard() {
     ? `${typeof window !== 'undefined' ? window.location.origin : ''}/?ref=${inviteCode}`
     : '';
 
-  const handleCopy = async () => {
+  const handleShare = async () => {
     if (!inviteLink) return;
 
     const shareText = `Hey! Join me on RyesVP to discover and track Austin events together!
@@ -40,6 +40,21 @@ ${inviteLink}
 
 Sign up with my link and we'll be automatically connected 🎵`;
 
+    // Try native share first (mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Join me on RyesVP',
+          text: shareText,
+        });
+        return;
+      } catch (e) {
+        // User cancelled or not supported, fall back to clipboard
+        if ((e as Error).name === 'AbortError') return;
+      }
+    }
+
+    // Fall back to clipboard
     try {
       await navigator.clipboard.writeText(shareText);
       setCopied(true);
@@ -81,14 +96,14 @@ Sign up with my link and we'll be automatically connected 🎵`;
               {inviteLink}
             </code>
             <button
-              onClick={handleCopy}
+              onClick={handleShare}
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors whitespace-nowrap ${
                 copied
                   ? 'bg-emerald-100 text-emerald-700'
                   : 'bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)]'
               }`}
             >
-              {copied ? '✓ Copied!' : 'Copy'}
+              {copied ? '✓ Copied!' : 'Share'}
             </button>
           </div>
         </div>
