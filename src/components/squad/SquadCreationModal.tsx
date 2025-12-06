@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui';
 import { formatInTimeZone } from 'date-fns-tz';
+import { useToast } from '@/contexts/ToastContext';
 
 const AUSTIN_TIMEZONE = 'America/Chicago';
 
@@ -35,6 +36,7 @@ interface SquadCreationModalProps {
 }
 
 export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: SquadCreationModalProps) {
+  const { showToast } = useToast();
   const [friends, setFriends] = useState<Friend[]>([]);
   const [selectedFriends, setSelectedFriends] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(false);
@@ -106,6 +108,11 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
         throw new Error(errorData.error || 'Failed to join squad');
       }
 
+      showToast({
+        message: `You joined ${friendName}'s plan!`,
+        type: 'success',
+      });
+
       // Close modal and redirect to squad
       onClose();
       onSquadCreated(squadId);
@@ -146,6 +153,26 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
 
       await Promise.all(invitePromises);
 
+      // Show toast based on whether friends were added
+      if (selectedFriends.size > 0) {
+        const friendCount = selectedFriends.size;
+        showToast({
+          message: `Plan created! ${friendCount} friend${friendCount > 1 ? 's' : ''} invited and notified.`,
+          type: 'success',
+          action: {
+            label: 'Copy link',
+            onClick: () => {
+              navigator.clipboard.writeText(`${window.location.origin}/squads/${squadId}`);
+            }
+          }
+        });
+      } else {
+        showToast({
+          message: 'Plan created! Add friends to invite them.',
+          type: 'success',
+        });
+      }
+
       onSquadCreated(squadId);
       onClose();
     } catch (err) {
@@ -161,14 +188,16 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>
-            Start a plan
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-sm sm:max-w-md p-0">
+        <div className="px-6 py-4 border-b border-gray-100">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">
+              Start a plan
+            </DialogTitle>
+          </DialogHeader>
+        </div>
 
-        <div className="p-6 space-y-4">
+        <div className="px-6 py-4 space-y-4">
           {/* Event Info */}
           <div className="text-center border-b border-gray-200 pb-4">
             <h3 className="font-medium text-gray-900 mb-1">
@@ -268,31 +297,34 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
                 )}
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-2 pt-4 border-t border-gray-200">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={onClose}
-                  disabled={creating}
-                  className="flex-1"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={handleCreateSquad}
-                  disabled={creating}
-                  loading={creating}
-                  className="flex-1"
-                >
-                  {creating ? 'Creating...' : `Start Plan${selectedFriends.size > 0 ? ` (${selectedFriends.size + 1})` : ''}`}
-                </Button>
-              </div>
             </>
           )}
         </div>
+
+        {/* Action Buttons */}
+        {!loading && !error && (
+          <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={onClose}
+              disabled={creating}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={handleCreateSquad}
+              disabled={creating}
+              loading={creating}
+              className="flex-1"
+            >
+              {creating ? 'Creating...' : `Start Plan${selectedFriends.size > 0 ? ` (${selectedFriends.size + 1})` : ''}`}
+            </Button>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
@@ -332,22 +364,38 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
   };
 
   return (
-    <label className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${
-      isSelected ? 'bg-[var(--brand-primary-light)] border border-green-200' : 'hover:bg-gray-50'
+    <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+      isSelected 
+        ? 'bg-[var(--brand-primary-light)] border-[var(--brand-primary)] ring-2 ring-[var(--brand-primary)]/20' 
+        : 'border-gray-200 hover:border-[var(--brand-primary)]/30 hover:bg-gray-50'
     }`}>
-      <input
-        type="checkbox"
-        checked={isSelected}
-        onChange={onToggle}
-        className="w-4 h-4 text-[var(--brand-primary)] border-gray-300 rounded focus:ring-green-500"
-      />
+      {/* Custom Checkbox */}
+      <div className="relative flex-shrink-0">
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={onToggle}
+          className="sr-only"
+        />
+        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+          isSelected 
+            ? 'bg-[var(--brand-primary)] border-[var(--brand-primary)]' 
+            : 'bg-white border-gray-300'
+        }`}>
+          {isSelected && (
+            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          )}
+        </div>
+      </div>
       
-      <div className="flex items-center gap-2 flex-1">
-        <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600">
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600 flex-shrink-0">
           {friend.displayName.charAt(0).toUpperCase()}
         </div>
         
-        <span className="text-sm text-gray-900 flex-1">
+        <span className="text-sm font-medium text-gray-900 flex-1 truncate">
           {friend.displayName}
         </span>
         

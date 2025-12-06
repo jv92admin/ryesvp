@@ -52,7 +52,7 @@ export async function fetchEventsFromTPA(): Promise<NormalizedEvent[]> {
     
     // Click "View More" button until all events are loaded
     let loadMoreClicks = 0;
-    const maxClicks = 10; // Safety limit
+    const maxClicks = 20; // Safety limit
     
     while (loadMoreClicks < maxClicks) {
       try {

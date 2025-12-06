@@ -370,6 +370,14 @@ The *canonical brain* of RyesVP. If you open the app, you can see and act on eve
 - Ticket coverage updates ("Alex is handling your ticket")
 - Meaningful changes to plans you're in
 
+**Toast Notifications (Ephemeral Feedback):**
+- Instant confirmation when you take action
+- Light backgrounds, bold text, 8-second duration
+- "Plan created! 2 friends invited and notified."
+- Optional copy-link action for easy sharing
+- Actor sees toast; recipients see bell notification
+- Think confirmation, not alert
+
 **Feeds & Discovery:**
 - Event calendar with social signals
 - "Friends going to…" overlays

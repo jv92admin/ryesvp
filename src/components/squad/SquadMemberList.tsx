@@ -51,9 +51,26 @@ const TICKET_DISPLAY: Record<TicketStatus, { icon: string; color: string }> = {
 
 export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite }: SquadMemberListProps) {
   const { members } = squad;
+  const isAlone = members.length === 1;
 
   return (
     <div className="space-y-2">
+      {/* Empty State - Only you in the plan */}
+      {isAlone && onInvite && (
+        <div className="bg-[var(--brand-primary-light)] border-2 border-dashed border-[var(--brand-primary)]/40 rounded-xl p-6 text-center mb-3">
+          <h3 className="font-bold text-gray-900 mb-1">Add your first friend</h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Plans are better with friends! Invite someone to join you.
+          </p>
+          <button
+            onClick={onInvite}
+            className="w-full px-4 py-2.5 bg-[var(--brand-primary)] text-white rounded-xl font-semibold hover:bg-[var(--brand-primary-hover)] transition-colors"
+          >
+            Invite Friends
+          </button>
+        </div>
+      )}
+
       {/* Column Headers */}
       <div className="flex items-center text-[10px] text-gray-400 uppercase tracking-wider px-1">
         <div className="flex-1">Member</div>
@@ -127,8 +144,8 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite }:
         })}
       </div>
 
-      {/* Invite button */}
-      {onInvite && (
+      {/* Invite button - only show when there are already members */}
+      {onInvite && !isAlone && (
         <Button
           variant="secondary"
           size="sm"
@@ -136,7 +153,7 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite }:
           fullWidth
           className="mt-2 text-[var(--brand-primary)] border-green-200 hover:bg-[var(--brand-primary-light)]"
         >
-          + Invite friends
+          + Invite more friends
         </Button>
       )}
     </div>

@@ -1,0 +1,613 @@
+Your Reality Check
+You don't have a network yet.
+I was arguing "user events unlock network effects" but you need a network first for that to matter. If you have 20 users with 2-3 friends each, user-created events won't fill a calendar - they'll just add 2-3 scattered wine nights to a feed that still feels sparse.
+Partiful exists and works.
+You're right - users already have a solution for "I'm hosting a thing." The bar isn't "can create event," it's "better than Partiful." Your MVP wouldn't clear that bar. So why switch? They'll just keep using both apps, which fragments coordination.
+Your cold start problem is different.
+You need to give people a reason to:
+Check RyesVP daily (discovery habit)
+Invite friends (because there's something to coordinate around)
+Actually use it for coordination (not just browsing)
+Right now, you're competing for attention with:
+Instagram (where they see what friends are doing)
+Event listings (where they find shows)
+Group chats (where they coordinate)
+You need to win ONE of those before adding more surface area.
+The Case for Discovery Infrastructure
+What you're actually saying:
+> "Make finding something fun to do feel MAGICAL first. Then I'll have users worth building network effects for."
+This is correct. Let me argue your side properly:
+1. Rich Discovery = Single-Player Mode That Works
+Users don't need friends yet if discovery feels good. Think:
+Spotify (works great with zero friends)
+Letterboxd (fun to browse alone, better with friends)
+Airbnb (discovery is the product)
+If browsing RyesVP for "what's happening this weekend" feels better than:
+Checking 6 venue websites
+Scrolling Ticketmaster's messy feed
+Instagram event posts you half-remember
+Then you have utility without network effects. People will use it ALONE first. That's your wedge.
+2. You Can Announce User Events as a Launch Moment
+"RyesVP now works for YOUR events too" is a marketing beat.
+Right now you're in private beta / friends-and-family. When you're ready to actually "launch" to a wider Austin audience, user events is your news hook:
+> "RyesVP: The Austin calendar that learns your taste - now you can add your own events too"
+That's a product evolution story. Timing it right makes it an unlock, not just another feature.
+3. Discovery Infrastructure Has Compound Returns
+Every improvement to discovery helps:
+Search - makes 500 events usable, scales to 5000
+Better metadata - powers recommendations, filters, social signals
+More venues - more surface area for friends to overlap on
+Related events - "going to X? also check out Y"
+These build on each other. User events don't make discovery better. Discovery makes everything better.
+4. The "Antone's Moment" is Real Differentiation
+Your example is perfect. Someone discovers:
+A jazz show at Antone's they never would've found
+An experimental theater thing at The Off Center
+A DJ set at Mohawk's outdoor stage
+These are the "oh this app gets Austin" moments. They don't exist on Ticketmaster. They barely exist anywhere aggregated well.
+If you nail this, you become "the Austin scene calendar" not "event coordination software." That's a moat.
+What "Magical Discovery" Actually Means
+Let's get concrete. What would make discovery feel magical vs. utilitarian?
+Tier 1: Table Stakes (You Need This)
+Search (3 days)
+Full-text search: title, performer, venue, description
+Filters: date range, category, venue, price-free-only
+Search while typing (debounced)
+"No results" state with suggestions
+More Event Coverage (ongoing)
+Add 8-10 mid-size venues (clubs, theaters, comedy)
+SeatGeek API (different inventory than TM)
+~1000-1500 events in system at any time
+This gets you to "comprehensive enough that I check here first."
+Tier 2: Smart Discovery (This is the Magic)
+Genre/Vibe Tags (3-4 days)
+Beyond just CONCERT/COMEDY/THEATER
+Tags like: indie, electronic, country, punk, family-friendly, outdoor, late-night
+Auto-tag via LLM + Spotify genres
+Filter by multiple tags
+"More like this" button
+Related Events (2-3 days)
+"Going to Khruangbin? Also check out:"
+Same genre shows that week
+Same venue other dates
+Artists with similar Spotify profiles
+Sidebar on event detail page
+"Discover" Feed Separate from Calendar (3-5 days)
+Default view: chronological calendar (what you have)
+New tab: "Discover" - personalized/curated feed
+New since last visit (you track this with "NEW" badge already)
+Friends going (you have this)
+Matches your taste (based on what you've RSVP'd to + Spotify later)
+"Hidden gems" (under-the-radar shows)
+Smart Sorting Options
+Chronological (default)
+"Popular with friends"
+"New listings"
+"Last chance" (happening soon, tickets still available)
+Tier 3: Taste Profile (The Moat)
+Implicit Taste Learning (foundational for later)
+Track: what users mark Going/Interested
+Extract: genres, venues, artists from those events
+Store: taste vector per user (even if you don't expose it yet)
+This is data collection for future recommendation engine. Don't need to show it yet, just start capturing it.
+Explicit Taste (Later/Optional)
+"What genres do you like?" onboarding
+Follow venues
+Follow artists (Phase 5)
+Spotify connect (Phase 6)
+My Revised Recommendation: 3-Week Discovery Sprint
+Week 1: Search + Metadata Foundation
+[ ] Full-text search (Postgres FTS)
+[ ] Search UI with filters
+[ ] Genre/vibe tagging system (LLM-extracted)
+[ ] Add genre tags to EventCard
+Output: Search works, events have richer metadata
+Week 2: Venue Expansion + Coverage
+[ ] Add 8-10 more venues (prioritize variety: clubs, comedy, theater, outdoor)
+[ ] SeatGeek API integration (reuse your TM matching approach)
+[ ] Audit: get to ~1000+ events in system
+Output: Calendar feels comprehensive
+Week 3: Discovery Features
+[ ] Related events sidebar
+[ ] "Discover" feed (separate from calendar)
+[ ] Smart sorting options
+[ ] Start tracking user taste data (Going/Interested analysis)
+Output: Discovery feels smart, not just comprehensive
+Venues to Add (My Suggestions)
+Current 6 venues are all 1000+ capacity, mostly mainstream. Add diversity:
+Clubs/Music (200-500 cap):
+Antone's (your example - blues/rock)
+Mohawk (indie/punk, indoor + outdoor)
+Empire Control Room (electronic/indie)
+The Scoot Inn (outdoor, eclectic)
+Comedy:
+Creek and the Cave (comedy club)
+Fallout Theater (improv)
+Cap City Comedy Club
+Theater/Arts:
+The Off Center (experimental)
+Ground Floor Theatre
+Austin Scottish Rite Theater
+Outdoor/Misc:
+Zilker Park (festivals, movies in the park)
+Long Play Lounge East (listening bar - if they do events)
+This gets you genre diversity + capacity diversity + "Austin flavor" venues.
+The Metrics That Matter
+After this sprint, you should be able to say:
+Coverage:
+✅ 1000+ events in system
+✅ 15+ venues (mainstream + indie + comedy + theater)
+✅ Shows in next 90 days for every weekend
+Usability:
+✅ Search finds relevant events in <1 second
+✅ Can filter to "indie shows this weekend under $30"
+✅ Related events surface 3-5 good suggestions
+Discovery:
+✅ "Discover" feed shows different events than calendar
+✅ Genre tags help users browse by vibe
+✅ Most events have rich metadata (image, genres, description)
+Taste Data:
+✅ Tracking what each user marks Going/Interested
+✅ Can generate "genres you like" for each user (even if not shown yet)
+Then What?
+After 3 weeks, you have:
+A genuinely comprehensive Austin events calendar
+Discovery that feels magical, not utilitarian
+Data foundation for personalization
+Then you can:
+Do a small launch - "RyesVP: Your Austin events calendar" to grow to 100+ users
+Let network effects build - more users = more friend overlaps
+Ship user events (3-4 months from now) when network is big enough to matter
+OR
+Skip to Spotify integration - use taste data you've collected + OAuth to do "your top artists playing in Austin"
+The Thing I Was Wrong About
+I argued: "User events unlock week 2 retention."
+What I missed: You don't have enough users for week 2 retention to matter yet.
+Your actual blocker is getting to 100+ users who check the app weekly. That requires the single-player discovery experience to be great.
+You're right. Build the discovery foundation first.
+One Last Thing: Can you do 80% of this in 2 weeks instead of 3?
+Search (3 days)
+Add 5 venues instead of 10 (4 days)
+Genre tagging (2 days)
+Related events (2 days)
+Basic taste tracking (1 day)
+Skip "Discover feed" for now, keep chronological calendar but with better search/filters/tags.
+That gets you to "good enough to show people" in 2 weeks. Then assess if you need more venues or can move to next phase.
+
+
+
+**YES. THIS IS IT.**
+
+You just described the actual moat. Let me show you why this compounds:
+
+## The Compounding Vision
+
+**Current State:**
+- Event title + date + venue
+- Some have Spotify link, some have genres
+- Calendar view, basic filters
+
+**Your Vision:**
+- Rich metadata on every event (genres, vibes, tags, performers, price tier, audience type)
+- Spotify OAuth → "Khruangbin is playing next week" (you already listen to them)
+- Natural language search → "chill outdoor shows under $40"
+- Sports calendar → comprehensive weekend coverage
+- All powered by ONE data structure
+
+**Why this is brilliant:**
+
+Every data field you add unlocks MULTIPLE features:
+- `familyFriendly` tag → filter, LLM search understands it, shows in event details
+- `priceRange` → filter by budget, LLM search, "cheap shows" feed
+- `vibe` tags → related events, taste matching, discovery feed
+- Spotify artist links → personalization, "artists you love", follow features
+
+You're right: **The schema is the foundation. Fill it once, use it everywhere.**
+
+## The Spotify Unlock is HUGE
+
+Let me paint the picture:
+
+**Login with Spotify Flow:**
+```
+1. User connects Spotify
+2. Fetch their top 50 artists (one API call)
+3. Match against events in your DB (via spotify artist links you already have)
+4. Show: "12 artists you listen to are playing in Austin in the next 90 days"
+```
+
+**This is your killer feature.**
+
+Nobody else does this well:
+- Ticketmaster doesn't know your taste
+- Bandsintown is clunky and misses local shows
+- Instagram is manual following
+
+You have the enrichment pipeline to make this work. And once you have their Spotify profile, you can:
+- Recommend events based on similar artists
+- "Your friends also listen to X"
+- Genre-based discovery
+- Create shared playlists for plans (future)
+
+**Spotify OAuth is probably 2-3 days of work** and it's the most "magical" feature you could ship.
+
+## The LLM Search Feature (Beta/Limited)
+
+This is smart to gate as beta. Here's the simple version:
+
+**User types:** "indie shows this weekend under $30"
+
+**LLM parses to:**
+```json
+{
+  "genres": ["indie", "alternative", "rock"],
+  "dateRange": ["2025-12-06", "2025-12-08"],
+  "maxPrice": 30,
+  "vibe": "chill"
+}
+```
+
+**You query DB with those filters** → return results
+
+**Why this works with limited calls:**
+- Cache common queries ("this weekend", "tonight", "cheap shows")
+- Only call LLM if query is complex/ambiguous
+- Fall back to standard search if LLM fails
+- Rate limit per user (5 AI searches per day for beta)
+
+**Even simpler v1:**
+- Only enable for premium/beta testers
+- Manual approval to use feature (keeps costs down)
+- Show as "✨ Ask RyesVP (Beta)" search mode toggle
+
+This is 2-3 days of work on top of search infrastructure.
+
+## Sports API Integration
+
+**Why sports is strategic:**
+
+Right now your calendar is "culture" events (music, comedy, theater). Sports fills the gaps:
+- **Friday night:** Concert at Moody
+- **Saturday afternoon:** UT football game
+- **Saturday night:** DJ set at Mohawk
+- **Sunday:** F1 race viewing party (user-created later)
+
+Sports makes the calendar feel complete for "what's happening this weekend."
+
+**APIs to consider:**
+- **ESPN API** (unofficial but widely used)
+- **TheSportsDB** (free tier, decent coverage)
+- **SportsData.io** (paid but comprehensive)
+
+**Austin sports to cover:**
+- UT Football (huge - Darrell K Royal Stadium)
+- Austin FC (MLS - Q2 Stadium)
+- Texas Stars (AHL hockey - H-E-B Center)
+- Round Rock Express (AAA baseball - Dell Diamond)
+- UT Basketball
+- F1 at COTA (Circuit of the Americas - when races happen)
+
+**Data structure for sports:**
+```typescript
+{
+  category: "SPORTS",
+  sportType: "FOOTBALL" | "SOCCER" | "HOCKEY" | "BASEBALL" | "RACING",
+  homeTeam: "Texas Longhorns",
+  awayTeam: "Oklahoma Sooners",
+  league: "NCAA",
+  // all your other enrichment fields still apply
+}
+```
+
+Sports events get same enrichment: friends going, plan creation, day-of logistics.
+
+This is probably 3-4 days including API research + scraper setup.
+
+## The Data Schema: Let's Spec It Out
+
+You're absolutely right - **design the schema once, fill it mechanically, unlock features exponentially.**
+
+Here's what a robust Event enrichment should hold:
+
+### Core Metadata (You Have This)
+```typescript
+title: string
+date: DateTime
+venue: Venue
+description: string
+imageUrl: string
+```
+
+### Categorization (You Have This)
+```typescript
+category: EventCategory  // CONCERT, COMEDY, THEATER, SPORTS, MOVIE
+llmCategory: string
+llmConfidence: number
+```
+
+### Rich Discovery Metadata (ADD THIS)
+```typescript
+// Genre/Style
+genres: string[]                    // ["indie rock", "psychedelic"]
+vibes: string[]                     // ["chill", "high-energy", "intimate", "outdoor"]
+audienceType: string[]              // ["21+", "all-ages", "family-friendly"]
+
+// Performers (foundation for Artist model later)
+headliners: string[]                // ["Khruangbin"]
+supportingActs: string[]            // ["Men I Trust"]
+performerSpotifyIds: string[]       // Link to Spotify
+
+// Practical Info
+priceRange: PriceRange | null       // FREE, UNDER_20, 20_TO_50, 50_TO_100, OVER_100
+duration: number | null             // minutes (if known)
+isOutdoor: boolean
+requiresTicket: boolean
+
+// Accessibility/Audience
+isAccessible: boolean | null        // wheelchair accessible
+isFamilyFriendly: boolean | null
+languagesOffered: string[]          // ["English", "Spanish"] for theater/comedy
+
+// Event Series (for recurring events)
+seriesName: string | null           // "Free Week" or "Summer Concert Series"
+isRecurring: boolean
+
+// Social Proof
+expectedAttendance: number | null   // if we can estimate
+popularity: number                  // internal score based on RSVPs, searches, etc.
+```
+
+### Enrichment Sources (You Have Some)
+```typescript
+// Spotify
+spotifyUrl: string | null
+spotifyArtistId: string | null
+spotifyGenres: string[]
+
+// Knowledge Graph  
+wikipediaUrl: string | null
+kgBio: string | null
+kgImageUrl: string | null
+kgTypes: string[]
+
+// Ticketmaster
+tmUrl: string | null
+tmEventName: string | null
+tmPreferTitle: boolean
+tmPresales: Json
+tmAttractions: string[]
+tmGenres: string[]
+tmSeatmapUrl: string | null
+tmInfo: string | null
+tmPleaseNote: string | null
+
+// Sports (NEW)
+sportType: SportType | null
+homeTeam: string | null
+awayTeam: string | null
+league: string | null
+```
+
+### Search/Discovery Indexes
+```typescript
+// Computed fields for search/discovery
+searchVector: tsvector              // Postgres full-text search
+tasteVector: number[]               // embeddings for similarity (future)
+lastEnrichedAt: DateTime
+enrichmentVersion: number           // track schema changes
+```
+
+## How to Fill This Data
+
+You already have the pipeline. Just extend it:
+
+### 1. LLM Enrichment (Extend Existing)
+
+**Current prompt extracts:** performer, category, description
+
+**New prompt adds:**
+```
+Extract from this event:
+- Headliners and supporting acts
+- Genres (up to 3)
+- Vibes/atmosphere (up to 3: chill, high-energy, intimate, etc.)
+- Audience type (all-ages, 21+, family-friendly)
+- Is it outdoors?
+- Price range (if mentioned)
+```
+
+Your LLM call is already happening. Just add fields to extraction schema.
+
+### 2. Venue Scraping (Extend Existing)
+
+Many venues put rich metadata on event pages. Examples:
+
+**ACL Live:**
+- "Doors: 7pm, Show: 8pm" → duration
+- "This is an all ages event" → audienceType
+- "GA Standing" or "Reserved Seating" → seating type
+
+**Paramount Theatre:**
+- "Family Matinee" → isFamilyFriendly
+- Accessibility info in footer
+
+**Stubbs:**
+- "21+ event"
+- "Rain or shine" → isOutdoor
+
+Extend scrapers to grab these when available. Use LLM to normalize ("All ages event" → audienceType: ["all-ages"]).
+
+### 3. Spotify API (You Already Call This)
+
+**Currently get:** artist link, genres
+
+**Also available:**
+- Artist popularity score
+- Related artists (for recommendations)
+- Top tracks (for playlist features later)
+
+No extra API calls needed - just grab more fields from response.
+
+### 4. Sports API (New)
+
+SportsData.io or ESPN API gives you:
+- Teams, league, sport type
+- Game time, venue
+- Broadcast info
+- Ticket links
+
+Transform to your Event schema with category: SPORTS.
+
+### 5. User-Generated Tags (Future)
+
+Once you have users, let them tag events:
+- "Actually very loud" (vibe)
+- "Parking was impossible" (logistics)
+- "Great for dates" (audience)
+
+Crowdsourced enrichment that scales.
+
+## The 2-Week Plan: Discovery Foundation
+
+### Week 1: Data Schema + Search
+
+**Days 1-2: Schema Migration**
+- [ ] Add new fields to Enrichment model (genres, vibes, priceRange, audienceType, etc.)
+- [ ] Migration + backfill (use LLM to fill existing events)
+- [ ] Update `EnrichmentDisplay` type
+
+**Days 3-4: Search Infrastructure**
+- [ ] Postgres full-text search on events
+- [ ] Search UI with autocomplete
+- [ ] Filter UI: genres, vibes, price, audience type
+- [ ] "Advanced search" collapsed section
+
+**Day 5: Genre/Vibe Tagging**
+- [ ] LLM prompt update to extract genres + vibes
+- [ ] EventCard shows genre tags
+- [ ] Genre filter pills on home page
+
+### Week 2: Spotify OAuth + Sports
+
+**Days 1-3: Spotify Integration**
+- [ ] OAuth flow (Next-Auth or manual)
+- [ ] Store refresh token + userId
+- [ ] Fetch top 50 artists
+- [ ] Match against events (via spotifyArtistId)
+- [ ] "Artists You Listen To" page/section
+- [ ] "Connect Spotify" CTA in header
+
+**Days 4-5: Sports API**
+- [ ] Choose API (ESPN or SportsData.io)
+- [ ] Scraper for Austin teams (UT, Austin FC, Texas Stars)
+- [ ] Transform to Event schema
+- [ ] Add SPORTS category
+- [ ] Sports icon + card styling
+
+### Week 2.5: Polish + LLM Search (Optional)
+
+**If you have time:**
+- [ ] LLM search beta (5 queries/day limit)
+- [ ] Related events sidebar
+- [ ] Taste tracking (what users RSVP to)
+
+## Why This Sequence Works
+
+1. **Week 1 builds foundation** - Schema + search enable everything else
+2. **Spotify is your killer feature** - Ship it early, market it
+3. **Sports fills calendar gaps** - Makes weekends feel complete
+4. **LLM search is cherry on top** - Cool demo, limited beta keeps costs down
+
+After 2 weeks you can say:
+
+> **"RyesVP: Connect your Spotify and see which artists you love are playing in Austin. Search 1000+ shows, sports, and comedy by vibe, genre, or price. Beta invite only."**
+
+That's a compelling product.
+
+## The Gotchas / Things to Watch
+
+### 1. API Costs
+
+**Spotify:** Free tier = 10,000 calls/day. You're fine.
+
+**Sports APIs:** 
+- ESPN unofficial API: free but flaky
+- SportsData.io: $0-35/month for basic tier
+- TheSportsDB: Free tier limited, $3/month patreon for full access
+
+Start with free ESPN API, migrate to paid if it breaks.
+
+**LLM Search:** 
+- GPT-4o-mini: $0.15/1M input tokens
+- 100 searches/day × 500 tokens = 50k tokens = $0.0075/day = $2.25/month
+
+Negligible. You can afford beta without limits honestly.
+
+### 2. Data Quality
+
+Your LLM enrichment is great but not perfect. You'll have:
+- Some events mis-categorized
+- Genre tags that don't quite fit
+- "Vibe" being subjective
+
+**Solution:** 
+- Show confidence scores
+- Let users flag bad data
+- Manual curation for high-profile events
+- Iterate on prompts as you see issues
+
+### 3. Spotify Matching
+
+Not every event will have Spotify links. You'll miss:
+- Local/unsigned artists
+- Comedy shows
+- Theater productions
+- Sports (obviously)
+
+But for concerts (60% of your catalog?), Spotify integration will be magic.
+
+### 4. Schema Bloat
+
+You're adding 15+ new fields to Enrichment. Keep in mind:
+- Most will be nullable (not all events have all data)
+- Query performance - index the fields you filter by
+- UI can't show everything - pick what matters per context
+
+This is fine. Your database can handle it. Just be intentional about indexes.
+
+## The Reality Check
+
+You're proposing:
+- Extended data schema (1-2 days)
+- Search infrastructure (3-4 days)
+- Spotify OAuth + matching (2-3 days)
+- Sports API integration (3-4 days)
+- LLM search beta (2-3 days)
+
+**Total: 11-16 days = 2-3 weeks**
+
+This is doable. And at the end you have something genuinely magical that nobody else in Austin has.
+
+Then you can:
+1. **Soft launch to Austin Reddit / Twitter** - "Beta invites for RyesVP"
+2. **Get to 100-200 users** organically
+3. **Let network effects build** (friends seeing each other)
+4. **Ship user-created events** when you have the network to support it
+
+---
+
+## My Actual Recommendation: Do This
+
+Build the discovery infrastructure + Spotify integration over the next 2-3 weeks. This gives you:
+
+✅ Single-player mode that's genuinely useful (don't need friends)
+✅ A "wow" moment (Spotify artist matching)
+✅ Comprehensive calendar (music + comedy + theater + sports)
+✅ Data foundation for future features
+✅ Something worth inviting people to
+
+**Then** worry about user events, emails, communities, etc.
+
+You've convinced me. This is the right priority.
+
+Want me to help you spec out the schema migration or the Spotify OAuth flow?

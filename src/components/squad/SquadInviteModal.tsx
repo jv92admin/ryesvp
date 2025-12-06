@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui';
+import { useToast } from '@/contexts/ToastContext';
 
 interface Friend {
   id: string;
@@ -35,6 +36,7 @@ interface SquadInviteModalProps {
 }
 
 export function SquadInviteModal({ squad, isOpen, onClose, onMemberAdded }: SquadInviteModalProps) {
+  const { showToast } = useToast();
   const [friends, setFriends] = useState<Friend[]>([]);
   const [selectedFriends, setSelectedFriends] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -107,6 +109,29 @@ export function SquadInviteModal({ squad, isOpen, onClose, onMemberAdded }: Squa
 
       await Promise.all(invitePromises);
 
+      // Show success toast
+      const friendCount = selectedFriends.size;
+      const friendNames = friends
+        .filter(f => selectedFriends.has(f.id))
+        .map(f => f.displayName)
+        .slice(0, 2)
+        .join(' and ');
+      
+      showToast({
+        message: friendCount === 1 
+          ? `${friendNames} has been added to your plan and notified.`
+          : friendCount === 2
+          ? `${friendNames} have been added to your plan and notified.`
+          : `${friendCount} friends have been added to your plan and notified.`,
+        type: 'success',
+        action: {
+          label: 'Copy link',
+          onClick: () => {
+            navigator.clipboard.writeText(`${window.location.origin}/squads/${squad.id}`);
+          }
+        }
+      });
+
       // Success - close modal and refresh
       onMemberAdded();
     } catch (err) {
@@ -121,12 +146,14 @@ export function SquadInviteModal({ squad, isOpen, onClose, onMemberAdded }: Squa
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm sm:max-w-md max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Invite friends to your plan</DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-sm sm:max-w-md max-h-[90vh] overflow-y-auto p-0">
+        <div className="px-6 py-4 border-b border-gray-100">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">Invite friends to your plan</DialogTitle>
+          </DialogHeader>
+        </div>
 
-        <div className="space-y-4">
+        <div className="px-6 py-4 space-y-4">
           {loading && (
             <div className="text-center py-6 text-gray-500">
               <div className="animate-pulse">Loading friends...</div>
@@ -196,28 +223,29 @@ export function SquadInviteModal({ squad, isOpen, onClose, onMemberAdded }: Squa
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex gap-2 pt-4 border-t border-gray-200">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={onClose}
-              disabled={inviting}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={handleInvite}
-              disabled={inviting || selectedFriends.size === 0}
-              loading={inviting}
-              className="flex-1"
-            >
-              {inviting ? 'Inviting...' : `Invite${selectedFriends.size > 0 ? ` (${selectedFriends.size})` : ''}`}
-            </Button>
-          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex gap-2">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onClose}
+            disabled={inviting}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleInvite}
+            disabled={inviting || selectedFriends.size === 0}
+            loading={inviting}
+            className="flex-1"
+          >
+            {inviting ? 'Inviting...' : `Invite${selectedFriends.size > 0 ? ` (${selectedFriends.size})` : ''}`}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -252,22 +280,38 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
   };
 
   return (
-    <label className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${
-      isSelected ? 'bg-[var(--brand-primary-light)] border border-green-200' : 'hover:bg-gray-50'
+    <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+      isSelected 
+        ? 'bg-[var(--brand-primary-light)] border-[var(--brand-primary)] ring-2 ring-[var(--brand-primary)]/20' 
+        : 'border-gray-200 hover:border-[var(--brand-primary)]/30 hover:bg-gray-50'
     }`}>
-      <input
-        type="checkbox"
-        checked={isSelected}
-        onChange={onToggle}
-        className="w-4 h-4 text-[var(--brand-primary)] border-gray-300 rounded focus:ring-green-500"
-      />
+      {/* Custom Checkbox */}
+      <div className="relative flex-shrink-0">
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={onToggle}
+          className="sr-only"
+        />
+        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+          isSelected 
+            ? 'bg-[var(--brand-primary)] border-[var(--brand-primary)]' 
+            : 'bg-white border-gray-300'
+        }`}>
+          {isSelected && (
+            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          )}
+        </div>
+      </div>
       
-      <div className="flex items-center gap-2 flex-1">
-        <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600">
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600 flex-shrink-0">
           {friend.displayName.charAt(0).toUpperCase()}
         </div>
         
-        <span className="text-sm text-gray-900 flex-1">
+        <span className="text-sm font-medium text-gray-900 flex-1 truncate">
           {friend.displayName}
         </span>
         

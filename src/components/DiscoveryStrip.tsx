@@ -12,12 +12,14 @@ interface DiscoveryChip {
 
 interface DiscoveryStripProps {
   newListingsCount?: number;
+  presalesCount?: number;
   onChipClick?: (chipId: string) => void;
   activeChip?: string | null;
 }
 
 export function DiscoveryStrip({ 
-  newListingsCount = 0, 
+  newListingsCount = 0,
+  presalesCount = 0,
   onChipClick,
   activeChip = null 
 }: DiscoveryStripProps) {
@@ -32,8 +34,9 @@ export function DiscoveryStrip({
     {
       id: 'presales',
       label: 'Presales',
-      isActive: false,
-      isComingSoon: true,
+      count: presalesCount,
+      isActive: presalesCount > 0,
+      isComingSoon: presalesCount === 0,
     },
     {
       id: 'foryou',

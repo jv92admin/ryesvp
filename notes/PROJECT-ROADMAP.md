@@ -29,8 +29,8 @@ Based on strategic review: **Infra → Core Loop → Surfaces → Flavor → Soc
 | 3A | **Start Plan Ingresses** | Multiple entry points | 1-2 days | ✅ Complete |
 | 3B | Transactional Emails | Welcome, invites, reminders | 2-3 days | 🔲 Deferred |
 | 4A | Create-Your-Own Event | User-generated events | 3-5 days | 🔲 Deferred |
-| **4B** | **Friend Profile Page** | `/users/[id]`, "Start plan with X" | 2-3 days | 🔲 **Next** |
-| 4C | Friend Avatar Popover | Hover quick actions (desktop) | 1 day | 🔲 After 4B |
+| 4B | **Friend Profile Page** | `/users/[id]`, "Start plan with X" | 2-3 days | ✅ Complete |
+| **4C** | **Friend Avatar Popover** | Hover quick actions (desktop) | 1 day | 🔲 **Next** |
 | **5** | **Artist Foundation** | Data model, event links | 3-5 days | 🔲 After Phase 4 |
 | **6** | **Spotify v1** | OAuth, top artists | 1 week | 🔲 After Phase 5 |
 | **7** | **Communities v1** | Reimagined communities | 2-3 weeks | 🔲 Last |
@@ -565,7 +565,41 @@ See `data-model-101.md` for full documentation.
 - [x] All jobs tested locally and verified working
 - [x] Docs: `docs/phase2-backend-reliability-plan.md`
 
+### Sprint: Plan Creation UX & Toast Notifications (Complete ✅)
+
+**Toast Notification System:**
+- [x] `Toast` component with light backgrounds, bold text, 8s duration
+- [x] `ToastContext` for global toast management
+- [x] Success/info/error variants with colored icon badges
+- [x] Copy button replaced with clean copy icon (2 overlapping squares)
+- [x] Mobile-friendly: full width on mobile, max-width on desktop
+- [x] Smooth slide-up animation
+
+**Plan Creation Flow Polish:**
+- [x] Toast feedback for all plan creation flows:
+  - Creating plan from header
+  - Creating plan from event card
+  - Adding friends to existing plan
+  - Joining friend's plan
+- [x] Consistent copy link action across all toasts
+
+**Modal Improvements:**
+- [x] `StartPlanModal` polish: rounded corners, green accents, better spacing
+- [x] `SquadInviteModal` & `SquadCreationModal`: proper padding structure, no cramped edges
+- [x] Custom branded checkboxes (green when selected, replaces browser default)
+- [x] Friend cards: rounded-xl, green border on selection, ring effect
+- [x] Better typography hierarchy in modals
+
+**Squad Page Navigation:**
+- [x] Back button: "Back to Event" with animated arrow
+- [x] Home link: "Home" text on right side
+- [x] Clean navigation header with balanced spacing
+
+**Empty States:**
+- [x] Members section: prominent "Add your first friend" callout when solo
+- [x] Clean CTA without misleading affordances
+
 ---
 
-**Last Updated:** December 3, 2025
+**Last Updated:** December 6, 2025
 

@@ -30,6 +30,36 @@ export function EventListWithPagination({
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [loading, setLoading] = useState(false);
   const [activeDiscoveryChip, setActiveDiscoveryChip] = useState<string | null>(null);
+  
+  // Presale data from API (same source as CalendarSidebar)
+  const [presalesCount, setPresalesCount] = useState(0);
+  const [presaleEvents, setPresaleEvents] = useState<Array<{
+    id: string;
+    title: string;
+    startDateTime: string;
+    venue: { name: string };
+    presaleType: 'active' | 'upcoming' | 'onsale';
+    presaleName?: string;
+    presaleDate?: string;
+  }>>([]);
+
+  // Fetch presale events from API (same endpoint as CalendarSidebar)
+  useEffect(() => {
+    async function fetchPresales() {
+      try {
+        const res = await fetch('/api/events/presales');
+        if (res.ok) {
+          const data = await res.json();
+          const fetchedPresales = data.events || [];
+          setPresalesCount(fetchedPresales.length);
+          setPresaleEvents(fetchedPresales);
+        }
+      } catch (error) {
+        console.error('Error fetching presales:', error);
+      }
+    }
+    fetchPresales();
+  }, []);
 
   // Count new listings
   const newListingsCount = useMemo(() => {
@@ -41,6 +71,7 @@ export function EventListWithPagination({
     if (activeDiscoveryChip === 'new') {
       return events.filter(e => isNewListing(e.createdAt));
     }
+    // Presales handled separately below
     return events;
   }, [events, activeDiscoveryChip]);
 
@@ -93,11 +124,75 @@ export function EventListWithPagination({
       {/* Discovery Strip - compact chips for quick filters */}
       <DiscoveryStrip
         newListingsCount={newListingsCount}
+        presalesCount={presalesCount}
         activeChip={activeDiscoveryChip}
         onChipClick={handleDiscoveryChipClick}
       />
 
-      {sortedDates.length === 0 ? (
+      {/* Presales View - separate render when presales filter is active */}
+      {activeDiscoveryChip === 'presales' ? (
+        presaleEvents.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No upcoming presales or on-sale events.</p>
+            <button
+              onClick={() => setActiveDiscoveryChip(null)}
+              className="mt-2 text-purple-600 hover:text-purple-700 text-sm font-medium"
+            >
+              Clear filter
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg px-3 py-1.5">
+              <span className="text-sm text-blue-700">
+                Showing {presaleEvents.length} event{presaleEvents.length !== 1 ? 's' : ''} with upcoming presales or on-sale dates
+              </span>
+              <button
+                onClick={() => setActiveDiscoveryChip(null)}
+                className="text-blue-700 hover:text-blue-900 text-sm font-medium"
+              >
+                Show all
+              </button>
+            </div>
+            
+            <div className="space-y-2">
+              {presaleEvents.map((event) => (
+                <a
+                  key={event.id}
+                  href={`/events/${event.id}`}
+                  className="block bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all p-4"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        {event.presaleType === 'active' && (
+                          <span className="px-2 py-0.5 text-xs font-medium rounded bg-blue-500 text-white">
+                            🔐 {event.presaleName || 'PRESALE'} NOW
+                          </span>
+                        )}
+                        {event.presaleType === 'upcoming' && event.presaleDate && (
+                          <span className="px-2 py-0.5 text-xs font-medium rounded bg-blue-100 text-blue-800">
+                            ⚡ {event.presaleName || 'PRESALE'} {new Date(event.presaleDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </span>
+                        )}
+                        {event.presaleType === 'onsale' && event.presaleDate && (
+                          <span className="px-2 py-0.5 text-xs font-medium rounded bg-amber-100 text-amber-800">
+                            🎫 ON SALE {new Date(event.presaleDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="font-semibold text-gray-900 line-clamp-2">{event.title}</h3>
+                      <p className="text-sm text-gray-500 mt-1">
+                        {event.venue.name} • {new Date(event.startDateTime).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                      </p>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )
+      ) : sortedDates.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-gray-500">
             {activeDiscoveryChip === 'new' 
@@ -145,22 +240,24 @@ export function EventListWithPagination({
         </div>
       )}
 
-      {/* Load More / Status */}
-      <div className="text-center mt-8">
-        {hasMore ? (
-          <button
-            onClick={loadMore}
-            disabled={loading}
-            className="px-6 py-2.5 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {loading ? 'Loading...' : 'Load More Events'}
-          </button>
-        ) : (
-          <p className="text-sm text-gray-500">
-            Showing all {events.length} events
-          </p>
-        )}
-      </div>
+      {/* Load More / Status - hide when presales filter is active */}
+      {activeDiscoveryChip !== 'presales' && (
+        <div className="text-center mt-8">
+          {hasMore ? (
+            <button
+              onClick={loadMore}
+              disabled={loading}
+              className="px-6 py-2.5 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? 'Loading...' : 'Load More Events'}
+            </button>
+          ) : (
+            <p className="text-sm text-gray-500">
+              Showing all {events.length} events
+            </p>
+          )}
+        </div>
+      )}
     </>
   );
 }

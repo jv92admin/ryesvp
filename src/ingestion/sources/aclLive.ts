@@ -48,7 +48,7 @@ export async function fetchEventsFromAclLive(): Promise<NormalizedEvent[]> {
     // Auto-scroll to load all events from infinite scroll
     let previousEventCount = 0;
     let scrollAttempts = 0;
-    const maxScrollAttempts = 20; // Prevent infinite loops
+    const maxScrollAttempts = 30; // Prevent infinite loops
     
     while (scrollAttempts < maxScrollAttempts) {
       // Count current events
@@ -70,7 +70,7 @@ export async function fetchEventsFromAclLive(): Promise<NormalizedEvent[]> {
       });
       
       // Wait for potential new content to load
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       scrollAttempts++;
     }

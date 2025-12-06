@@ -1,0 +1,125 @@
+RyesVP In-App Notification Philosophy
+
+Scope:
+This covers in-app notifications only – the bell icon and the ephemeral toasts/banners inside the site. It does not define external channels (email, push, SMS).
+
+1. Purpose
+
+In-app notifications exist to:
+
+Confirm that a social action really happened
+
+“Your plan was created.”
+
+“Maya was invited and notified.”
+
+“Someone is covering your ticket.”
+
+Provide a durable activity log
+
+If you miss a toast, the bell still tells you what changed since you last visited.
+
+They are not trying to be a real-time alert channel (no push, no guarantees of timing).
+
+2. When we notify
+
+We only generate notifications when something social and stateful happens – i.e., when another person’s experience or your commitments have changed.
+
+We notify for:
+
+Friend graph changes
+
+You receive a friend request.
+
+Your friend request is accepted.
+
+Plan membership
+
+You are added to a plan.
+
+A plan you’re in is cancelled.
+
+(Host only) Someone joins or leaves your plan.
+
+Ticket coverage
+
+Someone covers your ticket for an event.
+
+(Optionally) You start covering tickets for others.
+
+We do not notify for low-signal activity like:
+
+“X marked Interested in Y.”
+
+Passive browsing.
+
+3. Feedback style: toast + log
+
+We use a two-layer pattern:
+
+Toast (ephemeral)
+
+Shows immediately after you take an action.
+
+Non-blocking, auto-dismisses.
+
+Used to reassure the actor:
+
+“Plan created…”
+
+“We added Alex and Maya and notified them.”
+
+Often includes a contextual CTA:
+
+Copy plan link
+
+Notification bell (durable)
+
+Stores notifications for recipients of actions:
+
+“You were added to a plan…”
+
+“@X sent you a friend request.”
+
+Lets people catch up on changes whenever they next visit.
+
+Rule of thumb:
+
+If an action affects other people or materially changes a shared plan, it should:
+
+Show a toast to the actor, and
+
+Create a bell notification for the recipients.
+
+4. Consistency across flows
+
+We apply the same feedback pattern across:
+
+Plan creation
+
+Toast to creator (“Plan created…”)
+
+Notifications to auto-added friends.
+
+Inviting friends to an existing plan
+
+Toast to inviter (“We added X and Y…”)
+
+Notifications to invitees.
+
+Friend requests
+
+Toast to sender (“Friend request sent…”)
+
+Notification to recipient.
+
+Ticket coverage
+
+Toast to buyer (“You’re handling tickets for…”)
+
+Notification to covered members.
+
+This keeps the mental model simple:
+
+“When I do something social, I see a little confirmation.
+The people I involve see it under the bell.

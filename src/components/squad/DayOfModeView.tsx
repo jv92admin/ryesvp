@@ -37,6 +37,7 @@ interface Enrichment {
   tmPleaseNote?: string | null;
   tmTicketLimit?: number | null;
   tmUrl?: string | null;
+  tmSupportingActs?: string[] | null;
 }
 
 interface Squad {
@@ -221,23 +222,31 @@ export function DayOfModeView({ squad, enrichment }: DayOfModeViewProps) {
       </div>
 
       {/* Know Before You Go */}
-      {(enrichment?.tmInfo || enrichment?.tmPleaseNote || enrichment?.tmTicketLimit) ? (
+      {(enrichment?.tmInfo || enrichment?.tmPleaseNote || enrichment?.tmTicketLimit || (enrichment?.tmSupportingActs && enrichment.tmSupportingActs.length > 0)) ? (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <h3 className="font-medium text-gray-900 mb-3">📋 Know before you go</h3>
           <div className="space-y-3 text-sm">
-            {enrichment.tmInfo && (
+            {enrichment?.tmSupportingActs && enrichment.tmSupportingActs.length > 0 && (
+              <div>
+                <div className="text-gray-500 text-xs mb-1">Supporting Acts</div>
+                <p className="text-gray-700">
+                  {enrichment.tmSupportingActs.join(', ')}
+                </p>
+              </div>
+            )}
+            {enrichment?.tmInfo && (
               <div>
                 <div className="text-gray-500 text-xs mb-1">Event Info</div>
                 <p className="text-gray-700 whitespace-pre-wrap">{enrichment.tmInfo}</p>
               </div>
             )}
-            {enrichment.tmPleaseNote && (
+            {enrichment?.tmPleaseNote && (
               <div>
                 <div className="text-gray-500 text-xs mb-1">Please Note</div>
                 <p className="text-gray-700 whitespace-pre-wrap">{enrichment.tmPleaseNote}</p>
               </div>
             )}
-            {enrichment.tmTicketLimit && (
+            {enrichment?.tmTicketLimit && (
               <div className="flex items-center gap-2 text-gray-600">
                 <span>🎟️</span>
                 <span>Max {enrichment.tmTicketLimit} tickets per order</span>

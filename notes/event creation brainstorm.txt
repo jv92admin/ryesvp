@@ -1,0 +1,248 @@
+A. Implementation Spec – Plan Creation Flow + In-App Notifications
+A1. Ingress behavior & prefill rules
+
+Ingresses (unchanged conceptually):
+
+Home – header Start Plan
+
+Home – event card Start Plan
+
+Event detail page – Start Plan
+
+Friend profile page – Start Plan
+
+1) Home header – Start Plan
+
+Current: probably asks to pick an event, then dumps user into a plan.
+
+Target behavior:
+
+User clicks Start Plan in the header.
+
+Show event search/picker (modal or inline) – “What do you want to plan?”
+
+On selecting an event:
+
+Create a new plan with:
+
+event_id = selected event
+
+members = [current_user]
+
+Navigate to Plan page for that plan.
+
+Plan page expectations:
+
+Members block is visually emphasized with an empty state:
+
+“Add your first friend to this plan”
+
+Primary CTA: Add Friends
+
+No pre-plan friend-picker step.
+
+2) Home event card – Start Plan
+
+Target behavior:
+
+Clicking Start Plan on a card behaves exactly like starting from event detail:
+
+No intermediate navigation to event page required.
+
+Flow:
+
+Create plan with:
+
+event_id = event from card
+
+members = [current_user]
+
+Navigate to Plan page.
+
+Same member empty state as above.
+
+3) Event detail page – Start Plan
+
+Target behavior:
+
+Same as event card:
+
+Create plan with (event + current user).
+
+Navigate to Plan page.
+
+Members block shows “Add friends” CTA.
+
+4) Friend profile page – Start Plan
+
+This is the friend-first ingress.
+
+Target behavior:
+
+User clicks Start Plan on friend profile F.
+
+Show event search/picker:
+
+“What do you want to plan with [Friend Name]?”
+
+On selecting an event:
+
+Create plan with:
+
+event_id = selected event
+
+members = [current_user, friend]
+
+Navigate to Plan page.
+
+Plan page expectations:
+
+Members block shows:
+
+You + that friend already listed.
+
+No extra friend-picker step before the plan exists.
+
+A2. “Add Friends” flow inside Plan
+
+Once on the Plan page, all friend management happens inside the plan.
+
+UI affordance:
+
+Members section shows:
+
+If only you: “Add friends to this plan” + primary Add Friends button.
+
+If some friends already in: list of members + Add Friends secondary button.
+
+Flow:
+
+Clicking Add Friends opens friend selector (multi-select).
+
+On confirm:
+
+Back-end:
+
+Add selected friends as members to the plan.
+
+Trigger notifications (see A3).
+
+Front-end:
+
+Update members list immediately.
+
+Show a toast (see A4):
+
+“We added Maya and Jordan and notified them.”
+
+A3. In-app notification events to create
+
+Note: This is just what should be created; you already have a separate doc for notification schema.
+
+We want notifications to act as a durable activity log behind the toasts.
+
+On plan creation from any ingress:
+
+For the creator:
+
+(Optional) PLAN_CREATED notification, mainly for parity with bell log.
+
+For friends auto-added (only friend-profile ingress):
+
+ADDED_TO_PLAN notification:
+
+“Alex started a plan for Mt Joy on Dec 4 and added you.”
+
+When adding friends via Add Friends inside a plan:
+
+For each newly added user:
+
+ADDED_TO_PLAN notification:
+
+“Alex added you to their plan for Mt Joy on Dec 4.”
+
+(Optional) For the host/actor:
+
+No separate notification needed; they already see the toast.
+
+Friend requests:
+
+On send:
+
+FRIEND_REQUEST_SENT is optional in the bell; toast is the main UX.
+
+On receive:
+
+FRIEND_REQUEST_RECEIVED:
+
+“@X sent you a friend request.”
+
+On accept:
+
+FRIEND_REQUEST_ACCEPTED for the requester:
+
+“@Y accepted your friend request.”
+
+Ticket coverage:
+
+When user A covers tickets for user B (or “buy for all”):
+
+For B:
+
+TICKET_COVERED_FOR_YOU:
+
+“Alex is handling your ticket for Mt Joy on Dec 4.”
+
+For A:
+
+Optional YOU_COVER_TICKETS notification:
+
+“You’re covering tickets for Maya and Jordan for Mt Joy.”
+
+All of these end up:
+
+As toasts immediately when you perform the action (local feedback), and
+
+As bell notifications for the recipients when they next open the site.
+
+A4. Toast / banner behavior
+
+Default pattern for “social actions” (things that affect others):
+
+Show a non-blocking toast at bottom or top.
+
+Lasts ~3–5 seconds.
+
+Includes a clear summary + optional “Copy link” CTA.
+
+On plan creation (any ingress):
+
+Immediately after landing on the Plan page, show a toast:
+
+If no friends auto-added:
+
+“Plan created for Mt Joy on Dec 4. Add friends to this plan to invite them.”
+Buttons: Copy plan link (optional)
+
+If friends auto-added (friend-profile ingress):
+
+“Plan created for Mt Joy on Dec 4 with Maya. We’ve notified her.”
+Button: Copy plan link
+
+On adding friends inside a plan:
+
+“We added Maya and Jordan to this plan and notified them.”
+Button: Copy plan link (optional)
+
+On sending a friend request:
+
+“Friend request sent to Maya.”
+(No link needed.)
+
+On ticket coverage:
+
+For the person doing the covering:
+
+“You’re handling tickets for Maya and Jordan for this event.”
+
+Additionally, the UI for tickets should visually update (e.g., “Covered by you”), so the toast is just confirmation, not the only signal.

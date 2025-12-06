@@ -256,6 +256,8 @@ const categoryColors = {
 
 ```
 ┌─────────────────────────────────┐
+│ [← Back to Event]         Home  │  ← Navigation header
+├─────────────────────────────────┤
 │ ┌─────────────┬───────────────┐ │  ← Apple-style toggle
 │ │    Plan     │    Day-of     │ │     (sliding background)
 │ └─────────────┴───────────────┘ │
@@ -310,6 +312,16 @@ const categoryColors = {
 
 ### Design Decisions
 
+#### Navigation Header
+- **Layout:** Flex container with space-between
+- **Left:** "Back to Event" with left arrow icon
+  - Animated: arrow slides left on hover (`group-hover:-translate-x-0.5`)
+  - Links to event detail page
+- **Right:** "Home" text link
+  - Same styling as back button for consistency
+  - Links to home page
+- **Typography:** `text-sm font-medium`, gray-600 → gray-900 on hover
+
 #### Mode Toggle (Plan / Day-of)
 - **Style:** Apple-style segmented control with sliding white background
 - **Full-width** at top of page, rounded-full
@@ -351,6 +363,15 @@ const categoryColors = {
 - **Ticket icon:** 🎫 (has), — (needs), (X) = covered by X's initial
 - **Org badge:** Small purple "Org" pill
 - **No +N badge:** Removed — covered status shown via ticket column
+
+**Empty State (Solo Plan):**
+- Shows when only organizer is in plan
+- Prominent light green callout with dashed border
+- Heading: "Add your first friend"
+- Subtitle: "Plans are better with friends! Invite someone to join you."
+- Full-width green "Invite Friends" button
+- Replaces the subtle "+ Invite friends" button when empty
+- Once friends added: button changes to "+ Invite more friends"
 
 #### Share Buttons
 - **Two buttons side-by-side:** Share Plan | Share Day-of
@@ -748,6 +769,69 @@ bg-white border border-gray-300 text-gray-700 hover:bg-gray-50
 
 ---
 
+## Toast Notifications
+
+**File:** `src/components/ui/Toast.tsx`  
+**Context:** `src/contexts/ToastContext.tsx`  
+**Last updated:** December 2025
+
+### Usage
+
+```typescript
+import { useToast } from '@/contexts/ToastContext';
+
+const { showToast } = useToast();
+
+showToast({
+  message: 'Plan created! 2 friends invited and notified.',
+  type: 'success',  // 'success' | 'info' | 'error'
+  action: {
+    label: 'Copy link',
+    onClick: () => {
+      navigator.clipboard.writeText(url);
+    }
+  }
+});
+```
+
+### Design
+
+**Layout:**
+- Light backgrounds with subtle color tints (not dark/opaque)
+- Small text: `text-xs font-bold`
+- Duration: 8 seconds (2x longer than typical)
+- Full width on mobile, max-width on desktop
+- Bottom position: `bottom-4 left-4 right-4`
+
+**Variants:**
+- **Success:** Light green background (`--brand-primary-light`), green icon with ✓
+- **Info:** Light gray background, gray icon with ℹ
+- **Error:** Light red background, red icon with ✕
+
+**Action Button:**
+- Copy icon (2 overlapping squares) instead of text
+- Green color matching brand
+- Only shown when action is provided
+
+**Mobile Optimization:**
+- Full width prevents squished text
+- Smaller font keeps it compact
+- Bold text ensures readability on light backgrounds
+
+### When to Use
+
+**DO use toasts for:**
+- Plan created confirmation
+- Friends added to plan
+- Success actions with optional copy link
+
+**DON'T use toasts for:**
+- Errors requiring action (use inline errors)
+- Critical information (use modals)
+- Multiple simultaneous messages (queue them)
+
+---
+
 ## Data Display Rules
 
 ### displayTitle
@@ -933,8 +1017,13 @@ These pages don't exist yet. Document design decisions here as they're built.
 | Dec 2025 | Header | "Start a Plan" CTA added; Friends moved to UserMenu dropdown |
 | Dec 2025 | Event Card | EventCardActions: ✓/★ buttons → conditional Start Plan (progressive disclosure) |
 | Dec 2025 | Planned | Added Create Event, Friend Profile, Avatar Popover, Artist Page specs |
+| Dec 6, 2025 | Toast | New toast notification system — light backgrounds, 8s duration, bold text, copy icon |
+| Dec 6, 2025 | Modals | StartPlanModal, SquadInviteModal, SquadCreationModal polish — proper padding, green accents |
+| Dec 6, 2025 | Modals | Custom branded checkboxes — green when selected, replaces browser default |
+| Dec 6, 2025 | Squad Page | Navigation header with "Back to Event" and "Home" links |
+| Dec 6, 2025 | Squad Page | Empty state callout for solo plans — "Add your first friend" |
 
 ---
 
-*Last Updated: December 2025*
+*Last Updated: December 6, 2025*
 

@@ -39,7 +39,7 @@ export async function fetchEventsFromParamount(): Promise<NormalizedEvent[]> {
     }
     
     // Give it a bit more time for all events to render
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 3000));
     
     // Get the rendered HTML
     const html = await page.content();

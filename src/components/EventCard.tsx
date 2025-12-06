@@ -1,10 +1,73 @@
 'use client';
 
 import Link from 'next/link';
-import { EventDisplay } from '@/db/events';
+import { EventDisplay, EnrichmentDisplay } from '@/db/events';
 import { EventCardActions } from './EventCardActions';
 import { FriendCountBadge } from './ui/StatusBadge';
 import { formatEventDate, isNewListing } from '@/lib/utils';
+import { type TMPresale } from '@/lib/presales';
+
+// Get presale badge info for display (client-side version)
+function getPresaleBadgeForCard(enrichment: EnrichmentDisplay | undefined): {
+  label: string;
+  className: string;
+} | null {
+  if (!enrichment) return null;
+  
+  const now = new Date();
+  const presales = enrichment.tmPresales as TMPresale[] | null;
+  
+  // Check for active presale first
+  if (presales && Array.isArray(presales)) {
+    for (const presale of presales) {
+      if (!presale.startDateTime) continue;
+      
+      const start = new Date(presale.startDateTime);
+      const end = presale.endDateTime ? new Date(presale.endDateTime) : null;
+      
+      // Active presale
+      if (start <= now && (!end || end > now)) {
+        const name = presale.name?.replace(/presale$/i, '').trim() || '';
+        return {
+          label: `🔐 ${name || 'PRESALE'}`,
+          className: 'bg-blue-500 text-white',
+        };
+      }
+    }
+    
+    // Check for upcoming presale
+    const upcomingPresales = presales
+      .filter(p => p.startDateTime && new Date(p.startDateTime) > now)
+      .sort((a, b) => new Date(a.startDateTime!).getTime() - new Date(b.startDateTime!).getTime());
+    
+    if (upcomingPresales.length > 0) {
+      const next = upcomingPresales[0];
+      const dateStr = new Date(next.startDateTime!).toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric' 
+      });
+      const name = next.name?.replace(/presale$/i, '').trim() || '';
+      return {
+        label: `⚡ ${name || 'PRESALE'} ${dateStr}`,
+        className: 'bg-blue-100 text-blue-800',
+      };
+    }
+  }
+  
+  // Check for future public on-sale
+  if (enrichment.tmOnSaleStart && new Date(enrichment.tmOnSaleStart) > now) {
+    const dateStr = new Date(enrichment.tmOnSaleStart).toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric' 
+    });
+    return {
+      label: `🎫 ON SALE ${dateStr}`,
+      className: 'bg-amber-100 text-amber-800',
+    };
+  }
+  
+  return null;
+}
 
 interface EventCardProps {
   event: EventDisplay;
@@ -17,6 +80,9 @@ export function EventCard({ event }: EventCardProps) {
   
   // displayTitle is already computed at the data layer - use directly
   const { displayTitle } = event;
+  
+  // Get presale badge if applicable
+  const presaleBadge = getPresaleBadgeForCard(enrichment);
   
   const categoryColors: Record<string, string> = {
     CONCERT: 'bg-violet-100 text-violet-800',
@@ -80,6 +146,11 @@ export function EventCard({ event }: EventCardProps) {
               {isNew && (
                 <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-emerald-500 text-white rounded">
                   NEW
+                </span>
+              )}
+              {presaleBadge && (
+                <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded whitespace-nowrap ${presaleBadge.className}`}>
+                  {presaleBadge.label}
                 </span>
               )}
               <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${categoryColors[event.category]}`}>

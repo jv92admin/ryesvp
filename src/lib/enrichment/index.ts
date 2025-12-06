@@ -57,6 +57,22 @@ export async function enrichEvent(
   };
 
   try {
+    // Fetch any existing TM classification data from prior TM matching
+    const existingEnrichment = await prisma.enrichment.findUnique({
+      where: { eventId: event.id },
+      select: {
+        tmGenre: true,
+        tmSubGenre: true,
+        tmSegment: true,
+      },
+    });
+    
+    const tmClassification = existingEnrichment ? {
+      genre: existingEnrichment.tmGenre,
+      subGenre: existingEnrichment.tmSubGenre,
+      segment: existingEnrichment.tmSegment,
+    } : null;
+    
     // Mark as processing
     await prisma.enrichment.upsert({
       where: { eventId: event.id },
@@ -87,6 +103,7 @@ export async function enrichEvent(
         description: event.description,
         url: event.url,
         currentCategory: event.category,
+        tmClassification,
       }
     );
     await delay(DELAY_BETWEEN_REQUESTS_MS);

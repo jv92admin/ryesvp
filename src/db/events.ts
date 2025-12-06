@@ -21,6 +21,10 @@ export type EnrichmentDisplay = {
   wikipediaUrl: string | null;
   genres: string[];
   tmUrl: string | null;
+  // Presale data for discovery filter + badges
+  tmOnSaleStart: Date | null;
+  tmPresales: unknown; // JSON array of TMPresale objects
+  tmStatus: string | null;
 };
 
 /**
@@ -166,6 +170,9 @@ export async function getEventDisplay(id: string): Promise<EventDisplay | null> 
       wikipediaUrl: enrichment.kgWikiUrl,
       genres: enrichment.spotifyGenres?.slice(0, 2) || [],
       tmUrl: enrichment.tmUrl,
+      tmOnSaleStart: null, // Not fetched in single event query
+      tmPresales: null,
+      tmStatus: null,
     } : undefined,
   };
 }
@@ -473,6 +480,9 @@ export async function getEventsWithSocialSignals(
         wikipediaUrl: enrichmentData.wikipediaUrl,
         genres: enrichmentData.genres,
         tmUrl: enrichmentData.tmUrl,
+        tmOnSaleStart: enrichmentData.tmOnSaleStart,
+        tmPresales: enrichmentData.tmPresales,
+        tmStatus: enrichmentData.tmStatus,
       } : undefined,
     };
   });
@@ -487,6 +497,10 @@ type EnrichmentForDisplay = {
   // For displayTitle computation
   tmEventName: string | null;
   preferTMTitle: boolean;
+  // Presale data
+  tmOnSaleStart: Date | null;
+  tmPresales: unknown;
+  tmStatus: string | null;
 };
 
 // Get enrichment data needed for display (internal use)
@@ -508,6 +522,9 @@ async function getEnrichmentForDisplay(eventIds: string[]): Promise<Map<string, 
       tmEventName: true,
       tmPreferTitle: true,
       tmUrl: true,
+      tmOnSaleStart: true,
+      tmPresales: true,
+      tmStatus: true,
     },
   });
   
@@ -519,6 +536,9 @@ async function getEnrichmentForDisplay(eventIds: string[]): Promise<Map<string, 
       tmUrl: e.tmUrl,
       tmEventName: e.tmEventName,
       preferTMTitle: e.tmPreferTitle,
+      tmOnSaleStart: e.tmOnSaleStart,
+      tmPresales: e.tmPresales,
+      tmStatus: e.tmStatus,
     });
   }
   

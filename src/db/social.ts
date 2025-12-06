@@ -366,5 +366,8 @@ function mapEnrichmentForDisplay(enrichment: any): EnrichmentDisplay {
     wikipediaUrl: enrichment.kgWikiUrl,
     genres: enrichment.spotifyGenres || [],
     tmUrl: enrichment.tmUrl,
+    tmOnSaleStart: enrichment.tmOnSaleStart || null,
+    tmPresales: enrichment.tmPresales || null,
+    tmStatus: enrichment.tmStatus || null,
   };
 }

@@ -154,9 +154,16 @@ export default async function EventPage({ params }: EventPageProps) {
             )}
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
             {displayTitle}
           </h1>
+
+          {/* Supporting Acts */}
+          {fullEnrichment?.tmSupportingActs && fullEnrichment.tmSupportingActs.length > 0 && (
+            <p className="text-sm text-gray-500 mb-3">
+              With: {fullEnrichment.tmSupportingActs.join(', ')}
+            </p>
+          )}
 
           {/* Compact date + time on single line */}
           <div className="text-sm sm:text-base text-gray-600 mb-2">

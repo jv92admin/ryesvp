@@ -16,6 +16,16 @@ interface NewListingEvent {
   createdAt: string;
 }
 
+interface PresaleEvent {
+  id: string;
+  title: string;
+  startDateTime: string;
+  venue: { name: string };
+  presaleType: 'active' | 'upcoming' | 'onsale';
+  presaleName?: string;
+  presaleDate?: string; // ISO string for the presale/onsale start
+}
+
 interface CalendarSidebarProps {
   isLoggedIn: boolean;
 }
@@ -23,15 +33,25 @@ interface CalendarSidebarProps {
 export function CalendarSidebar({ isLoggedIn }: CalendarSidebarProps) {
   const [loading, setLoading] = useState(true);
   const [newListings, setNewListings] = useState<NewListingEvent[]>([]);
+  const [presaleEvents, setPresaleEvents] = useState<PresaleEvent[]>([]);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch recently added events (last 48 hours)
-        const newListingsRes = await fetch('/api/events/recent');
+        // Fetch recently added events (last 48 hours) and presale events
+        const [newListingsRes, presalesRes] = await Promise.all([
+          fetch('/api/events/recent'),
+          fetch('/api/events/presales'),
+        ]);
+        
         if (newListingsRes.ok) {
           const recentData = await newListingsRes.json();
           setNewListings(recentData.events || []);
+        }
+        
+        if (presalesRes.ok) {
+          const presalesData = await presalesRes.json();
+          setPresaleEvents(presalesData.events || []);
         }
       } catch (error) {
         console.error('Error fetching calendar sidebar data:', error);
@@ -108,11 +128,53 @@ export function CalendarSidebar({ isLoggedIn }: CalendarSidebarProps) {
       <div className="bg-white border border-gray-200 rounded-lg p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <span>⚡</span>
-          Presales
+          Presales & On-Sales
         </h3>
         
-        {/* TODO: Implement when we have reliable presale data from TM enrichment */}
-        <p className="text-sm text-gray-500">Coming soon - presale alerts</p>
+        {presaleEvents.length === 0 ? (
+          <p className="text-sm text-gray-500">No upcoming presales or on-sale dates</p>
+        ) : (
+          <div className="space-y-2">
+            {presaleEvents.slice(0, 4).map((event) => (
+              <Link
+                key={event.id}
+                href={`/events/${event.id}`}
+                className="block p-2 -mx-2 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center gap-2 mb-0.5">
+                  {event.presaleType === 'active' && (
+                    <span className="text-xs px-1.5 py-0.5 rounded font-medium bg-blue-500 text-white">
+                      🔐 {event.presaleName || 'PRESALE'} NOW
+                    </span>
+                  )}
+                  {event.presaleType === 'upcoming' && event.presaleDate && (
+                    <span className="text-xs px-1.5 py-0.5 rounded font-medium bg-blue-100 text-blue-800">
+                      ⚡ {event.presaleName || 'PRESALE'} {formatInTimeZone(new Date(event.presaleDate), AUSTIN_TIMEZONE, 'MMM d')}
+                    </span>
+                  )}
+                  {event.presaleType === 'onsale' && event.presaleDate && (
+                    <span className="text-xs px-1.5 py-0.5 rounded font-medium bg-amber-100 text-amber-800">
+                      🎫 ON SALE {formatInTimeZone(new Date(event.presaleDate), AUSTIN_TIMEZONE, 'MMM d')}
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm font-medium text-gray-900 line-clamp-1">
+                  {event.title}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {formatInTimeZone(new Date(event.startDateTime), AUSTIN_TIMEZONE, 'EEE, MMM d')}
+                  {' • '}
+                  {event.venue.name}
+                </p>
+              </Link>
+            ))}
+            {presaleEvents.length > 4 && (
+              <p className="text-xs text-gray-500 pt-1">
+                +{presaleEvents.length - 4} more with presales
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Recommendations/Discover */}

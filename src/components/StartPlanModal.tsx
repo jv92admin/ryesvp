@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatEventDate } from '@/lib/utils';
+import { useToast } from '@/contexts/ToastContext';
 
 interface Event {
   id: string;
@@ -21,6 +22,7 @@ interface StartPlanModalProps {
 
 export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPlanModalProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,6 +79,11 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ userId: preSelectedFriendId }),
             });
+            
+            showToast({
+              message: 'Your friend has been added to your existing plan and notified.',
+              type: 'success',
+            });
           }
           router.push(`/squads/${data.squad.id}`);
           onClose();
@@ -96,6 +103,27 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
 
       if (createRes.ok) {
         const data = await createRes.json();
+        const selectedEvent = events.find(e => e.id === eventId);
+        
+        // Show toast based on whether friend was pre-added
+        if (preSelectedFriendId) {
+          showToast({
+            message: `Plan created for ${selectedEvent?.displayTitle || 'event'}. Your friend has been notified.`,
+            type: 'success',
+            action: {
+              label: 'Copy link',
+              onClick: () => {
+                navigator.clipboard.writeText(`${window.location.origin}/squads/${data.squad.id}`);
+              }
+            }
+          });
+        } else {
+          showToast({
+            message: `Plan created for ${selectedEvent?.displayTitle || 'event'}. Add friends to invite them.`,
+            type: 'success',
+          });
+        }
+        
         router.push(`/squads/${data.squad.id}`);
         onClose();
       } else if (createRes.status === 409) {
@@ -110,6 +138,12 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: preSelectedFriendId }),
+              });
+              
+              showToast({
+                message: 'Your friend has been added to your existing plan and notified.',
+                type: 'success',
+                duration: 4000,
               });
             }
             router.push(`/squads/${existingData.squad.id}`);
@@ -141,35 +175,35 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
       
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] flex flex-col">
+        <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col border border-gray-100">
           {/* Header */}
-          <div className="px-6 py-4 border-b border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-100">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="text-xl font-bold text-gray-900">
                 Start a Plan
               </h2>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-600 transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
               >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </div>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-600 mt-1">
               Pick an event to plan with friends
             </p>
           </div>
 
           {/* Search */}
-          <div className="px-6 py-3 border-b border-gray-100">
+          <div className="px-6 py-3 border-b border-gray-100 bg-gray-50">
             <input
               type="text"
               placeholder="Search events..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent transition-all"
             />
           </div>
 
@@ -191,18 +225,18 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
                     onClick={() => handleCreatePlan(event.id)}
                     disabled={creating}
                     className={`
-                      w-full flex items-center gap-3 p-3 rounded-lg border text-left
+                      w-full flex items-center gap-3 p-3 rounded-xl border text-left
                       transition-all
                       ${selectedEventId === event.id 
-                        ? 'border-[var(--brand-primary)] bg-[var(--brand-primary-light)]' 
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        ? 'border-[var(--brand-primary)] bg-[var(--brand-primary-light)] ring-2 ring-[var(--brand-primary)]/20' 
+                        : 'border-gray-200 hover:border-[var(--brand-primary)]/30 hover:bg-gray-50'
                       }
                       ${creating && selectedEventId !== event.id ? 'opacity-50' : ''}
                     `}
                   >
                     {/* Event Image */}
                     {event.imageUrl ? (
-                      <div className="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                      <div className="w-14 h-14 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100 ring-1 ring-gray-200">
                         <img 
                           src={event.imageUrl} 
                           alt=""
@@ -210,8 +244,8 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
                         />
                       </div>
                     ) : (
-                      <div className="w-12 h-12 flex-shrink-0 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                        <span className="text-xl">📅</span>
+                      <div className="w-14 h-14 flex-shrink-0 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                        <span className="text-2xl">📅</span>
                       </div>
                     )}
                     
@@ -241,8 +275,8 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
           </div>
 
           {/* Footer hint */}
-          <div className="px-6 py-3 border-t border-gray-100 bg-gray-50 rounded-b-xl">
-            <p className="text-xs text-gray-500 text-center">
+          <div className="px-6 py-3 border-t border-gray-100 bg-[var(--brand-primary-light)] rounded-b-2xl">
+            <p className="text-xs text-gray-600 text-center font-medium">
               Select an event to start planning • You can invite friends after
             </p>
           </div>

@@ -10,7 +10,7 @@ import { load } from 'cheerio';
  */
 export async function fetchEventsFromMoodyCenter(): Promise<NormalizedEvent[]> {
   const events: NormalizedEvent[] = [];
-  const maxPages = 10; // Limit to prevent infinite loops
+  const maxPages = 30; // Limit to prevent infinite loops
   
   try {
     // Fetch pages until we find no more events

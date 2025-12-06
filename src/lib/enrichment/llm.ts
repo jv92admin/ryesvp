@@ -59,7 +59,12 @@ function buildUserPrompt(
   date: string,
   description?: string | null,
   url?: string | null,
-  currentCategory?: string
+  currentCategory?: string,
+  tmClassification?: {
+    genre?: string | null;
+    subGenre?: string | null;
+    segment?: string | null;
+  } | null
 ): string {
   let prompt = `Event: "${title}"
 Venue: ${venueName} (Austin, TX)
@@ -73,6 +78,15 @@ Date: ${date}`;
   }
   if (currentCategory && currentCategory !== 'OTHER') {
     prompt += `\nVenue's category guess: ${currentCategory}`;
+  }
+  
+  // Add Ticketmaster classification data if available
+  if (tmClassification && (tmClassification.segment || tmClassification.genre)) {
+    const tmParts: string[] = [];
+    if (tmClassification.segment) tmParts.push(`Segment: ${tmClassification.segment}`);
+    if (tmClassification.genre) tmParts.push(`Genre: ${tmClassification.genre}`);
+    if (tmClassification.subGenre) tmParts.push(`Sub-genre: ${tmClassification.subGenre}`);
+    prompt += `\nTicketmaster classification: ${tmParts.join(', ')}`;
   }
 
   prompt += `
@@ -99,6 +113,11 @@ export async function categorizeWithLLM(
     description?: string | null;
     url?: string | null;
     currentCategory?: string;
+    tmClassification?: {
+      genre?: string | null;
+      subGenre?: string | null;
+      segment?: string | null;
+    } | null;
   }
 ): Promise<LLMEnrichmentResult | null> {
   if (!OPENAI_API_KEY) {
@@ -116,7 +135,8 @@ export async function categorizeWithLLM(
         date,
         options?.description,
         options?.url,
-        options?.currentCategory
+        options?.currentCategory,
+        options?.tmClassification
       ),
     },
   ];
@@ -193,6 +213,11 @@ export async function categorizeEventsBatch(
     description?: string | null;
     url?: string | null;
     currentCategory?: string;
+    tmClassification?: {
+      genre?: string | null;
+      subGenre?: string | null;
+      segment?: string | null;
+    } | null;
   }>,
   delayMs: number = 200
 ): Promise<Map<string, LLMEnrichmentResult | null>> {
@@ -207,6 +232,7 @@ export async function categorizeEventsBatch(
         description: event.description,
         url: event.url,
         currentCategory: event.currentCategory,
+        tmClassification: event.tmClassification,
       }
     );
     results.set(event.id, result);
