@@ -171,7 +171,7 @@ export function EventFilters({ venues }: EventFiltersProps) {
             </svg>
           </button>
           {categoryOpen && (
-            <div className="absolute z-20 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-1 max-h-48 overflow-y-auto">
+            <div className="absolute z-30 mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-1 max-h-48 overflow-y-auto">
               {CATEGORIES.map((cat) => (
                 <label key={cat.value} className="flex items-center px-3 py-1.5 hover:bg-gray-50 cursor-pointer">
                   <input
@@ -204,7 +204,7 @@ export function EventFilters({ venues }: EventFiltersProps) {
             </svg>
           </button>
           {venueOpen && (
-            <div className="absolute z-20 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 max-h-48 overflow-y-auto">
+            <div className="absolute z-30 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-1 max-h-48 overflow-y-auto">
               {venues.map((venue) => (
                 <label key={venue.id} className="flex items-center px-3 py-1.5 hover:bg-gray-50 cursor-pointer">
                   <input

@@ -19,6 +19,42 @@ interface PresaleEventResult {
   presaleDate?: string;
 }
 
+/**
+ * Filter to only include "real" presales - time-limited early access.
+ * Excludes resale, already-public sales, and VIP packages.
+ */
+function isRelevantPresale(presaleName: string | undefined): boolean {
+  if (!presaleName) return false;
+  
+  const name = presaleName.toLowerCase();
+  
+  // Exclude these exact categories (not useful for presale alerts)
+  // Note: Check these BEFORE presale patterns since "presale" contains "resale"
+  if (name === 'resale') return false;                    // Resale market only
+  if (name.includes('vip package')) return false;         // VIP upsells
+  if (name.includes('platinum')) return false;            // Dynamic pricing
+  if (name.includes('public onsale')) return false;       // Already public
+  if (name === 'onsale' || name.endsWith(' onsale')) return false; // Generic onsale
+  
+  // Include these patterns (real presales worth alerting about)
+  const includePatterns = [
+    'presale',
+    'pre-sale',
+    'fan club',
+    'early access',
+    'preferred tickets', // Card member access (Amex, Citi, etc.)
+    'preferred seating',
+    'select seats',      // Verizon, etc. card perks
+  ];
+  
+  for (const pattern of includePatterns) {
+    if (name.includes(pattern)) return true;
+  }
+  
+  // Default: exclude if doesn't match presale patterns
+  return false;
+}
+
 export async function GET() {
   try {
     const now = new Date();
@@ -61,9 +97,12 @@ export async function GET() {
 
       const presales = enrichment.tmPresales as TMPresale[] | null;
 
-      // Check for active presales
+      // Check for active presales (only relevant ones)
       if (presales && Array.isArray(presales)) {
-        for (const presale of presales) {
+        // Filter to only relevant presales first
+        const relevantPresales = presales.filter(p => isRelevantPresale(p.name));
+        
+        for (const presale of relevantPresales) {
           if (!presale.startDateTime) continue;
 
           const start = new Date(presale.startDateTime);
@@ -87,7 +126,7 @@ export async function GET() {
         // If not added as active, check for upcoming presales
         const alreadyAdded = presaleEvents.some(pe => pe.id === event.id);
         if (!alreadyAdded) {
-          const upcomingPresales = presales
+          const upcomingPresales = relevantPresales
             .filter(p => p.startDateTime && new Date(p.startDateTime) > now)
             .sort((a, b) => new Date(a.startDateTime!).getTime() - new Date(b.startDateTime!).getTime());
 

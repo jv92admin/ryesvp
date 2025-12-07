@@ -6,38 +6,241 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 **Spec Documents:**
 - `data-model-101.md` - **Canonical event types & access patterns (READ FIRST)**
-- `squads-social-spec.md` - **Squads, Social Tab, Ticket Exchange (ACTIVE)**
+- `event-discovery-spec.md` - **Event Discovery & Performer Model (ACTIVE)**
+- `squads-social-spec.md` - Squads, Social Tab, Ticket Exchange
 - `ui-polish-spec.md` - Visual improvements, event cards, layout
 - `social-layer-spec.md` - Friends, lists, communities (legacy)
 - `social-layer-phase5-spec.md` - Invite codes
-- `data-enrichment-spec.md` - Knowledge Graph, Spotify integration
+- `data-enrichment-spec.md` - Knowledge Graph, Spotify integration (legacy - see event-discovery-spec)
 - `scheduled-jobs-spec.md` - Cron for scraping + enrichment
 
 ---
 
 ## Current Priority Order
 
-Based on strategic review: **Infra → Core Loop → Surfaces → Flavor → Social Graph**
+**Strategy:** Event Discovery Foundation → UX Quick Wins → User Testing → Data Enrichment
 
-| # | Phase | Description | Est. Time | Status |
-|---|-------|-------------|-----------|--------|
-| 0 | **Ticket Statuses** | Expand UserEventStatus | 1-2 days | ✅ Complete |
-| 1 | **Social Tab + Squads** | Plans, social signals | 2-3 weeks | ✅ Complete |
-| 1.5 | **Security - RLS** | Row Level Security | 1-2 days | ✅ Complete |
-| 1.6 | **In-App Notifications** | Bell, triggers | 1 day | ✅ Complete |
-| 2 | **Backend Reliability** | Async jobs, cron | 2-3 days | ✅ Complete |
-| 3A | **Start Plan Ingresses** | Multiple entry points | 1-2 days | ✅ Complete |
-| 3B | Transactional Emails | Welcome, invites, reminders | 2-3 days | 🔲 Deferred |
-| 4A | Create-Your-Own Event | User-generated events | 3-5 days | 🔲 Deferred |
-| 4B | **Friend Profile Page** | `/users/[id]`, "Start plan with X" | 2-3 days | ✅ Complete |
-| **4C** | **Friend Avatar Popover** | Hover quick actions (desktop) | 1 day | 🔲 **Next** |
-| **5** | **Artist Foundation** | Data model, event links | 3-5 days | 🔲 After Phase 4 |
-| **6** | **Spotify v1** | OAuth, top artists | 1 week | 🔲 After Phase 5 |
-| **7** | **Communities v1** | Reimagined communities | 2-3 weeks | 🔲 Last |
+| Block | Phase | Description | Est. Time | Status |
+|-------|-------|-------------|-----------|--------|
+| **A** | **Event Discovery 0** | Scraper cleanup & stabilization | 1-2 days | ✅ Complete |
+| **A** | **Event Discovery 1.1** | Priority venue identification | 0.5 day | ✅ Complete |
+| **A** | **Event Discovery 1.2** | Add priority venue scrapers | 2-3 days | 🔄 In Progress (3/12) |
+| **A** | **Event Discovery 1.3** | Comprehensive source audit | 1-2 days | 🔲 |
+| **A** | **Event Discovery 1.4** | Performer entity design | 0.5 day | 🔲 |
+| **A** | **Event Discovery 1.5** | Basic search implementation | 1-2 days | 🔲 |
+| **A** | **Event Discovery 1.6** | Performer entity implementation | 2-3 days | 🔲 |
+| **B** | **UX: Avatar Popover** | Hover quick actions (desktop) | 1 day | 🔲 |
+| **B** | **UX: Transactional Emails** | Welcome, invites, reminders | 2-3 days | 🔲 |
+| **B** | **UX: Bug Fixes** | Issues identified during build | 1-2 days | 🔲 |
+| **C** | **User Testing** | Invite 20-30 users, collect feedback | 1-2 weeks | 🔲 |
+| **D** | **Event Discovery 2.x** | Data enrichment (venue, event, performer) | 1-2 weeks | 🔲 |
+| **D** | **Event Discovery 3.x** | Personalization + Spotify OAuth | 1 week | 🔲 |
+| — | Create-Your-Own Event | User-generated events | 3-5 days | 🔲 Deferred |
+| — | Communities v1 | Reimagined communities | 2-3 weeks | 🔲 Deferred |
+
+**Note:** Event Discovery spec's **Performer** model replaces the original "Artist Foundation" (Phase 5). Event Discovery Phase 3 (Spotify) covers what was originally "Phase 6".
 
 ---
 
-## Next Up: Phase 2-7 Details
+## Completed Phases (Legacy Numbering)
+
+| # | Phase | Description | Status |
+|---|-------|-------------|--------|
+| 0 | Ticket Statuses | Expand UserEventStatus | ✅ Complete |
+| 1 | Social Tab + Squads | Plans, social signals | ✅ Complete |
+| 1.5 | Security - RLS | Row Level Security | ✅ Complete |
+| 1.6 | In-App Notifications | Bell, triggers | ✅ Complete |
+| 2 | Backend Reliability | Async jobs, cron | ✅ Complete |
+| 3A | Start Plan Ingresses | Multiple entry points | ✅ Complete |
+| 4B | Friend Profile Page | `/users/[id]`, "Start plan with X" | ✅ Complete |
+
+---
+
+## Block A: Event Discovery Foundation
+
+**See:** `notes/event-discovery-spec.md` for full details.
+
+**Goal:** Build robust event coverage and search before inviting more users.
+
+### Phase 0: Scraper Cleanup & Stabilization ✅ COMPLETE
+
+**Goal:** Fix and optimize existing 6 scrapers BEFORE expanding.
+
+**Scrapers audited:**
+- [x] Moody Center - ✅ Healthy (69 events)
+- [x] ACL Live - ✅ Fixed infinite scroll + Load More (73 events to Dec 2026)
+- [x] Paramount Theatre - ✅ Healthy (102 events)
+- [x] Bass Concert Hall / Texas Performing Arts - ✅ Healthy (37 events)
+- [x] Emo's - ✅ Fixed image extraction bug (36 events)
+- [x] Long Center - ✅ Healthy (59 events)
+
+**Output:** All scrapers working reliably, ~460 events across 11 venues.
+
+### Phase 1.1: Priority Venue Identification
+
+**Goal:** Identify gaps in venue coverage for Austin.
+
+**Create:** `docs/priority-venues.md`
+
+**Priority categories:**
+- Major music venues (not yet covered)
+- Sports stadiums (UT, Austin FC, minor league)
+- Comedy clubs
+- Theaters
+- Bars with regular events
+
+### Phase 1.2: Add Priority Venue Scrapers
+
+**Goal:** Expand coverage to priority venues.
+
+- Implement scrapers using patterns from Phase 0
+- Ensure events link to Venue entity
+- Test reliability before moving on
+
+### Phase 1.3: Comprehensive Source Audit
+
+**Goal:** Document what metadata is available across ALL sources.
+
+**Create:**
+- `docs/source-structure-log.md` — All fields per source
+- `docs/venue-metadata-audit.md` — Venue enrichment possibilities
+
+### Phase 1.4: Performer Entity Design
+
+**Goal:** Design Performer model based on audit findings.
+
+**Key decisions already made:**
+- Single `Performer` entity (not separate Artist/Team/etc.)
+- `type` discriminator: ARTIST, TEAM, COMEDIAN, COMPANY, OTHER
+- Event ↔ Performer: Many-to-many relationship
+
+**Output:** `docs/performer-model-design.md`
+
+### Phase 1.5: Basic Search Implementation
+
+**Goal:** Enable users to search events by text.
+
+- Search event title/displayTitle
+- Search venue name
+- Search performer name (after 1.6)
+- Use existing filters (date, category, venue)
+
+**Output:** `docs/discovery-v1.md`
+
+### Phase 1.6: Performer Entity Implementation
+
+**Goal:** Create Performer model in database.
+
+- [ ] Create Performer model in Prisma
+- [ ] Create Event ↔ Performer many-to-many relation
+- [ ] Backfill existing events with Performer links
+- [ ] Add Performer to search
+
+---
+
+## Block B: UX Quick Wins
+
+**Goal:** Polish UX before inviting real users.
+
+### Friend Avatar Popover (was Phase 4C)
+
+**Goal:** Quick actions on hover (desktop) without leaving current context.
+
+- [ ] Hover on any friend avatar → popover
+- [ ] Quick actions: "Start plan with X", "View profile"
+- [ ] Desktop only (touch devices go straight to profile)
+
+### Transactional Emails (was Phase 3B)
+
+**Goal:** Basic transactional emails for key moments.
+
+**Emails to Build:**
+- [ ] Welcome email (on signup)
+  - "This is a small community project"
+  - How to start a plan, how to invite friends
+  - Privacy reassurance
+- [ ] "You were added to a plan" email
+- [ ] "Your event is tomorrow" reminder email
+
+**Email Philosophy:**
+- Low risk, high clarity
+- Reply-to-act where possible (parse "I'm in, need 1 ticket")
+- No journeys/drip campaigns yet — just transactional
+
+### UX Bug Fixes
+
+- [ ] Issues identified during Event Discovery build
+- [ ] Friend-add flow polish
+- [ ] Any other friction points
+
+---
+
+## Block C: User Testing Pause
+
+**Goal:** Validate foundation before investing in enrichment.
+
+**Activities:**
+- [ ] Invite 20-30 real users
+- [ ] Collect feedback on event discovery, search, plan creation
+- [ ] Fix top issues
+- [ ] Huddle on technical roadmap for enrichment (Block D)
+
+**Exit criteria:** TBD by PM based on user feedback.
+
+---
+
+## Block D: Data Enrichment & Personalization
+
+**See:** `notes/event-discovery-spec.md` Phases 2-3 for full details.
+
+### Event Discovery Phase 2: Data Enrichment
+
+**Goal:** Enrich events, venues, and performers based on user feedback.
+
+- 2.1 Enrichment use case selection (with PM)
+- 2.2 Enrichment schema design
+- 2.3 Venue enrichment
+- 2.4 Event enrichment
+- 2.5 Performer enrichment
+- 2.6 Discovery upgrade (new filters based on enrichment)
+
+### Event Discovery Phase 3: Personalization + Spotify
+
+**Goal:** Personalized recommendations based on music taste.
+
+- 3.1 Spotify OAuth flow
+- 3.2 Fetch user's top artists, match to Performers
+- 3.3 "For You" surface based on preferences
+
+**Note:** This covers what was originally "Phase 6: Spotify v1" in the old roadmap.
+
+---
+
+## Deferred Work
+
+### Create-Your-Own Event (was Phase 4A)
+
+**Deferred because:** Core loop works well with scraped events. User events add complexity (moderation, spam, visibility). Will revisit after Event Discovery proves useful.
+
+**When ready:**
+- `/events/new` page
+- Fields: Title, Date/time, Location (text + optional map), URL (optional), Description
+- Creates event with `source: 'USER_CREATED'`
+- Event page IS the plan (like Partiful)
+- Invite friends flow
+
+### Communities v1 (was Phase 7)
+
+**Deferred because:** Communities need people to show up — ship last.
+
+**When ready:**
+- Plan → Community relation
+- Start plan from community
+- Simple community feed
+
+---
+
+## Historical: Completed Infrastructure
 
 ### Phase 2: Backend Reliability ✅ COMPLETE
 
@@ -89,137 +292,6 @@ Based on strategic review: **Infra → Core Loop → Surfaces → Flavor → Soc
 **Deferred:**
 - Friend profile "Start plan with X" (Phase 4B)
 - Friend avatar popover (Phase 4C)
-
----
-
-### Phase 3B: Transactional Emails 🔲 NEXT
-
-**Goal:** Basic transactional emails for key moments.
-
-**Emails to Build:**
-- [ ] Welcome email (on signup)
-  - "This is a small community project"
-  - How to start a plan, how to invite friends
-  - Privacy reassurance
-- [ ] "You were added to a plan" email
-- [ ] "Your event is tomorrow" reminder email
-
-**Email Philosophy:**
-- Low risk, high clarity
-- Reply-to-act where possible (parse "I'm in, need 1 ticket")
-- No journeys/drip campaigns yet — just transactional
-
----
-
-### Phase 4B: Friend Profile Page 🔲 NEXT
-
-**Goal:** Let users discover what friends are up to and start plans with them.
-
-**Route:** `/users/[id]` (or `/profile/[username]` if we add usernames later)
-
-**Page Layout:**
-- [ ] Header: Avatar (large), Display Name, short blurb (future: editable bio)
-- [ ] Friendship status: "Add Friend" button OR "Friends since [date]"
-- [ ] **Their Plans section:** Upcoming plans they're in (events they're Going to)
-- [ ] **Their Interests section:** Events they're Interested in
-- [ ] **"Start plan with X" CTA:** Opens StartPlanModal with this friend pre-added
-
-**Data Requirements:**
-- [ ] API: `GET /api/users/[id]` — profile data + friendship status
-- [ ] API: `GET /api/users/[id]/events` — their Going + Interested events (respect privacy: only show if friends)
-- [ ] Privacy: Non-friends see limited profile (name, avatar). Friends see events.
-
-**Components:**
-- [ ] `UserProfilePage` — Main page component
-- [ ] `UserProfileHeader` — Avatar, name, friend status
-- [ ] `UserEventList` — Their plans/interests (reuse EventCard styles)
-
-**Entry Points:**
-- [ ] Click friend avatar/name anywhere in app → goes to profile
-- [ ] `/friends` page friend list → links to profiles
-- [ ] Notification click ("X joined your plan") → links to profile
-
----
-
-### Phase 4A: Create-Your-Own Event 🔲 DEFERRED
-
-**Goal:** Let users create custom events (house parties, dinners, etc.)
-
-**Deferred because:** Core loop works well with scraped events. User events add complexity (moderation, spam, visibility). Will revisit after profile pages prove useful.
-
-**When ready:**
-- `/events/new` page
-- Fields: Title, Date/time, Location (text + optional map), URL (optional), Description
-- Creates event with `source: 'USER'`
-- Event page IS the plan (like Partiful)
-- Invite friends flow
-
----
-
-### Phase 4C: Friend Avatar Popover 🔲 AFTER 4B
-
-**Goal:** Quick actions on hover (desktop) without leaving current context.
-
-- [ ] Hover on any friend avatar → popover
-- [ ] Quick actions: "Start plan with X", "View profile"
-- [ ] Desktop only (touch devices go straight to profile)
-
----
-
-### Phase 5: Artist Foundation 🔲
-
-**Goal:** Make artists first-class entities (groundwork for Spotify + follows).
-
-**Data Model:**
-- [ ] `Artist` table: id, name, spotifyId, image, bio, genres
-- [ ] `EventPerformer` table: eventId, artistId, role (headliner/opener)
-- [ ] Migration + seed data
-
-**Populate Artists:**
-- [ ] Extract from existing enrichment data
-- [ ] Script to backfill from events
-- [ ] Link events to artists via `EventPerformer`
-
-**Optional: Artist Stub Page:**
-- [ ] `/artists/[id]` page
-- [ ] Name, image, upcoming Austin shows
-- [ ] "Follow" button (stores UserArtistFollow)
-- [ ] Links to Spotify
-
----
-
-### Phase 6: Spotify v1 🔲
-
-**Goal:** Personalized discovery via music taste.
-
-**OAuth + Storage:**
-- [ ] Spotify OAuth flow
-- [ ] Store refresh tokens securely
-- [ ] Fetch user's top artists
-
-**Simple Discovery Surfaces:**
-- [ ] "Your top artists playing in the next 30 days"
-- [ ] "Top artists in Austin among your friends" (if enough data)
-
-**Keep v1 small and opinionated.**
-
----
-
-### Phase 7: Communities v1 🔲
-
-**Goal:** Communities need people to show up — ship last.
-
-**Data Model (sketch now):**
-- [ ] `Community` table (exists)
-- [ ] `CommunityMember` table (exists)
-- [ ] Optional: Plan → Community relation (so a plan can belong to a community)
-
-**UI:**
-- [ ] Create/join community
-- [ ] Start plan from community
-- [ ] Simple community feed (events & plans in that community)
-
-**Prerequisites:** Core planning loop + reasonable event coverage + some friend graph.
 
 ---
 
@@ -393,11 +465,12 @@ See `data-model-101.md` for full documentation.
 | Plan Notes (Bulletin Board) | Freeform notes ("BYOB", "Meet at east entrance"). Price Guide covers structured case for now. |
 | Activity Feed | Real-time friend/community activity in sidebar. Requires activity logging. |
 | "New to You" Tracking | Requires `lastVisitAt` on User. |
-| Search Functionality | Not scoped yet. |
 | Dark Mode Polish | Exists but not styled. |
 | Soft Reputation | Show-up signals, ticket trust. After communities. |
 | Email Journeys | Multi-step flows, re-engagement. After transactional emails prove out. |
 | Job Run Database Logging | Store job results in `JobRun` table for admin dashboard. |
+| Smart Search (NL) | "Jazz concerts this weekend" → structured search. See event-discovery-spec Phase 4. |
+| Performer/Venue Pages | Rich entity pages. See event-discovery-spec Phase 4.3. |
 
 ---
 
@@ -644,7 +717,37 @@ See `data-model-101.md` for full documentation.
 - Never modify Prisma's internal `_prisma_migrations` table in migrations
 - Supabase-specific SQL (auth.uid(), etc.) needs stub migrations for shadow DB compatibility
 
+### Sprint: Event Discovery Phase 0-1 + Bug Fixes (Complete ✅)
+
+**New Venue Scrapers (3/12 priority venues):**
+- [x] Emo's Austin - Puppeteer + JSON-LD extraction (36 events)
+- [x] Mohawk - Puppeteer + "show me more" button (37 events)
+- [x] Concourse Project - Puppeteer + AJAX Load More (25 events)
+
+**Scraper Fixes:**
+- [x] ACL Live - Fixed infinite scroll + Load More hybrid (was truncating at 2 months)
+- [x] Emo's - Fixed image extraction (`item.image?.[0]` was returning just "h")
+
+**Discovery UX Fixes:**
+- [x] "New" filter - Now fetches total from API (was counting only loaded events)
+- [x] "New" filter - Dedicated view with all new events from API
+- [x] Presales filter - Fixed "presale contains resale" substring bug
+- [x] Presales filter - Proper include/exclude logic for sale types
+- [x] "Show all presales" link in desktop sidebar
+- [x] URL param support (`?discovery=presales`, `?discovery=new`)
+- [x] Removed verbose callout banners from filter views
+- [x] Hide "Load more" when discovery filters active
+
+**Scripts Added:**
+- [x] `scripts/backdate-new-venues.ts` - Backdate createdAt for bulk imports
+- [x] `scripts/debug/check-presales.ts` - Inspect presale data with filter status
+- [x] `scripts/debug/test-presales-api.ts` - Test presale API logic directly
+
+**Documentation:**
+- [x] `docs/priority-venues.md` - Created and maintained
+
 ---
 
-**Last Updated:** December 6, 2025
+**Last Updated:** December 7, 2025
+**Active Spec:** `notes/event-discovery-spec.md` (Blocks A, D)
 

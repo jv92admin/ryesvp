@@ -45,35 +45,75 @@ export async function fetchEventsFromAclLive(): Promise<NormalizedEvent[]> {
       return events;
     }
     
-    // Auto-scroll to load all events from infinite scroll
+    // ACL Live uses infinite scroll with loading spinner + hidden "Load More" button
+    // Strategy: scroll → wait for spinner → if stuck, click hidden button → repeat
     let previousEventCount = 0;
     let scrollAttempts = 0;
-    const maxScrollAttempts = 30; // Prevent infinite loops
+    let consecutiveNoChange = 0;
+    const maxScrollAttempts = 50;
+    const maxConsecutiveNoChange = 3;
     
     while (scrollAttempts < maxScrollAttempts) {
-      // Count current events
+      // Scroll to bottom
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      
+      // Wait for loading spinner (3 seconds)
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // Count events
       const currentEventCount = await page.$$eval('.eventItem', items => items.length);
       
-      console.log(`ACL Live: Scroll attempt ${scrollAttempts + 1}, found ${currentEventCount} events`);
-      
-      // If no new events loaded after scrolling, we're done
-      if (currentEventCount === previousEventCount && scrollAttempts > 0) {
-        console.log('ACL Live: No new events loaded, stopping scroll');
-        break;
-      }
-      
-      previousEventCount = currentEventCount;
-      
-      // Scroll to bottom of page
-      await page.evaluate(() => {
-        window.scrollTo(0, document.body.scrollHeight);
+      // Get last event date for progress tracking
+      const lastEventDate = await page.$$eval('.eventItem', items => {
+        if (items.length === 0) return 'none';
+        const last = items[items.length - 1];
+        const month = last.querySelector('.m-date__month')?.textContent?.trim() || '';
+        const day = last.querySelector('.m-date__day')?.textContent?.trim() || '';
+        const year = last.querySelector('.m-date__year')?.textContent?.trim() || '';
+        return `${month} ${day} ${year}`;
       });
       
-      // Wait for potential new content to load
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
       scrollAttempts++;
+      console.log(`ACL Live: Scroll ${scrollAttempts} | Events: ${currentEventCount} | Last: ${lastEventDate}`);
+      
+      // Check progress
+      if (currentEventCount > previousEventCount) {
+        consecutiveNoChange = 0;
+        previousEventCount = currentEventCount;
+      } else {
+        consecutiveNoChange++;
+        
+        // When scroll stops working, try clicking hidden "Load More" button
+        const loadMoreBtn = await page.$('#loadMoreEvents');
+        if (loadMoreBtn) {
+          console.log(`ACL Live: Scroll stuck, clicking hidden Load More button...`);
+          try {
+            await page.evaluate(() => {
+              const btn = document.querySelector('#loadMoreEvents') as HTMLElement;
+              if (btn) btn.click();
+            });
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            const newCount = await page.$$eval('.eventItem', items => items.length);
+            if (newCount > currentEventCount) {
+              console.log(`ACL Live: Button worked! ${currentEventCount} → ${newCount}`);
+              consecutiveNoChange = 0;
+              previousEventCount = newCount;
+              continue;
+            }
+          } catch (e) {
+            // Button click failed, continue
+          }
+        }
+        
+        if (consecutiveNoChange >= maxConsecutiveNoChange) {
+          console.log('ACL Live: Reached end of events');
+          break;
+        }
+      }
     }
+    
+    console.log(`ACL Live: Done after ${scrollAttempts} scrolls, ${previousEventCount} total events`);
     
     // Get final rendered HTML
     const html = await page.content();
@@ -97,13 +137,24 @@ export async function fetchEventsFromAclLive(): Promise<NormalizedEvent[]> {
           continue;
         }
 
-        // Get date parts
-        const month = $item.find('.m-date__month').first().text().trim();
-        const day = $item.find('.m-date__day').first().text().trim();
-        const year = $item.find('.m-date__year').first().text().trim().replace(',', '');
+        // Get date parts - try structured spans first, fall back to raw text
+        let month = $item.find('.m-date__month').first().text().trim();
+        let day = $item.find('.m-date__day').first().text().trim();
+        let year = $item.find('.m-date__year').first().text().trim().replace(',', '');
 
-        // Parse the date
-        const startDateTime = parseAclLiveDate(month, day, year, eventUrl);
+        let startDateTime: Date | null = null;
+        
+        // If structured date elements exist, use them
+        if (month && day) {
+          startDateTime = parseAclLiveDate(month, day, year, eventUrl);
+        }
+        
+        // Fall back to parsing raw date text for edge cases like:
+        // "DECEMBER 12 & 14, 2025" or "THURSDAY APRIL 2, 2026"
+        if (!startDateTime || isNaN(startDateTime.getTime())) {
+          const rawDateText = $item.find('.date a').first().text().trim();
+          startDateTime = parseRawDateText(rawDateText, eventUrl);
+        }
         
         if (!startDateTime || isNaN(startDateTime.getTime())) {
           console.log(`ACL Live: Could not parse date for "${title}": ${month} ${day} ${year}`);
@@ -223,6 +274,70 @@ function parseAclLiveDate(month: string, day: string, year: string, url: string)
 
   } catch (error) {
     console.error('ACL Live: Error parsing date:', error);
+    return null;
+  }
+}
+
+/**
+ * Parse raw date text for edge cases like:
+ * - "DECEMBER 12 & 14, 2025" (multi-day event, use first date)
+ * - "THURSDAY APRIL 2, 2026" (day name prefix)
+ */
+function parseRawDateText(rawText: string, url: string): Date | null {
+  if (!rawText) return null;
+  
+  const monthMap: Record<string, number> = {
+    'january': 0, 'february': 1, 'march': 2, 'april': 3, 'may': 4, 'june': 5,
+    'july': 6, 'august': 7, 'september': 8, 'october': 9, 'november': 10, 'december': 11,
+    'jan': 0, 'feb': 1, 'mar': 2, 'apr': 3, 'jun': 5,
+    'jul': 6, 'aug': 7, 'sep': 8, 'oct': 9, 'nov': 10, 'dec': 11,
+  };
+
+  try {
+    // Normalize: uppercase to title case, remove extra whitespace
+    const text = rawText.toUpperCase().replace(/\s+/g, ' ').trim();
+    
+    // Pattern: "MONTH DAY, YEAR" or "MONTH DAY & DAY, YEAR" or "DAYNAME MONTH DAY, YEAR"
+    // Examples: "DECEMBER 12 & 14, 2025", "THURSDAY APRIL 2, 2026"
+    
+    // Extract year (4 digits at end)
+    const yearMatch = text.match(/(\d{4})\s*$/);
+    const year = yearMatch ? parseInt(yearMatch[1], 10) : new Date().getFullYear();
+    
+    // Find month name
+    let month: number | null = null;
+    for (const [name, num] of Object.entries(monthMap)) {
+      if (text.includes(name.toUpperCase())) {
+        month = num;
+        break;
+      }
+    }
+    
+    if (month === null) return null;
+    
+    // Extract first day number after month name
+    const dayMatch = text.match(/[A-Z]+\s+(\d{1,2})/);
+    const day = dayMatch ? parseInt(dayMatch[1], 10) : null;
+    
+    if (!day) return null;
+    
+    // Try to extract time from URL
+    const timeMatch = url.match(/at-(\d+)(?:-(\d+))?-(am|pm)/i);
+    let hour = 20; // Default to 8 PM
+    let minute = 0;
+    
+    if (timeMatch) {
+      hour = parseInt(timeMatch[1], 10);
+      minute = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
+      const isPM = timeMatch[3].toLowerCase() === 'pm';
+      if (isPM && hour !== 12) hour += 12;
+      else if (!isPM && hour === 12) hour = 0;
+    }
+    
+    return new Date(year, month, day, hour, minute);
+    
+  } catch (error) {
+    console.error('ACL Live: Error parsing raw date text:', rawText, error);
     return null;
   }
 }

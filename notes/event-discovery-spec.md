@@ -1,0 +1,456 @@
+# Event Discovery & Data Enrichment Spec
+
+> **Purpose:** Build a robust event discovery system with rich metadata, smart search, and personalized recommendations.
+
+> **Philosophy:** Audit first, document findings, THEN make schema decisions. Don't pre-engineer based on assumptions.
+
+> **Cross-reference:** This spec drives Blocks A and D in `PROJECT-ROADMAP.md`. The Performer model here replaces the original "Artist Foundation" (Phase 5). Phase 3 (Spotify) here covers what was originally "Phase 6".
+
+---
+
+## Terminology Note
+
+- **Code:** "Squad" everywhere — database tables, API routes, file names, types
+- **UI:** "Plan" everywhere — buttons, modals, notifications, user-facing copy
+- **This spec:** Uses "Performer" (the new unified entity) not "Artist"
+
+---
+
+## Current State (December 2025)
+
+**What exists:**
+- Venue model (first-class entity, 6+ venues)
+- Event model with basic fields
+- 6 scrapers: Moody Center, ACL Live, Paramount, Bass Concert Hall, Emo's, Texas Performing Arts
+- Enrichment model with Spotify, Knowledge Graph, Ticketmaster fields
+- LLM enrichment for category inference, performer extraction
+- Basic event list with category/venue filters
+
+**What's missing:**
+- Performer as first-class entity
+- Comprehensive source metadata documentation
+- Many venues not covered
+- No text search
+- No personalization
+
+---
+
+## Phase 0 – Scraper Cleanup & Stabilization
+
+### 0.1 Current Scraper Cleanup
+
+**Goal:** Fix and optimize existing scrapers BEFORE expanding or auditing.
+
+**For each existing scraper (6 currently):**
+1. Review current implementation for reliability issues
+2. Fix any broken selectors, timing issues, pagination problems
+3. Ensure events link to Venue entity (not inline strings)
+4. Optimize to capture all fields the current schema supports
+5. Verify scraper runs successfully end-to-end
+
+**Output:** Working, reliable scrapers ready for expansion.
+
+**Note:** Do NOT document metadata structure yet - that comes after expansion.
+
+---
+
+## Phase 1 – Expand Coverage, Then Audit Everything
+
+### 1.1 Priority Venue Identification
+
+**Goal:** Identify gaps in venue coverage for Austin.
+
+**Create:** `docs/priority-venues.md`
+
+| Venue | Category | Currently Covered? | Potential Source |
+|-------|----------|-------------------|------------------|
+| [Venue Name] | [Music/Sports/Comedy/etc.] | Yes/No/Partial | [Source if known] |
+
+**Priority categories:**
+- Major music venues
+- Sports stadiums (UT, Austin FC, minor league)
+- Comedy clubs
+- Theaters
+- Bars with regular events
+
+### 1.2 Add Priority Venue Scrapers
+
+**Goal:** Expand coverage to priority venues identified in 1.1.
+
+**For each new source:**
+1. Implement scraper using existing patterns (from cleaned-up scrapers)
+2. Ensure events link to Venue entity
+3. Capture all fields current schema supports
+4. Test reliability before moving on
+
+**Do NOT add new Event/Venue fields yet** - just capture what current schema supports.
+
+**Do NOT document metadata structure yet** - that's next.
+
+### 1.3 Comprehensive Source Audit (ALL Sources)
+
+**Goal:** Now that ALL scrapers exist, document what metadata is available across the COMPLETE landscape.
+
+**Create:** `docs/source-structure-log.md`
+
+**For EACH source (original + new), document:**
+
+```markdown
+## [Source Name]
+
+### Base URL / Endpoint
+[URL or scrape target]
+
+### Structure Type
+[API JSON / HTML scrape / RSS / etc.]
+
+### Fields Observed (Raw)
+List ALL fields visible in source, whether we use them or not:
+- [ ] Field name - description - example value
+- [ ] ...
+
+### Fields Currently Captured
+- [x] Field → maps to Event.fieldName
+- [ ] Field → NOT captured (reason)
+
+### Potential Future Value
+- Field X could enable [use case]
+- Field Y could power [feature]
+
+### Venue-Specific Fields Available
+- [ ] What venue metadata does this source provide?
+- [ ] About page? Capacity? Age restrictions?
+
+### Gotchas / Limitations
+- [reliability issues, inconsistencies, etc.]
+```
+
+**Also create:** `docs/venue-metadata-audit.md`
+- What venue info is available across all sources
+- What could be scraped from venue websites directly
+- Venue enrichment possibilities
+
+**This is the COMPREHENSIVE audit that informs all schema decisions.**
+
+### 1.4 Performer Entity Design
+
+**Goal:** Design Performer as first-class entity based on COMPLETE audit findings.
+
+**Note:** This replaces the original "Artist Foundation" (Phase 5) from `PROJECT-ROADMAP.md`. The Performer model is broader — it handles music artists, sports teams, comedians, theater companies, etc.
+
+**Agreed decisions:**
+- Single `Performer` entity (not separate Artist/Team/etc.)
+- `type` discriminator: ARTIST, TEAM, COMEDIAN, COMPANY, OTHER
+- Primary category field
+- Generic tags (structure TBD by audit - single layer? hierarchical?)
+- Event ↔ Performer: Many-to-many relationship
+- Junction table: `EventPerformer` with role (HEADLINER, OPENER, SUPPORT, etc.)
+
+**Questions the audit will answer:**
+- What performer metadata do sources provide?
+- What external IDs are available? (Spotify, IMDB, ESPN, etc.)
+- What tag/genre structures exist across sources?
+- What's consistently available vs. sparse?
+
+**Make schema decision based on actual audit findings, not assumptions.**
+
+**Output:** `docs/performer-model-design.md`
+
+### 1.5 Basic Search Implementation
+
+**Goal:** Enable users to search events by text.
+
+**Scope:**
+- Search event title/displayTitle
+- Search venue name
+- Search performer name (once Performer entity exists)
+- Use existing filters (date, category, venue)
+
+**Implementation:**
+- Simple text matching initially (can upgrade to full-text search later)
+- Expose in UI with existing patterns
+
+**Output:** `docs/discovery-v1.md`
+- What fields are searchable
+- What filters exist
+- Known limitations
+
+### 1.6 Performer Entity Implementation
+
+**Goal:** Create Performer model based on 1.4 design.
+
+**Tasks:**
+1. Create Performer model in Prisma
+2. Create Event ↔ Performer many-to-many relation
+3. Backfill existing events with Performer links (where extractable)
+4. Add Performer to search
+
+**Schema:** Defined in `docs/performer-model-design.md` (from 1.4)
+
+---
+
+## Planned Pause – UX Quick Wins & User Testing
+
+**Goal:** Validate foundation before investing in enrichment.
+
+**Cross-reference:** This is "Block B" and "Block C" in `PROJECT-ROADMAP.md`.
+
+### UX Quick Wins (Block B)
+
+Ship polish before inviting real users:
+
+| Task | Description | Est. |
+|------|-------------|------|
+| **Friend Avatar Popover** | Hover quick actions on desktop ("Start plan with X", "View profile") | 1 day |
+| **Welcome Email** | "This is a small community project" — how to start, privacy | 0.5 day |
+| **"Added to Plan" Email** | Notification when invited to a plan | 0.5 day |
+| **"Event Tomorrow" Reminder** | Day-before reminder for Going events | 1 day |
+| **UX Bug Fixes** | Issues identified during Phase 0-1 build | 1-2 days |
+
+### User Testing (Block C)
+
+**Activities:**
+- [ ] Invite 20-30 real users
+- [ ] Collect feedback on event discovery, search, plan creation
+- [ ] Fix top issues
+- [ ] Huddle on technical roadmap for enrichment (Phase 2+)
+
+**Exit criteria:** TBD by PM based on user feedback.
+
+**Do not proceed to Phase 2 until pause complete.**
+
+---
+
+## Phase 2 – Data Enrichment
+
+### 2.1 Enrichment Use Case Selection
+
+**Goal:** Decide WHAT to enrich based on user value.
+
+**Review:**
+- Source Structure Log (what's available)
+- User feedback from pause
+- Discovery pain points
+
+**With PM, select concrete use cases:**
+- Example: Family-friendly filter
+- Example: Genre-based discovery
+- Example: Venue capacity/vibe info
+
+**Output:** `docs/enrichment-use-cases.md`
+- Each use case
+- How it surfaces in product
+- What data it requires
+
+### 2.2 Enrichment Schema Design
+
+**Goal:** Define minimal schema changes to support 2.1 use cases.
+
+**Constraints:**
+- Only fields tied to selected use cases
+- Prefer enums/booleans over free-form
+- Document source for each field
+
+**Output:** `docs/enrichment-schema.md`
+
+### 2.3 Venue Enrichment
+
+**Goal:** Populate venue metadata from sources.
+
+**Process:**
+1. Use Source Structure Log to identify venue data sources
+2. Implement enrichment (scrape about pages, APIs, manual, LLM-assisted)
+3. Start with high-priority venues
+4. Validate against schema
+
+**Output:** `docs/venue-enrichment-process.md`
+
+### 2.4 Event Enrichment
+
+**Goal:** Derive enriched event metadata.
+
+**Sources:**
+- Raw event fields
+- Enriched venue data
+- Enriched performer data
+- LLM classification (constrained to schema enums)
+
+**Output:** `docs/event-enrichment-process.md`
+
+### 2.5 Performer Enrichment
+
+**Goal:** Enrich performers with external data.
+
+**Potential sources (based on type):**
+- Spotify API (artists)
+- Sports APIs (teams) - if available
+- Knowledge Graph
+- LLM extraction
+
+**Category-specific fields to consider:**
+- Artists: Spotify ID, genres, popularity, images
+- Teams: League, sport, team ID
+- Comedians: Style, social links
+- Movies/Theater: IMDB ID, genre
+
+**Output:** `docs/performer-enrichment-process.md`
+
+### 2.6 Discovery Upgrade
+
+**Goal:** Surface enriched data in search/filters.
+
+**Tasks:**
+- Add filters based on enrichment use cases
+- Update search to use enriched fields
+- Validate user value
+
+**Output:** `docs/discovery-v2.md`
+
+---
+
+## Phase 3 – Personalization & Recommendations
+
+**Note:** This phase covers what was originally "Phase 6: Spotify v1" in `PROJECT-ROADMAP.md`.
+
+### 3.1 Spotify Integration
+
+**Goal:** Personalized recommendations based on music taste.
+
+**Tasks:**
+- Spotify OAuth flow
+- Store refresh tokens securely
+- Fetch user's top artists
+- Match to Performer entities (type=ARTIST)
+- "For You" surface
+
+### 3.2 Interaction-Based Preferences
+
+**Goal:** Learn from user behavior.
+
+**Track:**
+- Events viewed
+- Events marked Going/Interested
+- Performers followed (future)
+- Venues favorited (future)
+
+**Aggregate into preference signals.**
+
+### 3.3 Simple Recommendations
+
+**Goal:** Score events by user fit.
+
+**Logic:**
+- Match enriched event metadata to user preferences
+- Boost events matching Spotify artists
+- Boost events at venues user has attended
+
+**Surface in "For You" section.**
+
+---
+
+## Phase 4 – Smart Search & Planning
+
+### 4.1 Natural Language Query Parsing
+
+**Goal:** "Jazz concerts this weekend" → structured search.
+
+**Implementation:**
+- LLM translates NL → filter params
+- Constrained to existing schema (no hallucinated fields)
+- Fallback to text search on parse failure
+
+**Cost management:**
+- Cache common queries
+- Rate limit per user (beta)
+- Fallback to structured search
+
+### 4.2 Smart Planning / Itineraries
+
+**Goal:** "Plan my Saturday night" → curated event set.
+
+**Combines:**
+- User preferences
+- Enriched metadata
+- Recommendations logic
+- Time/location constraints
+
+### 4.3 Performer & Venue Pages as Context
+
+**Goal:** Rich entity pages that inform smart search.
+
+- `/performers/[id]` - Upcoming events, similar performers
+- `/venues/[id]` - Upcoming events, venue vibe, typical categories
+
+**These pages provide context for smart search answers.**
+
+---
+
+## Future: User-Created Events
+
+**Deferred.** See "Create-Your-Own Event" in `PROJECT-ROADMAP.md`.
+
+**When ready:**
+- Reuse Performer/Venue/Event models
+- User creates Event with `source: 'USER_CREATED'`
+- Can link to existing or new Performer
+- Can link to existing or new Venue (with moderation?)
+- Integrates into discovery and recommendations
+
+**Separate project plan:** `docs/create-events-spec.md`
+
+---
+
+## Open Questions (To Be Answered By Phase 1.3 Audit)
+
+### Performer Model
+- [ ] What tag/genre structure makes sense across types?
+- [ ] Single layer or hierarchical tags?
+- [ ] What external IDs are consistently available?
+- [ ] What type-specific fields are worth capturing?
+
+### Venue Model
+- [ ] What venue metadata is available from sources?
+- [ ] What's the value vs. effort for each field?
+- [ ] How do we handle user-created venues?
+
+### Event Model
+- [ ] What metadata are we missing that sources provide?
+- [ ] What enrichment has highest user value?
+
+### Enrichment Sources
+- [ ] What APIs are available? (Spotify ✓, Sports ?, Comedy ?)
+- [ ] What can be scraped reliably?
+- [ ] What requires LLM extraction?
+
+---
+
+## Documents to Produce
+
+| Phase | Document | Purpose |
+|-------|----------|---------|
+| 1.1 | `docs/priority-venues.md` | Venue coverage gaps |
+| 1.3 | `docs/source-structure-log.md` | All available metadata per source (COMPLETE) |
+| 1.3 | `docs/venue-metadata-audit.md` | Venue enrichment possibilities |
+| 1.4 | `docs/performer-model-design.md` | Performer schema based on audit |
+| 1.5 | `docs/discovery-v1.md` | Basic search/filter docs |
+| 2.1 | `docs/enrichment-use-cases.md` | What to enrich and why |
+| 2.2 | `docs/enrichment-schema.md` | Schema changes for enrichment |
+| 2.3-2.5 | `docs/*-enrichment-process.md` | How each entity is enriched |
+| 2.6 | `docs/discovery-v2.md` | Enriched discovery docs |
+
+---
+
+## Success Metrics (TBD with PM)
+
+- Event coverage: % of Austin events captured
+- Search success: Users finding what they want
+- Recommendation relevance: Click-through on "For You"
+- User satisfaction: Feedback from cohort
+
+---
+
+*Created: December 6, 2025*
+*Updated: December 6, 2025*
+*Status: Ready for Phase 0 execution*
+*Cross-reference: PROJECT-ROADMAP.md (Blocks A, B, C, D)*
+

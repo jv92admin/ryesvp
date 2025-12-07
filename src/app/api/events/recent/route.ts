@@ -7,24 +7,30 @@ export async function GET(req: NextRequest) {
     const cutoff = new Date();
     cutoff.setHours(cutoff.getHours() - 48);
 
-    const recentEvents = await prisma.event.findMany({
-      where: {
-        createdAt: {
-          gte: cutoff,
-        },
-        startDateTime: {
-          gte: new Date(), // Only future events
-        },
+    const whereClause = {
+      createdAt: {
+        gte: cutoff,
       },
+      startDateTime: {
+        gte: new Date(), // Only future events
+      },
+    };
+
+    // Get total count for the chip badge
+    const totalCount = await prisma.event.count({ where: whereClause });
+
+    // Get the most recent events for display (all of them for the filter)
+    const recentEvents = await prisma.event.findMany({
+      where: whereClause,
       include: {
         venue: {
           select: { name: true },
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        startDateTime: 'asc', // Sort by event date, not created date
       },
-      take: 10,
+      take: 100, // Reasonable limit
     });
 
     const events = recentEvents.map(event => ({
@@ -37,7 +43,7 @@ export async function GET(req: NextRequest) {
       },
     }));
 
-    return NextResponse.json({ events });
+    return NextResponse.json({ events, totalCount });
   } catch (error) {
     console.error('Error fetching recent events:', error);
     return NextResponse.json(

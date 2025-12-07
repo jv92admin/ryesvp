@@ -5,6 +5,9 @@ import { fetchEventsFromAclLive } from './sources/aclLive';
 import { fetchEventsFromStubbs } from './sources/stubbs';
 import { fetchEventsFromTPA } from './sources/texasPerformingArts';
 import { fetchEventsFromLongCenter } from './sources/longCenter';
+import { fetchEventsFromEmos } from './sources/emos';
+import { fetchEventsFromMohawk } from './sources/mohawk';
+import { fetchEventsFromConcourseProject } from './sources/concourseProject';
 import { fetchMockEvents } from './sources/mock';
 import { upsertEvents } from './upsert';
 
@@ -54,6 +57,21 @@ export async function runAllScrapers(): Promise<{
       name: 'Long Center',
       venueSlug: 'long-center',
       fn: fetchEventsFromLongCenter,
+    },
+    {
+      name: "Emo's Austin",
+      venueSlug: 'emos',
+      fn: fetchEventsFromEmos,
+    },
+    {
+      name: 'Mohawk',
+      venueSlug: 'mohawk',
+      fn: fetchEventsFromMohawk,
+    },
+    {
+      name: 'The Concourse Project',
+      venueSlug: 'concourse-project',
+      fn: fetchEventsFromConcourseProject,
     },
     // Mock scraper only runs in development or when explicitly requested
     ...(process.env.NODE_ENV === 'development' && process.env.ENABLE_MOCK_SCRAPER === 'true' ? [{
@@ -122,6 +140,12 @@ export async function runScraper(scraperName: string): Promise<ScraperResult> {
     'texas-performing-arts': fetchEventsFromTPA,
     'long-center': fetchEventsFromLongCenter,
     'longcenter': fetchEventsFromLongCenter,
+    'emos': fetchEventsFromEmos,
+    'emos-austin': fetchEventsFromEmos,
+    'mohawk': fetchEventsFromMohawk,
+    'mohawk-austin': fetchEventsFromMohawk,
+    'concourse-project': fetchEventsFromConcourseProject,
+    'concourse': fetchEventsFromConcourseProject,
     'mock': fetchMockEvents,
   };
 

@@ -169,9 +169,12 @@ export function CalendarSidebar({ isLoggedIn }: CalendarSidebarProps) {
               </Link>
             ))}
             {presaleEvents.length > 4 && (
-              <p className="text-xs text-gray-500 pt-1">
-                +{presaleEvents.length - 4} more with presales
-              </p>
+              <Link 
+                href="/?discovery=presales"
+                className="block text-xs text-[var(--brand-primary)] hover:text-green-700 font-medium pt-1"
+              >
+                Show all {presaleEvents.length} presales →
+              </Link>
             )}
           </div>
         )}

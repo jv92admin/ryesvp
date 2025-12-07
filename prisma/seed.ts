@@ -81,11 +81,11 @@ async function main() {
       },
     }),
     prisma.venue.upsert({
-      where: { slug: 'emo-s' },
+      where: { slug: 'emos' },
       update: { lat: 30.2423, lng: -97.7245 },
       create: {
         name: "Emo's Austin",
-        slug: 'emo-s',
+        slug: 'emos',
         websiteUrl: 'https://emosaustin.com',
         address: '2015 E Riverside Dr',
         city: 'Austin',
