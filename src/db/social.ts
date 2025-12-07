@@ -228,15 +228,14 @@ export async function getAlmostPlans(userId: string, filters?: SocialFilters): P
   });
 
   // Process and prioritize events
+  // Note: We intentionally do NOT filter out events where user has a squad.
+  // Users may look in "Friends" section expecting to see events they're attending
+  // with friends, even if they already have a plan. Completeness > deduplication.
   const processedEvents = events.map(event => {
     const userEvent = event.userEvents.find(ue => ue.userId === userId);
     const friendEvents = event.userEvents.filter(ue => friendIds.includes(ue.userId));
-    const hasUserSquad = event.squads.length > 0;
     
-    // Skip if user already has squad for this event (should be in "Your Plans" instead)
-    if (hasUserSquad) return null;
-    
-    // Keep track of user squad info even for almost plans
+    // Keep track of user squad info for smart buttons
     const userSquad = event.squads.find(squad => 
       squad.members.some(member => member.userId === userId)
     );
