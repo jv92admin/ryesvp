@@ -21,8 +21,12 @@
 | Stubb's BBQ | Music/BBQ | 20 | 2026-05 | ✅ Smaller venue |
 | McCullough Theatre | Theater | 4 | 2026-01 | ✅ TPA sub-venue |
 | Bates Recital Hall | Classical | 2 | 2026-02 | ✅ TPA sub-venue |
+| Antone's Nightclub | Blues | 57 | 2026-05 | ✅ NEW - fetch + cheerio |
+| Moody Amphitheater | Outdoor | 9 | 2026-05 | ✅ NEW - fetch + cheerio |
+| Scoot Inn | Outdoor | 13 | 2026-05 | ✅ NEW - Puppeteer + JSON-LD |
+| Radio East | Music | 23 | 2026-04 | ✅ NEW - Puppeteer + DICE JSON-LD |
 
-**Total: ~460 future events across 11 venues**
+**Total: ~570 future events across 15 venues**
 
 ---
 
@@ -32,16 +36,16 @@
 |---|-------|----------|--------|---------------|-------|
 | 1 | **Emo's** | Music | ✅ | ✅ | 36 events via JSON-LD |
 | 2 | **Mohawk** | Music | ✅ | ✅ | 37 events, "show me more" button |
-| 3 | **Parish** | Music | ⏳ | ⬜ | Upstairs from Mohawk? |
-| 4 | **Antone's** | Blues | ⏳ | ⬜ | Legendary blues venue |
-| 5 | **Moody Amphitheatre** | Outdoor | ⏳ | ⬜ | Waterloo Park |
-| 6 | **Concourse Project** | EDM | ✅ | ✅ | 25 events, Load More AJAX |
-| 7 | **Empire** | Music | ⏳ | ⬜ | Empire Control Room |
-| 8 | **Scoot Inn** | Outdoor | ⏳ | ⬜ | Outdoor shows |
+| 3 | **Parish** | Music | ⏸️ | ⬜ | Calendar empty (Dec 2025) |
+| 4 | **Antone's** | Blues | ✅ | ✅ | 57 events, fetch + cheerio |
+| 5 | **Moody Amphitheater** | Outdoor | ✅ | ✅ | 9 events, fetch + cheerio |
+| 6 | **Scoot Inn** | Outdoor | ✅ | ✅ | 13 events, Puppeteer + JSON-LD |
+| 7 | **Concourse Project** | EDM | ✅ | ✅ | 25 events, Load More AJAX |
+| 8 | **Empire** | Music | ⏳ | ⬜ | Empire Control Room |
 | 9 | **HEB Center** | Sports/Arena | ⏳ | ⬜ | Cedar Park - Texas Stars |
 | 10 | **COTA** | Racing/Concerts | ⏳ | ⬜ | F1, MotoGP, concerts |
 | 11 | **Darrell K Royal** | Football/Concerts | ⏳ | ⬜ | UT Stadium |
-| 12 | **Radio East** | Music | ⏳ | ⬜ | Newer venue? |
+| 12 | **Radio East** | Music | ✅ | ✅ | 23 events, Puppeteer + DICE JSON-LD |
 
 ---
 
@@ -79,4 +83,10 @@
 | 2025-12-06 | Concourse Project | Scraper created | 25 events, Puppeteer + AJAX Load More |
 | 2025-12-06 | ACL Live | Backdated events | Fixed "New" filter flood |
 | 2025-12-06 | All | Bug fixes | Emo's image fix, presale filter fix, "New" filter API |
+| 2025-12-07 | Antone's | Scraper created | 57 events, fetch + cheerio (no Puppeteer) |
+| 2025-12-07 | Moody Amphitheater | Scraper created | 9 events, fetch + cheerio |
+| 2025-12-07 | Scoot Inn | Scraper created | 13 events, Puppeteer + JSON-LD |
+| 2025-12-07 | Radio East | Scraper created | 23 events, Puppeteer + DICE JSON-LD |
+
+**Note on Moody Amphitheater:** Only 9 events currently listed. No pagination visible with this small dataset. If event count grows significantly, may need to revisit for pagination handling.
 

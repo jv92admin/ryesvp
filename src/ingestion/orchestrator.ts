@@ -8,6 +8,10 @@ import { fetchEventsFromLongCenter } from './sources/longCenter';
 import { fetchEventsFromEmos } from './sources/emos';
 import { fetchEventsFromMohawk } from './sources/mohawk';
 import { fetchEventsFromConcourseProject } from './sources/concourseProject';
+import { fetchEventsFromAntones } from './sources/antones';
+import { fetchEventsFromMoodyAmphitheater } from './sources/moodyAmphitheater';
+import { fetchEventsFromScootInn } from './sources/scootInn';
+import { fetchEventsFromRadioEast } from './sources/radioEast';
 import { fetchMockEvents } from './sources/mock';
 import { upsertEvents } from './upsert';
 
@@ -72,6 +76,26 @@ export async function runAllScrapers(): Promise<{
       name: 'The Concourse Project',
       venueSlug: 'concourse-project',
       fn: fetchEventsFromConcourseProject,
+    },
+    {
+      name: "Antone's Nightclub",
+      venueSlug: 'antones',
+      fn: fetchEventsFromAntones,
+    },
+    {
+      name: 'Moody Amphitheater',
+      venueSlug: 'moody-amphitheater',
+      fn: fetchEventsFromMoodyAmphitheater,
+    },
+    {
+      name: 'Scoot Inn',
+      venueSlug: 'scoot-inn',
+      fn: fetchEventsFromScootInn,
+    },
+    {
+      name: 'Radio East',
+      venueSlug: 'radio-east',
+      fn: fetchEventsFromRadioEast,
     },
     // Mock scraper only runs in development or when explicitly requested
     ...(process.env.NODE_ENV === 'development' && process.env.ENABLE_MOCK_SCRAPER === 'true' ? [{
@@ -146,6 +170,16 @@ export async function runScraper(scraperName: string): Promise<ScraperResult> {
     'mohawk-austin': fetchEventsFromMohawk,
     'concourse-project': fetchEventsFromConcourseProject,
     'concourse': fetchEventsFromConcourseProject,
+    'antones': fetchEventsFromAntones,
+    'antones-nightclub': fetchEventsFromAntones,
+    'moody-amphitheater': fetchEventsFromMoodyAmphitheater,
+    'moody-amp': fetchEventsFromMoodyAmphitheater,
+    'waterloo-park': fetchEventsFromMoodyAmphitheater,
+    'scoot-inn': fetchEventsFromScootInn,
+    'scootinn': fetchEventsFromScootInn,
+    'radio-east': fetchEventsFromRadioEast,
+    'radioeast': fetchEventsFromRadioEast,
+    'radio': fetchEventsFromRadioEast,
     'mock': fetchMockEvents,
   };
 

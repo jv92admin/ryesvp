@@ -47,6 +47,76 @@ Tracking scraper reviews, fixes, and status.
 
 ---
 
+## 2025-12-07: Antone's Nightclub
+
+**Status:** ✅ New scraper created
+
+**URL:** `https://antonesnightclub.com/`
+
+**Structure:**
+- Paginated list (3 pages)
+- Events in `.tw-section.tw-section--list` containers
+- Date in `.tw-event-date` (format: "December 06, 2025")
+- Time in `.tw-event-time` (format: "8:00pm")
+- Title/link in `.tw-name a`
+- Images in `.tw-image img`
+- Ticket links in `.tw-buy-tix-btn`
+
+**Implementation:** fetch + cheerio (no Puppeteer needed)
+
+**Result:** **57 events** through May 2026
+
+**Files Created:**
+- `src/ingestion/sources/antones.ts`
+
+---
+
+## 2025-12-07: Scoot Inn
+
+**Status:** ✅ New scraper created
+
+**URL:** `https://www.scootinnaustin.com/shows`
+
+**Structure:**
+- LiveNation venue-sites platform (JS-rendered)
+- JSON-LD embedded in page after render
+- Events in `script[type="application/ld+json"]` with `@type: "MusicEvent"`
+
+**Implementation:** Puppeteer + JSON-LD extraction (tries JSON-LD first, DOM fallback)
+
+**Result:** **13 events** through May 2026
+
+**Files Created:**
+- `src/ingestion/sources/scootInn.ts`
+
+---
+
+## 2025-12-07: Moody Amphitheater (Waterloo Park)
+
+**Status:** ✅ New scraper created
+
+**URL:** `https://www.moodyamphitheater.com/events-tickets`
+
+**Structure:**
+- Single page list (no pagination visible)
+- Events in `.collection-item.w-dyn-item` containers
+- Date split: `.date-weekday`, `.date-month`, `.date-day`
+- Time in `.event-time`
+- Title in `.event-headliner` + `.event-title` (tour name)
+- Support acts in `.event-support`
+- Ticket links to Ticketmaster
+
+**Implementation:** fetch + cheerio (no Puppeteer needed)
+
+**Result:** **9 events** through May 2026
+
+**Note:** Only 9 events currently listed. No pagination visible with this small dataset. If event count grows significantly, may need to revisit for pagination handling.
+
+**Files Created:**
+- `src/ingestion/sources/moodyAmphitheater.ts`
+
+---
+
 ## 2025-12-06: Full Coverage Audit
 
 All venues verified healthy:
@@ -57,13 +127,18 @@ All venues verified healthy:
 | ACL Live | 73 | 2026-12-01 | ✅ Fixed |
 | Moody Center | 69 | 2026-11-09 | ✅ Healthy |
 | Long Center | 59 | 2026-05-30 | ✅ Healthy |
+| Antone's | 57 | 2026-05-17 | ✅ NEW |
+| Mohawk | 37 | 2026-05 | ✅ NEW |
 | Bass Concert Hall | 37 | 2031-01-31 | ✅ Healthy (includes far-future bookings) |
+| Emo's | 36 | 2026-05 | ✅ NEW (fixed image bug) |
+| Concourse Project | 25 | 2026-03 | ✅ NEW |
 | Stubb's | 20 | 2026-05-03 | ✅ Healthy (smaller venue) |
+| Scoot Inn | 13 | 2026-05-15 | ✅ NEW |
+| Moody Amphitheater | 9 | 2026-05-29 | ✅ NEW |
 | McCullough | 4 | 2026-01-25 | ✅ Sub-venue of TPA |
 | Bates Recital | 2 | 2026-02-28 | ✅ Sub-venue of TPA |
-| Emo's | 0 | N/A | ❌ Not implemented |
 
-**Total: 366 future events**
+**Total: ~545 future events across 14 venues**
 
 ---
 

@@ -80,20 +80,6 @@ async function main() {
         lng: -97.7368,
       },
     }),
-    prisma.venue.upsert({
-      where: { slug: 'emos' },
-      update: { lat: 30.2423, lng: -97.7245 },
-      create: {
-        name: "Emo's Austin",
-        slug: 'emos',
-        websiteUrl: 'https://emosaustin.com',
-        address: '2015 E Riverside Dr',
-        city: 'Austin',
-        state: 'TX',
-        lat: 30.2423,
-        lng: -97.7245,
-      },
-    }),
     // Texas Performing Arts venues
     prisma.venue.upsert({
       where: { slug: 'bass-concert-hall' },
@@ -150,6 +136,66 @@ async function main() {
         state: 'TX',
         lat: 30.2594,
         lng: -97.7505,
+      },
+    }),
+    // Antone's Nightclub - legendary blues venue
+    prisma.venue.upsert({
+      where: { slug: 'antones' },
+      update: { lat: 30.2671, lng: -97.7395 },
+      create: {
+        name: "Antone's Nightclub",
+        slug: 'antones',
+        websiteUrl: 'https://antonesnightclub.com',
+        address: '305 E 5th St',
+        city: 'Austin',
+        state: 'TX',
+        lat: 30.2671,
+        lng: -97.7395,
+      },
+    }),
+    // Radio East (Radio Coffee & Beer) - outdoor music venue
+    prisma.venue.upsert({
+      where: { slug: 'radio-east' },
+      update: { lat: 30.2292, lng: -97.7089 },
+      create: {
+        name: 'Radio East',
+        slug: 'radio-east',
+        websiteUrl: 'https://radio-coffee-beer.webflow.io/radio-east',
+        address: '3504 Montopolis Dr',
+        city: 'Austin',
+        state: 'TX',
+        lat: 30.2292,
+        lng: -97.7089,
+      },
+    }),
+    // Moody Amphitheater at Waterloo Park - outdoor venue
+    prisma.venue.upsert({
+      where: { slug: 'moody-amphitheater' },
+      update: { lat: 30.2733, lng: -97.7385 },
+      create: {
+        name: "Moody Amphitheater at Waterloo Park",
+        slug: 'moody-amphitheater',
+        websiteUrl: 'https://www.moodyamphitheater.com',
+        address: '1401 Trinity St',
+        city: 'Austin',
+        state: 'TX',
+        lat: 30.2733,
+        lng: -97.7385,
+      },
+    }),
+    // Scoot Inn - outdoor music venue
+    prisma.venue.upsert({
+      where: { slug: 'scoot-inn' },
+      update: { lat: 30.2615, lng: -97.7280 },
+      create: {
+        name: "Scoot Inn",
+        slug: 'scoot-inn',
+        websiteUrl: 'https://www.scootinnaustin.com',
+        address: '1308 E 4th St',
+        city: 'Austin',
+        state: 'TX',
+        lat: 30.2615,
+        lng: -97.7280,
       },
     }),
   ]);
