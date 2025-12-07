@@ -1,6 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { getAvatarStyle, getInitials, getDisplayName } from '@/lib/avatar';
 import { Button } from '@/components/ui';
 
@@ -32,6 +34,7 @@ interface SquadMemberListProps {
   currentUserId: string;
   isOrganizer: boolean;
   onInvite?: () => void;
+  onRefresh?: () => void;
 }
 
 // Status icon mapping
@@ -49,9 +52,38 @@ const TICKET_DISPLAY: Record<TicketStatus, { icon: string; color: string }> = {
   COVERED: { icon: '✓', color: 'text-[var(--brand-primary)]' },
 };
 
-export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite }: SquadMemberListProps) {
+export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite, onRefresh }: SquadMemberListProps) {
+  const router = useRouter();
+  const [removingUserId, setRemovingUserId] = useState<string | null>(null);
   const { members } = squad;
   const isAlone = members.length === 1;
+
+  const handleRemoveMember = async (userId: string) => {
+    if (!confirm('Remove this person from the plan?')) return;
+    
+    setRemovingUserId(userId);
+    try {
+      const res = await fetch(`/api/squads/${squad.id}/members`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      
+      if (!res.ok) throw new Error('Failed to remove member');
+      
+      // Use the refresh callback if available, otherwise fallback to router.refresh()
+      if (onRefresh) {
+        onRefresh();
+      } else {
+        router.refresh();
+      }
+    } catch (error) {
+      console.error('Error removing member:', error);
+      alert('Failed to remove member');
+    } finally {
+      setRemovingUserId(null);
+    }
+  };
 
   return (
     <div className="space-y-2">
@@ -76,6 +108,7 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite }:
         <div className="flex-1">Member</div>
         <div className="w-10 text-center">Going</div>
         <div className="w-10 text-center">Ticket</div>
+        {isOrganizer && <div className="w-6"></div>}
       </div>
 
       {/* Member List */}
@@ -139,6 +172,18 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite }:
                   ticketInfo.icon
                 )}
               </div>
+
+              {/* Remove button - only for organizer, not on self or other organizers */}
+              {isOrganizer && member.userId !== currentUserId && !member.isOrganizer && (
+                <button
+                  onClick={() => handleRemoveMember(member.userId)}
+                  disabled={removingUserId === member.userId}
+                  className="w-6 text-center text-gray-300 hover:text-red-500 transition-colors disabled:opacity-50"
+                  title={`Remove ${displayName} from plan`}
+                >
+                  {removingUserId === member.userId ? '...' : '×'}
+                </button>
+              )}
             </div>
           );
         })}

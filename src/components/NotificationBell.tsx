@@ -88,7 +88,14 @@ export function NotificationBell() {
     <div className="relative">
       {/* Bell Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          const wasOpen = isOpen;
+          setIsOpen(!isOpen);
+          // Auto-mark all as read when closing the dropdown
+          if (wasOpen && unreadCount > 0) {
+            handleMarkAllAsRead();
+          }
+        }}
         className="relative p-1.5 text-gray-500 hover:text-[var(--brand-primary)] transition-colors"
         title="Notifications"
       >
@@ -113,7 +120,13 @@ export function NotificationBell() {
           {/* Backdrop */}
           <div
             className="fixed inset-0 z-10"
-            onClick={() => setIsOpen(false)}
+            onClick={() => {
+              setIsOpen(false);
+              // Auto-mark all as read when closing the dropdown
+              if (unreadCount > 0) {
+                handleMarkAllAsRead();
+              }
+            }}
           />
 
           {/* Dropdown Panel */}

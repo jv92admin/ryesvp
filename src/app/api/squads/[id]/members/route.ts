@@ -74,9 +74,12 @@ export async function POST(
       });
     }
 
-    // Notify the organizer if someone joined (and they're not the organizer themselves)
+    // Notify the organizer if someone joined THEMSELVES (not when organizer adds someone)
+    // - If targetUserId === user.dbUser.id: user is joining themselves → notify organizer
+    // - If targetUserId !== user.dbUser.id: organizer is adding someone → don't notify (redundant)
+    const isSelfJoin = targetUserId === user.dbUser.id;
     const organizer = squad.members.find(m => m.isOrganizer);
-    if (organizer && organizer.userId !== targetUserId) {
+    if (isSelfJoin && organizer && organizer.userId !== targetUserId) {
       // Get the new member's name
       const newMemberUser = await prisma.user.findUnique({
         where: { id: targetUserId },
@@ -195,9 +198,12 @@ export async function DELETE(
       return NextResponse.json({ squadDeleted: true });
     }
 
-    // Notify the organizer that someone left (if they're not the one leaving)
+    // Notify the organizer that someone left THEMSELVES (not when organizer removes someone)
+    // - If targetUserId === user.dbUser.id: user is leaving themselves → notify organizer
+    // - If targetUserId !== user.dbUser.id: organizer is removing someone → don't notify (redundant)
+    const isSelfLeave = targetUserId === user.dbUser.id;
     const organizer = squad.members.find(m => m.isOrganizer);
-    if (organizer && organizer.userId !== targetUserId) {
+    if (isSelfLeave && organizer && organizer.userId !== targetUserId) {
       await createNotification(organizer.userId, 'PLAN_MEMBER_LEFT', {
         actorId: targetUserId,
         actorName: leavingMemberName,

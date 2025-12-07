@@ -43,8 +43,11 @@ export function Toast({ message, type = 'info', duration = 8000, onClose, action
   }[type];
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 z-50 animate-slide-up">
-      <div className={`${styles.bg} ${styles.text} px-3 py-2.5 rounded-xl shadow-lg border flex items-center gap-2.5 w-full sm:max-w-md`}>
+    // Outer wrapper handles positioning (full-width on mobile, centered on desktop)
+    <div className="fixed bottom-4 left-4 right-4 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 sm:w-auto z-50">
+      {/* Inner wrapper handles animation (slide up + fade in) */}
+      <div className="animate-slide-up">
+        <div className={`${styles.bg} ${styles.text} px-3 py-2.5 rounded-xl shadow-lg border flex items-center gap-2.5 w-full sm:max-w-md`}>
         {/* Icon */}
         <div className={`${styles.iconBg} text-white w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold`}>
           {styles.icon}
@@ -80,6 +83,7 @@ export function Toast({ message, type = 'info', duration = 8000, onClose, action
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
+        </div>
       </div>
     </div>
   );

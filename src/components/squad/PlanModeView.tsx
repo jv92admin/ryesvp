@@ -185,6 +185,7 @@ export function PlanModeView({
           currentUserId={currentUserId}
           isOrganizer={isOrganizer}
           onInvite={onInvite}
+          onRefresh={onSquadRefresh}
         />
       </div>
 
