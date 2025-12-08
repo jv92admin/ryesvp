@@ -34,7 +34,7 @@ export async function launchBrowser(): Promise<Browser> {
     return puppeteerCore.default.launch({
       args: chromium.default.args,
       executablePath: await chromium.default.executablePath(),
-      headless: chromium.default.headless,
+      headless: true,
     });
   } else {
     // Local environment: use regular puppeteer
