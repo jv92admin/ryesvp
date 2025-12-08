@@ -1,8 +1,27 @@
 import { format, formatDistanceToNow, isToday, isTomorrow, isThisWeek } from 'date-fns';
-import { formatInTimeZone, toZonedTime } from 'date-fns-tz';
+import { formatInTimeZone, toZonedTime, fromZonedTime } from 'date-fns-tz';
 
 // Austin, TX is in Central Time (America/Chicago)
-const AUSTIN_TIMEZONE = 'America/Chicago';
+export const AUSTIN_TIMEZONE = 'America/Chicago';
+
+/**
+ * Create a UTC Date from Austin local time components.
+ * Use this in scrapers to ensure times are stored correctly regardless of server timezone.
+ * 
+ * Example: createAustinDate(2026, 1, 30, 19, 0) creates "Jan 30, 2026 7:00 PM Austin time" as UTC
+ */
+export function createAustinDate(
+  year: number,
+  month: number,  // 0-indexed (0 = January)
+  day: number,
+  hour: number = 19,  // Default to 7 PM
+  minute: number = 0
+): Date {
+  // Create a date string that fromZonedTime can parse
+  // fromZonedTime treats the input as being in the specified timezone
+  const dateInAustin = new Date(year, month, day, hour, minute, 0, 0);
+  return fromZonedTime(dateInAustin, AUSTIN_TIMEZONE);
+}
 
 export function formatEventDate(date: Date): string {
   // Convert to Central Time for display

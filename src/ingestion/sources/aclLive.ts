@@ -2,6 +2,7 @@ import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
 import { launchBrowser } from '@/lib/browser';
+import { createAustinDate } from '@/lib/utils';
 
 /**
  * Scrape events from ACL Live website.
@@ -267,7 +268,8 @@ function parseAclLiveDate(month: string, day: string, year: string, url: string)
       }
     }
 
-    return new Date(yearNum, monthNum, dayNum, hour, minute);
+    // Create date in Austin timezone
+    return createAustinDate(yearNum, monthNum, dayNum, hour, minute);
 
   } catch (error) {
     console.error('ACL Live: Error parsing date:', error);
@@ -331,7 +333,8 @@ function parseRawDateText(rawText: string, url: string): Date | null {
       else if (!isPM && hour === 12) hour = 0;
     }
     
-    return new Date(year, month, day, hour, minute);
+    // Create date in Austin timezone
+    return createAustinDate(year, month, day, hour, minute);
     
   } catch (error) {
     console.error('ACL Live: Error parsing raw date text:', rawText, error);

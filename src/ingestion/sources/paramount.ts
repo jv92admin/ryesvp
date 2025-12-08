@@ -3,6 +3,7 @@ import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
 import { inferCategory } from '../utils/dateParser';
 import { launchBrowser } from '@/lib/browser';
+import { createAustinDate } from '@/lib/utils';
 
 /**
  * Scrape events from Paramount Theatre website.
@@ -204,13 +205,7 @@ function parseParamountDate(dateText: string, timeText: string): Date | null {
     // Combine date and time
     const fullDateStr = `${datePart} ${timeText}`.trim();
     
-    // Try parsing with Date constructor
-    const parsed = new Date(fullDateStr);
-    if (!isNaN(parsed.getTime())) {
-      return parsed;
-    }
-    
-    // Manual parsing as fallback
+    // Manual parsing to ensure Austin timezone
     // "November 28, 2025 7:00PM"
     const match = fullDateStr.match(/(\w+)\s+(\d+),?\s+(\d{4})\s*(\d{1,2}):(\d{2})(AM|PM)?/i);
     if (match) {
@@ -227,7 +222,8 @@ function parseParamountDate(dateText: string, timeText: string): Date | null {
         hourNum = 0;
       }
       
-      return new Date(
+      // Create date in Austin timezone
+      return createAustinDate(
         parseInt(year, 10),
         months[month.toLowerCase()] ?? 0,
         parseInt(day, 10),

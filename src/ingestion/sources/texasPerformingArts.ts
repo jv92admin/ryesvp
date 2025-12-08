@@ -2,6 +2,7 @@ import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
 import { launchBrowser } from '@/lib/browser';
+import { createAustinDate } from '@/lib/utils';
 
 /**
  * Scrape events from Texas Performing Arts (Bass Concert Hall, McCullough Theatre, etc.)
@@ -242,36 +243,30 @@ function parseTPADate(dateText: string): { startDateTime: Date | null; endDateTi
  * Parse a simple date like "Nov 29, 2025"
  */
 function parseSimpleDate(dateStr: string): Date | null {
-  // Try native parsing first
-  const parsed = new Date(dateStr);
-  if (!isNaN(parsed.getTime())) {
-    // Set time to 7:30 PM (common show time)
-    parsed.setHours(19, 30, 0, 0);
-    return parsed;
-  }
+  const months: Record<string, number> = {
+    jan: 0, january: 0,
+    feb: 1, february: 1,
+    mar: 2, march: 2,
+    apr: 3, april: 3,
+    may: 4,
+    jun: 5, june: 5,
+    jul: 6, july: 6,
+    aug: 7, august: 7,
+    sep: 8, september: 8,
+    oct: 9, october: 9,
+    nov: 10, november: 10,
+    dec: 11, december: 11,
+  };
   
   // Manual parsing: "Nov 29, 2025"
   const match = dateStr.match(/(\w+)\s+(\d+),?\s+(\d{4})/);
   if (match) {
     const [, month, day, year] = match;
-    const months: Record<string, number> = {
-      jan: 0, january: 0,
-      feb: 1, february: 1,
-      mar: 2, march: 2,
-      apr: 3, april: 3,
-      may: 4,
-      jun: 5, june: 5,
-      jul: 6, july: 6,
-      aug: 7, august: 7,
-      sep: 8, september: 8,
-      oct: 9, october: 9,
-      nov: 10, november: 10,
-      dec: 11, december: 11,
-    };
     
     const monthNum = months[month.toLowerCase()];
     if (monthNum !== undefined) {
-      return new Date(parseInt(year), monthNum, parseInt(day), 19, 30);
+      // Create date in Austin timezone with default 7:30 PM show time
+      return createAustinDate(parseInt(year), monthNum, parseInt(day), 19, 30);
     }
   }
   

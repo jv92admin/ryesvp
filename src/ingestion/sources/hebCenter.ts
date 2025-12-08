@@ -2,6 +2,7 @@ import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
 import { launchBrowser } from '@/lib/browser';
+import { createAustinDate } from '@/lib/utils';
 
 /**
  * Scrape events from H-E-B Center at Cedar Park website using the CALENDAR view.
@@ -162,10 +163,10 @@ function parseCalendarDate(fullDate: string | undefined, dateSpan: string, timeS
       const day = parseInt(parts[1], 10);
       const year = parseInt(parts[2], 10);
       
-      // Parse time
+      // Parse time and create date in Austin timezone
       const { hours, minutes } = parseTime(timeStr);
       
-      return new Date(year, month, day, hours, minutes, 0);
+      return createAustinDate(year, month, day, hours, minutes);
     }
   }
   
@@ -173,11 +174,19 @@ function parseCalendarDate(fullDate: string | undefined, dateSpan: string, timeS
   if (dateSpan) {
     // Remove trailing " - " or similar
     const cleanDate = dateSpan.replace(/\s*-\s*$/, '').trim();
-    const parsed = new Date(cleanDate);
-    if (!isNaN(parsed.getTime())) {
-      const { hours, minutes } = parseTime(timeStr);
-      parsed.setHours(hours, minutes, 0, 0);
-      return parsed;
+    // Parse date components manually to use Austin timezone
+    const match = cleanDate.match(/(\w+)\s+(\d+),?\s+(\d{4})/);
+    if (match) {
+      const [, monthName, day, year] = match;
+      const months: Record<string, number> = {
+        jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
+        jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
+      };
+      const monthNum = months[monthName.toLowerCase().slice(0, 3)];
+      if (monthNum !== undefined) {
+        const { hours, minutes } = parseTime(timeStr);
+        return createAustinDate(parseInt(year), monthNum, parseInt(day), hours, minutes);
+      }
     }
   }
   

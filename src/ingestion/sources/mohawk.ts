@@ -2,6 +2,7 @@ import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
 import { launchBrowser } from '@/lib/browser';
+import { createAustinDate } from '@/lib/utils';
 
 /**
  * Scrape events from Mohawk Austin website.
@@ -202,7 +203,8 @@ function parseMohawkDate(month: string, day: string, time: string): Date | null 
       year++;
     }
     
-    return new Date(year, monthNum, dayNum, hour, minute);
+    // Create date in Austin timezone
+    return createAustinDate(year, monthNum, dayNum, hour, minute);
     
   } catch {
     return null;

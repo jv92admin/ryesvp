@@ -1,6 +1,7 @@
 import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
+import { createAustinDate } from '@/lib/utils';
 
 /**
  * Scrape events from Circuit of the Americas (COTA) website.
@@ -169,21 +170,14 @@ function parseCOTADate(dateStr: string): Date | null {
  * Parse a simple date string like "March 14, 2026" or "November 21 2025"
  */
 function parseSimpleDate(dateStr: string): Date | null {
-  // Try standard Date parsing
-  const parsed = new Date(dateStr);
-  if (!isNaN(parsed.getTime())) {
-    // Set to evening (7 PM) for events
-    parsed.setHours(19, 0, 0, 0);
-    return parsed;
-  }
-  
-  // Manual parsing for formats like "March 14 2026" (no comma)
+  // Manual parsing to ensure we create dates in Austin timezone
   const monthMap: Record<string, number> = {
     'january': 0, 'february': 1, 'march': 2, 'april': 3,
     'may': 4, 'june': 5, 'july': 6, 'august': 7,
     'september': 8, 'october': 9, 'november': 10, 'december': 11,
   };
   
+  // Match formats like "March 14, 2026" or "March 14 2026"
   const match = dateStr.match(/([A-Za-z]+)\s+(\d{1,2}),?\s*(\d{4})/i);
   if (match) {
     const month = monthMap[match[1].toLowerCase()];
@@ -191,7 +185,8 @@ function parseSimpleDate(dateStr: string): Date | null {
     const year = parseInt(match[3], 10);
     
     if (month !== undefined && !isNaN(day) && !isNaN(year)) {
-      return new Date(year, month, day, 19, 0, 0);
+      // Create date in Austin timezone (7 PM default for events)
+      return createAustinDate(year, month, day, 19, 0);
     }
   }
   

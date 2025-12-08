@@ -1,6 +1,7 @@
 import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
+import { createAustinDate } from '@/lib/utils';
 
 /**
  * Scrape events from Q2 Stadium website (Austin FC home).
@@ -121,12 +122,20 @@ export async function fetchEventsFromQ2Stadium(): Promise<NormalizedEvent[]> {
 function parseQ2Date(dateStr: string): Date | null {
   if (!dateStr) return null;
   
-  // Try standard Date parsing
-  const parsed = new Date(dateStr);
-  if (!isNaN(parsed.getTime())) {
-    // Set to evening (7:30 PM) for soccer matches
-    parsed.setHours(19, 30, 0, 0);
-    return parsed;
+  const months: Record<string, number> = {
+    january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+    july: 6, august: 7, september: 8, october: 9, november: 10, december: 11,
+  };
+  
+  // Parse manually: "February 21, 2026"
+  const match = dateStr.match(/(\w+)\s+(\d+),?\s+(\d{4})/);
+  if (match) {
+    const [, monthName, day, year] = match;
+    const monthNum = months[monthName.toLowerCase()];
+    if (monthNum !== undefined) {
+      // Create date in Austin timezone with default 7:30 PM
+      return createAustinDate(parseInt(year), monthNum, parseInt(day), 19, 30);
+    }
   }
   
   return null;

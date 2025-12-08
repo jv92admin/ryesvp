@@ -2,6 +2,7 @@ import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
 import { inferCategory } from '../utils/dateParser';
+import { createAustinDate } from '@/lib/utils';
 
 /**
  * Scrape events from Stubb's BBQ website.
@@ -59,21 +60,16 @@ export async function fetchEventsFromStubbs(): Promise<NormalizedEvent[]> {
         const displayDate = $section.find('.tw-event-date').first().text().trim();
         const dayOfWeek = $section.find('.tw-day-of-week').first().text().trim();
 
+        // Get show time
+        const timeText = $section.find('.tw-event-time').first().text().trim();
+        const timeInfo = parseTimeFromText(timeText);
+
         // Parse date - try to extract year from URL first
-        const startDateTime = parseStubbyDate(displayDate, eventUrl);
+        const startDateTime = parseStubbyDate(displayDate, eventUrl, timeInfo.hour, timeInfo.minute);
 
         if (!startDateTime || isNaN(startDateTime.getTime())) {
           console.log(`Stubb's: Could not parse date for "${title}": ${displayDate}`);
           continue;
-        }
-
-        // Get show time
-        const timeText = $section.find('.tw-event-time').first().text().trim();
-        
-        // Parse and apply time to date if available
-        const timeInfo = parseTimeFromText(timeText);
-        if (timeInfo.hour !== null) {
-          startDateTime.setHours(timeInfo.hour, timeInfo.minute);
         }
 
         // Get door time for description
@@ -140,15 +136,19 @@ export async function fetchEventsFromStubbs(): Promise<NormalizedEvent[]> {
  * Display date: "11/30" (month/day only)
  * URL contains full date: /tm-event/gospel-brunch-2025-11-30/
  */
-function parseStubbyDate(displayDate: string, url: string): Date | null {
+function parseStubbyDate(displayDate: string, url: string, hour: number | null, minute: number): Date | null {
   try {
+    // Default to 8 PM if no time provided
+    const finalHour = hour ?? 20;
+    const finalMinute = minute;
+
     // First try to extract full date from URL
     // URL pattern: /tm-event/event-name-YYYY-MM-DD/ or /tm-event/event-name-2025-11-30/
     const urlDateMatch = url.match(/(\d{4})-(\d{2})-(\d{2})/);
     if (urlDateMatch) {
       const [, year, month, day] = urlDateMatch;
-      // Default to 8 PM for shows
-      return new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 20, 0);
+      // Create date in Austin timezone
+      return createAustinDate(parseInt(year), parseInt(month) - 1, parseInt(day), finalHour, finalMinute);
     }
 
     // Fall back to parsing display date with current/next year logic
@@ -169,8 +169,8 @@ function parseStubbyDate(displayDate: string, url: string): Date | null {
       year += 1;
     }
 
-    // Default to 8 PM for shows
-    return new Date(year, month, day, 20, 0);
+    // Create date in Austin timezone
+    return createAustinDate(year, month, day, finalHour, finalMinute);
 
   } catch (error) {
     console.error("Stubb's: Error parsing date:", error);

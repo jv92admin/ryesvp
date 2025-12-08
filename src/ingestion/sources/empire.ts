@@ -2,6 +2,7 @@ import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
 import { launchBrowser } from '@/lib/browser';
+import { createAustinDate } from '@/lib/utils';
 
 /**
  * Scrape events from Empire Garage & Control Room website.
@@ -203,7 +204,7 @@ function parseEmpireDate(dateStr: string): Date | null {
     }
   }
   
-  // Default time to 8 PM for concerts
-  return new Date(year, month, day, 20, 0, 0);
+  // Default time to 8 PM for concerts - create in Austin timezone
+  return createAustinDate(year, month, day, 20, 0);
 }
 

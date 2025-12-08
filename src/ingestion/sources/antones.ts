@@ -1,6 +1,7 @@
 import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import * as cheerio from 'cheerio';
+import { createAustinDate } from '@/lib/utils';
 
 type CheerioAPI = ReturnType<typeof cheerio.load>;
 
@@ -151,25 +152,41 @@ function parseAntonesDateTime(dateStr: string, timeStr: string): Date | null {
     if (!dateStr) return null;
     
     // Parse date
+    const months: Record<string, number> = {
+      january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+      july: 6, august: 7, september: 8, october: 9, november: 10, december: 11,
+      jan: 0, feb: 1, mar: 2, apr: 3, jun: 5,
+      jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
+    };
+    
     const dateMatch = dateStr.match(/(\w+)\s+(\d{1,2}),?\s*(\d{4})/);
+    let monthNum: number;
+    let dayNum: number;
+    let yearNum: number;
+    
     if (!dateMatch) {
       // Try alternate format without year
       const shortMatch = dateStr.match(/(\w+)\s+(\d{1,2})/);
       if (shortMatch) {
-        const [, month, day] = shortMatch;
-        const year = new Date().getFullYear();
-        const attempt = new Date(`${month} ${day}, ${year}`);
+        const [, monthName, day] = shortMatch;
+        monthNum = months[monthName.toLowerCase()] ?? 0;
+        dayNum = parseInt(day, 10);
+        yearNum = new Date().getFullYear();
         
         // If date is in the past, assume next year
-        if (attempt < new Date()) {
-          return new Date(`${month} ${day}, ${year + 1}`);
+        const testDate = new Date(yearNum, monthNum, dayNum);
+        if (testDate < new Date()) {
+          yearNum++;
         }
-        return attempt;
+      } else {
+        return null;
       }
-      return null;
+    } else {
+      const [, monthName, day, year] = dateMatch;
+      monthNum = months[monthName.toLowerCase()] ?? 0;
+      dayNum = parseInt(day, 10);
+      yearNum = parseInt(year, 10);
     }
-    
-    const [, month, day, year] = dateMatch;
     
     // Parse time (e.g., "8:00pm", "9:30pm")
     let hours = 19; // Default to 7pm if no time
@@ -190,11 +207,8 @@ function parseAntonesDateTime(dateStr: string, timeStr: string): Date | null {
       }
     }
     
-    // Build the date
-    const date = new Date(`${month} ${day}, ${year}`);
-    date.setHours(hours, minutes, 0, 0);
-    
-    return date;
+    // Build the date in Austin timezone
+    return createAustinDate(yearNum, monthNum, dayNum, hours, minutes);
   } catch {
     return null;
   }
