@@ -135,7 +135,7 @@ export async function fetchEventsFromEmpire(): Promise<NormalizedEvent[]> {
           imageUrl,
           description: null,
           source: EventSource.VENUE_WEBSITE,
-          category: EventCategory.MUSIC,
+          category: EventCategory.CONCERT,
           venueSlug: 'empire-control-room',
         });
         

@@ -1,14 +1,15 @@
 #!/usr/bin/env npx tsx
 /**
- * Test the presales API logic directly (without HTTP)
+ * Test the presales API logic directly
  */
+
 import { config } from 'dotenv';
 config({ path: '.env.local' });
 
 import prisma from '../../src/db/prisma';
 
 interface TMPresale {
-  name: string;
+  name?: string;
   startDateTime?: string;
   endDateTime?: string;
 }
@@ -25,8 +26,13 @@ function isRelevantPresale(presaleName: string | undefined): boolean {
   if (name === 'onsale' || name.endsWith(' onsale')) return false;
   
   const includePatterns = [
-    'presale', 'pre-sale', 'fan club', 'early access',
-    'preferred tickets', 'preferred seating', 'select seats',
+    'presale',
+    'pre-sale',
+    'fan club',
+    'early access',
+    'preferred tickets',
+    'preferred seating',
+    'select seats',
   ];
   
   for (const pattern of includePatterns) {
@@ -36,11 +42,12 @@ function isRelevantPresale(presaleName: string | undefined): boolean {
   return false;
 }
 
-async function main() {
+async function test() {
   const now = new Date();
   console.log('Current time:', now.toISOString());
   console.log('');
-
+  
+  // Fetch the same way the API does
   const events = await prisma.event.findMany({
     where: {
       startDateTime: { gte: now },
@@ -62,90 +69,69 @@ async function main() {
     take: 200,
   });
 
-  console.log(`Found ${events.length} events with enrichment\n`);
-
-  let presaleCount = 0;
-  let upcomingCount = 0;
-  let skippedNoPresales = 0;
-  let skippedNoRelevant = 0;
-  let skippedNotActive = 0;
+  console.log(`Found ${events.length} future events with enrichment`);
+  console.log('');
   
-  for (const event of events) {
-    const enrichment = event.enrichment;
-    if (!enrichment) continue;
-    if (!enrichment.tmPresales && !enrichment.tmOnSaleStart) {
-      skippedNoPresales++;
-      continue;
-    }
-
-    const presales = enrichment.tmPresales as TMPresale[] | null;
-    if (!presales || !Array.isArray(presales)) continue;
-
-    const relevantPresales = presales.filter(p => isRelevantPresale(p.name));
-    if (relevantPresales.length === 0) {
-      skippedNoRelevant++;
-      continue;
-    }
-
-    // Check for active presales
-    let foundActive = false;
-    for (const presale of relevantPresales) {
-      if (!presale.startDateTime) continue;
-
-      const start = new Date(presale.startDateTime);
-      const end = presale.endDateTime ? new Date(presale.endDateTime) : null;
-
-      if (start <= now && (!end || end > now)) {
-        presaleCount++;
-        foundActive = true;
-        console.log(`✅ ACTIVE: ${event.title}`);
-        console.log(`   Presale: ${presale.name}`);
-        console.log(`   Started: ${start.toISOString()}`);
-        console.log(`   Ends: ${end?.toISOString() || 'N/A'}`);
-        console.log('');
-        break;
-      }
-    }
+  // Look specifically for Jeff Dunham
+  const jeffDunham = events.find(e => e.title.includes('Jeff Dunham'));
+  
+  if (!jeffDunham) {
+    console.log('❌ Jeff Dunham event NOT FOUND in query results!');
+    console.log('');
     
-    // If not active, check for upcoming presales
-    if (!foundActive && relevantPresales.length > 0) {
-      const upcomingPresales = relevantPresales
-        .filter(p => p.startDateTime && new Date(p.startDateTime) > now)
-        .sort((a, b) => new Date(a.startDateTime!).getTime() - new Date(b.startDateTime!).getTime());
-      
-      if (upcomingPresales.length > 0) {
-        upcomingCount++;
-        const next = upcomingPresales[0];
-        const start = new Date(next.startDateTime!);
-        if (upcomingCount <= 10) {
-          console.log(`🔜 UPCOMING: ${event.title}`);
-          console.log(`   Presale: ${next.name}`);
-          console.log(`   Starts: ${start.toISOString()}`);
-          console.log('');
-        }
-      } else {
-        skippedNotActive++;
-        if (skippedNotActive <= 3) {
-          console.log(`⏭️ ENDED: ${event.title}`);
-          for (const presale of relevantPresales.slice(0, 2)) {
-            const end = presale.endDateTime ? new Date(presale.endDateTime) : null;
-            console.log(`   - ${presale.name}: ended ${end?.toISOString() || 'unknown'}`);
-          }
-          console.log('');
-        }
-      }
+    // Check if it exists at all
+    const directCheck = await prisma.event.findFirst({
+      where: { title: { contains: 'Jeff Dunham' } },
+      include: { enrichment: true }
+    });
+    
+    if (directCheck) {
+      console.log('Event exists in DB:');
+      console.log('  ID:', directCheck.id);
+      console.log('  Title:', directCheck.title);
+      console.log('  Status:', directCheck.status);
+      console.log('  startDateTime:', directCheck.startDateTime);
+      console.log('  Has enrichment:', !!directCheck.enrichment);
+    }
+    return;
+  }
+  
+  console.log('✅ Jeff Dunham event FOUND in query');
+  console.log('  ID:', jeffDunham.id);
+  console.log('  Status: SCHEDULED');
+  console.log('');
+  
+  const enrichment = jeffDunham.enrichment;
+  const presales = enrichment?.tmPresales as TMPresale[] | null;
+  
+  if (!presales) {
+    console.log('❌ No presales data');
+    return;
+  }
+  
+  console.log(`Checking ${presales.length} presales:`);
+  
+  const relevantPresales = presales.filter(p => isRelevantPresale(p.name));
+  console.log(`  Relevant presales: ${relevantPresales.length}`);
+  
+  for (const presale of relevantPresales) {
+    const start = presale.startDateTime ? new Date(presale.startDateTime) : null;
+    const end = presale.endDateTime ? new Date(presale.endDateTime) : null;
+    
+    const isActive = start && start <= now && (!end || end > now);
+    
+    console.log(`  - "${presale.name}"`);
+    console.log(`    Start: ${start?.toISOString()}`);
+    console.log(`    End: ${end?.toISOString()}`);
+    console.log(`    Active: ${isActive ? '✅ YES' : '❌ NO'}`);
+    
+    if (isActive) {
+      console.log('');
+      console.log('🎉 This event SHOULD appear in presales filter!');
     }
   }
-
-  console.log(`\n=== SUMMARY ===`);
-  console.log(`Active presales: ${presaleCount}`);
-  console.log(`Upcoming presales: ${upcomingCount}`);
-  console.log(`Skipped - no presale data: ${skippedNoPresales}`);
-  console.log(`Skipped - no relevant presales: ${skippedNoRelevant}`);
-  console.log(`Skipped - presales ended: ${skippedNotActive}`);
 }
 
-main()
+test()
   .catch(console.error)
   .finally(() => prisma.$disconnect());
-

@@ -61,6 +61,8 @@ export async function GET() {
     
     // Fetch upcoming events with their enrichment data
     // We'll filter for presales in code since Prisma JSON queries are tricky
+    // Note: No limit - we need ALL future events to find active presales
+    // (an event in 2026 could have an active presale NOW)
     const events = await prisma.event.findMany({
       where: {
         startDateTime: { gte: now },
@@ -79,7 +81,6 @@ export async function GET() {
         },
       },
       orderBy: { startDateTime: 'asc' },
-      take: 200, // Fetch more since we'll filter
     });
 
     const presaleEvents: PresaleEventResult[] = [];
