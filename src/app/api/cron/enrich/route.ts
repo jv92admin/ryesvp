@@ -1,12 +1,14 @@
 /**
- * POST /api/cron/enrich
+ * GET /api/cron/enrich
  * 
  * Cron job to enrich events with LLM categorization, Knowledge Graph, and Spotify data.
  * Processes events that don't have enrichment records yet.
  * 
  * Schedule: Daily at 4 AM Central (10 AM UTC) — after scraping completes
  * 
- * Auth: Requires CRON_SECRET bearer token
+ * Auth: Requires CRON_SECRET bearer token (Vercel sends this automatically)
+ * 
+ * Note: Vercel Cron jobs use GET requests.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -17,7 +19,10 @@ import prisma from '@/db/prisma';
 const JOB_NAME = 'enrich';
 const DEFAULT_BATCH_SIZE = 50;
 
-export async function POST(request: NextRequest) {
+// Prevent caching
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: NextRequest) {
   // Auth check
   const authError = verifyCronAuth(request);
   if (authError) return authError;
@@ -70,20 +75,11 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * GET /api/cron/enrich
+ * POST /api/cron/enrich
  * 
- * Health check / status endpoint
+ * Manual trigger endpoint (for local testing)
  */
-export async function GET() {
-  return NextResponse.json({
-    job: JOB_NAME,
-    description: 'Enrich events with LLM categorization, Knowledge Graph, and Spotify data',
-    method: 'POST',
-    auth: 'Bearer CRON_SECRET',
-    params: {
-      limit: 'Optional batch size (default: 50)',
-      force: 'Set to "true" to re-process all events (deletes existing enrichments)',
-    },
-  });
+export async function POST(request: NextRequest) {
+  return GET(request);
 }
 

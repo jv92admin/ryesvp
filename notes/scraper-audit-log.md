@@ -47,6 +47,32 @@ Tracking scraper reviews, fixes, and status.
 
 ---
 
+## 2025-12-08: Emo's (DOM Extraction Fix)
+
+**Status:** ✅ Fixed
+
+**Issue:** Scraper was missing 1 event (Chance Peña on July 31, 2026) that wasn't in JSON-LD structured data.
+
+**Root Cause:**
+1. JSON-LD only contains 36 of 37 events
+2. DOM extraction wasn't being used because JSON-LD had events
+3. Page required aggressive scrolling to load lazy content
+
+**Fix Applied:**
+- Hybrid approach: Extract from JSON-LD first, then supplement with DOM extraction
+- DOM extraction parses Ticketmaster URLs to find events not in JSON-LD
+- Added multi-pass scrolling to ensure all lazy-loaded content renders
+- Smart deduplication to avoid double-counting (compares normalized titles + dates within 1 day)
+
+**Result:**
+- Before: 36 events (missing July 2026)
+- After: **37 events** (through July 2026, includes Chance Peña)
+
+**Files Changed:**
+- `src/ingestion/sources/emos.ts` - Complete rewrite of DOM extraction logic
+
+---
+
 ## 2025-12-07: Antone's Nightclub
 
 **Status:** ✅ New scraper created

@@ -1,12 +1,14 @@
 /**
- * POST /api/cron/weather-precache
+ * GET /api/cron/weather-precache
  * 
  * Cron job to pre-cache weather forecasts for upcoming events.
  * Ensures Day-of mode loads instantly without hitting Google Weather API.
  * 
  * Schedule: Daily at 6 AM Central (12 PM UTC)
  * 
- * Auth: Requires CRON_SECRET bearer token
+ * Auth: Requires CRON_SECRET bearer token (Vercel sends this automatically)
+ * 
+ * Note: Vercel Cron jobs use GET requests.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -17,7 +19,10 @@ import { getWeatherForDate, roundCoords, getDateString } from '@/lib/weather';
 const JOB_NAME = 'weather-precache';
 const CACHE_TTL_HOURS = 1;
 
-export async function POST(request: NextRequest) {
+// Prevent caching
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: NextRequest) {
   // Auth check
   const authError = verifyCronAuth(request);
   if (authError) return authError;
@@ -166,16 +171,11 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * GET /api/cron/weather-precache
+ * POST /api/cron/weather-precache
  * 
- * Health check / status endpoint
+ * Manual trigger endpoint (for local testing)
  */
-export async function GET() {
-  return NextResponse.json({
-    job: JOB_NAME,
-    description: 'Pre-cache weather forecasts for upcoming events',
-    method: 'POST',
-    auth: 'Bearer CRON_SECRET',
-  });
+export async function POST(request: NextRequest) {
+  return GET(request);
 }
 

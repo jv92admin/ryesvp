@@ -1,12 +1,14 @@
 /**
- * POST /api/cron/tm-match
+ * GET /api/cron/tm-match
  * 
  * Cron job to match our events against cached Ticketmaster data.
  * Updates Enrichment records with TM URLs, presales, and ticket info.
  * 
  * Schedule: Daily at 5 AM Central (11 AM UTC) — after tm-download and enrich complete
  * 
- * Auth: Requires CRON_SECRET bearer token
+ * Auth: Requires CRON_SECRET bearer token (Vercel sends this automatically)
+ * 
+ * Note: Vercel Cron jobs use GET requests.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -17,6 +19,9 @@ import { calculateSimilarity } from '@/lib/ticketmaster/matcher';
 
 const JOB_NAME = 'tm-match';
 const DEFAULT_BATCH_SIZE = 100;
+
+// Prevent caching
+export const dynamic = 'force-dynamic';
 
 // LLM to pick the best match from candidates (or none)
 interface LLMMatchResult {
@@ -104,8 +109,8 @@ JSON response:
   }
 }
 
-export async function POST(request: NextRequest) {
-  // Auth check
+export async function GET(request: NextRequest) {
+  // Auth check - Vercel automatically sends Authorization header
   const authError = verifyCronAuth(request);
   if (authError) return authError;
 
@@ -296,19 +301,11 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * GET /api/cron/tm-match
+ * POST /api/cron/tm-match
  * 
- * Health check / status endpoint
+ * Manual trigger endpoint (for local testing)
  */
-export async function GET() {
-  return NextResponse.json({
-    job: JOB_NAME,
-    description: 'Match events against Ticketmaster cache',
-    method: 'POST',
-    auth: 'Bearer CRON_SECRET',
-    params: {
-      limit: 'Optional batch size (default: 100)',
-    },
-  });
+export async function POST(request: NextRequest) {
+  return GET(request);
 }
 

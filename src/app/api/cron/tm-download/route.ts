@@ -1,12 +1,14 @@
 /**
- * POST /api/cron/tm-download
+ * GET /api/cron/tm-download
  * 
  * Cron job to download Ticketmaster event cache.
  * Fetches all TM events for our mapped venues and stores in TMEventCache.
  * 
  * Schedule: Daily at 3 AM Central (9 AM UTC)
  * 
- * Auth: Requires CRON_SECRET bearer token
+ * Auth: Requires CRON_SECRET bearer token (Vercel sends this automatically)
+ * 
+ * Note: Vercel Cron jobs use GET requests.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -26,7 +28,10 @@ import { TMEvent } from '@/lib/ticketmaster/types';
 const JOB_NAME = 'tm-download';
 const DEFAULT_MONTHS_AHEAD = 6;
 
-export async function POST(request: NextRequest) {
+// Prevent caching
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: NextRequest) {
   // Auth check
   const authError = verifyCronAuth(request);
   if (authError) return authError;
@@ -201,19 +206,11 @@ export async function POST(request: NextRequest) {
 }
 
 /**
- * GET /api/cron/tm-download
+ * POST /api/cron/tm-download
  * 
- * Health check / status endpoint
+ * Manual trigger endpoint (for local testing)
  */
-export async function GET() {
-  return NextResponse.json({
-    job: JOB_NAME,
-    description: 'Download Ticketmaster events to cache',
-    method: 'POST',
-    auth: 'Bearer CRON_SECRET',
-    params: {
-      months: 'Optional months ahead to fetch (default: 6)',
-    },
-  });
+export async function POST(request: NextRequest) {
+  return GET(request);
 }
 

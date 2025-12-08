@@ -24,7 +24,7 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 |-------|-------|-------------|-----------|--------|
 | **A** | **Event Discovery 0** | Scraper cleanup & stabilization | 1-2 days | ✅ Complete |
 | **A** | **Event Discovery 1.1** | Priority venue identification | 0.5 day | ✅ Complete |
-| **A** | **Event Discovery 1.2** | Add priority venue scrapers | 2-3 days | 🔄 In Progress (3/12) |
+| **A** | **Event Discovery 1.2** | Add priority venue scrapers | 2-3 days | 🔄 In Progress (7/12) |
 | **A** | **Event Discovery 1.3** | Comprehensive source audit | 1-2 days | 🔲 |
 | **A** | **Event Discovery 1.4** | Performer entity design | 0.5 day | 🔲 |
 | **A** | **Event Discovery 1.5** | Basic search implementation | 1-2 days | 🔲 |
@@ -74,7 +74,7 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 - [x] Emo's - ✅ Fixed image extraction bug (36 events)
 - [x] Long Center - ✅ Healthy (59 events)
 
-**Output:** All scrapers working reliably, ~460 events across 11 venues.
+**Output:** All scrapers working reliably, ~570 events across 15 venues.
 
 ### Phase 1.1: Priority Venue Identification
 
@@ -719,10 +719,14 @@ See `data-model-101.md` for full documentation.
 
 ### Sprint: Event Discovery Phase 0-1 + Bug Fixes (Complete ✅)
 
-**New Venue Scrapers (3/12 priority venues):**
+**New Venue Scrapers (7/12 priority venues):**
 - [x] Emo's Austin - Puppeteer + JSON-LD extraction (36 events)
 - [x] Mohawk - Puppeteer + "show me more" button (37 events)
 - [x] Concourse Project - Puppeteer + AJAX Load More (25 events)
+- [x] Antone's Nightclub - fetch + cheerio (57 events)
+- [x] Moody Amphitheater - fetch + cheerio (9 events)
+- [x] Scoot Inn - Puppeteer + JSON-LD (13 events)
+- [x] Radio East - Puppeteer + DICE JSON-LD (23 events)
 
 **Scraper Fixes:**
 - [x] ACL Live - Fixed infinite scroll + Load More hybrid (was truncating at 2 months)

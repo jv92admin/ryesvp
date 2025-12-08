@@ -1,6 +1,8 @@
 import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
-import { load, CheerioAPI } from 'cheerio';
+import * as cheerio from 'cheerio';
+
+type CheerioAPI = ReturnType<typeof cheerio.load>;
 
 /**
  * Scrape events from Antone's Nightclub website.
@@ -45,7 +47,7 @@ export async function fetchEventsFromAntones(): Promise<NormalizedEvent[]> {
       }
       
       const html = await response.text();
-      const $ = load(html);
+      const $ = cheerio.load(html);
       
       // Parse events from this page
       const pageEvents = parseAntonesPage($, seenUrls);

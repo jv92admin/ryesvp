@@ -16,7 +16,7 @@
 | Long Center | Arts/Symphony | 59 | 2026-05 | ✅ Healthy |
 | Bass Concert Hall | Theater/Music | 37 | 2031-01 | ✅ TPA sub-venue |
 | Mohawk | Music | 37 | 2026-05 | ✅ NEW - Puppeteer |
-| Emo's Austin | Music | 36 | 2026-05 | ✅ NEW - JSON-LD |
+| Emo's Austin | Music | 37 | 2026-07 | ✅ Fixed - JSON-LD + DOM hybrid |
 | Concourse Project | EDM | 25 | 2026-03 | ✅ NEW - AJAX Load More |
 | Stubb's BBQ | Music/BBQ | 20 | 2026-05 | ✅ Smaller venue |
 | McCullough Theatre | Theater | 4 | 2026-01 | ✅ TPA sub-venue |
@@ -87,6 +87,7 @@
 | 2025-12-07 | Moody Amphitheater | Scraper created | 9 events, fetch + cheerio |
 | 2025-12-07 | Scoot Inn | Scraper created | 13 events, Puppeteer + JSON-LD |
 | 2025-12-07 | Radio East | Scraper created | 23 events, Puppeteer + DICE JSON-LD |
+| 2025-12-08 | Emo's | DOM extraction fix | 36→37 events, catches events not in JSON-LD |
 
 **Note on Moody Amphitheater:** Only 9 events currently listed. No pagination visible with this small dataset. If event count grows significantly, may need to revisit for pagination handling.
 
