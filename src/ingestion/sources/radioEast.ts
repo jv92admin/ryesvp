@@ -10,7 +10,7 @@
  * - JSON-LD contains @type: "MusicEvent" with full event data
  */
 
-import puppeteer from 'puppeteer';
+import { launchBrowser } from '@/lib/browser';
 import * as cheerio from 'cheerio';
 import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
@@ -23,10 +23,7 @@ export async function fetchEventsFromRadioEast(): Promise<NormalizedEvent[]> {
   
   console.log("Radio East: Starting scraper...");
   
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-  });
+  const browser = await launchBrowser();
   
   try {
     const page = await browser.newPage();

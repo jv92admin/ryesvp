@@ -1,7 +1,7 @@
 import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
-import puppeteer from 'puppeteer';
+import { launchBrowser } from '@/lib/browser';
 
 /**
  * Scrape events from Texas Performing Arts (Bass Concert Hall, McCullough Theatre, etc.)
@@ -27,10 +27,7 @@ export async function fetchEventsFromTPA(): Promise<NormalizedEvent[]> {
     console.log('TPA: Starting scrape...');
     
     // Launch headless browser
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    browser = await launchBrowser();
     
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 720 });

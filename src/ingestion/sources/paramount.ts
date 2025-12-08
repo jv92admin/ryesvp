@@ -2,7 +2,7 @@ import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
 import { inferCategory } from '../utils/dateParser';
-import puppeteer from 'puppeteer';
+import { launchBrowser } from '@/lib/browser';
 
 /**
  * Scrape events from Paramount Theatre website.
@@ -16,10 +16,7 @@ export async function fetchEventsFromParamount(): Promise<NormalizedEvent[]> {
   
   try {
     // Launch headless browser
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    browser = await launchBrowser();
     
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 720 });

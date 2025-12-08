@@ -1,7 +1,7 @@
 import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import * as cheerio from 'cheerio';
-import puppeteer from 'puppeteer';
+import { launchBrowser } from '@/lib/browser';
 
 type CheerioAPI = ReturnType<typeof cheerio.load>;
 type CheerioElement = cheerio.Element;
@@ -27,10 +27,7 @@ export async function fetchEventsFromEmos(): Promise<NormalizedEvent[]> {
   try {
     console.log("Emo's: Starting scraper...");
     
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    });
+    browser = await launchBrowser();
     
     const page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 720 });
@@ -125,7 +122,16 @@ function extractFromJsonLd($: CheerioAPI, eventsMap: Map<string, NormalizedEvent
         if (item['@type'] === 'Event' || item['@type'] === 'MusicEvent') {
           const startDateTime = new Date(item.startDate);
           
-          if (isNaN(startDateTime.getTime()) || startDateTime < new Date()) {
+          if (isNaN(startDateTime.getTime())) {
+            continue;
+          }
+          
+          // Compare dates only (ignore time) to avoid filtering out events happening later today
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const eventDate = new Date(startDateTime);
+          eventDate.setHours(0, 0, 0, 0);
+          if (eventDate < today) {
             continue;
           }
           
@@ -350,4 +356,3 @@ function inferEventCategory(title: string): EventCategory {
   // Default to concert for music venues
   return EventCategory.CONCERT;
 }
-

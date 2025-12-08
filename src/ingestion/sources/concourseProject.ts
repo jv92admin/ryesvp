@@ -1,6 +1,6 @@
 import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
-import puppeteer from 'puppeteer';
+import { launchBrowser } from '@/lib/browser';
 import { load } from 'cheerio';
 import { parseDate } from '../utils/dateParser';
 
@@ -16,10 +16,7 @@ export async function fetchEventsFromConcourseProject(): Promise<NormalizedEvent
     let browser;
 
     try {
-        browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
-        });
+        browser = await launchBrowser();
         const page = await browser.newPage();
         await page.setViewport({ width: 1280, height: 720 });
 
