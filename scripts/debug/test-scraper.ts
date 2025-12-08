@@ -33,6 +33,10 @@ import { fetchEventsFromAntones } from '../../src/ingestion/sources/antones';
 import { fetchEventsFromMoodyAmphitheater } from '../../src/ingestion/sources/moodyAmphitheater';
 import { fetchEventsFromScootInn } from '../../src/ingestion/sources/scootInn';
 import { fetchEventsFromRadioEast } from '../../src/ingestion/sources/radioEast';
+import { fetchEventsFromEmpire } from '../../src/ingestion/sources/empire';
+import { fetchEventsFromHEBCenter } from '../../src/ingestion/sources/hebCenter';
+import { fetchEventsFromCOTA } from '../../src/ingestion/sources/cota';
+import { fetchEventsFromQ2Stadium } from '../../src/ingestion/sources/q2Stadium';
 import { NormalizedEvent } from '../../src/ingestion/types';
 
 const scrapers: Record<string, () => Promise<NormalizedEvent[]>> = {
@@ -49,6 +53,10 @@ const scrapers: Record<string, () => Promise<NormalizedEvent[]>> = {
   'moody-amphitheater': fetchEventsFromMoodyAmphitheater,
   'scoot-inn': fetchEventsFromScootInn,
   'radio-east': fetchEventsFromRadioEast,
+  'empire': fetchEventsFromEmpire,
+  'heb-center': fetchEventsFromHEBCenter,
+  'cota': fetchEventsFromCOTA,
+  'q2-stadium': fetchEventsFromQ2Stadium,
 };
 
 async function main() {

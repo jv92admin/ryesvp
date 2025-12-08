@@ -243,6 +243,7 @@ src/
 │   ├── squads.ts         # Squad queries
 │   └── ...
 ├── lib/                   # Utilities, API clients
+│   ├── browser.ts        # Puppeteer launcher (local + serverless)
 │   ├── ticketmaster.ts   # TM API client
 │   ├── spotify.ts        # Spotify API client
 │   ├── weather.ts        # Weather API client
@@ -260,17 +261,37 @@ scripts/                  # CLI scripts for enrichment, maintenance
 
 ---
 
-## 9. Known Technical Debt
+## 9. Scheduled Jobs (Cron)
+
+All jobs run daily on Vercel Cron (staggered 2-6 AM Central).
+
+| Job | Route | Purpose |
+|-----|-------|---------|
+| Scrape | `/api/cron/scrape` | Run all venue scrapers |
+| Enrich | `/api/cron/enrich` | LLM + KG + Spotify enrichment |
+| TM Download | `/api/cron/tm-download` | Refresh Ticketmaster cache |
+| TM Match | `/api/cron/tm-match` | Match events to TM data |
+| Weather | `/api/cron/weather-precache` | Pre-cache weather for upcoming events |
+
+**Authentication:** All routes require `Bearer CRON_SECRET` header.
+
+**Serverless Puppeteer:** 8 scrapers use Puppeteer for JavaScript-heavy sites. On Vercel:
+- `@sparticuz/chromium-min` downloads chromium at runtime from GitHub releases
+- `puppeteer-core` launches the browser
+- `src/lib/browser.ts` abstracts local vs serverless environment detection
+
+---
+
+## 10. Known Technical Debt
 
 | Issue | Impact | Notes |
 |-------|--------|-------|
 | Venue lat/lng not populated | Weather + Maps links require geocoding | Need script to backfill via Google Geocoding API |
-| No scheduled jobs | Enrichment is manual | See `scheduled-jobs-spec.md` for cron approach |
 | Weather pre-caching | API calls on every Day-of view | Could pre-cache popular dates |
 
 ---
 
-## 10. Schema Gaps (Future Phases)
+## 11. Schema Gaps (Future Phases)
 
 Models and fields needed for upcoming features. Reference this when starting each phase. Assess data model based on updated knowledge and clarifications with users.
 

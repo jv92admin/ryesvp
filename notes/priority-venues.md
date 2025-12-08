@@ -2,7 +2,7 @@
 
 > **Purpose:** Identify gaps in venue coverage for comprehensive Austin event discovery.
 > **Created:** 2025-12-06
-> **Status:** In Progress
+> **Status:** ✅ Phase 1.2 Complete (Dec 8, 2025)
 
 ---
 
@@ -25,29 +25,41 @@
 | Moody Amphitheater | Outdoor | 9 | 2026-05 | ✅ NEW - fetch + cheerio |
 | Scoot Inn | Outdoor | 13 | 2026-05 | ✅ NEW - Puppeteer + JSON-LD |
 | Radio East | Music | 23 | 2026-04 | ✅ NEW - Puppeteer + DICE JSON-LD |
+| Empire Control Room | Music | 47 | 2026-06 | ✅ NEW - Puppeteer + MEC Load More |
+| HEB Center | Sports/Arena | 61 | 2026-06 | ✅ NEW - Puppeteer + Calendar view |
+| COTA | Racing/Concerts | 9 | 2026-10 | ✅ NEW - fetch + cheerio |
+| Q2 Stadium | Soccer/MLS | 16 | 2026-11 | ✅ NEW - fetch + cheerio |
 
-**Total: ~570 future events across 15 venues**
+**Total: ~711 future events across 19 venues**
+
+---
+
+## Priority Venues - Phase 1.2 ✅ COMPLETE
+
+| # | Venue | Category | Status | Notes |
+|---|-------|----------|--------|-------|
+| 1 | **Emo's** | Music | ✅ | 37 events, JSON-LD + DOM hybrid |
+| 2 | **Mohawk** | Music | ✅ | 37 events, Puppeteer + "show me more" |
+| 3 | **Antone's** | Blues | ✅ | 57 events, fetch + cheerio |
+| 4 | **Moody Amphitheater** | Outdoor | ✅ | 9 events, fetch + cheerio |
+| 5 | **Scoot Inn** | Outdoor | ✅ | 13 events, Puppeteer + JSON-LD |
+| 6 | **Concourse Project** | EDM | ✅ | 25 events, Puppeteer + AJAX Load More |
+| 7 | **Empire Control Room** | Music | ✅ | 47 events, Puppeteer + MEC Load More |
+| 8 | **HEB Center** | Sports/Arena | ✅ | 61 events, Puppeteer + Calendar view |
+| 9 | **COTA** | Racing/Concerts | ✅ | 9 events, fetch + cheerio |
+| 10 | **Q2 Stadium** | Soccer/MLS | ✅ | 16 events, fetch + cheerio |
+| 11 | **Radio East** | Music | ✅ | 23 events, Puppeteer + DICE JSON-LD |
+
+**11/11 priority venues complete!**
 
 ---
 
-## Must Do - Priority Venues
+## Deferred - Tier 2 (Seasonal/Empty)
 
-| # | Venue | Category | Status | HTML Provided | Notes |
-|---|-------|----------|--------|---------------|-------|
-| 1 | **Emo's** | Music | ✅ | ✅ | 36 events via JSON-LD |
-| 2 | **Mohawk** | Music | ✅ | ✅ | 37 events, "show me more" button |
-| 3 | **Parish** | Music | ⏸️ | ⬜ | Calendar empty (Dec 2025) |
-| 4 | **Antone's** | Blues | ✅ | ✅ | 57 events, fetch + cheerio |
-| 5 | **Moody Amphitheater** | Outdoor | ✅ | ✅ | 9 events, fetch + cheerio |
-| 6 | **Scoot Inn** | Outdoor | ✅ | ✅ | 13 events, Puppeteer + JSON-LD |
-| 7 | **Concourse Project** | EDM | ✅ | ✅ | 25 events, Load More AJAX |
-| 8 | **Empire** | Music | ⏳ | ⬜ | Empire Control Room |
-| 9 | **HEB Center** | Sports/Arena | ⏳ | ⬜ | Cedar Park - Texas Stars |
-| 10 | **COTA** | Racing/Concerts | ⏳ | ⬜ | F1, MotoGP, concerts |
-| 11 | **Darrell K Royal** | Football/Concerts | ⏳ | ⬜ | UT Stadium |
-| 12 | **Radio East** | Music | ✅ | ✅ | 23 events, Puppeteer + DICE JSON-LD |
-
----
+| Venue | Category | Status | Notes |
+|-------|----------|--------|-------|
+| **Parish** | Music | ⏸️ Deferred | Calendar empty as of Dec 2025 - revisit when events posted |
+| **Darrell K Royal** | Football/Concerts | ⏸️ Deferred | Texas football season over - revisit Fall 2026 or when concerts scheduled |
 
 ## Optional - Later Phase
 
@@ -88,6 +100,31 @@
 | 2025-12-07 | Scoot Inn | Scraper created | 13 events, Puppeteer + JSON-LD |
 | 2025-12-07 | Radio East | Scraper created | 23 events, Puppeteer + DICE JSON-LD |
 | 2025-12-08 | Emo's | DOM extraction fix | 36→37 events, catches events not in JSON-LD |
+| 2025-12-08 | Empire | Scraper created | 47 events, Puppeteer + MEC Load More |
+| 2025-12-08 | HEB Center | Scraper created | 61 events, Puppeteer + Calendar view |
+| 2025-12-08 | COTA | Scraper created | 9 events, fetch + cheerio |
+| 2025-12-08 | Q2 Stadium | Scraper created | 16 events, fetch + cheerio |
+| 2025-12-08 | All new venues | Ingested + Enriched | 133 events added, backdated to avoid "New" flood |
+| 2025-12-08 | Parish, DKR | Deferred to Tier 2 | Parish empty, Texas football season over |
 
 **Note on Moody Amphitheater:** Only 9 events currently listed. No pagination visible with this small dataset. If event count grows significantly, may need to revisit for pagination handling.
+
+---
+
+## Phase 1.2 Summary
+
+**Completed:** December 8, 2025
+
+- **11 priority venue scrapers** built and operational
+- **19 total venues** now covered
+- **~711 future events** in database
+- **133 new events** from today's session (Empire, HEB, COTA, Q2)
+- All events enriched with Knowledge Graph + Spotify metadata
+- Backdated to prevent "New" filter flood
+
+**Deferred:**
+- Parish (calendar empty)
+- Darrell K Royal Stadium (football season over)
+
+**Next:** Phase 1.3 - Source Structure Audit, or UX Quick Wins (Block B)
 

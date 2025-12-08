@@ -6,7 +6,7 @@ import prisma from '../src/db/prisma';
 
 async function backdate() {
   // Add new venues here when bulk importing to prevent "New" flood
-  const venueSlugs = ['antones', 'moody-amphitheater', 'scoot-inn', 'radio-east'];
+  const venueSlugs = ['empire-control-room', 'heb-center', 'cota', 'q2-stadium'];
   const backdateDate = new Date('2025-12-01T00:00:00Z');
   
   for (const slug of venueSlugs) {

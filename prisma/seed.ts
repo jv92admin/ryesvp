@@ -168,6 +168,66 @@ async function main() {
         lng: -97.7089,
       },
     }),
+    // Empire Garage & Control Room - music venue
+    prisma.venue.upsert({
+      where: { slug: 'empire-control-room' },
+      update: { lat: 30.2641, lng: -97.7347 },
+      create: {
+        name: 'Empire Control Room',
+        slug: 'empire-control-room',
+        websiteUrl: 'https://empireatx.com',
+        address: '606 E 7th St',
+        city: 'Austin',
+        state: 'TX',
+        lat: 30.2641,
+        lng: -97.7347,
+      },
+    }),
+    // HEB Center at Cedar Park - arena for Texas Stars, Austin Spurs
+    prisma.venue.upsert({
+      where: { slug: 'heb-center' },
+      update: { lat: 30.5241, lng: -97.8203 },
+      create: {
+        name: 'H-E-B Center at Cedar Park',
+        slug: 'heb-center',
+        websiteUrl: 'https://www.hebcenter.com',
+        address: '2100 Avenue of the Stars',
+        city: 'Cedar Park',
+        state: 'TX',
+        lat: 30.5241,
+        lng: -97.8203,
+      },
+    }),
+    // COTA - Circuit of the Americas
+    prisma.venue.upsert({
+      where: { slug: 'cota' },
+      update: { lat: 30.1346, lng: -97.6358 },
+      create: {
+        name: 'Circuit of the Americas',
+        slug: 'cota',
+        websiteUrl: 'https://circuitoftheamericas.com',
+        address: '9201 Circuit of the Americas Blvd',
+        city: 'Austin',
+        state: 'TX',
+        lat: 30.1346,
+        lng: -97.6358,
+      },
+    }),
+    // Q2 Stadium - Austin FC home
+    prisma.venue.upsert({
+      where: { slug: 'q2-stadium' },
+      update: { lat: 30.3885, lng: -97.7193 },
+      create: {
+        name: 'Q2 Stadium',
+        slug: 'q2-stadium',
+        websiteUrl: 'https://www.q2stadium.com',
+        address: '10414 McKalla Pl',
+        city: 'Austin',
+        state: 'TX',
+        lat: 30.3885,
+        lng: -97.7193,
+      },
+    }),
     // Moody Amphitheater at Waterloo Park - outdoor venue
     prisma.venue.upsert({
       where: { slug: 'moody-amphitheater' },

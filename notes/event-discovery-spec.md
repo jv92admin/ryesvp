@@ -19,17 +19,16 @@
 ## Current State (December 2025)
 
 **What exists:**
-- Venue model (first-class entity, 6+ venues)
-- Event model with basic fields
-- 6 scrapers: Moody Center, ACL Live, Paramount, Bass Concert Hall, Emo's, Texas Performing Arts
+- Venue model (first-class entity, **19 venues**)
+- Event model with basic fields (~711 future events)
+- **19 scrapers** covering major Austin venues (Phase 1.2 complete)
 - Enrichment model with Spotify, Knowledge Graph, Ticketmaster fields
 - LLM enrichment for category inference, performer extraction
 - Basic event list with category/venue filters
 
 **What's missing:**
 - Performer as first-class entity
-- Comprehensive source metadata documentation
-- Many venues not covered
+- Comprehensive source metadata documentation (Phase 1.3)
 - No text search
 - No personalization
 
@@ -73,19 +72,36 @@
 - Theaters
 - Bars with regular events
 
-### 1.2 Add Priority Venue Scrapers
+### 1.2 Add Priority Venue Scrapers ✅ COMPLETE
+
+**Status:** Completed December 8, 2025
 
 **Goal:** Expand coverage to priority venues identified in 1.1.
 
-**For each new source:**
-1. Implement scraper using existing patterns (from cleaned-up scrapers)
-2. Ensure events link to Venue entity
-3. Capture all fields current schema supports
-4. Test reliability before moving on
+**Results:**
+- **11 priority venue scrapers** built (see `notes/priority-venues.md`)
+- **19 total venues** now covered
+- **~711 future events** in database
+- All scrapers tested, events ingested, enriched, and backdated
 
-**Do NOT add new Event/Venue fields yet** - just capture what current schema supports.
+**Scrapers added:**
+- Emo's (JSON-LD + DOM hybrid)
+- Mohawk (Puppeteer + "show me more")
+- Antone's (fetch + cheerio)
+- Moody Amphitheater (fetch + cheerio)
+- Scoot Inn (Puppeteer + JSON-LD)
+- Concourse Project (Puppeteer + AJAX Load More)
+- Empire Control Room (Puppeteer + MEC Load More)
+- HEB Center (Puppeteer + Calendar view)
+- COTA (fetch + cheerio)
+- Q2 Stadium (fetch + cheerio)
+- Radio East (Puppeteer + DICE JSON-LD)
 
-**Do NOT document metadata structure yet** - that's next.
+**Deferred to Tier 2:**
+- Parish (calendar empty as of Dec 2025)
+- Darrell K Royal Stadium (Texas football season over)
+
+**Next:** Phase 1.3 - Comprehensive Source Audit
 
 ### 1.3 Comprehensive Source Audit (ALL Sources)
 
@@ -450,7 +466,7 @@ Ship polish before inviting real users:
 ---
 
 *Created: December 6, 2025*
-*Updated: December 6, 2025*
-*Status: Ready for Phase 0 execution*
+*Updated: December 8, 2025*
+*Status: Phase 1.2 Complete - Ready for Phase 1.3 (Source Audit) or UX Quick Wins*
 *Cross-reference: PROJECT-ROADMAP.md (Blocks A, B, C, D)*
 

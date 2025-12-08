@@ -12,6 +12,10 @@ import { fetchEventsFromAntones } from './sources/antones';
 import { fetchEventsFromMoodyAmphitheater } from './sources/moodyAmphitheater';
 import { fetchEventsFromScootInn } from './sources/scootInn';
 import { fetchEventsFromRadioEast } from './sources/radioEast';
+import { fetchEventsFromEmpire } from './sources/empire';
+import { fetchEventsFromHEBCenter } from './sources/hebCenter';
+import { fetchEventsFromCOTA } from './sources/cota';
+import { fetchEventsFromQ2Stadium } from './sources/q2Stadium';
 import { fetchMockEvents } from './sources/mock';
 import { upsertEvents } from './upsert';
 
@@ -97,6 +101,26 @@ export async function runAllScrapers(): Promise<{
       venueSlug: 'radio-east',
       fn: fetchEventsFromRadioEast,
     },
+    {
+      name: 'Empire Control Room',
+      venueSlug: 'empire-control-room',
+      fn: fetchEventsFromEmpire,
+    },
+    {
+      name: 'HEB Center',
+      venueSlug: 'heb-center',
+      fn: fetchEventsFromHEBCenter,
+    },
+    {
+      name: 'COTA',
+      venueSlug: 'cota',
+      fn: fetchEventsFromCOTA,
+    },
+    {
+      name: 'Q2 Stadium',
+      venueSlug: 'q2-stadium',
+      fn: fetchEventsFromQ2Stadium,
+    },
     // Mock scraper only runs in development or when explicitly requested
     ...(process.env.NODE_ENV === 'development' && process.env.ENABLE_MOCK_SCRAPER === 'true' ? [{
       name: 'Mock Scraper',
@@ -180,6 +204,17 @@ export async function runScraper(scraperName: string): Promise<ScraperResult> {
     'radio-east': fetchEventsFromRadioEast,
     'radioeast': fetchEventsFromRadioEast,
     'radio': fetchEventsFromRadioEast,
+    'empire': fetchEventsFromEmpire,
+    'empire-control-room': fetchEventsFromEmpire,
+    'empire-garage': fetchEventsFromEmpire,
+    'heb-center': fetchEventsFromHEBCenter,
+    'heb': fetchEventsFromHEBCenter,
+    'cedar-park': fetchEventsFromHEBCenter,
+    'cota': fetchEventsFromCOTA,
+    'circuit-of-the-americas': fetchEventsFromCOTA,
+    'q2-stadium': fetchEventsFromQ2Stadium,
+    'q2': fetchEventsFromQ2Stadium,
+    'austin-fc': fetchEventsFromQ2Stadium,
     'mock': fetchMockEvents,
   };
 

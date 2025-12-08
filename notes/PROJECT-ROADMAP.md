@@ -24,7 +24,7 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 |-------|-------|-------------|-----------|--------|
 | **A** | **Event Discovery 0** | Scraper cleanup & stabilization | 1-2 days | ✅ Complete |
 | **A** | **Event Discovery 1.1** | Priority venue identification | 0.5 day | ✅ Complete |
-| **A** | **Event Discovery 1.2** | Add priority venue scrapers | 2-3 days | 🔄 In Progress (7/12) |
+| **A** | **Event Discovery 1.2** | Add priority venue scrapers | 2-3 days | ✅ Complete (11/11) |
 | **A** | **Event Discovery 1.3** | Comprehensive source audit | 1-2 days | 🔲 |
 | **A** | **Event Discovery 1.4** | Performer entity design | 0.5 day | 🔲 |
 | **A** | **Event Discovery 1.5** | Basic search implementation | 1-2 days | 🔲 |
@@ -71,7 +71,7 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 - [x] ACL Live - ✅ Fixed infinite scroll + Load More (73 events to Dec 2026)
 - [x] Paramount Theatre - ✅ Healthy (102 events)
 - [x] Bass Concert Hall / Texas Performing Arts - ✅ Healthy (37 events)
-- [x] Emo's - ✅ Fixed image extraction bug (36 events)
+- [x] Emo's - ✅ Fixed image extraction + hybrid JSON-LD/DOM parsing (37 events)
 - [x] Long Center - ✅ Healthy (59 events)
 
 **Output:** All scrapers working reliably, ~570 events across 15 venues.
@@ -638,6 +638,14 @@ See `data-model-101.md` for full documentation.
 - [x] All jobs tested locally and verified working
 - [x] Docs: `docs/phase2-backend-reliability-plan.md`
 
+### Sprint: Serverless Puppeteer Fix (Complete ✅)
+- [x] `src/lib/browser.ts` — Shared browser launcher for local + serverless
+- [x] `@sparticuz/chromium-min` + `puppeteer-core` for Vercel compatibility
+- [x] Downloads chromium from GitHub releases at runtime (no bundled binaries)
+- [x] Updated all 8 Puppeteer scrapers to use `launchBrowser()` utility
+- [x] `next.config.ts` — `serverExternalPackages` for chromium/puppeteer
+- [x] Verified: All 13 scrapers working on Vercel cron (578 events, 0 errors)
+
 ### Sprint: Plan Creation UX & Toast Notifications (Complete ✅)
 
 **Toast Notification System:**
@@ -719,9 +727,22 @@ See `data-model-101.md` for full documentation.
 
 ### Sprint: Event Discovery Phase 0-1 + Bug Fixes (Complete ✅)
 
-**New Venue Scrapers (7/12 priority venues):**
-- [x] Emo's Austin - Puppeteer + JSON-LD extraction (36 events)
+**New Venue Scrapers (11/11 priority venues complete):**
+- [x] Emo's Austin - JSON-LD + DOM hybrid (37 events)
 - [x] Mohawk - Puppeteer + "show me more" button (37 events)
+- [x] Antone's - fetch + cheerio (57 events)
+- [x] Moody Amphitheater - fetch + cheerio (9 events)
+- [x] Scoot Inn - Puppeteer + JSON-LD (13 events)
+- [x] Concourse Project - Puppeteer + AJAX Load More (25 events)
+- [x] Radio East - Puppeteer + DICE JSON-LD (23 events)
+- [x] Empire Control Room - Puppeteer + MEC Load More (47 events)
+- [x] HEB Center - Puppeteer + Calendar view (61 events)
+- [x] COTA - fetch + cheerio (9 events)
+- [x] Q2 Stadium - fetch + cheerio (16 events)
+
+**Deferred to Tier 2:**
+- [ ] Parish - calendar empty (Dec 2025)
+- [ ] Darrell K Royal Stadium - Texas football season over
 - [x] Concourse Project - Puppeteer + AJAX Load More (25 events)
 - [x] Antone's Nightclub - fetch + cheerio (57 events)
 - [x] Moody Amphitheater - fetch + cheerio (9 events)
