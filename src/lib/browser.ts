@@ -27,14 +27,14 @@ export async function launchBrowser(): Promise<Browser> {
   );
 
   if (isServerless) {
-    // Serverless environment: use @sparticuz/chromium
-    const chromium = await import('@sparticuz/chromium');
+    // Serverless environment: use @sparticuz/chromium-min
+    const chromium = await import('@sparticuz/chromium-min');
     const puppeteerCore = await import('puppeteer-core');
 
     return puppeteerCore.default.launch({
       args: chromium.default.args,
       executablePath: await chromium.default.executablePath(),
-      headless: 'shell', // Required for @sparticuz/chromium's chrome-headless-shell binary
+      headless: true,
     });
   } else {
     // Local environment: use regular puppeteer
