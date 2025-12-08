@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Externalize packages that shouldn't be bundled (keeps binaries intact)
+  serverExternalPackages: [
+    '@sparticuz/chromium',
+    'puppeteer-core',
+  ],
 };
 
 export default nextConfig;
