@@ -124,10 +124,10 @@ export async function fetchEventsFromEmpire(): Promise<NormalizedEvent[]> {
         const imageUrl = $item.find('.mec-event-image img').attr('src') || null;
         
         // Create external ID from event ID or URL slug
-        const externalId = eventId || eventUrl.split('/').filter(Boolean).pop() || '';
+        const eventSlug = eventId || eventUrl.split('/').filter(Boolean).pop() || '';
         
         events.push({
-          externalId: `empire-${externalId}`,
+          sourceEventId: `empire-${eventSlug}`,
           title,
           startDateTime,
           endDateTime: null,
