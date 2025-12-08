@@ -34,7 +34,7 @@ export async function launchBrowser(): Promise<Browser> {
     return puppeteerCore.default.launch({
       args: chromium.default.args,
       executablePath: await chromium.default.executablePath(),
-      headless: true,
+      headless: 'shell', // Required for @sparticuz/chromium's chrome-headless-shell binary
     });
   } else {
     // Local environment: use regular puppeteer
