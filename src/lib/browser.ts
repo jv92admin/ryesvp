@@ -27,13 +27,18 @@ export async function launchBrowser(): Promise<Browser> {
   );
 
   if (isServerless) {
-    // Serverless environment: use @sparticuz/chromium-min
+    // Serverless environment: use @sparticuz/chromium-min with remote binary
     const chromium = await import('@sparticuz/chromium-min');
     const puppeteerCore = await import('puppeteer-core');
 
+    // Download chromium from GitHub releases at runtime
+    const executablePath = await chromium.default.executablePath(
+      'https://github.com/Sparticuz/chromium/releases/download/v131.0.1/chromium-v131.0.1-pack.tar'
+    );
+
     return puppeteerCore.default.launch({
       args: chromium.default.args,
-      executablePath: await chromium.default.executablePath(),
+      executablePath,
       headless: true,
     });
   } else {
