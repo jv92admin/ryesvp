@@ -1,6 +1,7 @@
 import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
+import { createAustinDate } from '@/lib/utils';
 
 /**
  * Scrape events from Moody Amphitheater at Waterloo Park.
@@ -161,8 +162,8 @@ function parseDate(month: string, day: string, timeStr: string): Date | null {
       }
     }
     
-    const date = new Date(year, monthNum, dayNum, hours, minutes, 0, 0);
-    return date;
+    // Create date in Austin timezone to prevent issues on UTC servers
+    return createAustinDate(year, monthNum, dayNum, hours, minutes);
     
   } catch {
     return null;

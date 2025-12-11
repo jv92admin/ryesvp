@@ -172,42 +172,51 @@ List ALL fields visible in source, whether we use them or not:
 
 **Output:** `docs/performer-model-design.md`
 
-### 1.5 Basic Search Implementation
+### 1.5 Performer Entity Implementation
 
-**Goal:** Enable users to search events by text.
+**Goal:** Create Performer model based on 1.4 design, with basic UI.
+
+**Tasks:**
+1. Create Performer model in Prisma
+2. Create Event ↔ Performer many-to-many relation (`EventPerformer` junction table)
+3. Backfill existing events with Performer links (using `llmPerformer` field)
+4. Display performer on event pages/cards
+5. **Performer popover/modal** - click performer name → see bio, image, other Austin shows
+
+**Schema:** Defined in `docs/performer-model-design.md` (from 1.4)
+
+**UI Scope (minimal):**
+- Performer name clickable on event cards/pages
+- Popover or modal shows: name, image, bio snippet, upcoming events
+- NOT a full `/performers/[id]` page yet (that's Phase 4.3)
+
+### 1.6 Basic Search Implementation
+
+**Goal:** Enable users to search events by text, including performers.
 
 **Scope:**
 - Search event title/displayTitle
 - Search venue name
-- Search performer name (once Performer entity exists)
+- **Search performer name** (now possible since 1.5 is complete)
 - Use existing filters (date, category, venue)
 
 **Implementation:**
 - Simple text matching initially (can upgrade to full-text search later)
-- Expose in UI with existing patterns
+- Search input in header or filter bar
+- Results show matching events with relevance
 
 **Output:** `docs/discovery-v1.md`
 - What fields are searchable
 - What filters exist
 - Known limitations
 
-### 1.6 Performer Entity Implementation
-
-**Goal:** Create Performer model based on 1.4 design.
-
-**Tasks:**
-1. Create Performer model in Prisma
-2. Create Event ↔ Performer many-to-many relation
-3. Backfill existing events with Performer links (where extractable)
-4. Add Performer to search
-
-**Schema:** Defined in `docs/performer-model-design.md` (from 1.4)
-
 ---
 
 ## Planned Pause – UX Quick Wins & User Testing
 
-**Goal:** Validate foundation before investing in enrichment.
+**Goal:** Validate Phase 1 foundation before investing in enrichment.
+
+**Timing:** After Phase 1.6 is complete (all of Event Discovery Foundation done).
 
 **Cross-reference:** This is "Block B" and "Block C" in `PROJECT-ROADMAP.md`.
 
@@ -445,10 +454,10 @@ Ship polish before inviting real users:
 | Phase | Document | Purpose |
 |-------|----------|---------|
 | 1.1 | `docs/priority-venues.md` | Venue coverage gaps |
-| 1.3 | `docs/source-structure-log.md` | All available metadata per source (COMPLETE) |
+| 1.3 | `docs/source-data-audit.md` | All available metadata per source ✅ STARTED |
 | 1.3 | `docs/venue-metadata-audit.md` | Venue enrichment possibilities |
 | 1.4 | `docs/performer-model-design.md` | Performer schema based on audit |
-| 1.5 | `docs/discovery-v1.md` | Basic search/filter docs |
+| 1.6 | `docs/discovery-v1.md` | Basic search/filter docs |
 | 2.1 | `docs/enrichment-use-cases.md` | What to enrich and why |
 | 2.2 | `docs/enrichment-schema.md` | Schema changes for enrichment |
 | 2.3-2.5 | `docs/*-enrichment-process.md` | How each entity is enriched |
@@ -466,7 +475,7 @@ Ship polish before inviting real users:
 ---
 
 *Created: December 6, 2025*
-*Updated: December 8, 2025*
-*Status: Phase 1.2 Complete - Ready for Phase 1.3 (Source Audit) or UX Quick Wins*
+*Updated: December 10, 2025*
+*Status: Phase 1.3 in progress (source audit started) → 1.4 → 1.5 → 1.6 → PAUSE*
 *Cross-reference: PROJECT-ROADMAP.md (Blocks A, B, C, D)*
 
