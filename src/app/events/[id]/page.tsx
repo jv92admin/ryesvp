@@ -9,6 +9,7 @@ import { AboutCard } from '@/components/AboutCard';
 import { ExploreCard } from '@/components/ExploreCard';
 import { InviteBanner } from '@/components/InviteBanner';
 import { InviteRedemptionHandler } from '@/components/InviteRedemptionHandler';
+import { PerformerLink } from '@/components/PerformerLink';
 import { getCurrentUser } from '@/lib/auth';
 import { getUserEventByEventId } from '@/db/userEvents';
 import { getEventAttendance } from '@/db/userEvents';
@@ -157,6 +158,13 @@ export default async function EventPage({ params }: EventPageProps) {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
             {displayTitle}
           </h1>
+
+          {/* Main Performer - clickable to open modal */}
+          {event.performer && (
+            <div className="text-sm text-gray-600 mb-2">
+              by <PerformerLink performerId={event.performer.id} performerName={event.performer.name} />
+            </div>
+          )}
 
           {/* Supporting Acts */}
           {fullEnrichment?.tmSupportingActs && fullEnrichment.tmSupportingActs.length > 0 && (

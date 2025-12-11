@@ -25,10 +25,10 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 | **A** | **Event Discovery 0** | Scraper cleanup & stabilization | 1-2 days | ✅ Complete |
 | **A** | **Event Discovery 1.1** | Priority venue identification | 0.5 day | ✅ Complete |
 | **A** | **Event Discovery 1.2** | Add priority venue scrapers | 2-3 days | ✅ Complete (11/11) |
-| **A** | **Event Discovery 1.3** | Comprehensive source audit | 1-2 days | 🔲 |
-| **A** | **Event Discovery 1.4** | Performer entity design | 0.5 day | 🔲 |
-| **A** | **Event Discovery 1.5** | Basic search implementation | 1-2 days | 🔲 |
-| **A** | **Event Discovery 1.6** | Performer entity implementation | 2-3 days | 🔲 |
+| **A** | **Event Discovery 1.3** | Comprehensive source audit | 1-2 days | ✅ Complete |
+| **A** | **Event Discovery 1.4** | Performer entity design | 0.5 day | ✅ Complete |
+| **A** | **Event Discovery 1.5** | Performer entity + modal UI | 2-3 days | ✅ Complete |
+| **A** | **Event Discovery 1.6** | Basic search implementation | 1-2 days | 🔲 |
 | **B** | **UX: Avatar Popover** | Hover quick actions (desktop) | 1 day | 🔲 |
 | **B** | **UX: Transactional Emails** | Welcome, invites, reminders | 2-3 days | 🔲 |
 | **B** | **UX: Bug Fixes** | Issues identified during build | 1-2 days | 🔲 |
@@ -97,44 +97,57 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 - Ensure events link to Venue entity
 - Test reliability before moving on
 
-### Phase 1.3: Comprehensive Source Audit
+### Phase 1.3: Comprehensive Source Audit ✅ COMPLETE
 
 **Goal:** Document what metadata is available across ALL sources.
 
-**Create:**
-- `docs/source-structure-log.md` — All fields per source
-- `docs/venue-metadata-audit.md` — Venue enrichment possibilities
+**Output:** `docs/source-data-audit.md`
+- Documented all 17 scrapers with field coverage
+- Identified gaps: Antone's (door/age), Mohawk (venue type/age), Moody Amp (image)
+- Identified common platforms: TicketWeb, JSON-LD, MEC, SeeTickets
+- Created enhancement priorities for Phase 2 venue/event enrichment
 
-### Phase 1.4: Performer Entity Design
+### Phase 1.4: Performer Entity Design ✅ COMPLETE
 
 **Goal:** Design Performer model based on audit findings.
 
-**Key decisions already made:**
+**Key decisions:**
 - Single `Performer` entity (not separate Artist/Team/etc.)
 - `type` discriminator: ARTIST, TEAM, COMEDIAN, COMPANY, OTHER
-- Event ↔ Performer: Many-to-many relationship
+- Event → Performer: Simple FK (not many-to-many, simplifies MVP)
+- User → Performer: Junction table for follows (better query patterns)
+- External IDs: Explicit columns (spotifyId, ticketmasterId, espnId) not JSON
+- Universal `tags` array for genres/styles/leagues
 
 **Output:** `docs/performer-model-design.md`
 
-### Phase 1.5: Basic Search Implementation
+### Phase 1.5: Performer Entity Implementation ✅ COMPLETE
+
+**Goal:** Create Performer model + basic UI.
+
+- [x] Create Performer model in Prisma
+- [x] Create UserPerformerFollow junction table
+- [x] Add Event.performerId FK
+- [x] Migration: `20251211041441_add_performer_entity`
+- [x] Backfill script: 502 performers, 597 events linked
+- [x] PerformerModal UI (click performer name → see bio, image, past/upcoming shows)
+- [x] Integrate into Event page
+
+**Future follow-ups (not MVP):**
+- Follow button + notification when followed performer has new show
+- Performer data cleanup (remove legacy artist fields from Enrichment)
+- Full `/performers/[slug]` page (Phase 4.3)
+
+### Phase 1.6: Basic Search Implementation
 
 **Goal:** Enable users to search events by text.
 
 - Search event title/displayTitle
 - Search venue name
-- Search performer name (after 1.6)
+- Search performer name (now possible since 1.5 complete)
 - Use existing filters (date, category, venue)
 
 **Output:** `docs/discovery-v1.md`
-
-### Phase 1.6: Performer Entity Implementation
-
-**Goal:** Create Performer model in database.
-
-- [ ] Create Performer model in Prisma
-- [ ] Create Event ↔ Performer many-to-many relation
-- [ ] Backfill existing events with Performer links
-- [ ] Add Performer to search
 
 ---
 
@@ -773,6 +786,6 @@ See `data-model-101.md` for full documentation.
 
 ---
 
-**Last Updated:** December 7, 2025
+**Last Updated:** December 11, 2025
 **Active Spec:** `notes/event-discovery-spec.md` (Blocks A, D)
 

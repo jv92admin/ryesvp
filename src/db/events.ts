@@ -38,6 +38,15 @@ export type EventSocialSignals = {
 };
 
 /**
+ * Performer data subset for UI display
+ */
+export type PerformerDisplay = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+/**
  * THE canonical event type for all UI display.
  * 
  * DISCIPLINE: Always use this type when displaying events.
@@ -50,6 +59,7 @@ export type EventDisplay = EventWithVenue & {
   displayTitle: string;              // ALWAYS resolved - use TM title if preferred, else event.title
   enrichment?: EnrichmentDisplay;
   social?: EventSocialSignals;
+  performer?: PerformerDisplay | null;  // Main performer for this event
   userSquad?: {                      // User's squad for this event (if any)
     id: string;
     hasSquad: boolean;
@@ -139,7 +149,16 @@ export async function getEventById(id: string): Promise<EventWithVenue | null> {
 export async function getEventDisplay(id: string): Promise<EventDisplay | null> {
   const event = await prisma.event.findUnique({
     where: { id },
-    include: { venue: true },
+    include: {
+      venue: true,
+      performer: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
+    },
   });
   
   if (!event) return null;
@@ -174,6 +193,7 @@ export async function getEventDisplay(id: string): Promise<EventDisplay | null> 
       tmPresales: null,
       tmStatus: null,
     } : undefined,
+    performer: event.performer,
   };
 }
 
