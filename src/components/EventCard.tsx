@@ -5,7 +5,7 @@ import { EventDisplay, EnrichmentDisplay } from '@/db/events';
 import { EventCardActions } from './EventCardActions';
 import { FriendCountBadge } from './ui/StatusBadge';
 import { formatEventDate, isNewListing } from '@/lib/utils';
-import { type TMPresale } from '@/lib/presales';
+import { type TMPresale, isRelevantPresale } from '@/lib/presales';
 
 // Get presale info for display - returns text for the presale row
 function getPresaleInfo(enrichment: EnrichmentDisplay | undefined): {
@@ -18,45 +18,46 @@ function getPresaleInfo(enrichment: EnrichmentDisplay | undefined): {
   const now = new Date();
   const presales = enrichment.tmPresales as TMPresale[] | null;
   
+  // Filter to only relevant presales (exclude VIP, resale, etc.)
+  const relevantPresales = presales?.filter(p => isRelevantPresale(p.name)) || [];
+  
   // Check for active presale first
-  if (presales && Array.isArray(presales)) {
-    for (const presale of presales) {
-      if (!presale.startDateTime) continue;
-      
-      const start = new Date(presale.startDateTime);
-      const end = presale.endDateTime ? new Date(presale.endDateTime) : null;
-      
-      // Active presale
-      if (start <= now && (!end || end > now)) {
-        const name = presale.name?.trim() || 'Presale';
-        return {
-          icon: '🔐',
-          text: name,
-          isActive: true,
-        };
-      }
-    }
+  for (const presale of relevantPresales) {
+    if (!presale.startDateTime) continue;
     
-    // Check for upcoming presale
-    const upcomingPresales = presales
-      .filter(p => p.startDateTime && new Date(p.startDateTime) > now)
-      .sort((a, b) => new Date(a.startDateTime!).getTime() - new Date(b.startDateTime!).getTime());
+    const start = new Date(presale.startDateTime);
+    const end = presale.endDateTime ? new Date(presale.endDateTime) : null;
     
-    if (upcomingPresales.length > 0) {
-      const next = upcomingPresales[0];
-      const dateStr = new Date(next.startDateTime!).toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-      });
-      const name = next.name?.trim() || 'Presale';
+    // Active presale
+    if (start <= now && (!end || end > now)) {
+      const name = presale.name?.replace(/presale$/i, '').trim() || 'Presale';
       return {
-        icon: '⚡',
-        text: `${name} · ${dateStr}`,
-        isActive: false,
+        icon: '🔐',
+        text: name,
+        isActive: true,
       };
     }
+  }
+  
+  // Check for upcoming presale
+  const upcomingPresales = relevantPresales
+    .filter(p => p.startDateTime && new Date(p.startDateTime) > now)
+    .sort((a, b) => new Date(a.startDateTime!).getTime() - new Date(b.startDateTime!).getTime());
+  
+  if (upcomingPresales.length > 0) {
+    const next = upcomingPresales[0];
+    const dateStr = new Date(next.startDateTime!).toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+    const name = next.name?.replace(/presale$/i, '').trim() || 'Presale';
+    return {
+      icon: '⚡',
+      text: `${name} · ${dateStr}`,
+      isActive: false,
+    };
   }
   
   // Check for future public on-sale

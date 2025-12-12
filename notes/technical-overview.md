@@ -178,6 +178,17 @@ All 16 tables have RLS enabled. Defense-in-depth (app uses Prisma direct connect
 
 No refactoring the codebase. Just consistent UI copy mapping.
 
+### Centralized Business Logic
+
+**Principle:** Complex filtering/matching logic must live in ONE place, imported everywhere.
+
+**Examples:**
+- `lib/presales.ts` → `isRelevantPresale()` used by API routes, data layer, and components
+- `db/events.ts` → `getPresaleEventIds()` shared helper for consistent presale filtering
+- Search parameters flow through `getEventsWithSocialSignals()` — never duplicated in UI
+
+**Why:** When chip counts and list results use different logic, users see mismatched numbers. Single source of truth prevents drift.
+
 ### Weather Caching
 
 - Cache at (lat, lng, date) level

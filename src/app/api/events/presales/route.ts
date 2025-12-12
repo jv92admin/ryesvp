@@ -7,7 +7,7 @@
 
 import { NextResponse } from 'next/server';
 import prisma from '@/db/prisma';
-import { type TMPresale } from '@/lib/presales';
+import { type TMPresale, isRelevantPresale } from '@/lib/presales';
 
 interface PresaleEventResult {
   id: string;
@@ -17,42 +17,6 @@ interface PresaleEventResult {
   presaleType: 'active' | 'upcoming' | 'onsale';
   presaleName?: string;
   presaleDate?: string;
-}
-
-/**
- * Filter to only include "real" presales - time-limited early access.
- * Excludes resale, already-public sales, and VIP packages.
- */
-function isRelevantPresale(presaleName: string | undefined): boolean {
-  if (!presaleName) return false;
-  
-  const name = presaleName.toLowerCase();
-  
-  // Exclude these exact categories (not useful for presale alerts)
-  // Note: Check these BEFORE presale patterns since "presale" contains "resale"
-  if (name === 'resale') return false;                    // Resale market only
-  if (name.includes('vip package')) return false;         // VIP upsells
-  if (name.includes('platinum')) return false;            // Dynamic pricing
-  if (name.includes('public onsale')) return false;       // Already public
-  if (name === 'onsale' || name.endsWith(' onsale')) return false; // Generic onsale
-  
-  // Include these patterns (real presales worth alerting about)
-  const includePatterns = [
-    'presale',
-    'pre-sale',
-    'fan club',
-    'early access',
-    'preferred tickets', // Card member access (Amex, Citi, etc.)
-    'preferred seating',
-    'select seats',      // Verizon, etc. card perks
-  ];
-  
-  for (const pattern of includePatterns) {
-    if (name.includes(pattern)) return true;
-  }
-  
-  // Default: exclude if doesn't match presale patterns
-  return false;
 }
 
 export async function GET() {

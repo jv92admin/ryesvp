@@ -15,6 +15,56 @@ export interface TMPresale {
   endDateTime?: string;
 }
 
+/**
+ * Filter to only include "real" presales - time-limited early access.
+ * Excludes resale, already-public sales, and VIP packages.
+ * 
+ * Used by: EventCard, /api/events/presales
+ */
+export function isRelevantPresale(presaleName: string | undefined): boolean {
+  if (!presaleName) return false;
+
+  const name = presaleName.toLowerCase();
+
+  // Exclude these exact categories (not useful for presale alerts)
+  // Note: Check these BEFORE presale patterns since "presale" contains "resale"
+  if (name === 'resale') return false;                    // Resale market only
+  if (name.includes('vip package')) return false;         // VIP upsells
+  if (name.includes('official platinum')) return false;   // Dynamic pricing
+  if (name.includes('standard admission')) return false;  // Already public
+  if (name.includes('general admission')) return false;   // Already public
+
+  // Include these patterns (real presales worth alerting about)
+  const presalePatterns = [
+    // Generic presale terms
+    'presale',
+    'pre-sale',
+    'early access',
+    'fan club',
+    'member',
+    'artist presale',
+    'venue presale',
+    'local presale',
+    // Credit card / payment partner presales
+    'citi',
+    'amex',
+    'chase',
+    'capital one',
+    'mastercard',
+    'visa',
+    'verizon',
+    // Platform presales
+    'spotify',
+    'live nation',
+    // Preferred access (card member perks)
+    'preferred tickets',
+    'preferred seating',
+    'select seats',
+  ];
+
+  return presalePatterns.some(pattern => name.includes(pattern));
+}
+
 export type PresaleStatus = 
   | { type: 'active_presale'; presale: TMPresale; endsAt: Date }
   | { type: 'upcoming_presale'; presale: TMPresale; startsAt: Date }

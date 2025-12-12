@@ -4,8 +4,78 @@ import { toZonedTime } from 'date-fns-tz';
 import { getFriendIds } from './friends';
 import { getListMemberIds, getAllListMemberIds } from './lists';
 import { getCommunityMemberIds, getUserCommunities } from './communities';
+import { type TMPresale, isRelevantPresale } from '@/lib/presales';
 
 const AUSTIN_TIMEZONE = 'America/Chicago';
+
+/**
+ * Get event IDs that have active presales, upcoming presales, or future on-sale dates.
+ * Uses the same logic as /api/events/presales for consistency.
+ */
+async function getPresaleEventIds(): Promise<string[]> {
+  const now = new Date();
+  
+  // Fetch all future scheduled events with enrichment data
+  const events = await prisma.event.findMany({
+    where: {
+      startDateTime: { gte: now },
+      status: 'SCHEDULED',
+      enrichment: { isNot: null },
+    },
+    select: {
+      id: true,
+      enrichment: {
+        select: {
+          tmPresales: true,
+          tmOnSaleStart: true,
+        },
+      },
+    },
+  });
+
+  const presaleEventIds: string[] = [];
+
+  for (const event of events) {
+    const enrichment = event.enrichment;
+    if (!enrichment) continue;
+    
+    // Skip if no presale data at all
+    if (!enrichment.tmPresales && !enrichment.tmOnSaleStart) continue;
+
+    const presales = enrichment.tmPresales as TMPresale[] | null;
+
+    // Check for active or upcoming presales
+    if (presales && Array.isArray(presales)) {
+      const relevantPresales = presales.filter(p => isRelevantPresale(p.name));
+      
+      for (const presale of relevantPresales) {
+        if (!presale.startDateTime) continue;
+
+        const start = new Date(presale.startDateTime);
+        const end = presale.endDateTime ? new Date(presale.endDateTime) : null;
+
+        // Active presale (started but not ended)
+        if (start <= now && (!end || end > now)) {
+          presaleEventIds.push(event.id);
+          break;
+        }
+        
+        // Upcoming presale (starts in future)
+        if (start > now) {
+          presaleEventIds.push(event.id);
+          break;
+        }
+      }
+    }
+
+    // If not added yet, check for future public on-sale
+    if (!presaleEventIds.includes(event.id) && enrichment.tmOnSaleStart && enrichment.tmOnSaleStart > now) {
+      presaleEventIds.push(event.id);
+    }
+  }
+
+  return presaleEventIds;
+}
 
 /**
  * Compute date range for a preset (today, thisWeek, weekend).
@@ -264,15 +334,16 @@ export async function getEvents(params: GetEventsParams = {}): Promise<EventWith
     where.createdAt = { gte: cutoff };
   }
 
-  // Presales filter: events with presale data or upcoming on-sale
+  // Presales filter: events with active presales, upcoming presales, or future on-sale
+  // Uses helper function with same logic as /api/events/presales for consistency
   if (presales) {
-    const now = new Date();
-    where.enrichment = {
-      OR: [
-        { tmPresales: { not: null } },
-        { tmOnSaleStart: { gt: now } },
-      ],
-    };
+    const presaleEventIds = await getPresaleEventIds();
+    if (presaleEventIds.length > 0) {
+      where.id = { in: presaleEventIds };
+    } else {
+      // No presale events - return empty result by using impossible filter
+      where.id = { equals: 'no-presale-events' };
+    }
   }
 
   // Search filter: search across title, performer name, venue name, genres, category
@@ -476,15 +547,16 @@ export async function getEventsWithAttendance(params: GetEventsParams = {}): Pro
     baseWhere.createdAt = { gte: cutoff };
   }
 
-  // Presales filter: events with presale data or upcoming on-sale
+  // Presales filter: events with active presales, upcoming presales, or future on-sale
+  // Uses helper function with same logic as /api/events/presales for consistency
   if (params.presales) {
-    const now = new Date();
-    baseWhere.enrichment = {
-      OR: [
-        { tmPresales: { not: null } },
-        { tmOnSaleStart: { gt: now } },
-      ],
-    };
+    const presaleEventIds = await getPresaleEventIds();
+    if (presaleEventIds.length > 0) {
+      baseWhere.id = { in: presaleEventIds };
+    } else {
+      // No presale events - return empty result by using impossible filter
+      baseWhere.id = { equals: 'no-presale-events' };
+    }
   }
 
   // Search filter: search across title, performer name, venue name, genres, category
