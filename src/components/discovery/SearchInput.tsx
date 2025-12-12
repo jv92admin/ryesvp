@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 interface SearchInputProps {
@@ -9,12 +9,11 @@ interface SearchInputProps {
 }
 
 /**
- * Debounced search input that updates URL params.
+ * Search input that updates URL on Enter or button click.
  * 
  * Features:
- * - 300ms debounce to avoid excessive API calls
- * - Instant URL update (no Apply button needed)
- * - Clears with × button or empty input
+ * - Submit on Enter key or search button click
+ * - Clears with × button
  * - Syncs with URL on mount (for back/forward nav)
  */
 export function SearchInput({ 
@@ -32,58 +31,72 @@ export function SearchInput({
     setValue(searchParams.get('q') || '');
   }, [searchParams]);
 
-  // Debounced URL update
-  const updateUrl = useCallback((query: string) => {
+  const submitSearch = () => {
     const params = new URLSearchParams(searchParams.toString());
+    const trimmedValue = value.trim();
     
-    if (query.trim()) {
-      params.set('q', query.trim());
+    if (trimmedValue) {
+      params.set('q', trimmedValue);
     } else {
       params.delete('q');
     }
     
     const queryString = params.toString();
     router.push(queryString ? `/?${queryString}` : '/', { scroll: false });
-  }, [router, searchParams]);
+  };
 
-  // Debounce effect
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const urlQuery = searchParams.get('q') || '';
-      if (value.trim() !== urlQuery) {
-        updateUrl(value);
-      }
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [value, searchParams, updateUrl]);
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      submitSearch();
+    }
+  };
 
   const handleClear = () => {
     setValue('');
-    updateUrl('');
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete('q');
+    const queryString = params.toString();
+    router.push(queryString ? `/?${queryString}` : '/', { scroll: false });
   };
+
+  // Check if current value differs from URL (show search button)
+  const urlQuery = searchParams.get('q') || '';
+  const hasUnsearchedValue = value.trim() !== urlQuery;
 
   return (
     <div className={`relative ${className}`}>
-      {/* Search icon */}
-      <svg 
-        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
-        fill="none" 
-        stroke="currentColor" 
-        viewBox="0 0 24 24"
+      {/* Search icon / submit button */}
+      <button
+        type="button"
+        onClick={submitSearch}
+        className={`absolute left-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded transition-colors
+          ${hasUnsearchedValue 
+            ? 'text-[var(--brand-primary)] hover:bg-green-50' 
+            : 'text-gray-400 cursor-default'
+          }`}
+        title={hasUnsearchedValue ? 'Search' : ''}
       >
-        <path 
-          strokeLinecap="round" 
-          strokeLinejoin="round" 
-          strokeWidth={2} 
-          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
-        />
-      </svg>
+        <svg 
+          className="w-4 h-4"
+          fill="none" 
+          stroke="currentColor" 
+          viewBox="0 0 24 24"
+        >
+          <path 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+            strokeWidth={2} 
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
+          />
+        </svg>
+      </button>
       
       <input
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder={placeholder}
         className="w-full pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg 
                    bg-white text-gray-900 placeholder:text-gray-400
@@ -107,4 +120,3 @@ export function SearchInput({
     </div>
   );
 }
-
