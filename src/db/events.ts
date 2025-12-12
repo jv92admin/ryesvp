@@ -1,11 +1,125 @@
 import prisma from './prisma';
-import { Event, Venue, EventCategory, EventStatus } from '@prisma/client';
+import { Event, Venue, EventCategory, EventStatus, Prisma } from '@prisma/client';
 import { toZonedTime } from 'date-fns-tz';
 import { getFriendIds } from './friends';
 import { getListMemberIds, getAllListMemberIds } from './lists';
 import { getCommunityMemberIds, getUserCommunities } from './communities';
 
 const AUSTIN_TIMEZONE = 'America/Chicago';
+
+/**
+ * Compute date range for a preset (today, thisWeek, weekend).
+ * All calculations in America/Chicago timezone.
+ */
+function getDateRangeForPreset(preset: 'today' | 'thisWeek' | 'weekend'): { start: Date; end: Date } {
+  // Get current time in Austin timezone
+  const now = new Date();
+  const austinNow = toZonedTime(now, AUSTIN_TIMEZONE);
+  
+  // Helper to create a date at start/end of day in Austin time
+  const startOfDay = (date: Date): Date => {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  };
+  
+  const endOfDay = (date: Date): Date => {
+    const d = new Date(date);
+    d.setHours(23, 59, 59, 999);
+    return d;
+  };
+  
+  const dayOfWeek = austinNow.getDay(); // 0 = Sunday, 6 = Saturday
+  
+  switch (preset) {
+    case 'today':
+      return {
+        start: startOfDay(austinNow),
+        end: endOfDay(austinNow),
+      };
+      
+    case 'thisWeek':
+      // Today through end of Sunday
+      const endOfWeek = new Date(austinNow);
+      endOfWeek.setDate(austinNow.getDate() + (7 - dayOfWeek)); // Next Sunday
+      return {
+        start: startOfDay(austinNow),
+        end: endOfDay(endOfWeek),
+      };
+      
+    case 'weekend':
+      // Friday through Sunday (current or next weekend)
+      let friday: Date;
+      let sunday: Date;
+      
+      if (dayOfWeek === 0) {
+        // It's Sunday - show today only
+        friday = austinNow;
+        sunday = austinNow;
+      } else if (dayOfWeek === 6) {
+        // It's Saturday - show Sat + Sun
+        friday = austinNow;
+        sunday = new Date(austinNow);
+        sunday.setDate(austinNow.getDate() + 1);
+      } else if (dayOfWeek === 5) {
+        // It's Friday - show Fri + Sat + Sun
+        friday = austinNow;
+        sunday = new Date(austinNow);
+        sunday.setDate(austinNow.getDate() + 2);
+      } else {
+        // Mon-Thu - show next weekend (Fri-Sun)
+        friday = new Date(austinNow);
+        friday.setDate(austinNow.getDate() + (5 - dayOfWeek)); // Next Friday
+        sunday = new Date(friday);
+        sunday.setDate(friday.getDate() + 2);
+      }
+      
+      return {
+        start: startOfDay(friday),
+        end: endOfDay(sunday),
+      };
+      
+    default:
+      // Fallback: today
+      return {
+        start: startOfDay(austinNow),
+        end: endOfDay(austinNow),
+      };
+  }
+}
+
+/**
+ * Find event IDs where performer tags or enrichment genres contain the search term.
+ * Uses raw SQL for partial matching in arrays (ILIKE '%term%' on array elements).
+ */
+async function findEventIdsByGenreSearch(searchTerm: string): Promise<string[]> {
+  const pattern = `%${searchTerm.toLowerCase()}%`;
+  
+  // Search performer.tags and enrichment.spotifyGenres for partial matches
+  const results = await prisma.$queryRaw<{ id: string }[]>`
+    SELECT DISTINCT e.id
+    FROM "Event" e
+    LEFT JOIN "Performer" p ON e."performerId" = p.id
+    LEFT JOIN "Enrichment" en ON en."eventId" = e.id
+    WHERE 
+      e."startDateTime" > NOW()
+      AND e.status = 'SCHEDULED'
+      AND (
+        -- Check performer tags
+        EXISTS (
+          SELECT 1 FROM unnest(p.tags) AS tag 
+          WHERE lower(tag) LIKE ${pattern}
+        )
+        -- Check enrichment spotifyGenres
+        OR EXISTS (
+          SELECT 1 FROM unnest(en."spotifyGenres") AS genre 
+          WHERE lower(genre) LIKE ${pattern}
+        )
+      )
+  `;
+  
+  return results.map(r => r.id);
+}
 
 export type EventWithVenue = Event & { venue: Venue };
 
@@ -84,6 +198,11 @@ export interface GetEventsParams {
   listId?: string; // Filter by list members going
   communityId?: string; // Filter by community members going
   userId?: string; // Required when myEvents, friendsGoing, listId, or communityId is set
+  // Discovery filters (Phase 1.6)
+  q?: string; // Search query - searches event title, performer name, venue name
+  newListings?: boolean; // Filter to events created in last 48 hours
+  presales?: boolean; // Filter to events with active/upcoming presales
+  when?: 'today' | 'thisWeek' | 'weekend'; // Date preset (takes precedence over startDate/endDate)
 }
 
 export async function getEvents(params: GetEventsParams = {}): Promise<EventWithVenue[]> {
@@ -97,16 +216,28 @@ export async function getEvents(params: GetEventsParams = {}): Promise<EventWith
     status = 'SCHEDULED',
     limit = 1000,
     offset = 0,
+    q,
+    newListings,
+    presales,
+    when,
   } = params;
 
-  const where: Record<string, unknown> = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const where: Record<string, any> = {};
 
-  // Default: only show future events
-  if (startDate || endDate) {
+  // Date filtering: ?when= takes precedence over startDate/endDate (per spec)
+  if (when) {
+    const dateRange = getDateRangeForPreset(when);
+    where.startDateTime = {
+      gte: dateRange.start,
+      lte: dateRange.end,
+    };
+  } else if (startDate || endDate) {
     where.startDateTime = {};
     if (startDate) (where.startDateTime as Record<string, Date>).gte = startDate;
     if (endDate) (where.startDateTime as Record<string, Date>).lte = endDate;
   } else {
+    // Default: only show future events
     where.startDateTime = { gte: new Date() };
   }
 
@@ -125,6 +256,58 @@ export async function getEvents(params: GetEventsParams = {}): Promise<EventWith
   }
   
   if (status) where.status = status;
+
+  // New listings filter: events created in last 48 hours
+  if (newListings) {
+    const cutoff = new Date();
+    cutoff.setHours(cutoff.getHours() - 48);
+    where.createdAt = { gte: cutoff };
+  }
+
+  // Presales filter: events with presale data or upcoming on-sale
+  if (presales) {
+    const now = new Date();
+    where.enrichment = {
+      OR: [
+        { tmPresales: { not: null } },
+        { tmOnSaleStart: { gt: now } },
+      ],
+    };
+  }
+
+  // Search filter: search across title, performer name, venue name, genres, category
+  if (q && q.trim().length > 0) {
+    const searchTerm = q.trim();
+    const searchTermUpper = searchTerm.toUpperCase();
+    
+    // Find event IDs matching genre search (partial match in arrays)
+    const genreMatchIds = await findEventIdsByGenreSearch(searchTerm);
+    
+    // Check if search term matches a category name
+    const categoryValues = ['CONCERT', 'COMEDY', 'THEATER', 'MOVIE', 'SPORTS', 'FESTIVAL', 'OTHER'];
+    const matchingCategories = categoryValues.filter(cat => 
+      cat.includes(searchTermUpper) || searchTermUpper.includes(cat.slice(0, 4))
+    ) as EventCategory[];
+    
+    // Build OR conditions for text search + genre matches + category matches
+    const orConditions: Prisma.EventWhereInput[] = [
+      { title: { contains: searchTerm, mode: 'insensitive' } },
+      { performer: { name: { contains: searchTerm, mode: 'insensitive' } } },
+      { venue: { name: { contains: searchTerm, mode: 'insensitive' } } },
+    ];
+    
+    // Include events matching genre search
+    if (genreMatchIds.length > 0) {
+      orConditions.push({ id: { in: genreMatchIds } });
+    }
+    
+    // Include events matching category
+    if (matchingCategories.length > 0) {
+      orConditions.push({ category: { in: matchingCategories } });
+    }
+    
+    where.OR = orConditions;
+  }
 
   return prisma.event.findMany({
     where,
@@ -250,13 +433,22 @@ export async function getEventsWithAttendance(params: GetEventsParams = {}): Pro
   }
   
   // Build base where clause (same as getEvents)
-  const baseWhere: Record<string, unknown> = {};
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const baseWhere: Record<string, any> = {};
   
-  if (params.startDate || params.endDate) {
+  // Date filtering: ?when= takes precedence over startDate/endDate (per spec)
+  if (params.when) {
+    const dateRange = getDateRangeForPreset(params.when);
+    baseWhere.startDateTime = {
+      gte: dateRange.start,
+      lte: dateRange.end,
+    };
+  } else if (params.startDate || params.endDate) {
     baseWhere.startDateTime = {};
     if (params.startDate) (baseWhere.startDateTime as Record<string, Date>).gte = params.startDate;
     if (params.endDate) (baseWhere.startDateTime as Record<string, Date>).lte = params.endDate;
   } else {
+    // Default: only show future events
     baseWhere.startDateTime = { gte: new Date() };
   }
   
@@ -276,6 +468,58 @@ export async function getEventsWithAttendance(params: GetEventsParams = {}): Pro
   
   if (params.status) baseWhere.status = params.status;
   else baseWhere.status = 'SCHEDULED';
+
+  // New listings filter: events created in last 48 hours
+  if (params.newListings) {
+    const cutoff = new Date();
+    cutoff.setHours(cutoff.getHours() - 48);
+    baseWhere.createdAt = { gte: cutoff };
+  }
+
+  // Presales filter: events with presale data or upcoming on-sale
+  if (params.presales) {
+    const now = new Date();
+    baseWhere.enrichment = {
+      OR: [
+        { tmPresales: { not: null } },
+        { tmOnSaleStart: { gt: now } },
+      ],
+    };
+  }
+
+  // Search filter: search across title, performer name, venue name, genres, category
+  if (params.q && params.q.trim().length > 0) {
+    const searchTerm = params.q.trim();
+    const searchTermUpper = searchTerm.toUpperCase();
+    
+    // Find event IDs matching genre search (partial match in arrays)
+    const genreMatchIds = await findEventIdsByGenreSearch(searchTerm);
+    
+    // Check if search term matches a category name
+    const categoryValues = ['CONCERT', 'COMEDY', 'THEATER', 'MOVIE', 'SPORTS', 'FESTIVAL', 'OTHER'];
+    const matchingCategories = categoryValues.filter(cat => 
+      cat.includes(searchTermUpper) || searchTermUpper.includes(cat.slice(0, 4))
+    ) as EventCategory[];
+    
+    // Build OR conditions for text search + genre matches + category matches
+    const orConditions: Prisma.EventWhereInput[] = [
+      { title: { contains: searchTerm, mode: 'insensitive' } },
+      { performer: { name: { contains: searchTerm, mode: 'insensitive' } } },
+      { venue: { name: { contains: searchTerm, mode: 'insensitive' } } },
+    ];
+    
+    // Include events matching genre search
+    if (genreMatchIds.length > 0) {
+      orConditions.push({ id: { in: genreMatchIds } });
+    }
+    
+    // Include events matching category
+    if (matchingCategories.length > 0) {
+      orConditions.push({ category: { in: matchingCategories } });
+    }
+    
+    baseWhere.OR = orConditions;
+  }
   
   // Special case: myEvents filters to user's own events directly at DB level
   if (params.myEvents) {

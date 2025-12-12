@@ -20,6 +20,11 @@ interface HomePageContentProps {
     friendsGoing: boolean;
     listId?: string;
     communityId?: string;
+    // Discovery filters (Phase 1.6)
+    q?: string;
+    newListings?: boolean;
+    presales?: boolean;
+    when?: 'today' | 'thisWeek' | 'weekend';
   };
 }
 

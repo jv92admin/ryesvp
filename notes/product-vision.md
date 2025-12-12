@@ -270,26 +270,39 @@ Users can signal their ticket situation:
 
 ## 6. Explore & Discovery
 
-### Artists as Entities
+### Performers as Entities
 
-Artists are first-class objects in the data model, not just event metadata.
+Performers are first-class objects in the data model, not just event metadata.
+
+**What is a Performer?**
+The term "performer" encompasses anyone who is the *reason* you go to an event:
+- **Artists** — musicians, bands, DJs
+- **Comedians** — stand-up, improv troupes
+- **Teams** — sports teams, leagues
+- **Companies** — theater groups, orchestras, dance companies
+- **Hosts** (future) — users who create and host their own events
+
+This framing is intentional. It lets us build one system that handles "follow your favorite band" and "follow Austin FC" with the same mechanics.
 
 **Why this matters:**
-- Enables "follow artist" → get notified when they play Austin
+- Enables "follow performer" → get notified when they're in Austin
 - Powers personalized discovery ("Artists you listen to are coming to town")
-- Links events to performers cleanly (an event can have multiple artists)
-- Foundation for Spotify integration
+- Links events to performers cleanly
+- Foundation for Spotify integration (for music artists)
+- Foundation for ESPN/sports data (for teams)
+- Future: User-hosted events where the *host* is the performer
 
-**What an Artist holds:**
+**What a Performer holds:**
 - Name, image, bio
-- Spotify link, genres
-- Events they're performing at (via `event_performers` link)
-- Followers (users who follow this artist)
+- Type (artist, comedian, team, company, etc.)
+- Tags (genres, styles, leagues — universal across types)
+- External links (Spotify for artists, team pages for sports)
+- Events they're performing at
+- Followers (users who follow this performer)
 
-**Artist profiles (future):**
-- Simple stub page: name, image, upcoming Austin shows
-- "Follow" button
-- Links to Spotify
+**Performer profiles:**
+- Click performer name on event page → modal with bio, image, past/upcoming shows
+- Full performer page (future): deeper profile, all Austin history, follow button
 
 ### Music Discovery
 
@@ -304,18 +317,26 @@ Artists are first-class objects in the data model, not just event metadata.
 
 ### Event Discovery
 
+**Search:**
+- Find events by performer, venue, genre, or keyword
+- Typo-tolerant ("artic" finds "Arctic Monkeys")
+- Results surface with social context: "Khruangbin (3 friends going)"
+- Search placeholder teaches the feature: `"Bill Burr", "dreampop", or "Sports"...`
+
+**Filters:**
+- Quick date chips: Today, This Week, Weekend
+- Category chips: Concerts, Comedy, Theater, Sports
+- Discovery chips: New listings, Presales
+- All filters instant-apply, no "Apply" button
+
 **"New to You" Signals:**
-- Events added since your last visit are highlighted
+- Events added in last 48 hours highlighted with ✨ New badge
 - The feed shows what's genuinely new, not just what's upcoming
 - Simple signal keeps the calendar fresh without manufactured urgency
 
-**Search:**
-- Find events by artist, venue, or keyword
-- Results surface with social context: "Khruangbin (3 friends going)"
-
-**Future — Artist Following:**
-- Follow artists and get notified when they announce Austin shows
-- Connected to listening history
+**Future — Performer Following:**
+- Follow performers and get notified when they're in Austin
+- Connected to listening history (for artists via Spotify)
 - Taste graph that powers smarter recommendations
 
 ---
@@ -512,8 +533,9 @@ People bring their friends because it makes their nights out better — not beca
 
 | Capability | Status |
 |------------|--------|
-| Event calendar (Large Events) | ✅ Live |
-| Event enrichment (images, Spotify, genres) | ✅ Live |
+| Event calendar (17 venue scrapers) | ✅ Live |
+| Event enrichment (images, Spotify, genres, Ticketmaster) | ✅ Live |
+| Performer entity & modal profiles | ✅ Live |
 | Friends & friend requests | ✅ Live |
 | Communities (basic) | ✅ Live |
 | Ticket status signals (Have/Need) | ✅ Live |
@@ -527,20 +549,20 @@ People bring their friends because it makes their nights out better — not beca
 | In-app notifications | ✅ Live |
 | Invite codes & auto-friend | ✅ Live |
 | Share Plan / Share Day-of exports | ✅ Live |
+| Async jobs (daily scrape, enrich, TM match) | ✅ Live |
 | Row Level Security | ✅ Live |
 
 ### What's Next (Priority Order)
 
 | Phase | Capability | Notes |
 |-------|------------|-------|
-| 2 | Async jobs / backend reliability | Daily refresh, logging |
-| 3 | More "Start Plan" ingresses | From cards, profiles, global CTA |
-| 3 | Basic emails | Welcome, "added to plan", reminders |
-| 4 | Create-your-own events | User-hosted events (Partiful lane) |
-| 4 | Friend profile pages | Minimal profiles with "start plan" |
-| 5 | Artist data model | First-class artist entities |
-| 6 | Spotify integration | OAuth, top artists, discovery |
-| 7 | Communities reimagined | Plans within communities |
+| Now | Discovery & Filters redesign | Chip-based filters, search, no Apply button |
+| Next | Basic emails | Welcome, "added to plan", reminders |
+| Next | Engagement & onboarding | First-run experience, empty states |
+| Later | Create-your-own events | User-hosted events (Partiful lane) |
+| Later | Performer following | Get notified when followed performers come to town |
+| Later | Spotify OAuth | Top artists → personalized recommendations |
+| Later | Communities reimagined | Plans within communities |
 
 ---
 

@@ -7,10 +7,11 @@ import { FriendCountBadge } from './ui/StatusBadge';
 import { formatEventDate, isNewListing } from '@/lib/utils';
 import { type TMPresale } from '@/lib/presales';
 
-// Get presale badge info for display (client-side version)
-function getPresaleBadgeForCard(enrichment: EnrichmentDisplay | undefined): {
-  label: string;
-  className: string;
+// Get presale info for display - returns text for the presale row
+function getPresaleInfo(enrichment: EnrichmentDisplay | undefined): {
+  icon: string;
+  text: string;
+  isActive: boolean;
 } | null {
   if (!enrichment) return null;
   
@@ -27,10 +28,11 @@ function getPresaleBadgeForCard(enrichment: EnrichmentDisplay | undefined): {
       
       // Active presale
       if (start <= now && (!end || end > now)) {
-        const name = presale.name?.replace(/presale$/i, '').trim() || '';
+        const name = presale.name?.trim() || 'Presale';
         return {
-          label: `🔐 ${name || 'PRESALE'}`,
-          className: 'bg-blue-500 text-white',
+          icon: '🔐',
+          text: name,
+          isActive: true,
         };
       }
     }
@@ -44,12 +46,15 @@ function getPresaleBadgeForCard(enrichment: EnrichmentDisplay | undefined): {
       const next = upcomingPresales[0];
       const dateStr = new Date(next.startDateTime!).toLocaleDateString('en-US', { 
         month: 'short', 
-        day: 'numeric' 
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
       });
-      const name = next.name?.replace(/presale$/i, '').trim() || '';
+      const name = next.name?.trim() || 'Presale';
       return {
-        label: `⚡ ${name || 'PRESALE'} ${dateStr}`,
-        className: 'bg-blue-100 text-blue-800',
+        icon: '⚡',
+        text: `${name} · ${dateStr}`,
+        isActive: false,
       };
     }
   }
@@ -58,11 +63,14 @@ function getPresaleBadgeForCard(enrichment: EnrichmentDisplay | undefined): {
   if (enrichment.tmOnSaleStart && new Date(enrichment.tmOnSaleStart) > now) {
     const dateStr = new Date(enrichment.tmOnSaleStart).toLocaleDateString('en-US', { 
       month: 'short', 
-      day: 'numeric' 
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
     });
     return {
-      label: `🎫 ON SALE ${dateStr}`,
-      className: 'bg-amber-100 text-amber-800',
+      icon: '🎫',
+      text: `On sale ${dateStr}`,
+      isActive: false,
     };
   }
   
@@ -78,11 +86,10 @@ export function EventCard({ event }: EventCardProps) {
   const enrichment = event.enrichment;
   const isNew = isNewListing(event.createdAt);
   
-  // displayTitle is already computed at the data layer - use directly
   const { displayTitle } = event;
   
-  // Get presale badge if applicable
-  const presaleBadge = getPresaleBadgeForCard(enrichment);
+  // Get presale info
+  const presaleInfo = getPresaleInfo(enrichment);
   
   const categoryColors: Record<string, string> = {
     CONCERT: 'bg-violet-100 text-violet-800',
@@ -104,77 +111,103 @@ export function EventCard({ event }: EventCardProps) {
     OTHER: '📅',
   };
 
-  const statusBadge = event.status !== 'SCHEDULED' && (
-    <span className={`
-      px-2 py-0.5 text-xs font-medium rounded
-      ${event.status === 'SOLD_OUT' ? 'bg-red-100 text-red-800' : ''}
-      ${event.status === 'CANCELLED' ? 'bg-gray-100 text-gray-800 line-through' : ''}
-      ${event.status === 'POSTPONED' ? 'bg-yellow-100 text-yellow-800' : ''}
-    `}>
-      {event.status.replace('_', ' ')}
-    </span>
-  );
+  // Status badge for non-scheduled events
+  const showStatusBadge = event.status !== 'SCHEDULED';
+  const statusBadgeClasses: Record<string, string> = {
+    SOLD_OUT: 'bg-red-100 text-red-800',
+    CANCELLED: 'bg-gray-100 text-gray-800 line-through',
+    POSTPONED: 'bg-yellow-100 text-yellow-800',
+  };
+  const statusBadgeClass = statusBadgeClasses[event.status] || '';
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all p-4">
       {/* Main clickable area - links to event page */}
-      <Link href={`/events/${event.id}`} className="flex gap-3">
-        {/* Event Image */}
-        {event.imageUrl ? (
-          <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-            <img 
-              src={event.imageUrl} 
-              alt={event.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        ) : (
-          <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-            <span className="text-2xl sm:text-3xl">{categoryEmojis[event.category] || '📅'}</span>
-          </div>
-        )}
-        
-        {/* Event Content */}
-        <div className="flex-1 min-w-0">
-          {/* Title + Category on same line */}
-          <div className="flex items-start gap-2">
-            <h3 className="font-semibold text-gray-900 line-clamp-2 leading-snug flex-1 min-w-0">
-              {displayTitle}
-            </h3>
-            {/* Badges - right side of title */}
-            <div className="flex-shrink-0 flex items-center gap-1">
+      <Link href={`/events/${event.id}`} className="block">
+        <div className="flex gap-3">
+          {/* Event Image */}
+          {event.imageUrl ? (
+            <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+              <img 
+                src={event.imageUrl} 
+                alt={event.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+              <span className="text-2xl sm:text-3xl">{categoryEmojis[event.category] || '📅'}</span>
+            </div>
+          )}
+          
+          {/* Event Content */}
+          <div className="flex-1 min-w-0">
+            {/* Row 1: Title + NEW badge */}
+            <div className="flex items-start gap-2">
+              <h3 className="font-semibold text-gray-900 line-clamp-2 leading-snug flex-1 min-w-0">
+                {displayTitle}
+              </h3>
               {isNew && (
-                <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-emerald-500 text-white rounded">
+                <span className="flex-shrink-0 px-1.5 py-0.5 text-[10px] font-semibold bg-emerald-500 text-white rounded">
                   NEW
                 </span>
               )}
-              {presaleBadge && (
-                <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded whitespace-nowrap ${presaleBadge.className}`}>
-                  {presaleBadge.label}
-                </span>
-              )}
-              <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${categoryColors[event.category]}`}>
-                {event.category}
-              </span>
-              {statusBadge}
             </div>
+            
+            {/* Row 2: Venue + Date */}
+            <p className="text-sm text-gray-500 mt-1 truncate">
+              {event.venue.name} • {formatEventDate(event.startDateTime)}
+            </p>
+            
+            {/* Row 3: Presale row (only if present) - plain text, truncated */}
+            {presaleInfo && (
+              <p className={`text-xs mt-1.5 truncate ${presaleInfo.isActive ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
+                {presaleInfo.icon} {presaleInfo.text}
+              </p>
+            )}
           </div>
-          
-          {/* Venue + Date on one line */}
-          <p className="text-sm text-gray-500 mt-1 truncate">
-            {event.venue.name} • {formatEventDate(event.startDateTime)}
-          </p>
         </div>
       </Link>
       
-      {/* Bottom row: Social signals + Actions */}
+      {/* Row 4: Meta tags + Social + Actions */}
       <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
-        {/* Social Signals - left side */}
+        {/* Left side: Category + Spotify + Status + Social */}
         <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
+          {/* Category badge */}
+          <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${categoryColors[event.category]}`}>
+            {event.category}
+          </span>
+          
+          {/* Status badge (Sold Out, Cancelled, etc.) */}
+          {showStatusBadge && (
+            <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${statusBadgeClass}`}>
+              {event.status.replace('_', ' ')}
+            </span>
+          )}
+          
+          {/* Spotify icon */}
+          {enrichment?.spotifyUrl && (
+            <a 
+              href={enrichment.spotifyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="w-5 h-5 rounded-full bg-[#1DB954] hover:bg-[#1ed760] flex items-center justify-center transition-colors"
+              title="Listen on Spotify"
+            >
+              <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
+              </svg>
+            </a>
+          )}
+          
+          {/* Friend count */}
           <FriendCountBadge 
             goingCount={social?.friendsGoing} 
             interestedCount={social?.friendsInterested}
           />
+          
+          {/* Community attendance */}
           {social?.communitiesGoing.slice(0, 1).map((c) => (
             <span 
               key={c.communityId}
@@ -185,25 +218,8 @@ export function EventCard({ event }: EventCardProps) {
           ))}
         </div>
         
-        {/* Actions - right side: Spotify + Going/Interested + Start Plan */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {/* Spotify icon */}
-          {enrichment?.spotifyUrl && (
-            <a 
-              href={enrichment.spotifyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="w-7 h-7 rounded-full bg-[#1DB954] hover:bg-[#1ed760] flex items-center justify-center transition-colors"
-              title="Listen on Spotify"
-            >
-              <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>
-              </svg>
-            </a>
-          )}
-          
-          {/* Going/Interested buttons + Start Plan (appears after selection) */}
+        {/* Right side: Going/Interested + Plan button */}
+        <div className="flex-shrink-0">
           <EventCardActions
             eventId={event.id}
             userStatus={social?.userStatus}
@@ -222,4 +238,3 @@ export function EventCard({ event }: EventCardProps) {
     </div>
   );
 }
-

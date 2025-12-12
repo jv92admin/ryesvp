@@ -28,7 +28,7 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 | **A** | **Event Discovery 1.3** | Comprehensive source audit | 1-2 days | ✅ Complete |
 | **A** | **Event Discovery 1.4** | Performer entity design | 0.5 day | ✅ Complete |
 | **A** | **Event Discovery 1.5** | Performer entity + modal UI | 2-3 days | ✅ Complete |
-| **A** | **Event Discovery 1.6** | Basic search implementation | 1-2 days | 🔲 |
+| **A** | **Event Discovery 1.6** | Search + Filter Strip redesign | 1-2 days | ✅ Complete |
 | **B** | **UX: Avatar Popover** | Hover quick actions (desktop) | 1 day | 🔲 |
 | **B** | **UX: Transactional Emails** | Welcome, invites, reminders | 2-3 days | 🔲 |
 | **B** | **UX: Bug Fixes** | Issues identified during build | 1-2 days | 🔲 |
@@ -138,16 +138,29 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 - Performer data cleanup (remove legacy artist fields from Enrichment)
 - Full `/performers/[slug]` page (Phase 4.3)
 
-### Phase 1.6: Basic Search Implementation
+### Phase 1.6: Search + Filter Strip Redesign ✅ COMPLETE
 
-**Goal:** Enable users to search events by text.
+**Goal:** Enable search and redesign filter UI with instant apply.
 
-- Search event title/displayTitle
-- Search venue name
-- Search performer name (now possible since 1.5 complete)
-- Use existing filters (date, category, venue)
+**What was built:**
+- [x] `pg_trgm` migration for fuzzy search indexes
+- [x] Search across event title, performer name, venue name, genres, category
+- [x] Partial genre matching (e.g., "rock" finds "alternative rock")
+- [x] New `FilterStrip` component with instant URL-based filtering
+- [x] `SearchInput` with 300ms debounce
+- [x] `DateChips` — This Week, Weekend, custom date picker
+- [x] `CategoryChips` — Concerts, Comedy, Theater, Sports, Other
+- [x] `DiscoveryChips` — New (count), Presales (count)
+- [x] All filters use URL params (`?q=`, `?when=`, `?categories=`, `?new=`, `?presales=`)
+- [x] No "Apply" button — all filters instant
+- [x] Removed legacy separate New/Presales views
+- [x] Chip styling with borders + green hover accents
 
-**Output:** `docs/discovery-v1.md`
+**Deleted:**
+- `src/components/EventFilters.tsx`
+- `src/components/DiscoveryStrip.tsx`
+
+**New components:** `src/components/discovery/`
 
 ---
 
@@ -784,8 +797,61 @@ See `data-model-101.md` for full documentation.
 **Documentation:**
 - [x] `docs/priority-venues.md` - Created and maintained
 
+### Sprint: Search + Filter Strip Redesign (Complete ✅)
+
+**Phase 1.6 — December 12, 2025**
+
+**Data Layer:**
+- [x] `pg_trgm` migration for fuzzy search indexes
+- [x] Search across event title, performer name, venue name
+- [x] Search by genre/tags (partial match)
+- [x] Search by category (e.g., "comedy" → COMEDY enum)
+- [x] `?when=thisWeek|weekend` date preset params
+- [x] `?startDate=&endDate=` custom date range params
+- [x] `?new=true` and `?presales=true` discovery params
+
+**UI — FilterStrip Components:**
+- [x] `FilterStrip` — Main container, replaces EventFilters
+- [x] `SearchInput` — 300ms debounced search with instant URL update
+- [x] `DateChips` — This Week, This Weekend, custom date picker dropdown
+- [x] `CategoryChips` — Concerts, Comedy, Theater, Sports, Other
+- [x] `DiscoveryChips` — New (count), Presales (count)
+- [x] Chip borders + green hover accents for visual relief
+- [x] All filters instant apply — no Apply button
+
+**EventCard Redesign:**
+- [x] Presale info as own row (not competing with title)
+- [x] Clean title row with just NEW badge
+- [x] Bottom row: Category + Status + Spotify + Social + Actions
+- [x] Presale text truncated with ellipsis
+
+**FriendsAndStatusCard Redesign (Event Page):**
+- [x] 3-row hierarchy: Attendance → Planning → Tickets
+- [x] Row 1: Interested/Going (primary, chip-style)
+- [x] Row 2: Friends tile + Start Plan (equal width)
+- [x] Row 3: Need Tickets / Selling Tickets (tertiary, muted)
+- [x] Optimistic updates (no page reload)
+- [x] Uses same `FriendCountBadge` as EventCard
+
+**StartPlanModal Improvements:**
+- [x] Server-side search (uses same `?q=` API as home)
+- [x] Date filter chips (This Week, This Weekend, custom picker)
+- [x] Same placeholder as home: "Lady Gaga, indie rock, Moody Center..."
+
+**Cleanup:**
+- [x] Deleted `EventFilters.tsx`
+- [x] Deleted `DiscoveryStrip.tsx`
+- [x] Removed separate New/Presales views from EventListWithPagination
+- [x] Updated `ui-design-reference.md` with new patterns
+
+**Deferred (per user feedback):**
+- MorePanel.tsx (all categories inline, not needed)
+- ActiveFilters.tsx (no venue filter in current UI)
+- Mobile optimization (already looks good)
+- Discover stub page (Phase 2)
+
 ---
 
-**Last Updated:** December 11, 2025
+**Last Updated:** December 12, 2025
 **Active Spec:** `notes/event-discovery-spec.md` (Blocks A, D)
 

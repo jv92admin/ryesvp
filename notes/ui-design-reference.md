@@ -552,65 +552,67 @@ Full squad experience rendered in a modal (same as page):
 ## Home Page / Event List
 
 **Route:** `/`  
-**Status:** 🔄 Redesign planned (UX Charter)
+**Status:** ✅ Redesigned (December 2025)
 
-### UX Charter Principles
-
-> **Main content first.** The core event list should be visible as early as possible.  
-> **Progressive discovery.** Extra sections feel like "oh nice" moments, not mandatory steps.  
-> **No UI for non-existent capabilities.** Only show chips with real backing data.
-
-### Target Layout (Mobile)
+### Layout
 
 ```
-┌─────────────────────────────┐
-│ Events        [Filters ▾]   │  ← Title/filters
-├─────────────────────────────┤
-│ [🆕 New] [🎫 Presales ◌]    │  ← Discovery strip (compact)
-├─────────────────────────────┤
-│ ┌─────────────────────────┐ │  ← Main event list starts
-│ │ Event Card              │ │     IMMEDIATELY
-│ └─────────────────────────┘ │
-│ ┌─────────────────────────┐ │
-│ │ Event Card              │ │
-│ └─────────────────────────┘ │
+┌────────────────────────────────────────────────────────────────┐
+│ [🔍 Conan, indie rock, Moody Center...]                        │  ← Search input
+├────────────────────────────────────────────────────────────────┤
+│ [This Week] [Weekend] [Dates ▾] • [Concerts] [Comedy] ... [More]│  ← Filter chips
+│                                                     [Clear all] │
+├────────────────────────────────────────────────────────────────┤
+│ ┌──────────────────────────────────────────────────────────────┐│
+│ │ Event Card                                                   ││
+│ └──────────────────────────────────────────────────────────────┘│
+│ ┌──────────────────────────────────────────────────────────────┐│
+│ │ Event Card                                                   ││
+│ └──────────────────────────────────────────────────────────────┘│
 ```
 
-### Discovery Strip
+### Filter Strip
 
-**Purpose:** Compact row of chips for special subsets (New, Presales, For You)
+**Purpose:** Unified filter UI with instant apply - no Apply button needed.
 
 **Behavior:**
-- Chips are small, tappable pills
-- Tap → Opens focused filtered view (bottom sheet or full-screen)
-- Only show chips with **real backing data**
-- "Coming soon" chips can be greyed out (executor's choice)
+- All filters update URL immediately on click
+- Search has 300ms debounce
+- Back/forward navigation works
+- Chips show active state with green background + border
 
-**Chips (v1):**
-| Chip | Status | Backing Data |
-|------|--------|--------------|
-| 🆕 New | Ready when logic exists | `createdAt` < X days |
-| 🎫 Presales | Future | TM presale windows |
-| ✨ For You | Future | Recommendation signal |
+**Filter Chips:**
+| Chip Type | Options | Behavior |
+|-----------|---------|----------|
+| Date | This Week, Weekend, Dates dropdown | Mutually exclusive |
+| Category | Concerts, Comedy, Theater, Sports, Other | Multi-select (OR) |
+| Discovery | New (count), Presales (count) | Toggle on/off |
 
-**Design:**
-```css
-/* Active chip */
-px-3 py-1 text-sm font-medium rounded-full bg-purple-100 text-purple-700
-
-/* Disabled/coming soon chip */
-px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-400
-```
+**URL Params:**
+- `?q=` — Search query
+- `?when=thisWeek|weekend` — Date preset
+- `?startDate=&endDate=` — Custom date range
+- `?categories=CONCERT,COMEDY` — Category filter
+- `?new=true` — New listings (48h)
+- `?presales=true` — Events with presales
 
 ### Components
 
 | Component | File | Purpose |
 |-----------|------|---------|
-| `DiscoveryStrip` | `src/components/DiscoveryStrip.tsx` | Chips row above event list |
+| `FilterStrip` | `src/components/discovery/FilterStrip.tsx` | Main filter container |
+| `SearchInput` | `src/components/discovery/SearchInput.tsx` | Debounced search |
+| `DateChips` | `src/components/discovery/DateChips.tsx` | Date presets + picker |
+| `CategoryChips` | `src/components/discovery/CategoryChips.tsx` | Category toggles |
+| `DiscoveryChips` | `src/components/discovery/DiscoveryChips.tsx` | New + Presales |
 | `EventCard` | `src/components/EventCard.tsx` | Event card in list view |
-| `EventFilters` | `src/components/EventFilters.tsx` | Category + venue multi-select |
 | `SocialTab` | `src/components/SocialTab.tsx` | Your Plans, Almost Plans |
 | `ViewToggle` | `src/components/ViewToggle.tsx` | Calendar/Social toggle |
+
+### Deprecated (Deleted)
+
+- `EventFilters.tsx` — Replaced by FilterStrip
+- `DiscoveryStrip.tsx` — Replaced by discovery/ components
 
 ---
 
@@ -1077,8 +1079,14 @@ These pages don't exist yet. Document design decisions here as they're built.
 | Dec 6, 2025 | Share | Web Share API for mobile native share sheet |
 | Dec 6, 2025 | Event Page | Back button and share button redesigned to minimal text links |
 | Dec 6, 2025 | Design System | Clean UI guidelines: minimize emojis, prefer SVG icons, text link navigation |
+| Dec 12, 2025 | Home Page | FilterStrip replaces EventFilters — chip-based, instant apply, no Apply button |
+| Dec 12, 2025 | Discovery | New discovery/ folder with SearchInput, DateChips, CategoryChips, DiscoveryChips |
+| Dec 12, 2025 | Search | Debounced search across title, performer, venue, genres, category |
+| Dec 12, 2025 | Filters | Date picker dropdown (From/To), replaces Today chip |
+| Dec 12, 2025 | Chips | Added subtle borders + green hover accents for visual relief |
+| Dec 12, 2025 | Deleted | EventFilters.tsx, DiscoveryStrip.tsx (replaced by discovery/ components) |
 
 ---
 
-*Last Updated: December 6, 2025*
+*Last Updated: December 12, 2025*
 

@@ -43,30 +43,31 @@ const sizeStyles: Record<ChipSize, string> = {
 };
 
 // Color styles for each chip color in both active and inactive states
+// Borders added for visual definition per UX feedback
 const colorStyles: Record<ChipColor, { active: string; inactive: string }> = {
   default: {
-    active: 'bg-gray-200 text-gray-900',
-    inactive: 'bg-gray-100 text-gray-500 hover:bg-gray-200',
+    active: 'bg-gray-200 text-gray-900 border border-gray-300',
+    inactive: 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50',
   },
   primary: {
-    active: 'bg-[var(--brand-primary-light)] text-[var(--brand-primary)]',
-    inactive: 'bg-gray-100 text-gray-500 hover:bg-gray-200',
+    active: 'bg-[var(--brand-primary-light)] text-[var(--brand-primary)] border border-green-300',
+    inactive: 'bg-white text-gray-600 border border-gray-200 hover:border-green-300 hover:bg-green-50',
   },
   accent: {
-    active: 'bg-[var(--brand-primary)] text-white',
-    inactive: 'bg-[var(--brand-primary-light)] text-[var(--brand-primary)] hover:bg-green-200',
+    active: 'bg-[var(--brand-primary)] text-white border border-[var(--brand-primary)]',
+    inactive: 'bg-[var(--brand-primary-light)] text-[var(--brand-primary)] border border-green-200 hover:bg-green-200',
   },
   category: {
-    active: 'bg-blue-100 text-blue-800',
-    inactive: 'bg-gray-100 text-gray-500 hover:bg-gray-200',
+    active: 'bg-blue-100 text-blue-800 border border-blue-300',
+    inactive: 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300 hover:bg-blue-50',
   },
   warning: {
-    active: 'bg-amber-100 text-amber-700',
-    inactive: 'bg-gray-100 text-gray-500 hover:bg-gray-200',
+    active: 'bg-amber-100 text-amber-700 border border-amber-300',
+    inactive: 'bg-white text-gray-600 border border-gray-200 hover:border-amber-300 hover:bg-amber-50',
   },
   success: {
-    active: 'bg-green-100 text-green-700',
-    inactive: 'bg-gray-100 text-gray-500 hover:bg-gray-200',
+    active: 'bg-green-100 text-green-700 border border-green-300',
+    inactive: 'bg-white text-gray-600 border border-gray-200 hover:border-green-300 hover:bg-green-50',
   },
 };
 

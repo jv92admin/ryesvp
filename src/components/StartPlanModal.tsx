@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatEventDate } from '@/lib/utils';
 import { useToast } from '@/contexts/ToastContext';
+import { Chip } from '@/components/ui';
 
 interface Event {
   id: string;
@@ -17,50 +18,139 @@ interface Event {
 interface StartPlanModalProps {
   isOpen: boolean;
   onClose: () => void;
-  preSelectedFriendId?: string; // Optional: pre-select a friend to invite
+  preSelectedFriendId?: string;
 }
+
+type DatePreset = 'thisWeek' | 'weekend' | null;
 
 export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPlanModalProps) {
   const router = useRouter();
   const { showToast } = useToast();
+  
+  // Search & filter state
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [datePreset, setDatePreset] = useState<DatePreset>(null);
+  const [customStartDate, setCustomStartDate] = useState('');
+  const [customEndDate, setCustomEndDate] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const datePickerRef = useRef<HTMLDivElement>(null);
+  
+  // Event list state
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
-  // Fetch upcoming events (larger limit to include events far in the future)
+  // Debounce search query (300ms)
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Close date picker on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (datePickerRef.current && !datePickerRef.current.contains(event.target as Node)) {
+        setShowDatePicker(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Fetch events with search + date filters
+  const fetchEvents = useCallback(async () => {
     if (!isOpen) return;
     
-    const fetchEvents = async () => {
-      setLoading(true);
-      try {
-        // Fetch up to 500 events to include events far in the future
-        const res = await fetch('/api/events?limit=500');
-        if (res.ok) {
-          const data = await res.json();
-          setEvents(data.events || []);
-        }
-      } catch (err) {
-        console.error('Error fetching events:', err);
-      } finally {
-        setLoading(false);
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      params.set('limit', '100');
+      
+      // Add search query
+      if (debouncedQuery.trim()) {
+        params.set('q', debouncedQuery.trim());
       }
-    };
-    
+      
+      // Add date filters
+      if (datePreset) {
+        params.set('when', datePreset);
+      } else if (customStartDate || customEndDate) {
+        if (customStartDate) params.set('startDate', customStartDate);
+        if (customEndDate) params.set('endDate', customEndDate);
+      }
+      
+      const res = await fetch(`/api/events?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setEvents(data.events || []);
+      }
+    } catch (err) {
+      console.error('Error fetching events:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [isOpen, debouncedQuery, datePreset, customStartDate, customEndDate]);
+
+  // Fetch when modal opens or filters change
+  useEffect(() => {
     fetchEvents();
+  }, [fetchEvents]);
+
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchQuery('');
+      setDebouncedQuery('');
+      setDatePreset(null);
+      setCustomStartDate('');
+      setCustomEndDate('');
+      setShowDatePicker(false);
+    }
   }, [isOpen]);
 
-  // Filter events by search query
-  const filteredEvents = events.filter(event => {
-    if (!searchQuery.trim()) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      event.displayTitle.toLowerCase().includes(query) ||
-      event.venue.name.toLowerCase().includes(query)
-    );
-  });
+  const handleDatePresetClick = (preset: DatePreset) => {
+    if (datePreset === preset) {
+      setDatePreset(null);
+    } else {
+      setDatePreset(preset);
+      setCustomStartDate('');
+      setCustomEndDate('');
+    }
+  };
+
+  const handleCustomDateChange = (start: string, end: string) => {
+    setCustomStartDate(start);
+    setCustomEndDate(end);
+    setDatePreset(null);
+  };
+
+  const clearDates = () => {
+    setDatePreset(null);
+    setCustomStartDate('');
+    setCustomEndDate('');
+    setShowDatePicker(false);
+  };
+
+  const hasCustomDates = customStartDate || customEndDate;
+  const hasAnyDateFilter = datePreset || hasCustomDates;
+
+  // Format date for display
+  const formatDateLabel = () => {
+    if (!customStartDate && !customEndDate) return 'Dates';
+    if (customStartDate && customEndDate) {
+      const start = new Date(customStartDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const end = new Date(customEndDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      return `${start} – ${end}`;
+    }
+    if (customStartDate) {
+      return `From ${new Date(customStartDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    }
+    return `Until ${new Date(customEndDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+  };
 
   const handleCreatePlan = async (eventId: string) => {
     setCreating(true);
@@ -132,7 +222,6 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
         if (existingRes.ok) {
           const existingData = await existingRes.json();
           if (existingData.squad) {
-            // If we have a friend to add, add them to the existing squad
             if (preSelectedFriendId) {
               await fetch(`/api/squads/${existingData.squad.id}/members`, {
                 method: 'POST',
@@ -196,30 +285,128 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
             </p>
           </div>
 
-          {/* Search */}
-          <div className="px-6 py-3 border-b border-gray-100 bg-gray-50">
+          {/* Search + Date Filters */}
+          <div className="px-6 py-3 border-b border-gray-100 bg-gray-50 space-y-3">
+            {/* Search Input */}
             <input
               type="text"
-              placeholder="Search events..."
+              placeholder="Lady Gaga, indie rock, Moody Center..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent transition-all"
             />
+            
+            {/* Date Chips */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <Chip
+                variant="toggle"
+                color="primary"
+                size="sm"
+                active={datePreset === 'thisWeek'}
+                onClick={() => handleDatePresetClick('thisWeek')}
+              >
+                This Week
+              </Chip>
+              <Chip
+                variant="toggle"
+                color="primary"
+                size="sm"
+                active={datePreset === 'weekend'}
+                onClick={() => handleDatePresetClick('weekend')}
+              >
+                This Weekend
+              </Chip>
+              
+              {/* Date Picker Dropdown */}
+              <div className="relative" ref={datePickerRef}>
+                <Chip
+                  variant="toggle"
+                  color="primary"
+                  size="sm"
+                  active={!!hasCustomDates && !datePreset}
+                  onClick={() => setShowDatePicker(!showDatePicker)}
+                >
+                  <span className="flex items-center gap-1">
+                    {formatDateLabel()}
+                    <svg 
+                      className={`w-3 h-3 transition-transform ${showDatePicker ? 'rotate-180' : ''}`} 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
+                </Chip>
+                
+                {showDatePicker && (
+                  <div className="absolute top-full left-0 mt-1 p-3 bg-white border border-gray-200 rounded-lg shadow-lg z-20 min-w-[200px]">
+                    <div className="space-y-2">
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">From</label>
+                        <input
+                          type="date"
+                          value={customStartDate}
+                          onChange={(e) => handleCustomDateChange(e.target.value, customEndDate)}
+                          className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md 
+                                   focus:outline-none focus:ring-1 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-500 mb-1">To</label>
+                        <input
+                          type="date"
+                          value={customEndDate}
+                          onChange={(e) => handleCustomDateChange(customStartDate, e.target.value)}
+                          className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md
+                                   focus:outline-none focus:ring-1 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)]"
+                        />
+                      </div>
+                      {hasCustomDates && (
+                        <button
+                          type="button"
+                          onClick={clearDates}
+                          className="w-full text-xs text-gray-500 hover:text-gray-700 mt-1"
+                        >
+                          Clear dates
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Clear all dates */}
+              {hasAnyDateFilter && (
+                <button
+                  onClick={clearDates}
+                  className="text-xs text-gray-500 hover:text-gray-700 ml-1"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Event List */}
           <div className="flex-1 overflow-y-auto px-6 py-3">
             {loading ? (
               <div className="text-center py-8 text-gray-500">
-                Loading events...
+                <svg className="animate-spin h-5 w-5 mx-auto mb-2 text-gray-400" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Searching events...
               </div>
-            ) : filteredEvents.length === 0 ? (
+            ) : events.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                {searchQuery ? 'No events match your search' : 'No upcoming events'}
+                {debouncedQuery || hasAnyDateFilter 
+                  ? 'No events match your search' 
+                  : 'No upcoming events'}
               </div>
             ) : (
               <div className="space-y-2">
-                {filteredEvents.map((event) => (
+                {events.map((event) => (
                   <button
                     key={event.id}
                     onClick={() => handleCreatePlan(event.id)}
@@ -285,4 +472,3 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
     </div>
   );
 }
-

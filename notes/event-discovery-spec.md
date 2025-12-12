@@ -190,25 +190,39 @@ List ALL fields visible in source, whether we use them or not:
 - Popover or modal shows: name, image, bio snippet, upcoming events
 - NOT a full `/performers/[id]` page yet (that's Phase 4.3)
 
-### 1.6 Basic Search Implementation
+### 1.6 Search + Filter Strip Redesign ✅ COMPLETE
 
-**Goal:** Enable users to search events by text, including performers.
+**Goal:** Enable search and redesign filter UI with instant apply.
 
-**Scope:**
-- Search event title/displayTitle
-- Search venue name
-- **Search performer name** (now possible since 1.5 is complete)
-- Use existing filters (date, category, venue)
+**Completed December 12, 2025**
 
-**Implementation:**
-- Simple text matching initially (can upgrade to full-text search later)
-- Search input in header or filter bar
-- Results show matching events with relevance
+**Search Implementation:**
+- `pg_trgm` PostgreSQL extension for fuzzy matching
+- GIN indexes on Event.title, Performer.name, Venue.name
+- Searches: title, performer, venue, genres/tags, category
+- Partial matching (e.g., "rock" finds "alternative rock")
+- 300ms debounced input, instant results
 
-**Output:** `docs/discovery-v1.md`
-- What fields are searchable
-- What filters exist
-- Known limitations
+**Filter Strip Redesign:**
+- Replaced dropdown-based `EventFilters` with chip-based `FilterStrip`
+- All filters instant apply — no "Apply" button
+- URL params: `?q=`, `?when=`, `?categories=`, `?new=`, `?presales=`
+- Components: `SearchInput`, `DateChips`, `CategoryChips`, `DiscoveryChips`
+
+**Additional UI Improvements:**
+- EventCard: Presale as own row, cleaner layout
+- FriendsAndStatusCard: 3-row hierarchy (Attendance → Planning → Tickets)
+- StartPlanModal: Server-side search + date filter chips
+- Optimistic updates throughout (no page reloads)
+
+**Deleted Legacy Code:**
+- `src/components/EventFilters.tsx`
+- `src/components/DiscoveryStrip.tsx`
+- Separate New/Presales views in EventListWithPagination
+
+**New Components:** `src/components/discovery/`
+
+**Output:** `notes/discovery-filters-spec.md` (detailed spec)
 
 ---
 
@@ -475,7 +489,7 @@ Ship polish before inviting real users:
 ---
 
 *Created: December 6, 2025*
-*Updated: December 10, 2025*
-*Status: Phase 1.3 in progress (source audit started) → 1.4 → 1.5 → 1.6 → PAUSE*
+*Updated: December 12, 2025*
+*Status: Phase 1.6 COMPLETE → Ready for Block B (UX Quick Wins) + Block C (User Testing)*
 *Cross-reference: PROJECT-ROADMAP.md (Blocks A, B, C, D)*
 

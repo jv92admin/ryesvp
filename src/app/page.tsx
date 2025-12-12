@@ -1,8 +1,7 @@
 import { getEventsWithSocialSignals } from '@/db/events';
-import { getAllVenues } from '@/db/venues';
 import { getPrivateLists } from '@/db/lists';
 import { getUserCommunities } from '@/db/communities';
-import { EventFilters } from '@/components/EventFilters';
+import { FilterStrip } from '@/components/discovery';
 import { Header } from '@/components/Header';
 import { SetNameBanner } from '@/components/SetNameBanner';
 import { HomePageContent } from '@/components/HomePageContent';
@@ -26,13 +25,17 @@ interface HomePageProps {
     friendsGoing?: string;
     listId?: string;
     communityId?: string;
+    // Discovery filters (Phase 1.6)
+    q?: string;
+    new?: string;
+    presales?: string;
+    when?: 'today' | 'thisWeek' | 'weekend';
   }>;
 }
 
 export default async function HomePage({ searchParams }: HomePageProps) {
   const params = await searchParams;
   const user = await getCurrentUser();
-  const venues = await getAllVenues();
   const [lists, communities] = user 
     ? await Promise.all([
         getPrivateLists(user.dbUser.id),
@@ -58,6 +61,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     communityId: user ? params.communityId || undefined : undefined,
     userId: user?.dbUser.id || '',
     limit: PAGE_SIZE + 1, // Fetch one extra to check if more exist
+    // Discovery filters (Phase 1.6)
+    q: params.q || undefined,
+    newListings: params.new === 'true',
+    presales: params.presales === 'true',
+    when: params.when || undefined,
   });
   
   const hasMore = events.length > PAGE_SIZE;
@@ -75,8 +83,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           {/* Invite Redemption Handler - redeems invite after login */}
           {user && <InviteRedemptionHandler />}
 
-          {/* Filters - Full Width (applies to both Calendar and Social views) */}
-          <EventFilters venues={venues} />
+          {/* Filter Strip - Instant apply, no Apply button */}
+          <FilterStrip />
 
           {/* Home Page Content with Conditional Layout */}
           <HomePageContent
@@ -92,6 +100,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               friendsGoing: params.friendsGoing === 'true',
               listId: params.listId,
               communityId: params.communityId,
+              // Discovery filters (Phase 1.6)
+              q: params.q,
+              newListings: params.new === 'true',
+              presales: params.presales === 'true',
+              when: params.when,
             }}
           />
         </div>

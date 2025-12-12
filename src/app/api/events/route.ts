@@ -29,6 +29,12 @@ export async function GET(request: NextRequest) {
   const listId = searchParams.get('listId') || undefined;
   const communityId = searchParams.get('communityId') || undefined;
   
+  // Discovery filters (Phase 1.6)
+  const q = searchParams.get('q') || undefined;
+  const newListings = searchParams.get('new') === 'true';
+  const presales = searchParams.get('presales') === 'true';
+  const when = searchParams.get('when') as 'today' | 'thisWeek' | 'weekend' | null;
+  
   const user = await getCurrentUser();
   
   const events = await getEventsWithSocialSignals({
@@ -43,6 +49,11 @@ export async function GET(request: NextRequest) {
     userId: user?.dbUser.id || '',
     limit: limit + 1, // Fetch one extra to check if more exist
     offset,
+    // Discovery filters
+    q,
+    newListings,
+    presales,
+    when: when || undefined,
   });
   
   const hasMore = events.length > limit;

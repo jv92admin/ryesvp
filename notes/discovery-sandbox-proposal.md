@@ -1,3 +1,241 @@
+#CURRENT PROPOSAL
+RyesVP Discovery & Filters – Product Vision
+1. Why we’re doing this
+
+Right now the Events home view is trying to do too much in a cramped space:
+
+A form-like filter bar (dropdowns, from/to, Apply button)
+
+A separate New/Presales strip
+
+Tabs for All Events / Your Events
+
+On mobile this means multiple “control rows” before you see any events. It feels like configuring a search query, not browsing what’s happening.
+
+At the same time, we’re starting to accumulate rich metadata (categories, tags, scenes, favorites). We need a place where people can actually play with that data without turning the main list into a control panel.
+
+Primary objective:
+Clean up the top of the Events view so it feels simple and legible, while laying the groundwork for a richer, separate Discover experience.
+
+2. Vision in one sentence
+
+A clean Events list with a minimal, chip-based filter strip, and a separate Discover surface where users can explore by tags, vibes, and preferences.
+
+Events view = “find something for this night.”
+Discover = “wander, tune your tastes, fall down rabbit holes.”
+
+3. Experience overview
+3.1 Events view – Filters as a lightweight “Discovery Strip”
+
+The existing “Discovery Sandbox” spec becomes the default filter experience for All Events.
+
+Principles
+
+One cohesive strip
+
+No big headings (“DISCOVER / WHEN / FILTER”).
+
+Just a single chip/search area above the list.
+
+Lead with When + Category
+
+People usually start with “When am I free?” and “What am I in the mood for?”
+
+Date and category chips come first; “New / Presales” are secondary.
+
+Instant apply, no form
+
+Every tap updates results immediately.
+
+No global “Apply” button on the main screen.
+
+Mobile: content above the fold
+
+Hard constraint: at least part of the first event card must be visible without scrolling.
+
+Target UI shape (conceptual)
+
+Header (logo, Start Plan, etc.)
+
+Tabs: All Events / Your Events
+
+Filter strip (single compact area):
+
+Date chips: Today, This Week, Weekend, Pick dates…
+
+2–4 primary category chips: Concerts, Comedy, etc.
+
+Discovery chips: New, Presales (with counts when non-zero)
+
+More filters ▾ for overflow
+
+Event list starts immediately.
+
+More filters panel
+
+More filters ▾ opens a compact panel/bottom sheet with:
+
+Full category list (multi-select)
+
+Venue selector:
+
+Search field
+
+Alphabetical multi-select list
+
+Changes apply instantly; no extra Apply on the main page.
+
+Selected venues appear as removable chips in the main strip.
+
+Filter semantics
+
+OR within a type (multiple categories, multiple venues).
+
+AND across types (This Week AND (Concerts OR Comedy) AND (Moody OR ACL) AND New).
+
+This keeps the top of the page clean while still giving power users enough control.
+
+3.2 Discover – a dedicated exploration hub
+
+Separate from the Events list, we introduce a Discover surface.
+
+For v1 this can be a simple, clearly branded page reachable from the Events view (e.g., ✨ Discover chip near search or in the header). Initially it may even be a “Coming soon” stub, but the UX paths and visual home should exist.
+
+Long-term role of Discover
+
+New-user onboarding (taste setup)
+
+First-run experience for new users:
+
+“Pick some artists, tags, scenes, and venues you like.”
+
+Seeds initial preferences for recommendations and “For You” style rows.
+
+Ongoing exploration & preference tuning
+
+A place to:
+
+Browse by tags (genres, moods, vibes, neighborhoods).
+
+Follow artists, venues, scenes.
+
+Adjust discovery preferences (e.g., “more small rooms, fewer big arenas”).
+
+Rabbit-hole entry point
+
+“More like this” for a tag, artist, or venue.
+
+Potential destination when tapping a tag on an event card:
+
+Tap Indie rock → open Discover with that tag pre-selected.
+
+v1 Discover scope
+
+Very lightweight page reachable from:
+
+A ✨ Discover entry point near the filter strip / search.
+
+Content for now:
+
+Even a simple “Coming soon” message is acceptable.
+
+Optionally: a few static blocks like:
+
+“New this week” (list of events)
+
+“By category” (Concerts / Comedy / Sports rows)
+
+The main goal of v1 is carving out the surface and wiring the navigation, not shipping full personalization.
+
+4. Clickable tags on cards (Phase 2+)
+
+We eventually want metadata tags on event cards (genre, scene, neighborhood, etc.) to be interactive pivots:
+
+Tap a tag → either:
+
+Apply that as a filter in place, or
+
+Open Discover with that tag selected.
+
+We will:
+
+Keep card-level tags visually distinct from the main filter chips (smaller, lighter, different palette).
+
+Use subtle hover/press feedback so people can learn they’re interactive.
+
+Add at least one small hint somewhere (“Tip: tap tags on cards to explore more like them”).
+
+Not required for the first iteration of this project, but it’s a key part of the longer-term discovery story.
+
+5. Scope & phases
+Phase 1 – Filter strip cleanup (MVP)
+
+Replace current multi-row, form-style filters with the unified chip strip as defined in the Discovery Sandbox spec.
+
+Implement More filters panel with category + venue selection.
+
+Remove top-level From/To inputs and global Apply button.
+
+Ensure mobile shows at least one event card above the fold.
+
+Phase 2 – Discover entry point (MVP+)
+
+Add a ✨ Discover entry point on the home Events view (near search/filters).
+
+Implement a bare-bones Discover page:
+
+At minimum: branded surface with “Coming soon” and a short message about what Discover will do.
+
+Wire navigation so it’s a real destination, not a dead link.
+
+Phase 3 – Discover v1 (taste + explore)
+
+Add simple genre/scene/tag chips and “New this week / This weekend” rows on Discover.
+
+Optionally experiment with:
+
+Onboarding flow that routes first-time users through Discover.
+
+Card tag clicks → Discover pre-filtered.
+
+6. Success criteria (directional)
+
+UX clarity
+
+Users understand “Events” as the main list and “Discover” as a separate exploration space.
+
+Fewer “what does this filter do?” questions in testing.
+
+Perceived simplicity
+
+Top of Events page visually lighter; more content seen on first screen.
+
+Filter usage remains equal or increases despite fewer visible controls.
+
+Foundation for future features
+
+Easy to layer in:
+
+Friends-going/Trending/For-You chips later.
+
+Tag-based recommendation features on Discover.
+
+This vision keeps the Events list fast and legible while letting you invest in a genuinely fun Discover experience over time, without the two fighting for the same cramped strip at the top of the page.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#####PREVIOUS SCOPING WORK
 # Discovery Sandbox: Filter UX Redesign Proposal
 
 **Author:** Engineering + PM  
