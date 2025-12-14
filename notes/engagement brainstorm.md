@@ -1,5 +1,27 @@
-
 # Proposal: Default Landing, Tips, and Social Nudge UX
+
+> **Status:** Proposed  
+> **Related:** `friend-links-spec.md` — Provides the Add Friend infrastructure this spec's CTAs depend on
+
+---
+
+## Relationship to Friend-Links Spec
+
+This spec's "Add friends" CTAs require working friend-add flows to be meaningful.
+
+| This Spec Says | Friend-Links Provides |
+|----------------|----------------------|
+| Tip 2: "Add friends" button | Profile share flow, group links |
+| Empty state: "Add friends" | Profile page + Add Friend button |
+| Friend-related nudges | Auto-friend on link click |
+
+**Build Sequence:**
+1. **Phase 1 (together):** Profile page + Add Friend + "Add friends" tip
+2. **Phase 2 (after validation):** Toasts, "Your Plans" tip, empty states polish
+
+See `friend-links-spec.md` for the Add Friend infrastructure.
+
+---
 
 ## 1. Goals
 

@@ -10,6 +10,9 @@ export type NotificationPayload = {
   actorId?: string;
   actorName?: string;
   
+  // Friend info (for friend-related notifications)
+  friendId?: string;
+  
   // Event info
   eventId?: string;
   eventTitle?: string;
@@ -63,8 +66,8 @@ function getNotificationLink(type: NotificationType, payload: NotificationPayloa
   switch (type) {
     case 'FRIEND_REQUEST_RECEIVED':
     case 'FRIEND_REQUEST_ACCEPTED':
-      // TBD: Link to profile page when we have it
-      return '/friends';
+      // Link to the friend's profile if we have their ID
+      return payload.friendId ? `/users/${payload.friendId}` : '/friends';
     case 'ADDED_TO_PLAN':
     case 'PLAN_MEMBER_JOINED':
     case 'PLAN_MEMBER_LEFT':

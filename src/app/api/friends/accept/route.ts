@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
     await createNotification(friendship.requesterId, 'FRIEND_REQUEST_ACCEPTED', {
       actorId: user.dbUser.id,
       actorName: user.dbUser.displayName || user.supabaseUser.email.split('@')[0],
+      friendId: user.dbUser.id, // Link to the profile of the person who accepted
     });
 
     return NextResponse.json({ friendship });

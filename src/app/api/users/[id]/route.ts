@@ -97,6 +97,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         // Create notification for target user
         await createNotification(targetUserId, 'FRIEND_REQUEST_RECEIVED', {
           actorId: viewerId,
+          friendId: viewerId,
         });
 
         return NextResponse.json({ 
@@ -119,6 +120,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         // Create notification for the requester (targetUserId is the one who sent the request)
         await createNotification(targetUserId, 'FRIEND_REQUEST_ACCEPTED', {
           actorId: viewerId,
+          friendId: viewerId,
         });
 
         return NextResponse.json({ 

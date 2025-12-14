@@ -1,6 +1,6 @@
 import prisma from './prisma';
 import { SquadMemberStatus, SquadTicketStatus } from '@prisma/client';
-import { getUserEventByEventId } from './userEvents';
+import { getUserEventByEventId, upsertUserEvent } from './userEvents';
 
 /**
  * Create a new Squad for an event
@@ -57,6 +57,16 @@ export async function createSquad(data: {
       
       // Only add if they don't already have a squad
       if (!friendExisting) {
+        // Auto-set INTERESTED if no event status (so it shows in their Social feed)
+        const friendEventStatus = await getUserEventByEventId(friendId, data.eventId);
+        if (!friendEventStatus) {
+          await upsertUserEvent({
+            userId: friendId,
+            eventId: data.eventId,
+            status: 'INTERESTED',
+          });
+        }
+        
         memberCreates.push({
           userId: friendId,
           isOrganizer: false,
@@ -367,6 +377,15 @@ export async function addSquadMember(squadId: string, userId: string) {
 
   // Check user's existing event attendance to inherit status
   const existingUserEvent = await getUserEventByEventId(userId, squad.eventId);
+  
+  // Auto-set INTERESTED if no event status (so it shows in their Social feed)
+  if (!existingUserEvent) {
+    await upsertUserEvent({
+      userId,
+      eventId: squad.eventId,
+      status: 'INTERESTED',
+    });
+  }
   
   const memberStatus: SquadMemberStatus = existingUserEvent?.status === 'GOING'
     ? 'IN'

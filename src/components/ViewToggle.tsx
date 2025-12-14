@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 interface ViewToggleProps {
   defaultView?: 'calendar' | 'social';
@@ -8,7 +9,19 @@ interface ViewToggleProps {
 }
 
 export function ViewToggle({ defaultView = 'calendar', onViewChange }: ViewToggleProps) {
-  const [view, setView] = useState<'calendar' | 'social'>(defaultView);
+  const searchParams = useSearchParams();
+  const urlView = searchParams.get('view') as 'calendar' | 'social' | null;
+  const initialView = urlView === 'social' ? 'social' : defaultView;
+  
+  const [view, setView] = useState<'calendar' | 'social'>(initialView);
+
+  // Sync with URL param on mount/change
+  useEffect(() => {
+    if (urlView === 'social' || urlView === 'calendar') {
+      setView(urlView);
+      onViewChange?.(urlView);
+    }
+  }, [urlView, onViewChange]);
 
   const handleChange = (newView: 'calendar' | 'social') => {
     setView(newView);

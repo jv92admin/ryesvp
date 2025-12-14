@@ -3,6 +3,7 @@
 import { prisma } from '@/db/prisma';
 import { FriendshipStatus } from '@prisma/client';
 import { nanoid } from 'nanoid';
+import { createNotification } from '@/db/notifications';
 
 /**
  * Get or create an invite code for a user
@@ -136,6 +137,13 @@ export async function redeemInviteCode(code: string, newUserId: string) {
       });
     }
   });
+
+  // Notify the inviter that someone joined via their link
+  if (!existingFriendship) {
+    await createNotification(inviterId, 'FRIEND_REQUEST_ACCEPTED', {
+      friendId: newUserId,
+    });
+  }
 
   return {
     success: true,

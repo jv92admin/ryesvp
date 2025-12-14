@@ -3,50 +3,32 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-export function SetNameBanner() {
-  const [show, setShow] = useState(false);
+export function SignInTip() {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    // Check if user has a display name
-    const checkName = async () => {
-      try {
-        const res = await fetch('/api/users/me');
-        if (res.ok) {
-          const json = await res.json();
-          if (!json.user.displayName) {
-            // Check if already dismissed this session
-            const wasDismissed = sessionStorage.getItem('name-banner-dismissed');
-            if (!wasDismissed) {
-              setShow(true);
-            }
-          }
-        }
-      } catch {
-        // Ignore errors
-      }
-    };
-    checkName();
+    // Check sessionStorage for dismissal
+    const wasDismissed = sessionStorage.getItem('ryesvp_signin_tip_dismissed');
+    if (wasDismissed) setDismissed(true);
   }, []);
 
   const handleDismiss = () => {
     setDismissed(true);
-    sessionStorage.setItem('name-banner-dismissed', 'true');
-    setShow(false);
+    sessionStorage.setItem('ryesvp_signin_tip_dismissed', 'true');
   };
 
-  if (!show || dismissed) return null;
+  if (dismissed) return null;
 
   return (
     <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 mb-4 flex items-center justify-between gap-3">
       <p className="text-sm text-gray-700">
         <Link 
-          href="/profile" 
+          href="/login" 
           className="font-medium text-[var(--brand-primary)] hover:underline"
         >
-          Add your name
+          Sign in or sign up
         </Link>
-        {' '}so friends can recognize you.
+        {' '}to track events, see friends&apos; plans, and coordinate together.
       </p>
       <button
         onClick={handleDismiss}

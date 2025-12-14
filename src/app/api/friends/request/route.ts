@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
     await createNotification(addresseeId, 'FRIEND_REQUEST_RECEIVED', {
       actorId: user.dbUser.id,
       actorName: user.dbUser.displayName || user.supabaseUser.email.split('@')[0],
+      friendId: user.dbUser.id, // Link to the profile of the person who sent the request
     });
 
     return NextResponse.json({ friendship });

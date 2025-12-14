@@ -18,8 +18,9 @@ export function SocialSummaryChips({
   activeSection,
   onSectionClick 
 }: SocialSummaryChipsProps) {
-  // Show chips with content OR coming soon placeholders
-  const visibleSections = sections.filter(s => s.count > 0 || s.isComingSoon);
+  // Show all sections - users can click to see empty states
+  // Coming soon sections show greyed out
+  const visibleSections = sections;
   
   if (visibleSections.length === 0) {
     return null;
@@ -28,28 +29,30 @@ export function SocialSummaryChips({
   return (
     <div className="flex items-center gap-2 py-2 overflow-x-auto scrollbar-none sticky top-0 bg-gray-50 z-20">
       {visibleSections.map((section) => {
-        const isActive = section.count > 0 && !section.isComingSoon;
+        const isComingSoon = section.isComingSoon;
+        const hasContent = section.count > 0;
+        const isClickable = !isComingSoon; // Can click even if empty (shows empty state)
         const isSelected = activeSection === section.id;
         
         return (
           <button
             key={section.id}
-            onClick={() => isActive && onSectionClick(section.id)}
-            disabled={!isActive}
+            onClick={() => isClickable && onSectionClick(section.id)}
+            disabled={!isClickable}
             className={`
               inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium
               whitespace-nowrap transition-colors
               ${isSelected
                 ? 'bg-[var(--brand-primary)] text-white'
-                : isActive
+                : isClickable
                   ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 cursor-pointer'
                   : 'bg-gray-100 text-gray-400 cursor-not-allowed'
               }
             `}
-            title={section.isComingSoon ? 'Coming soon' : undefined}
+            title={isComingSoon ? 'Coming soon' : undefined}
           >
             <span>{section.label}</span>
-            {isActive && (
+            {hasContent && (
               <span className={`
                 px-1.5 py-0.5 text-xs rounded-full
                 ${isSelected

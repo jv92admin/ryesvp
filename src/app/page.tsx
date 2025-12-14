@@ -7,6 +7,9 @@ import { SetNameBanner } from '@/components/SetNameBanner';
 import { HomePageContent } from '@/components/HomePageContent';
 import { InviteBanner } from '@/components/InviteBanner';
 import { InviteRedemptionHandler } from '@/components/InviteRedemptionHandler';
+import { OnboardingTips } from '@/components/OnboardingTips';
+import { SignInTip } from '@/components/SignInTip';
+import { OnboardingModal } from '@/components/OnboardingModal';
 import { getCurrentUser } from '@/lib/auth';
 import { EventCategory } from '@prisma/client';
 
@@ -74,7 +77,6 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   return (
     <>
       <Header />
-      {user && <SetNameBanner />}
       <main className="min-h-screen bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 py-4">
           {/* Invite Banner for logged-out users with ?ref= */}
@@ -85,6 +87,19 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
           {/* Filter Strip - Instant apply, no Apply button */}
           <FilterStrip />
+
+          {/* Onboarding Modal for first-time users */}
+          {user && <OnboardingModal />}
+
+          {/* Tips for users */}
+          {user ? (
+            <>
+              <SetNameBanner />
+              <OnboardingTips />
+            </>
+          ) : (
+            <SignInTip />
+          )}
 
           {/* Home Page Content with Conditional Layout */}
           <HomePageContent

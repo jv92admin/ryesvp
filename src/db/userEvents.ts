@@ -97,6 +97,35 @@ export async function getEventAttendance(eventId: string): Promise<{
 }
 
 /**
+ * Count user's future events by status
+ * Used for onboarding tips - matches Social feed logic (future events only)
+ */
+export async function countUserFutureEventsByStatus(
+  userId: string
+): Promise<{ going: number; interested: number }> {
+  const now = new Date();
+  
+  const [going, interested] = await Promise.all([
+    prisma.userEvent.count({
+      where: {
+        userId,
+        status: 'GOING',
+        event: { startDateTime: { gte: now } },
+      },
+    }),
+    prisma.userEvent.count({
+      where: {
+        userId,
+        status: 'INTERESTED',
+        event: { startDateTime: { gte: now } },
+      },
+    }),
+  ]);
+
+  return { going, interested };
+}
+
+/**
  * Get users with a specific attendance status for an event
  * Used for the tappable status lists
  */

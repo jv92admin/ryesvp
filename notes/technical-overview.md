@@ -446,6 +446,7 @@ model List {
 model User {
   // ... existing fields ...
   lastVisitAt   DateTime?     // For "New to You" tracking
+  lastLoginAt   DateTime?     // For feature launch system
 }
 
 // Add to Squad model (or create SquadNote)
@@ -454,6 +455,34 @@ model Squad {
   notes         String?       // Bulletin board / freeform notes
 }
 ```
+
+---
+
+## TODO: Feature Launch System
+
+**Current state:** Onboarding modals/tips use localStorage (client-side only).
+
+**Future migration:** DB-backed feature launch system with `lastLoginAt`.
+
+### Why migrate?
+
+- **Reliable:** Works across devices, doesn't clear with browser storage
+- **Server-side logic:** Can personalize server-rendered content
+- **Feature announcements:** Show "What's New" to returning users after a feature launch
+
+### Implementation steps:
+
+1. Add `lastLoginAt DateTime?` to User model
+2. Update auth callback to set `lastLoginAt` on every login
+3. Create feature config with launch dates
+4. Compare `lastLoginAt < launchDate` → show announcement
+5. Migrate existing localStorage checks to DB-backed system
+
+### Components affected:
+- `OnboardingModal.tsx` — First-time user welcome
+- `OnboardingTips.tsx` — Contextual tips with version flag
+- `SetNameBanner.tsx` — Name prompt
+- Future: Feature announcement modals
 
 ---
 

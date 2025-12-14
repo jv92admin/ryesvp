@@ -6,7 +6,9 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 **Spec Documents:**
 - `data-model-101.md` - **Canonical event types & access patterns (READ FIRST)**
-- `event-discovery-spec.md` - **Event Discovery & Performer Model (ACTIVE)**
+- `event-discovery-spec.md` - **Event Discovery & Performer Model**
+- `friend-links-spec.md` - **Friend Links & Communities (ACTIVE)**
+- `engagement brainstorm.md` - **Onboarding tips & nudges (ACTIVE)**
 - `squads-social-spec.md` - Squads, Social Tab, Ticket Exchange
 - `ui-polish-spec.md` - Visual improvements, event cards, layout
 - `social-layer-spec.md` - Friends, lists, communities (legacy)
@@ -29,7 +31,8 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 | **A** | **Event Discovery 1.4** | Performer entity design | 0.5 day | ✅ Complete |
 | **A** | **Event Discovery 1.5** | Performer entity + modal UI | 2-3 days | ✅ Complete |
 | **A** | **Event Discovery 1.6** | Search + Filter Strip redesign | 1-2 days | ✅ Complete |
-| **B** | **UX: Avatar Popover** | Hover quick actions (desktop) | 1 day | 🔲 |
+| **B** | **UX: Friend Links + Onboarding** | Profile page, Add Friend, onboarding tips | 2 days | 🔲 |
+| **B** | **UX: Group Friend Links** | Community backend (hidden), group join flow | 1 day | 🔲 |
 | **B** | **UX: Transactional Emails** | Welcome, invites, reminders | 2-3 days | 🔲 |
 | **B** | **UX: Bug Fixes** | Issues identified during build | 1-2 days | 🔲 |
 | **C** | **User Testing** | Invite 20-30 users, collect feedback | 1-2 weeks | 🔲 |
@@ -168,15 +171,41 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 **Goal:** Polish UX before inviting real users.
 
-### Friend Avatar Popover (was Phase 4C)
+**Specs:**
+- `friend-links-spec.md` — Friend adding infrastructure
+- `engagement brainstorm.md` — Onboarding tips and nudges
 
-**Goal:** Quick actions on hover (desktop) without leaving current context.
+### Friend Links + Onboarding (was Avatar Popover)
 
-- [ ] Hover on any friend avatar → popover
-- [ ] Quick actions: "Start plan with X", "View profile"
-- [ ] Desktop only (touch devices go straight to profile)
+**Goal:** Make friend-adding frictionless + teach users the product.
 
-### Transactional Emails (was Phase 3B)
+**Phase 1: Core Loop (2 days)**
+- [ ] Profile page with Add Friend button
+- [ ] Avatars clickable → profile (everywhere: interested, going, plan members)
+- [ ] Unified friend/invite link (share profile, smart redemption)
+- [ ] "Add friends" tip on All Events page (from engagement spec)
+- [ ] Friend-add notifications
+
+**Ship + validate:** Do people share friend links?
+
+**Phase 2: Group Links (1 day)**
+- [ ] Community model (hidden in UI, backend only)
+- [ ] Group link generation + join flow
+- [ ] Auto-friend on group join
+- [ ] Batched notifications (one per person, not per friendship)
+
+**Ship + validate:** Do people use group links for concert crews?
+
+**Phase 3: Engagement Polish (0.5 day)**
+- [ ] Social view empty states ("Add friends to see their plans")
+- [ ] First-plan toast ("Added to Your Plans")
+- [ ] "Your Plans" tip on All Events
+
+**Deferred (future Communities reveal):**
+- Community name input, list/tab, settings page
+- Auto-friend toggle UI
+
+### Transactional Emails
 
 **Goal:** Basic transactional emails for key moments.
 
@@ -196,7 +225,6 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 ### UX Bug Fixes
 
 - [ ] Issues identified during Event Discovery build
-- [ ] Friend-add flow polish
 - [ ] Any other friction points
 
 ---

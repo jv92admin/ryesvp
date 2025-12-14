@@ -5,6 +5,7 @@ import { AttendanceStatus } from '@prisma/client';
 import { EventDetailedSocial } from '@/db/events';
 import { SmartSquadButton } from './SmartSquadButton';
 import { CombinedAttendanceModal } from './CombinedAttendanceModal';
+import { useEngagementToast } from './EngagementToast';
 import Link from 'next/link';
 
 interface FriendsAndStatusCardProps {
@@ -55,6 +56,9 @@ export function FriendsAndStatusCard({
   // Local attendance counts for optimistic updates
   const [localAttendance, setLocalAttendance] = useState(attendance);
 
+  // Toast for first engagement
+  const { showToast, ToastComponent } = useEngagementToast();
+
   // Calculate friends going/interested
   const friendsGoing = socialSignals?.friends.filter(f => f.status === 'GOING').length || 0;
   const friendsInterested = socialSignals?.friends.filter(f => f.status === 'INTERESTED').length || 0;
@@ -98,6 +102,9 @@ export function FriendsAndStatusCard({
         if (!res.ok) {
           setStatus(previousStatus);
           setLocalAttendance(attendance);
+        } else if (previousStatus === null) {
+          // First engagement - show toast
+          showToast();
         }
       }
     } catch (error) {
@@ -292,6 +299,9 @@ export function FriendsAndStatusCard({
           onClose={() => setShowFriendsModal(false)}
         />
       )}
+
+      {/* First engagement toast */}
+      {ToastComponent}
     </div>
   );
 }
