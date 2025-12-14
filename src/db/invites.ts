@@ -140,7 +140,16 @@ export async function redeemInviteCode(code: string, newUserId: string) {
 
   // Notify the inviter that someone joined via their link
   if (!existingFriendship) {
+    // Get the new user's name for the notification
+    const newUser = await prisma.user.findUnique({
+      where: { id: newUserId },
+      select: { displayName: true, email: true },
+    });
+    const actorName = newUser?.displayName || newUser?.email?.split('@')[0] || 'Someone';
+    
     await createNotification(inviterId, 'FRIEND_REQUEST_ACCEPTED', {
+      actorId: newUserId,
+      actorName,
       friendId: newUserId,
     });
   }

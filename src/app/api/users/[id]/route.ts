@@ -94,9 +94,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         // Send friend request
         const friendship = await sendFriendRequest(viewerId, targetUserId);
         
+        const actorName = currentUser.dbUser.displayName || currentUser.supabaseUser.email?.split('@')[0] || 'Someone';
+        
         // Create notification for target user
         await createNotification(targetUserId, 'FRIEND_REQUEST_RECEIVED', {
           actorId: viewerId,
+          actorName,
           friendId: viewerId,
         });
 
@@ -117,9 +120,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         
         const friendship = await acceptFriendRequest(friendshipId, viewerId);
         
+        const actorName = currentUser.dbUser.displayName || currentUser.supabaseUser.email?.split('@')[0] || 'Someone';
+        
         // Create notification for the requester (targetUserId is the one who sent the request)
         await createNotification(targetUserId, 'FRIEND_REQUEST_ACCEPTED', {
           actorId: viewerId,
+          actorName,
           friendId: viewerId,
         });
 

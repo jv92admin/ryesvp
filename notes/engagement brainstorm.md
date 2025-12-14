@@ -1,7 +1,25 @@
 # Proposal: Default Landing, Tips, and Social Nudge UX
 
-> **Status:** Proposed  
+> **Status:** Partially Implemented (Dec 13, 2025)  
 > **Related:** `friend-links-spec.md` — Provides the Add Friend infrastructure this spec's CTAs depend on
+
+---
+
+## Implementation Status
+
+| Item | Status | Notes |
+|------|--------|-------|
+| Default landing = All Events | ✅ Done | Already default |
+| Tip 1: "Mark as Going/Interested" | ✅ Done | `OnboardingTips.tsx` |
+| Tip 2: "Add friends" | ✅ Done | `OnboardingTips.tsx` |
+| First-time modal | ✅ Done | `OnboardingModal.tsx` — "Discover. Connect. Plan. Go." |
+| Sign-in tip (logged out) | ✅ Done | `SignInTip.tsx` |
+| Set name banner | ✅ Done | `SetNameBanner.tsx` — restyled |
+| Social empty states | ✅ Done | "Browse Events" + "Add Friends" CTAs |
+| First engagement toast | ✅ Done | `EngagementToast.tsx` |
+| Version flag for legacy users | ✅ Done | Force-shows tips once to all users |
+
+**Future TODO:** Migrate from localStorage to DB-backed `lastLoginAt` for feature launch system. See `technical-overview.md`.
 
 ---
 

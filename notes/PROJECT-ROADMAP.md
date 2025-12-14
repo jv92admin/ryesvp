@@ -31,7 +31,7 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 | **A** | **Event Discovery 1.4** | Performer entity design | 0.5 day | ✅ Complete |
 | **A** | **Event Discovery 1.5** | Performer entity + modal UI | 2-3 days | ✅ Complete |
 | **A** | **Event Discovery 1.6** | Search + Filter Strip redesign | 1-2 days | ✅ Complete |
-| **B** | **UX: Friend Links + Onboarding** | Profile page, Add Friend, onboarding tips | 2 days | 🔲 |
+| **B** | **UX: Friend Links + Onboarding** | Profile page, Add Friend, onboarding tips | 2 days | 🔄 In Progress |
 | **B** | **UX: Group Friend Links** | Community backend (hidden), group join flow | 1 day | 🔲 |
 | **B** | **UX: Transactional Emails** | Welcome, invites, reminders | 2-3 days | 🔲 |
 | **B** | **UX: Bug Fixes** | Issues identified during build | 1-2 days | 🔲 |
@@ -179,12 +179,21 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 **Goal:** Make friend-adding frictionless + teach users the product.
 
-**Phase 1: Core Loop (2 days)**
+**Phase 1: Core Loop (2 days)** 🔄 IN PROGRESS
 - [ ] Profile page with Add Friend button
 - [ ] Avatars clickable → profile (everywhere: interested, going, plan members)
-- [ ] Unified friend/invite link (share profile, smart redemption)
-- [ ] "Add friends" tip on All Events page (from engagement spec)
-- [ ] Friend-add notifications
+- [x] Unified friend/invite link → renamed to "Add Friend" CTA
+- [x] "Add friends" tip on All Events page (from engagement spec)
+- [x] Friend-add notifications (existing — inviter gets notified)
+
+**Phase 1b: Onboarding UX (COMPLETE ✅)**
+- [x] OnboardingModal — First-time user welcome ("Discover. Connect. Plan. Go.")
+- [x] OnboardingTips — "Mark as Going/Interested" + "Add friends" tips
+- [x] SignInTip — Nudge for logged-out users
+- [x] SetNameBanner — Restyled to match tip aesthetic
+- [x] ViewToggle reads `?view=social` URL param
+- [x] SocialSummaryChips — Friends chip always visible (shows empty state)
+- [x] Version flag for force-showing tips to legacy users
 
 **Ship + validate:** Do people share friend links?
 
@@ -195,11 +204,6 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 - [ ] Batched notifications (one per person, not per friendship)
 
 **Ship + validate:** Do people use group links for concert crews?
-
-**Phase 3: Engagement Polish (0.5 day)**
-- [ ] Social view empty states ("Add friends to see their plans")
-- [ ] First-plan toast ("Added to Your Plans")
-- [ ] "Your Plans" tip on All Events
 
 **Deferred (future Communities reveal):**
 - Community name input, list/tab, settings page
@@ -880,6 +884,6 @@ See `data-model-101.md` for full documentation.
 
 ---
 
-**Last Updated:** December 12, 2025
+**Last Updated:** December 13, 2025
 **Active Spec:** `notes/event-discovery-spec.md` (Blocks A, D)
 

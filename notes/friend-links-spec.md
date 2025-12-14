@@ -1,10 +1,32 @@
 # Friend Links & Communities Spec
 
-> **Status:** Proposed  
+> **Status:** Phase 1b Complete, Phase 1a In Progress (Dec 13, 2025)  
 > **Goal:** Make friend-adding frictionless without phone/contact sync  
 > **Replaces:** Separate "Invite to App" and manual friend search flows  
 > **Approach:** Build Community model in backend, but hide from UI (friend-adding only)  
 > **Related:** `engagement brainstorm.md` — Onboarding tips depend on this spec's CTAs
+
+---
+
+## Implementation Status
+
+| Phase | Item | Status |
+|-------|------|--------|
+| **1a** | Profile page + Add Friend button | 🔲 TODO |
+| **1a** | Avatars clickable → profile | 🔲 TODO |
+| **1b** | "Add Friend" CTA (renamed from Invite) | ✅ Done |
+| **1b** | Onboarding tips + modal | ✅ Done |
+| **1b** | Social empty states | ✅ Done |
+| **1b** | First engagement toast | ✅ Done |
+| **2** | Community model (hidden) | 🔲 TODO |
+| **2** | Group link generation | 🔲 TODO |
+
+**Completed Components:**
+- `OnboardingModal.tsx` — First-time welcome
+- `OnboardingTips.tsx` — "Mark Going/Interested" + "Add friends"
+- `SignInTip.tsx` — Logged-out nudge
+- `AddFriendCard.tsx` — Unified friend/invite CTA (compact variant)
+- `SocialSummaryChips.tsx` — Friends chip always visible
 
 ---
 
