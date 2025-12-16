@@ -321,17 +321,18 @@ export function CommunityDetailContent({ communityId }: CommunityDetailContentPr
                     
                     {/* Attendee avatars - only shown if user is visible (reciprocity) */}
                     {canSeeNames ? (
-                      <div className="flex items-center gap-1 mt-3">
+                      <div className="flex items-center gap-1 mt-3" onClick={(e) => e.preventDefault()}>
                         <div className="flex -space-x-2">
                           {event.visibleAttendees.slice(0, 5).map((a, i) => (
-                            <div
+                            <Link
                               key={i}
-                              className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white"
+                              href={`/users/${a.user.id}`}
+                              className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white hover:ring-2 hover:ring-[var(--brand-primary)] hover:ring-offset-1 transition-shadow"
                               style={getAvatarStyle(a.user.id)}
-                              title={getDisplayName(a.user.displayName, a.user.email)}
+                              title={`View ${getDisplayName(a.user.displayName, a.user.email)}'s profile`}
                             >
                               {getInitials(a.user.displayName, a.user.email)}
-                            </div>
+                            </Link>
                           ))}
                         </div>
                         {event.visibleAttendees.length > 5 && (
@@ -359,20 +360,21 @@ export function CommunityDetailContent({ communityId }: CommunityDetailContentPr
           <div className="space-y-3">
             {/* Owner first */}
             <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-              <div 
-                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm"
+              <Link
+                href={`/users/${community.owner.id}`}
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm flex-shrink-0 hover:ring-2 hover:ring-[var(--brand-primary)] hover:ring-offset-1 transition-shadow"
                 style={getAvatarStyle(community.owner.id)}
-                title={getDisplayName(community.owner.displayName, community.owner.email)}
+                title={`View ${getDisplayName(community.owner.displayName, community.owner.email)}'s profile`}
               >
                 {getInitials(community.owner.displayName, community.owner.email)}
-              </div>
-              <div className="flex-1">
-                <p className="font-medium text-gray-900">
+              </Link>
+              <Link href={`/users/${community.owner.id}`} className="flex-1 min-w-0 hover:opacity-80 transition-opacity">
+                <p className="font-medium text-gray-900 truncate">
                   {community.owner.displayName || community.owner.email.split('@')[0]}
                 </p>
-                <p className="text-xs text-gray-500">{community.owner.email}</p>
-              </div>
-              <span className="text-xs font-medium text-[var(--brand-primary)] bg-[var(--brand-primary-light)] px-2 py-1 rounded">
+                <p className="text-xs text-gray-500 truncate">{community.owner.email}</p>
+              </Link>
+              <span className="text-xs font-medium text-[var(--brand-primary)] bg-[var(--brand-primary-light)] px-2 py-1 rounded flex-shrink-0">
                 Owner
               </span>
             </div>
@@ -382,27 +384,28 @@ export function CommunityDetailContent({ communityId }: CommunityDetailContentPr
               .filter((m) => m.userId !== community.ownerId)
               .map((member) => (
               <div key={member.id} className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg">
-                <div 
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm"
+                <Link
+                  href={`/users/${member.user.id}`}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm flex-shrink-0 hover:ring-2 hover:ring-[var(--brand-primary)] hover:ring-offset-1 transition-shadow"
                   style={getAvatarStyle(member.user.id)}
-                  title={getDisplayName(member.user.displayName, member.user.email)}
+                  title={`View ${getDisplayName(member.user.displayName, member.user.email)}'s profile`}
                 >
                   {getInitials(member.user.displayName, member.user.email)}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900">
-                      {member.user.displayName || member.user.email.split('@')[0]}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {member.invitedBy
-                        ? `Invited by ${member.invitedBy.displayName || member.invitedBy.email.split('@')[0]}`
-                        : member.user.email}
-                    </p>
-                  </div>
-                  {!member.isVisible && (
-                    <span className="text-xs text-gray-400">Hidden</span>
-                  )}
-                </div>
+                </Link>
+                <Link href={`/users/${member.user.id}`} className="flex-1 min-w-0 hover:opacity-80 transition-opacity">
+                  <p className="font-medium text-gray-900 truncate">
+                    {member.user.displayName || member.user.email.split('@')[0]}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {member.invitedBy
+                      ? `Invited by ${member.invitedBy.displayName || member.invitedBy.email.split('@')[0]}`
+                      : member.user.email}
+                  </p>
+                </Link>
+                {!member.isVisible && (
+                  <span className="text-xs text-gray-400 flex-shrink-0">Hidden</span>
+                )}
+              </div>
               ))}
           </div>
         </div>

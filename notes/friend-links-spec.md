@@ -1,6 +1,6 @@
 # Friend Links & Communities Spec
 
-> **Status:** Phase 1b Complete, Phase 1a In Progress (Dec 13, 2025)  
+> **Status:** Phase 1a & 1b Complete (Dec 16, 2025)  
 > **Goal:** Make friend-adding frictionless without phone/contact sync  
 > **Replaces:** Separate "Invite to App" and manual friend search flows  
 > **Approach:** Build Community model in backend, but hide from UI (friend-adding only)  
@@ -12,8 +12,8 @@
 
 | Phase | Item | Status |
 |-------|------|--------|
-| **1a** | Profile page + Add Friend button | 🔲 TODO |
-| **1a** | Avatars clickable → profile | 🔲 TODO |
+| **1a** | Profile page + Add Friend button | ✅ Done |
+| **1a** | Avatars clickable → profile | ✅ Done |
 | **1b** | "Add Friend" CTA (renamed from Invite) | ✅ Done |
 | **1b** | Onboarding tips + modal | ✅ Done |
 | **1b** | Social empty states | ✅ Done |
@@ -22,11 +22,21 @@
 | **2** | Group link generation | 🔲 TODO |
 
 **Completed Components:**
+- `UserProfileContent.tsx` — Full profile page at `/users/[id]` with Add Friend, mutual friends, events
 - `OnboardingModal.tsx` — First-time welcome
 - `OnboardingTips.tsx` — "Mark Going/Interested" + "Add friends"
 - `SignInTip.tsx` — Logged-out nudge
 - `AddFriendCard.tsx` — Unified friend/invite CTA (compact variant)
 - `SocialSummaryChips.tsx` — Friends chip always visible
+
+**Clickable Avatars (all link to `/users/[id]`):**
+- `EventSocialSection.tsx` — Friends going/interested on event pages
+- `SquadMemberList.tsx` — Plan member avatars and names
+- `CombinedAttendanceModal.tsx` — Attendance modal avatars
+- `FriendCard.tsx` — Friends list avatars
+- `FriendRequestCard.tsx` — Friend request avatars
+- `CommunityDetailContent.tsx` — Community member and attendee avatars
+- `UserProfileContent.tsx` — Mutual friend avatars
 
 ---
 

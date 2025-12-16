@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { getAvatarStyle, getInitials, getDisplayName } from '@/lib/avatar';
 
 type User = {
@@ -19,21 +20,21 @@ export function FriendRequestCard({ user, type, onAccept, onDecline }: FriendReq
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4 flex items-center justify-between">
-      <div className="flex items-center gap-3">
+      <Link href={`/users/${user.id}`} className="flex items-center gap-3 flex-1 min-w-0 hover:opacity-80 transition-opacity">
         <div 
-          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm"
+          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm flex-shrink-0"
           style={avatarStyle}
           title={getDisplayName(user.displayName, user.email)}
         >
           {initials}
         </div>
-        <div>
-          <p className="font-medium text-gray-900">
+        <div className="min-w-0">
+          <p className="font-medium text-gray-900 truncate">
             {getDisplayName(user.displayName, user.email)}
           </p>
-          <p className="text-sm text-gray-500">{user.email}</p>
+          <p className="text-sm text-gray-500 truncate">{user.email}</p>
         </div>
-      </div>
+      </Link>
       
       {type === 'received' ? (
         <div className="flex gap-2">

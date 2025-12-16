@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, usePathname } from 'next/navigation';
 
-const ONBOARDING_SEEN_KEY = 'ryesvp_onboarding_seen';
-
 export function OnboardingModal() {
   const [show, setShow] = useState(false);
   const searchParams = useSearchParams();
@@ -19,16 +17,38 @@ export function OnboardingModal() {
       return;
     }
 
-    // Check if already seen (permanent)
-    const seen = localStorage.getItem(ONBOARDING_SEEN_KEY);
-    if (!seen) {
-      setShow(true);
+    // Check engagement API for onboarding status (DB-backed, not localStorage)
+    async function checkOnboarding() {
+      try {
+        const res = await fetch('/api/users/me/engagement');
+        if (res.ok) {
+          const data = await res.json();
+          // Show if onboarding not completed
+          if (data.showOnboarding) {
+            setShow(true);
+          }
+        }
+      } catch (err) {
+        // If API fails, don't show modal (fail safe)
+        console.error('Failed to check onboarding status:', err);
+      }
     }
+    
+    checkOnboarding();
   }, [pathname, searchParams]);
 
-  const handleDismiss = () => {
+  const handleDismiss = async () => {
     setShow(false);
-    localStorage.setItem(ONBOARDING_SEEN_KEY, 'true');
+    // Mark onboarding complete in DB (replaces localStorage)
+    try {
+      await fetch('/api/users/me/engagement', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'complete_onboarding' }),
+      });
+    } catch (err) {
+      console.error('Failed to mark onboarding complete:', err);
+    }
   };
 
   const handleStartExploring = () => {

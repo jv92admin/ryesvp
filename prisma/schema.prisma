@@ -225,6 +225,11 @@ model User {
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
+  // Engagement tracking (replaces localStorage)
+  lastVisitAt          DateTime? // Updated on each visit - for announcement tips
+  onboardingCompletedAt DateTime? // Set when welcome modal dismissed
+  firstEngagementAt    DateTime? // Set when first Going/Interested/Plan action
+
   userEvents UserEvent[]
 
   // Friends

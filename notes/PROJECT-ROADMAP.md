@@ -31,7 +31,7 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 | **A** | **Event Discovery 1.4** | Performer entity design | 0.5 day | ✅ Complete |
 | **A** | **Event Discovery 1.5** | Performer entity + modal UI | 2-3 days | ✅ Complete |
 | **A** | **Event Discovery 1.6** | Search + Filter Strip redesign | 1-2 days | ✅ Complete |
-| **B** | **UX: Friend Links + Onboarding** | Profile page, Add Friend, onboarding tips | 2 days | 🔄 In Progress |
+| **B** | **UX: Friend Links + Onboarding** | Profile page, Add Friend, onboarding tips | 2 days | ✅ Complete |
 | **B** | **UX: Group Friend Links** | Community backend (hidden), group join flow | 1 day | 🔲 |
 | **B** | **UX: Transactional Emails** | Welcome, invites, reminders | 2-3 days | 🔲 |
 | **B** | **UX: Bug Fixes** | Issues identified during build | 1-2 days | 🔲 |
@@ -179,9 +179,9 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 **Goal:** Make friend-adding frictionless + teach users the product.
 
-**Phase 1: Core Loop (2 days)** 🔄 IN PROGRESS
-- [ ] Profile page with Add Friend button
-- [ ] Avatars clickable → profile (everywhere: interested, going, plan members)
+**Phase 1: Core Loop (COMPLETE ✅)**
+- [x] Profile page with Add Friend button (`/users/[id]`, `UserProfileContent.tsx`)
+- [x] Avatars clickable → profile (everywhere: interested, going, plan members)
 - [x] Unified friend/invite link → renamed to "Add Friend" CTA
 - [x] "Add friends" tip on All Events page (from engagement spec)
 - [x] Friend-add notifications (existing — inviter gets notified)
@@ -522,13 +522,14 @@ See `data-model-101.md` for full documentation.
 |------|-------|
 | Plan Notes (Bulletin Board) | Freeform notes ("BYOB", "Meet at east entrance"). Price Guide covers structured case for now. |
 | Activity Feed | Real-time friend/community activity in sidebar. Requires activity logging. |
-| "New to You" Tracking | Requires `lastVisitAt` on User. |
+| "New to You" Tracking | `lastVisitAt` now exists on User ✅. Build UI for "new since last visit" badges. |
 | Dark Mode Polish | Exists but not styled. |
 | Soft Reputation | Show-up signals, ticket trust. After communities. |
 | Email Journeys | Multi-step flows, re-engagement. After transactional emails prove out. |
 | Job Run Database Logging | Store job results in `JobRun` table for admin dashboard. |
 | Smart Search (NL) | "Jazz concerts this weekend" → structured search. See event-discovery-spec Phase 4. |
 | Performer/Venue Pages | Rich entity pages. See event-discovery-spec Phase 4.3. |
+| Announcement Sequencing | Queue tips/feature announcements with priority + conditions. Add `seenAnnouncements: String[]` to User. Foundation ready (lastVisitAt, engagement API pattern). |
 
 ---
 
@@ -882,8 +883,38 @@ See `data-model-101.md` for full documentation.
 - Mobile optimization (already looks good)
 - Discover stub page (Phase 2)
 
+### Sprint: Tips & Onboarding Refactor (Complete ✅)
+
+**December 16, 2025**
+
+**Problem:** Tips/onboarding used localStorage which was device-specific and lost on clear.
+
+**Solution:** DB-backed engagement tracking on User model.
+
+**Schema Changes:**
+- [x] `lastVisitAt` — Updated on each visit (enables "new since last visit")
+- [x] `onboardingCompletedAt` — Set when welcome modal dismissed
+- [x] `firstEngagementAt` — Set on first Going/Interested action
+
+**Components Refactored:**
+- [x] `OnboardingModal` — Now checks/sets `onboardingCompletedAt` via API
+- [x] `OnboardingTips` — Pure contextual: shows while condition true (0 events, 0 friends)
+- [x] `EngagementToast` — Now marks `firstEngagementAt` via API
+- [x] `NotificationBell` — Fixed API response checks (unrelated bug found during audit)
+
+**API Changes:**
+- [x] `GET /api/users/me/engagement` — Updates `lastVisitAt`, returns all flags
+- [x] `POST /api/users/me/engagement` — Actions: `complete_onboarding`, `mark_first_engagement`
+
+**Removed:**
+- `ryesvp_onboarding_seen` (localStorage)
+- `ryesvp_tips_version` (localStorage)  
+- `ryesvp_first_engagement_toast_shown` (localStorage)
+
+**Future:** Announcement sequencing added to backlog (foundation compatible).
+
 ---
 
-**Last Updated:** December 13, 2025
+**Last Updated:** December 16, 2025
 **Active Spec:** `notes/event-discovery-spec.md` (Blocks A, D)
 

@@ -49,8 +49,11 @@ export function NotificationBell() {
     // Mark as read if unread
     if (!notification.readAt) {
       try {
-        await fetch(`/api/notifications/${notification.id}`, { method: 'PATCH' });
-        // Update local state
+        const res = await fetch(`/api/notifications/${notification.id}`, { method: 'PATCH' });
+        if (!res.ok) {
+          throw new Error('Failed to mark notification as read');
+        }
+        // Only update local state if API succeeded
         setNotifications(prev =>
           prev.map(n =>
             n.id === notification.id ? { ...n, readAt: new Date().toISOString() } : n
@@ -59,6 +62,8 @@ export function NotificationBell() {
         setUnreadCount(prev => Math.max(0, prev - 1));
       } catch (error) {
         console.error('Failed to mark notification as read:', error);
+        // Refetch to ensure consistent state
+        fetchNotifications();
       }
     }
 
@@ -70,16 +75,23 @@ export function NotificationBell() {
   };
 
   const handleMarkAllAsRead = async () => {
+    if (unreadCount === 0) return; // Skip if nothing to mark
+    
     setIsLoading(true);
     try {
-      await fetch('/api/notifications', { method: 'POST' });
-      // Update local state
+      const res = await fetch('/api/notifications', { method: 'POST' });
+      if (!res.ok) {
+        throw new Error('Failed to mark all as read');
+      }
+      // Only update local state if API succeeded
       setNotifications(prev =>
         prev.map(n => ({ ...n, readAt: n.readAt || new Date().toISOString() }))
       );
       setUnreadCount(0);
     } catch (error) {
       console.error('Failed to mark all as read:', error);
+      // Refetch to ensure consistent state
+      await fetchNotifications();
     }
     setIsLoading(false);
   };

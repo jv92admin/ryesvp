@@ -3,9 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-// Bump this version to force-show tips to all users once
-const TIPS_VERSION = '1';
-
 interface EngagementStats {
   showTip1: boolean;
   showTip2: boolean;
@@ -15,19 +12,17 @@ export function OnboardingTips() {
   const [stats, setStats] = useState<EngagementStats | null>(null);
   const [dismissedTip1, setDismissedTip1] = useState(false);
   const [dismissedTip2, setDismissedTip2] = useState(false);
-  const [forceShow, setForceShow] = useState(false);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    // Check if user has seen this version of tips
-    const seenVersion = localStorage.getItem('ryesvp_tips_version');
-    if (seenVersion !== TIPS_VERSION) {
-      // First time seeing this version - force show regardless of conditions
-      setForceShow(true);
-    }
-
-    // Check sessionStorage for dismissed tips (session only - comes back on restart)
+    // Tips are now purely contextual - they show based on DB state:
+    // - Tip 1: Shows while goingCount + interestedCount === 0
+    // - Tip 2: Shows while friendsExcludingInviter === 0
+    // 
+    // Session dismissal allows user to temporarily hide tips during this session,
+    // but they'll re-appear next session if the condition is still true.
+    // This is intentional - contextual reminders until user takes action.
     const dismissed1 = sessionStorage.getItem('ryesvp_dismissed_tip1');
     const dismissed2 = sessionStorage.getItem('ryesvp_dismissed_tip2');
     if (dismissed1) setDismissedTip1(true);
@@ -38,7 +33,6 @@ export function OnboardingTips() {
         const res = await fetch('/api/users/me/engagement');
         if (res.ok) {
           const data = await res.json();
-          console.log('[OnboardingTips] Engagement stats:', data);
           setStats(data);
         }
       } catch (err) {
@@ -53,16 +47,14 @@ export function OnboardingTips() {
 
   const handleDismissTip1 = () => {
     setDismissedTip1(true);
+    // Session-only dismissal - tip will re-appear next session if condition still true
     sessionStorage.setItem('ryesvp_dismissed_tip1', 'true');
-    // Mark this version as seen
-    localStorage.setItem('ryesvp_tips_version', TIPS_VERSION);
   };
 
   const handleDismissTip2 = () => {
     setDismissedTip2(true);
+    // Session-only dismissal - tip will re-appear next session if condition still true
     sessionStorage.setItem('ryesvp_dismissed_tip2', 'true');
-    // Mark this version as seen
-    localStorage.setItem('ryesvp_tips_version', TIPS_VERSION);
   };
 
   const handleAddFriendsClick = async () => {
@@ -94,23 +86,14 @@ export function OnboardingTips() {
   };
 
   if (loading || !stats) {
-    console.log('[OnboardingTips] Loading or no stats yet');
     return null;
   }
 
-  // Force show if first time seeing this version, otherwise use normal conditions
-  const showTip1 = (forceShow || stats.showTip1) && !dismissedTip1;
-  const showTip2 = (forceShow || stats.showTip2) && !dismissedTip2;
-
-  console.log('[OnboardingTips] Render decision:', {
-    forceShow,
-    'stats.showTip1': stats.showTip1,
-    'stats.showTip2': stats.showTip2,
-    dismissedTip1,
-    dismissedTip2,
-    showTip1,
-    showTip2,
-  });
+  // Pure contextual logic - show tips while conditions are true
+  // Session dismissal allows temporary hiding, but tip re-appears next session
+  // if user hasn't taken the action yet (0 events marked, 0 friends added)
+  const showTip1 = stats.showTip1 && !dismissedTip1;
+  const showTip2 = stats.showTip2 && !dismissedTip2;
 
   if (!showTip1 && !showTip2) return null;
 
