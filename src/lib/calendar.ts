@@ -100,7 +100,7 @@ export function generateICS(squad: Squad, baseUrl: string): string {
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    `UID:ryesvp-squad-${squad.id}@ryesvp.com`,
+    `UID:ryesvp-squad-${squad.id}@ryesvp.me`,
     `DTSTAMP:${formatICSDate(new Date())}`,
     `DTSTART:${formatICSDate(startDate)}`,
     `DTEND:${formatICSDate(endDate)}`,

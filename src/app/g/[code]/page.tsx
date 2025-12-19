@@ -9,7 +9,7 @@ export async function generateMetadata({ params }: GroupJoinPageProps): Promise<
   const { code } = await params;
   
   // Fetch group info for metadata
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://ryesvp.com';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://ryesvp.me';
   try {
     const res = await fetch(`${baseUrl}/api/groups/join/${code}`, {
       cache: 'no-store',
