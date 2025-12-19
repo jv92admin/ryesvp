@@ -105,7 +105,7 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to join squad');
+        throw new Error(errorData.error || 'Failed to join plan');
       }
 
       showToast({
@@ -117,7 +117,7 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
       onClose();
       onSquadCreated(squadId);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to join squad');
+      setError(err instanceof Error ? err.message : 'Failed to join plan');
       setJoiningSquad(null);
     }
   };
@@ -136,7 +136,7 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
 
       if (!squadResponse.ok) {
         const errorData = await squadResponse.json();
-        throw new Error(errorData.error || 'Failed to create squad');
+        throw new Error(errorData.error || 'Failed to create plan');
       }
 
       const squadData = await squadResponse.json();
@@ -177,7 +177,7 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
       onClose();
     } catch (err) {
       console.error('Error creating squad:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create squad');
+      setError(err instanceof Error ? err.message : 'Failed to create plan');
     } finally {
       setCreating(false);
     }

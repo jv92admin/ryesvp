@@ -98,7 +98,7 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
         
         if (!response.ok) {
           const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to load squad');
+          throw new Error(errorData.error || 'Failed to load plan');
         }
 
         const data = await response.json();
@@ -106,7 +106,7 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
         setCurrentUserId(data.currentUserId);
       } catch (err) {
         console.error('Error fetching squad:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load squad');
+        setError(err instanceof Error ? err.message : 'Failed to load plan');
       } finally {
         setLoading(false);
       }
@@ -164,7 +164,7 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to leave squad');
+        throw new Error(errorData.error || 'Failed to leave plan');
       }
 
       onClose();

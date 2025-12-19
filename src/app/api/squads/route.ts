@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     console.error('Error creating squad:', error);
     
-    if (error.message === 'You already have a squad for this event') {
+    if (error.message === 'You already have a plan for this event') {
       return NextResponse.json(
         { error: error.message },
         { status: 409 }
@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
     }
     
     return NextResponse.json(
-      { error: 'Failed to create squad' },
+      { error: 'Failed to create plan' },
       { status: 500 }
     );
   }

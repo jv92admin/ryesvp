@@ -28,7 +28,7 @@ export async function POST(
     const squad = await getSquadById(id);
     if (!squad) {
       return NextResponse.json(
-        { error: 'Squad not found' },
+        { error: 'Plan not found' },
         { status: 404 }
       );
     }
@@ -38,7 +38,7 @@ export async function POST(
       const currentUserMember = squad.members.find(member => member.userId === user.dbUser.id);
       if (!currentUserMember) {
         return NextResponse.json(
-          { error: 'Not authorized to add members to this squad' },
+          { error: 'Not authorized to add members to this plan' },
           { status: 403 }
         );
       }
@@ -48,7 +48,7 @@ export async function POST(
     const existingMember = squad.members.find(member => member.userId === targetUserId);
     if (existingMember) {
       return NextResponse.json(
-        { error: targetUserId === user.dbUser.id ? 'You are already a member of this squad' : 'User is already a member of this squad' },
+        { error: targetUserId === user.dbUser.id ? 'You are already a member of this plan' : 'User is already a member of this plan' },
         { status: 409 }
       );
     }
@@ -100,15 +100,15 @@ export async function POST(
   } catch (error: any) {
     console.error('Error adding squad member:', error);
     
-    if (error.message === 'User already has a squad for this event') {
+    if (error.message === 'User already has a plan for this event') {
       return NextResponse.json(
-        { error: 'User already has a squad for this event' },
+        { error: 'User already has a plan for this event' },
         { status: 409 }
       );
     }
     
     return NextResponse.json(
-      { error: 'Failed to add member to squad' },
+      { error: 'Failed to add member to plan' },
       { status: 500 }
     );
   }
@@ -137,7 +137,7 @@ export async function DELETE(
     const squad = await getSquadById(id);
     if (!squad) {
       return NextResponse.json(
-        { error: 'Squad not found' },
+        { error: 'Plan not found' },
         { status: 404 }
       );
     }
@@ -157,7 +157,7 @@ export async function DELETE(
     const memberToRemove = squad.members.find(member => member.userId === targetUserId);
     if (!memberToRemove) {
       return NextResponse.json(
-        { error: 'User is not a member of this squad' },
+        { error: 'User is not a member of this plan' },
         { status: 404 }
       );
     }
@@ -217,7 +217,7 @@ export async function DELETE(
   } catch (error) {
     console.error('Error removing squad member:', error);
     return NextResponse.json(
-      { error: 'Failed to remove member from squad' },
+      { error: 'Failed to remove member from plan' },
       { status: 500 }
     );
   }

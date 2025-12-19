@@ -27,7 +27,7 @@ export async function GET(
   } catch (error) {
     console.error('Error checking user squad for event:', error);
     return NextResponse.json(
-      { error: 'Failed to check squad status' },
+      { error: 'Failed to check plan status' },
       { status: 500 }
     );
   }

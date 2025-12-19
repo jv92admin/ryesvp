@@ -541,6 +541,7 @@ See `data-model-101.md` for full documentation.
 |------|-------|
 | Plan Notes (Bulletin Board) | Freeform notes ("BYOB", "Meet at east entrance"). Price Guide covers structured now. |
 | Playlist within Plans | "Here's what we're listening to before the show." Spotify link or embed. |
+| Plan Link Onboarding | Currently `/squads/[id]` requires login. Add join flow for non-users (preview → sign up → auto-join). |
 
 ### Communities (Phase 4 — when ready to reveal)
 | Item | Notes |

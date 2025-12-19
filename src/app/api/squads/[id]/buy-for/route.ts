@@ -33,7 +33,7 @@ export async function POST(
     const squad = await getSquadById(id);
     if (!squad) {
       return NextResponse.json(
-        { error: 'Squad not found' },
+        { error: 'Plan not found' },
         { status: 404 }
       );
     }
@@ -41,7 +41,7 @@ export async function POST(
     const member = squad.members.find(m => m.userId === user.dbUser.id);
     if (!member) {
       return NextResponse.json(
-        { error: 'Not a member of this squad' },
+        { error: 'Not a member of this plan' },
         { status: 403 }
       );
     }
@@ -51,7 +51,7 @@ export async function POST(
     const invalidIds = memberIds.filter((memberId: string) => !validMemberIds.includes(memberId));
     if (invalidIds.length > 0) {
       return NextResponse.json(
-        { error: 'Some user IDs are not squad members' },
+        { error: 'Some user IDs are not plan members' },
         { status: 400 }
       );
     }
@@ -120,7 +120,7 @@ export async function DELETE(
     const squad = await getSquadById(id);
     if (!squad) {
       return NextResponse.json(
-        { error: 'Squad not found' },
+        { error: 'Plan not found' },
         { status: 404 }
       );
     }
@@ -128,7 +128,7 @@ export async function DELETE(
     const member = squad.members.find(m => m.userId === user.dbUser.id);
     if (!member) {
       return NextResponse.json(
-        { error: 'Not a member of this squad' },
+        { error: 'Not a member of this plan' },
         { status: 403 }
       );
     }

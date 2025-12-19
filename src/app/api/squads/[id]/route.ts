@@ -22,7 +22,7 @@ export async function GET(
 
     if (!squad) {
       return NextResponse.json(
-        { error: 'Squad not found' },
+        { error: 'Plan not found' },
         { status: 404 }
       );
     }
@@ -34,7 +34,7 @@ export async function GET(
     // TODO: Handle share link access for non-members
     if (!isMember) {
       return NextResponse.json(
-        { error: 'Not a member of this squad' },
+        { error: 'Not a member of this plan' },
         { status: 403 }
       );
     }
@@ -46,7 +46,7 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching squad:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch squad' },
+      { error: 'Failed to fetch plan' },
       { status: 500 }
     );
   }
@@ -74,7 +74,7 @@ export async function PUT(
     const squad = await getSquadById(id);
     if (!squad) {
       return NextResponse.json(
-        { error: 'Squad not found' },
+        { error: 'Plan not found' },
         { status: 404 }
       );
     }
@@ -82,7 +82,7 @@ export async function PUT(
     const isMember = squad.members.some(member => member.userId === user.dbUser.id);
     if (!isMember) {
       return NextResponse.json(
-        { error: 'Not a member of this squad' },
+        { error: 'Not a member of this plan' },
         { status: 403 }
       );
     }
@@ -98,7 +98,7 @@ export async function PUT(
   } catch (error) {
     console.error('Error updating squad logistics:', error);
     return NextResponse.json(
-      { error: 'Failed to update squad logistics' },
+      { error: 'Failed to update plan logistics' },
       { status: 500 }
     );
   }

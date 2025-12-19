@@ -116,7 +116,7 @@ export function SquadPage({ squad: initialSquad, currentUserId, enrichment, cale
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to leave squad');
+        throw new Error(errorData.error || 'Failed to leave plan');
       }
 
       router.push(`/events/${squad.eventId}`);

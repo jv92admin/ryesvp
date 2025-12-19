@@ -30,7 +30,7 @@ export async function GET(
     const squad = await getSquadById(id);
     if (!squad) {
       return NextResponse.json(
-        { error: 'Squad not found' },
+        { error: 'Plan not found' },
         { status: 404 }
       );
     }
@@ -38,7 +38,7 @@ export async function GET(
     const member = squad.members.find(m => m.userId === user.dbUser.id);
     if (!member) {
       return NextResponse.json(
-        { error: 'Not a member of this squad' },
+        { error: 'Not a member of this plan' },
         { status: 403 }
       );
     }
@@ -83,7 +83,7 @@ export async function POST(
     const squad = await getSquadById(id);
     if (!squad) {
       return NextResponse.json(
-        { error: 'Squad not found' },
+        { error: 'Plan not found' },
         { status: 404 }
       );
     }
@@ -91,7 +91,7 @@ export async function POST(
     const member = squad.members.find(m => m.userId === user.dbUser.id);
     if (!member) {
       return NextResponse.json(
-        { error: 'Not a member of this squad' },
+        { error: 'Not a member of this plan' },
         { status: 403 }
       );
     }
@@ -137,7 +137,7 @@ export async function PUT(
     const squad = await getSquadById(id);
     if (!squad) {
       return NextResponse.json(
-        { error: 'Squad not found' },
+        { error: 'Plan not found' },
         { status: 404 }
       );
     }
@@ -145,7 +145,7 @@ export async function PUT(
     const member = squad.members.find(m => m.userId === user.dbUser.id);
     if (!member) {
       return NextResponse.json(
-        { error: 'Not a member of this squad' },
+        { error: 'Not a member of this plan' },
         { status: 403 }
       );
     }
@@ -221,7 +221,7 @@ export async function DELETE(
     const squad = await getSquadById(id);
     if (!squad) {
       return NextResponse.json(
-        { error: 'Squad not found' },
+        { error: 'Plan not found' },
         { status: 404 }
       );
     }
@@ -229,7 +229,7 @@ export async function DELETE(
     const member = squad.members.find(m => m.userId === user.dbUser.id);
     if (!member) {
       return NextResponse.json(
-        { error: 'Not a member of this squad' },
+        { error: 'Not a member of this plan' },
         { status: 403 }
       );
     }

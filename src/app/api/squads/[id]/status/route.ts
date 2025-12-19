@@ -26,7 +26,7 @@ export async function PUT(
     const squad = await getSquadById(id);
     if (!squad) {
       return NextResponse.json(
-        { error: 'Squad not found' },
+        { error: 'Plan not found' },
         { status: 404 }
       );
     }
@@ -34,7 +34,7 @@ export async function PUT(
     const member = squad.members.find(m => m.userId === user.dbUser.id);
     if (!member) {
       return NextResponse.json(
-        { error: 'Not a member of this squad' },
+        { error: 'Not a member of this plan' },
         { status: 403 }
       );
     }
@@ -59,7 +59,7 @@ export async function PUT(
       const coveringMember = squad.members.find(m => m.userId === coveredById);
       if (!coveringMember) {
         return NextResponse.json(
-          { error: 'Covering user is not a squad member' },
+          { error: 'Covering user is not a plan member' },
           { status: 400 }
         );
       }
@@ -72,7 +72,7 @@ export async function PUT(
       const invalidIds = buyingForIds.filter(id => !validMemberIds.includes(id));
       if (invalidIds.length > 0) {
         return NextResponse.json(
-          { error: 'Some user IDs are not squad members' },
+          { error: 'Some user IDs are not plan members' },
           { status: 400 }
         );
       }

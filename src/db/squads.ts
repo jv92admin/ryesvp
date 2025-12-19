@@ -20,7 +20,7 @@ export async function createSquad(data: {
   });
   
   if (existing) {
-    throw new Error('You already have a squad for this event');
+    throw new Error('You already have a plan for this event');
   }
   
   // Check creator's existing event attendance to inherit status
@@ -362,7 +362,7 @@ export async function addSquadMember(squadId: string, userId: string) {
     select: { eventId: true },
   });
   
-  if (!squad) throw new Error('Squad not found');
+  if (!squad) throw new Error('Plan not found');
   
   const existing = await prisma.squadMember.findFirst({
     where: {
@@ -372,7 +372,7 @@ export async function addSquadMember(squadId: string, userId: string) {
   });
   
   if (existing) {
-    throw new Error('User already has a squad for this event');
+    throw new Error('User already has a plan for this event');
   }
 
   // Check user's existing event attendance to inherit status

@@ -24,13 +24,16 @@
 - **19 scrapers** covering major Austin venues (Phase 1.2 complete)
 - Enrichment model with Spotify, Knowledge Graph, Ticketmaster fields
 - LLM enrichment for category inference, performer extraction
-- Basic event list with category/venue filters
+- **Performer model** (first-class entity, 502 performers linked)
+- **Fuzzy text search** (pg_trgm) across events, performers, venues, genres
+- **Chip-based filter UI** with instant apply (no Apply button)
+- **Profile pages** with Add Friend button, clickable avatars everywhere
+- **Group friend links** for inviting concert crews
 
 **What's missing:**
-- Performer as first-class entity
-- Comprehensive source metadata documentation (Phase 1.3)
-- No text search
-- No personalization
+- Transactional emails (welcome, plan invites, reminders)
+- Performer follow + notifications
+- Personalization / "For You"
 
 ---
 
@@ -103,11 +106,11 @@
 
 **Next:** Phase 1.3 - Comprehensive Source Audit
 
-### 1.3 Comprehensive Source Audit (ALL Sources)
+### 1.3 Comprehensive Source Audit (ALL Sources) ✅ COMPLETE
 
 **Goal:** Now that ALL scrapers exist, document what metadata is available across the COMPLETE landscape.
 
-**Create:** `docs/source-structure-log.md`
+**Output:** `notes/scraping docs/source-data-audit.md`
 
 **For EACH source (original + new), document:**
 
@@ -148,47 +151,34 @@ List ALL fields visible in source, whether we use them or not:
 
 **This is the COMPREHENSIVE audit that informs all schema decisions.**
 
-### 1.4 Performer Entity Design
+### 1.4 Performer Entity Design ✅ COMPLETE
 
-**Goal:** Design Performer as first-class entity based on COMPLETE audit findings.
+**Goal:** Design Performer as first-class entity based on audit findings.
 
-**Note:** This replaces the original "Artist Foundation" (Phase 5) from `PROJECT-ROADMAP.md`. The Performer model is broader — it handles music artists, sports teams, comedians, theater companies, etc.
-
-**Agreed decisions:**
+**Decisions made:**
 - Single `Performer` entity (not separate Artist/Team/etc.)
 - `type` discriminator: ARTIST, TEAM, COMEDIAN, COMPANY, OTHER
-- Primary category field
-- Generic tags (structure TBD by audit - single layer? hierarchical?)
-- Event ↔ Performer: Many-to-many relationship
-- Junction table: `EventPerformer` with role (HEADLINER, OPENER, SUPPORT, etc.)
+- Event → Performer: Simple FK (not many-to-many — simplifies MVP)
+- User → Performer: Junction table for follows (better query patterns)
+- External IDs: Explicit columns (spotifyId, ticketmasterId, espnId)
+- Universal `tags` array for genres/styles/leagues
 
-**Questions the audit will answer:**
-- What performer metadata do sources provide?
-- What external IDs are available? (Spotify, IMDB, ESPN, etc.)
-- What tag/genre structures exist across sources?
-- What's consistently available vs. sparse?
+**Output:** `notes/project archives/performer-model-design.md`
 
-**Make schema decision based on actual audit findings, not assumptions.**
+### 1.5 Performer Entity Implementation ✅ COMPLETE
 
-**Output:** `docs/performer-model-design.md`
+**Goal:** Create Performer model with basic UI.
 
-### 1.5 Performer Entity Implementation
+**Completed:**
+- [x] Performer model in Prisma
+- [x] UserPerformerFollow junction table
+- [x] Event.performerId FK
+- [x] Migration: `20251211041441_add_performer_entity`
+- [x] Backfill script: 502 performers, 597 events linked
+- [x] PerformerModal UI (click performer → bio, image, upcoming shows)
+- [x] Integrated into Event page
 
-**Goal:** Create Performer model based on 1.4 design, with basic UI.
-
-**Tasks:**
-1. Create Performer model in Prisma
-2. Create Event ↔ Performer many-to-many relation (`EventPerformer` junction table)
-3. Backfill existing events with Performer links (using `llmPerformer` field)
-4. Display performer on event pages/cards
-5. **Performer popover/modal** - click performer name → see bio, image, other Austin shows
-
-**Schema:** Defined in `docs/performer-model-design.md` (from 1.4)
-
-**UI Scope (minimal):**
-- Performer name clickable on event cards/pages
-- Popover or modal shows: name, image, bio snippet, upcoming events
-- NOT a full `/performers/[id]` page yet (that's Phase 4.3)
+**Future:** Performer Follow + Notify, full `/performers/[slug]` pages (see Backlog)
 
 ### 1.6 Search + Filter Strip Redesign ✅ COMPLETE
 
@@ -238,13 +228,17 @@ List ALL fields visible in source, whether we use them or not:
 
 Ship polish before inviting real users:
 
-| Task | Description | Est. |
-|------|-------------|------|
-| **Friend Avatar Popover** | Hover quick actions on desktop ("Start plan with X", "View profile") | 1 day |
-| **Welcome Email** | "This is a small community project" — how to start, privacy | 0.5 day |
-| **"Added to Plan" Email** | Notification when invited to a plan | 0.5 day |
-| **"Event Tomorrow" Reminder** | Day-before reminder for Going events | 1 day |
-| **UX Bug Fixes** | Issues identified during Phase 0-1 build | 1-2 days |
+| Task | Description | Status |
+|------|-------------|--------|
+| **Friend Links + Profiles** | Profile pages, Add Friend button, clickable avatars | ✅ Complete |
+| **Group Friend Links** | Community backend, `/g/[code]` join flow, auto-friend | ✅ Complete |
+| **Onboarding Tips Refactor** | DB-backed engagement tracking (lastVisitAt, etc.) | ✅ Complete |
+| **Welcome Email** | "This is a small community project" — how to start, privacy | 🔲 Next |
+| **"Added to Plan" Email** | Notification when invited to a plan | 🔲 Next |
+| **"Event Tomorrow" Reminder** | Day-before reminder for Going events | 🔲 Next |
+| **UX Bug Fixes** | Issues identified during user testing | 🔲 |
+
+**Note:** Friend Avatar Popover was replaced by profile pages (all avatars → `/users/[id]`).
 
 ### User Testing (Block C)
 
@@ -439,43 +433,38 @@ Ship polish before inviting real users:
 
 ---
 
-## Open Questions (To Be Answered By Phase 1.3 Audit)
+## Open Questions (Resolved & Remaining)
 
-### Performer Model
-- [ ] What tag/genre structure makes sense across types?
-- [ ] Single layer or hierarchical tags?
-- [ ] What external IDs are consistently available?
-- [ ] What type-specific fields are worth capturing?
+### Performer Model ✅ RESOLVED
+- [x] Single-layer `tags[]` array for genres/styles/leagues
+- [x] External IDs: `spotifyId`, `ticketmasterId`, `espnId` (explicit columns)
+- [x] Simple Event → Performer FK (not many-to-many for MVP)
+- [x] Type-specific fields: Just `type` enum + universal tags
 
-### Venue Model
-- [ ] What venue metadata is available from sources?
+### Venue Model (Phase 2)
+- [ ] What venue metadata is worth enriching? (capacity, age restrictions, vibe)
 - [ ] What's the value vs. effort for each field?
-- [ ] How do we handle user-created venues?
 
-### Event Model
-- [ ] What metadata are we missing that sources provide?
-- [ ] What enrichment has highest user value?
-
-### Enrichment Sources
-- [ ] What APIs are available? (Spotify ✓, Sports ?, Comedy ?)
-- [ ] What can be scraped reliably?
-- [ ] What requires LLM extraction?
+### Enrichment Sources (Phase 2)
+- [x] Spotify API — working for artists
+- [ ] Sports APIs — not explored yet (Austin FC, UT)
+- [ ] Comedy APIs — likely manual/LLM only
+- [x] LLM extraction — working for category, performer, description
 
 ---
 
 ## Documents to Produce
 
-| Phase | Document | Purpose |
-|-------|----------|---------|
-| 1.1 | `docs/priority-venues.md` | Venue coverage gaps |
-| 1.3 | `docs/source-data-audit.md` | All available metadata per source ✅ STARTED |
-| 1.3 | `docs/venue-metadata-audit.md` | Venue enrichment possibilities |
-| 1.4 | `docs/performer-model-design.md` | Performer schema based on audit |
-| 1.6 | `docs/discovery-v1.md` | Basic search/filter docs |
-| 2.1 | `docs/enrichment-use-cases.md` | What to enrich and why |
-| 2.2 | `docs/enrichment-schema.md` | Schema changes for enrichment |
-| 2.3-2.5 | `docs/*-enrichment-process.md` | How each entity is enriched |
-| 2.6 | `docs/discovery-v2.md` | Enriched discovery docs |
+| Phase | Document | Status |
+|-------|----------|--------|
+| 1.1 | `notes/scraping docs/priority-venues.md` | ✅ Complete |
+| 1.3 | `notes/scraping docs/source-data-audit.md` | ✅ Complete |
+| 1.4 | `notes/project archives/performer-model-design.md` | ✅ Complete |
+| 1.6 | `notes/project archives/discovery-filters-spec.md` | ✅ Complete |
+| 2.1 | `docs/enrichment-use-cases.md` | 🔲 Phase 2 |
+| 2.2 | `docs/enrichment-schema.md` | 🔲 Phase 2 |
+| 2.3-2.5 | `docs/*-enrichment-process.md` | 🔲 Phase 2 |
+| 2.6 | `docs/discovery-v2.md` | 🔲 Phase 2 |
 
 ---
 
@@ -489,7 +478,7 @@ Ship polish before inviting real users:
 ---
 
 *Created: December 6, 2025*
-*Updated: December 12, 2025*
-*Status: Phase 1.6 COMPLETE → Ready for Block B (UX Quick Wins) + Block C (User Testing)*
+*Updated: December 19, 2025*
+*Status: Block A (Phase 1) COMPLETE, Block B (UX) IN PROGRESS → Transactional Emails next*
 *Cross-reference: PROJECT-ROADMAP.md (Blocks A, B, C, D)*
 
