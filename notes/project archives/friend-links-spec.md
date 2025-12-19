@@ -1,10 +1,12 @@
 # Friend Links & Communities Spec
 
-> **Status:** Phase 1a & 1b Complete (Dec 16, 2025)  
+> **Status:** ✅ Phase 1 & 2 Complete (Dec 19, 2025)  
 > **Goal:** Make friend-adding frictionless without phone/contact sync  
 > **Replaces:** Separate "Invite to App" and manual friend search flows  
 > **Approach:** Build Community model in backend, but hide from UI (friend-adding only)  
-> **Related:** `engagement brainstorm.md` — Onboarding tips depend on this spec's CTAs
+> **Related:** `engagement brainstorm.md` — Onboarding tips depend on this spec's CTAs  
+> **Dec 16 Update:** Tips/onboarding refactored to DB-backed tracking  
+> **Dec 19 Update:** Group Friend Links (Phase 2) complete
 
 ---
 
@@ -18,16 +20,28 @@
 | **1b** | Onboarding tips + modal | ✅ Done |
 | **1b** | Social empty states | ✅ Done |
 | **1b** | First engagement toast | ✅ Done |
-| **2** | Community model (hidden) | 🔲 TODO |
-| **2** | Group link generation | 🔲 TODO |
+| **2** | Community model (hidden) | ✅ Done |
+| **2** | Group link generation | ✅ Done |
+| **2** | Group join flow + auto-friend | ✅ Done |
+| **2** | Batched notifications | ✅ Done |
+| **2** | "Friend Groups" UI on Friends page | ✅ Done |
+| **2** | Delete group (keeps friendships) | ✅ Done |
 
-**Completed Components:**
+**Phase 1 Components:**
 - `UserProfileContent.tsx` — Full profile page at `/users/[id]` with Add Friend, mutual friends, events
 - `OnboardingModal.tsx` — First-time welcome
 - `OnboardingTips.tsx` — "Mark Going/Interested" + "Add friends"
 - `SignInTip.tsx` — Logged-out nudge
-- `AddFriendCard.tsx` — Unified friend/invite CTA (compact variant)
+- `AddFriendCard.tsx` — Unified friend/invite CTA with Personal + Group link options
 - `SocialSummaryChips.tsx` — Friends chip always visible
+
+**Phase 2 Components (Group Friend Links):**
+- `YourGroups.tsx` — "Friend Groups" section on Friends page
+- `CreateGroupModal.tsx` — Name input + link generation
+- `GroupJoinContent.tsx` — Join page at `/g/[code]` with member preview
+- API routes: `/api/groups`, `/api/groups/[id]`, `/api/groups/join/[code]`
+- Schema: Added `isHidden`, `inviteCode`, `autoFriend` to List model
+- Notification: `GROUP_MEMBER_JOINED` type
 
 **Clickable Avatars (all link to `/users/[id]`):**
 - `EventSocialSection.tsx` — Friends going/interested on event pages

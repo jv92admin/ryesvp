@@ -1,6 +1,6 @@
 # Proposal: Default Landing, Tips, and Social Nudge UX
 
-> **Status:** Partially Implemented (Dec 13, 2025)  
+> **Status:** ✅ Complete (Dec 19, 2025)  
 > **Related:** `friend-links-spec.md` — Provides the Add Friend infrastructure this spec's CTAs depend on
 
 ---
@@ -19,7 +19,7 @@
 | First engagement toast | ✅ Done | `EngagementToast.tsx` |
 | Version flag for legacy users | ✅ Done | Force-shows tips once to all users |
 
-**Future TODO:** Migrate from localStorage to DB-backed `lastLoginAt` for feature launch system. See `technical-overview.md`.
+**~~Future TODO:~~ DONE (Dec 16, 2025):** Migrated from localStorage to DB-backed engagement tracking (`lastVisitAt`, `onboardingCompletedAt`, `firstEngagementAt` on User model). See PROJECT-ROADMAP.md sprint log.
 
 ---
 

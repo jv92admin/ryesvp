@@ -8,6 +8,8 @@ import { ListCard } from '@/components/ListCard';
 import { CreateListModal } from '@/components/CreateListModal';
 import { ListDetailModal } from '@/components/ListDetailModal';
 import { AddFriendCard } from '@/components/InviteLinkCard';
+import { YourGroups, YourGroupsRef } from '@/components/YourGroups';
+import { useRef } from 'react';
 
 type User = {
   id: string;
@@ -61,6 +63,7 @@ export function FriendsContent() {
   const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'search' | 'lists'>('friends');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedListId, setSelectedListId] = useState<string | null>(null);
+  const groupsRef = useRef<YourGroupsRef>(null);
 
   const fetchFriends = async () => {
     try {
@@ -196,7 +199,12 @@ export function FriendsContent() {
   return (
     <>
       {/* Add Friend Link Card */}
-      <AddFriendCard />
+      <AddFriendCard onGroupCreated={() => groupsRef.current?.refresh()} />
+
+      {/* Friend Groups */}
+      <div className="mb-6">
+        <YourGroups ref={groupsRef} />
+      </div>
 
       {/* Tabs */}
       <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-lg">

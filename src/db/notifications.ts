@@ -21,6 +21,11 @@ export type NotificationPayload = {
   // Squad/Plan info
   squadId?: string;
   
+  // Group link info
+  groupId?: string;
+  groupName?: string;
+  newFriendCount?: number;
+  
   // Additional context
   message?: string;
 };
@@ -39,6 +44,7 @@ function getNotificationText(type: NotificationType, payload: NotificationPayloa
   const actor = payload.actorName || 'Someone';
   const event = payload.eventTitle || 'an event';
   const eventDate = payload.eventDate ? ` on ${payload.eventDate}` : '';
+  const groupName = payload.groupName || 'a group';
   
   switch (type) {
     case 'FRIEND_REQUEST_RECEIVED':
@@ -57,6 +63,8 @@ function getNotificationText(type: NotificationType, payload: NotificationPayloa
       return `${actor} is handling your ticket for ${event}${eventDate}.`;
     case 'PLAN_MEETUP_CREATED':
       return `Meetup added for your ${event} plan: ${payload.message || 'Check the plan for details'}.`;
+    case 'GROUP_MEMBER_JOINED':
+      return `${actor} joined ${groupName}.`;
     default:
       return 'You have a new notification.';
   }
@@ -77,6 +85,9 @@ function getNotificationLink(type: NotificationType, payload: NotificationPayloa
     case 'PLAN_CANCELLED':
       // Plan is gone, link to event instead
       return payload.eventId ? `/events/${payload.eventId}` : null;
+    case 'GROUP_MEMBER_JOINED':
+      // Link to the new member's profile
+      return payload.actorId ? `/users/${payload.actorId}` : '/friends';
     default:
       return null;
   }

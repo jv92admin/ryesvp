@@ -1,6 +1,7 @@
 import prisma from './prisma';
-import { List, ListMember, ListMemberStatus, ListRole, User } from '@prisma/client';
+import { List, ListMember, ListMemberStatus, ListRole, User, FriendshipStatus } from '@prisma/client';
 import { areFriends } from './friends';
+import { nanoid } from 'nanoid';
 
 // Types
 export type CommunityWithMembers = List & {
@@ -19,10 +20,12 @@ export type CommunityMembership = ListMember & {
 };
 
 // Get all communities the user is a member of (or owns)
+// Excludes hidden communities (group invite links) - those show in YourGroups section
 export async function getUserCommunities(userId: string): Promise<CommunityWithCount[]> {
   return prisma.list.findMany({
     where: {
       isPublic: true,
+      isHidden: false, // Exclude group invite links
       OR: [
         { ownerId: userId },
         {
@@ -629,5 +632,250 @@ export async function getCommunityEventStats(
     upcomingEvents: eventCount,
     membersGoing: goingCount,
   };
+}
+
+// ============================================
+// GROUP FRIEND LINKS (Phase 2)
+// ============================================
+
+export type GroupLinkWithMembers = List & {
+  owner: User;
+  members: (ListMember & { user: User })[];
+  _count: { members: number };
+};
+
+// Generate a unique short invite code
+function generateInviteCode(): string {
+  return nanoid(8); // 8-character code like "V1StGXR8"
+}
+
+// Create a group link (hidden community with invite code)
+export async function createGroupLink(data: {
+  name: string;
+  ownerId: string;
+}): Promise<List> {
+  const inviteCode = generateInviteCode();
+  
+  return prisma.list.create({
+    data: {
+      name: data.name,
+      ownerId: data.ownerId,
+      isPublic: true,   // It's a community
+      isHidden: true,   // But hidden from main UI
+      inviteCode,       // Has a shareable code
+      autoFriend: true, // Auto-friend on join
+    },
+  });
+}
+
+// Get a group by invite code (for join page)
+export async function getGroupByInviteCode(
+  inviteCode: string
+): Promise<GroupLinkWithMembers | null> {
+  return prisma.list.findFirst({
+    where: {
+      inviteCode,
+      isPublic: true,
+    },
+    include: {
+      owner: true,
+      members: {
+        where: { status: ListMemberStatus.ACTIVE },
+        include: { user: true },
+        orderBy: { joinedAt: 'asc' },
+      },
+      _count: {
+        select: { members: { where: { status: ListMemberStatus.ACTIVE } } },
+      },
+    },
+  });
+}
+
+// Get user's group links (both created and joined)
+export async function getUserGroupLinks(userId: string): Promise<{
+  created: GroupLinkWithMembers[];
+  joined: GroupLinkWithMembers[];
+}> {
+  // Groups the user created
+  const created = await prisma.list.findMany({
+    where: {
+      ownerId: userId,
+      isPublic: true,
+      isHidden: true,
+      inviteCode: { not: null },
+    },
+    include: {
+      owner: true,
+      members: {
+        where: { status: ListMemberStatus.ACTIVE },
+        include: { user: true },
+        orderBy: { joinedAt: 'asc' },
+      },
+      _count: {
+        select: { members: { where: { status: ListMemberStatus.ACTIVE } } },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  // Groups the user joined (not created)
+  const joined = await prisma.list.findMany({
+    where: {
+      isPublic: true,
+      isHidden: true,
+      inviteCode: { not: null },
+      ownerId: { not: userId },
+      members: {
+        some: {
+          userId,
+          status: ListMemberStatus.ACTIVE,
+        },
+      },
+    },
+    include: {
+      owner: true,
+      members: {
+        where: { status: ListMemberStatus.ACTIVE },
+        include: { user: true },
+        orderBy: { joinedAt: 'asc' },
+      },
+      _count: {
+        select: { members: { where: { status: ListMemberStatus.ACTIVE } } },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return { created, joined };
+}
+
+// Join a group via invite code and auto-friend all members
+export async function joinGroupLink(
+  inviteCode: string,
+  userId: string
+): Promise<{
+  group: GroupLinkWithMembers;
+  newFriendships: number;
+  alreadyMember: boolean;
+}> {
+  const group = await getGroupByInviteCode(inviteCode);
+  
+  if (!group) {
+    throw new Error('Invalid or expired group link');
+  }
+
+  // Check if already a member
+  const existingMembership = await prisma.listMember.findUnique({
+    where: {
+      listId_userId: {
+        listId: group.id,
+        userId,
+      },
+    },
+  });
+
+  if (existingMembership?.status === ListMemberStatus.ACTIVE) {
+    return { group, newFriendships: 0, alreadyMember: true };
+  }
+
+  // Get all current member IDs (owner + active members)
+  const allMemberIds = [
+    group.ownerId,
+    ...group.members.map((m) => m.user.id),
+  ].filter((id) => id !== userId);
+
+  // Start a transaction for atomic operations
+  const result = await prisma.$transaction(async (tx) => {
+    // Add user to group (or update if previously left/declined)
+    if (existingMembership) {
+      await tx.listMember.update({
+        where: { id: existingMembership.id },
+        data: {
+          status: ListMemberStatus.ACTIVE,
+          joinedAt: new Date(),
+        },
+      });
+    } else {
+      await tx.listMember.create({
+        data: {
+          listId: group.id,
+          userId,
+          status: ListMemberStatus.ACTIVE,
+          role: ListRole.MEMBER,
+        },
+      });
+    }
+
+    // Auto-friend all existing members if autoFriend is enabled
+    let newFriendships = 0;
+    
+    if (group.autoFriend) {
+      for (const memberId of allMemberIds) {
+        // Check if friendship already exists
+        const existingFriendship = await tx.friendship.findFirst({
+          where: {
+            OR: [
+              { requesterId: userId, addresseeId: memberId },
+              { requesterId: memberId, addresseeId: userId },
+            ],
+          },
+        });
+
+        if (!existingFriendship) {
+          // Create new accepted friendship
+          await tx.friendship.create({
+            data: {
+              requesterId: userId,
+              addresseeId: memberId,
+              status: FriendshipStatus.ACCEPTED,
+            },
+          });
+          newFriendships++;
+        } else if (existingFriendship.status !== FriendshipStatus.ACCEPTED) {
+          // Update existing to accepted (if pending/declined)
+          await tx.friendship.update({
+            where: { id: existingFriendship.id },
+            data: { status: FriendshipStatus.ACCEPTED },
+          });
+          newFriendships++;
+        }
+      }
+    }
+
+    return { newFriendships };
+  });
+
+  // Refetch group with updated members
+  const updatedGroup = await getGroupByInviteCode(inviteCode);
+  
+  return {
+    group: updatedGroup!,
+    newFriendships: result.newFriendships,
+    alreadyMember: false,
+  };
+}
+
+// Delete a group link (owner only) - deletes community but keeps friendships
+export async function deleteGroupLink(
+  groupId: string,
+  userId: string
+): Promise<void> {
+  const group = await prisma.list.findUnique({
+    where: { id: groupId },
+  });
+
+  if (!group) {
+    throw new Error('Group not found');
+  }
+
+  if (group.ownerId !== userId) {
+    throw new Error('Only the creator can delete this group');
+  }
+
+  // Delete the community (cascade deletes members)
+  // Friendships are NOT deleted - they persist
+  await prisma.list.delete({
+    where: { id: groupId },
+  });
 }
 

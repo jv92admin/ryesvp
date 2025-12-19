@@ -55,6 +55,14 @@ export async function requireAuth(): Promise<AuthUser> {
 }
 
 /**
+ * Get optional user - returns null if not authenticated (doesn't redirect)
+ * Use this for pages that work for both logged-in and logged-out users
+ */
+export async function getOptionalUser(): Promise<AuthUser | null> {
+  return getCurrentUser();
+}
+
+/**
  * Sign out the current user
  */
 export async function signOut() {

@@ -6,15 +6,18 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 **Spec Documents:**
 - `data-model-101.md` - **Canonical event types & access patterns (READ FIRST)**
-- `event-discovery-spec.md` - **Event Discovery & Performer Model**
-- `friend-links-spec.md` - **Friend Links & Communities (ACTIVE)**
-- `engagement brainstorm.md` - **Onboarding tips & nudges (ACTIVE)**
+- `event-discovery-spec.md` - **Event Discovery & Performer Model (ACTIVE)**
 - `squads-social-spec.md` - Squads, Social Tab, Ticket Exchange
 - `ui-polish-spec.md` - Visual improvements, event cards, layout
+- `ui-design-reference.md` - Design system, component patterns
+- `scheduled-jobs-spec.md` - Cron for scraping + enrichment
+
+**Archived Specs (Complete):**
+- `friend-links-spec.md` - Friend Links & Group Invites ✅
+- `engagement brainstorm.md` - Onboarding tips & nudges ✅
 - `social-layer-spec.md` - Friends, lists, communities (legacy)
 - `social-layer-phase5-spec.md` - Invite codes
-- `data-enrichment-spec.md` - Knowledge Graph, Spotify integration (legacy - see event-discovery-spec)
-- `scheduled-jobs-spec.md` - Cron for scraping + enrichment
+- `data-enrichment-spec.md` - Knowledge Graph, Spotify (legacy - see event-discovery-spec)
 
 ---
 
@@ -32,7 +35,7 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 | **A** | **Event Discovery 1.5** | Performer entity + modal UI | 2-3 days | ✅ Complete |
 | **A** | **Event Discovery 1.6** | Search + Filter Strip redesign | 1-2 days | ✅ Complete |
 | **B** | **UX: Friend Links + Onboarding** | Profile page, Add Friend, onboarding tips | 2 days | ✅ Complete |
-| **B** | **UX: Group Friend Links** | Community backend (hidden), group join flow | 1 day | 🔲 |
+| **B** | **UX: Group Friend Links** | Community backend (hidden), group join flow | 1 day | ✅ Complete |
 | **B** | **UX: Transactional Emails** | Welcome, invites, reminders | 2-3 days | 🔲 |
 | **B** | **UX: Bug Fixes** | Issues identified during build | 1-2 days | 🔲 |
 | **C** | **User Testing** | Invite 20-30 users, collect feedback | 1-2 weeks | 🔲 |
@@ -136,10 +139,7 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 - [x] PerformerModal UI (click performer name → see bio, image, past/upcoming shows)
 - [x] Integrate into Event page
 
-**Future follow-ups (not MVP):**
-- Follow button + notification when followed performer has new show
-- Performer data cleanup (remove legacy artist fields from Enrichment)
-- Full `/performers/[slug]` page (Phase 4.3)
+**Future:** See "Discovery & Content" and "Technical / Infrastructure" sections in Backlog.
 
 ### Phase 1.6: Search + Filter Strip Redesign ✅ COMPLETE
 
@@ -197,17 +197,17 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 
 **Ship + validate:** Do people share friend links?
 
-**Phase 2: Group Links (1 day)**
-- [ ] Community model (hidden in UI, backend only)
-- [ ] Group link generation + join flow
-- [ ] Auto-friend on group join
-- [ ] Batched notifications (one per person, not per friendship)
+**Phase 2: Group Links ✅ COMPLETE**
+- [x] Community model (hidden in UI, backend only)
+- [x] Group link generation + join flow (`/g/[code]`)
+- [x] Auto-friend on group join
+- [x] Batched notifications (`GROUP_MEMBER_JOINED`)
+- [x] "Friend Groups" UI on /friends page
+- [x] Create/delete group links
 
 **Ship + validate:** Do people use group links for concert crews?
 
-**Deferred (future Communities reveal):**
-- Community name input, list/tab, settings page
-- Auto-friend toggle UI
+**Deferred:** See "Communities" section in Backlog.
 
 ### Transactional Emails
 
@@ -347,9 +347,7 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 - `src/components/StartPlanModal.tsx` — Event search → squad creation flow
 - `src/components/UserMenu.tsx` — Added Friends link
 
-**Deferred:**
-- Friend profile "Start plan with X" (Phase 4B)
-- Friend avatar popover (Phase 4C)
+**Deferred:** See "Social & Friends" section in Backlog.
 
 ---
 
@@ -446,9 +444,7 @@ See `data-model-101.md` for full documentation.
 - [x] Delete Supabase Auth user (if service role key available)
 - [x] Logout and redirect to home
 
-**Future enhancements:**
-- Data export before deletion (GDPR portability)
-- Grace period / soft delete with recovery window
+**Future:** See "Account & Privacy" section in Backlog.
 
 ---
 
@@ -518,18 +514,75 @@ See `data-model-101.md` for full documentation.
 
 ## Backlog (Future / Unscheduled)
 
+### Discovery & Content
 | Item | Notes |
 |------|-------|
-| Plan Notes (Bulletin Board) | Freeform notes ("BYOB", "Meet at east entrance"). Price Guide covers structured case for now. |
-| Activity Feed | Real-time friend/community activity in sidebar. Requires activity logging. |
-| "New to You" Tracking | `lastVisitAt` now exists on User ✅. Build UI for "new since last visit" badges. |
-| Dark Mode Polish | Exists but not styled. |
-| Soft Reputation | Show-up signals, ticket trust. After communities. |
-| Email Journeys | Multi-step flows, re-engagement. After transactional emails prove out. |
-| Job Run Database Logging | Store job results in `JobRun` table for admin dashboard. |
+| Discover Page (`/discover`) | Stub page → evolves into taste setup, tag browsing, "For You". Entry point from filter strip. |
+| Clickable Tags on Event Cards | Tap genre/tag → filter events or open Discover pre-filtered. Subtle styling, hover feedback. |
+| Typeahead Search Suggestions | As-you-type dropdown: performers, events, tags. Phase 2 of search. |
 | Smart Search (NL) | "Jazz concerts this weekend" → structured search. See event-discovery-spec Phase 4. |
-| Performer/Venue Pages | Rich entity pages. See event-discovery-spec Phase 4.3. |
-| Announcement Sequencing | Queue tips/feature announcements with priority + conditions. Add `seenAnnouncements: String[]` to User. Foundation ready (lastVisitAt, engagement API pattern). |
+| Performer/Venue Pages | Full `/performers/[slug]` and `/venues/[slug]` pages. See event-discovery-spec Phase 4.3. |
+| Performer Follow + Notify | Follow button → notification when followed performer has new show. |
+| "New to You" Badges | `lastVisitAt` exists ✅. Build UI for "new since last visit" indicators on events. |
+| Medium Events (Indie Venues) | Curated smaller venues (bars, indie rooms). High effort/maintenance. V2+ flavor. |
+
+### Social & Friends
+| Item | Notes |
+|------|-------|
+| "Start Plan with X" | From friend profile, start a plan and auto-invite that friend. (Was Phase 4B) |
+| Friend Avatar Popover | Hover on avatar → quick actions popover. Currently all click → profile. (Was Phase 4C) |
+| Discovery Chips: Friends Going | `👥 Friends Going` filter chip on event list. |
+| Discovery Chips: Trending | `🔥 Trending` chip based on friend/community activity. |
+| Activity Feed | Real-time friend/community activity in sidebar. Requires activity logging. |
+| Soft Reputation | Show-up signals, ticket trust. After communities. |
+
+### Plans & Coordination
+| Item | Notes |
+|------|-------|
+| Plan Notes (Bulletin Board) | Freeform notes ("BYOB", "Meet at east entrance"). Price Guide covers structured now. |
+| Playlist within Plans | "Here's what we're listening to before the show." Spotify link or embed. |
+
+### Communities (Phase 4 — when ready to reveal)
+| Item | Notes |
+|------|-------|
+| Community UI Reveal | Surface hidden groups as named communities with settings. |
+| Community Settings | Auto-friend toggle, link expiry, multiple invite links. |
+| Group Size Limits | Cap auto-friend groups at N members to prevent abuse. |
+| Community Feed | Simple activity feed per community. |
+
+### Onboarding & Engagement
+| Item | Notes |
+|------|-------|
+| Taste Setup Onboarding | First-run flow: "Pick artists, tags, scenes, venues you like." Seeds preferences for recommendations. |
+| Taste Graph | Attendance history + playlist + friend overlap → preference profile. Powers "For You." |
+| Announcement Sequencing | Queue tips/feature announcements with priority + conditions. Add `seenAnnouncements: String[]` to User. Foundation ready (lastVisitAt, engagement API). |
+| Email Journeys | Multi-step flows, re-engagement. After transactional emails prove out. |
+
+### Technical / Infrastructure
+| Item | Notes |
+|------|-------|
+| Job Run Database Logging | Store job results in `JobRun` table for admin dashboard. |
+| Performer Data Cleanup | Remove legacy artist fields from Enrichment model. |
+| Dark Mode Polish | Exists but not styled. |
+
+### Communications (Beyond Transactional)
+| Item | Notes |
+|------|-------|
+| Email Reply-to-Act | Reply "I'm in, need 1 ticket" → parsed and updates status. |
+| Weekly Digest Email | Events this week + "just listed" matching your tastes. Opt-in. |
+| SMS Day-of Logistics | "Tonight: 5:30 Drinks → 8:00 Show." Last-mile only, not engagement. |
+
+### Account & Privacy
+| Item | Notes |
+|------|-------|
+| Data Export (GDPR) | Export user data before deletion. |
+| Soft Delete / Grace Period | Recovery window before permanent account deletion. |
+
+### Moonshots
+| Item | Notes |
+|------|-------|
+| "Plan My Night" AI | "I'm going to Khruangbin. Plan my evening." → dinner, pregame, afterparty suggestions. |
+| Conversational Planning | "Add me to the Khruangbin plan" via SMS → parsed and executed. |
 
 ---
 
@@ -883,6 +936,36 @@ See `data-model-101.md` for full documentation.
 - Mobile optimization (already looks good)
 - Discover stub page (Phase 2)
 
+### Sprint: Friend Links + Profile Pages (Complete ✅)
+
+**December 16, 2025**
+
+**Goal:** Make friend-adding frictionless with dedicated profile pages.
+
+**Profile Page (`/users/[id]`):**
+- [x] `UserProfileContent.tsx` — Full profile with avatar, name, stats
+- [x] Friendship states: Add Friend, Request Sent, Accept/Decline, Friends Since
+- [x] Mutual friends section with clickable avatars
+- [x] Upcoming events the user is attending
+- [x] "Start a Plan with X" CTA
+- [x] Redirects to `/profile` if viewing own profile
+
+**API (`/api/users/[id]`):**
+- [x] GET — Profile data with friendship context
+- [x] POST — Friend actions (send, accept, decline, cancel)
+- [x] DELETE — Remove friend
+- [x] Creates notifications for friend requests/accepts
+
+**Clickable Avatars (all link to `/users/[id]`):**
+- [x] `EventSocialSection.tsx` — Friends going/interested on event pages
+- [x] `SquadMemberList.tsx` — Plan member avatars
+- [x] `CombinedAttendanceModal.tsx` — Attendance modal avatars
+- [x] `FriendCard.tsx` — Friends list avatars
+- [x] `FriendRequestCard.tsx` — Friend request avatars
+- [x] `CommunityDetailContent.tsx` — Community member avatars
+
+**Decision:** All avatars redirect to profile page (no context-specific popovers).
+
 ### Sprint: Tips & Onboarding Refactor (Complete ✅)
 
 **December 16, 2025**
@@ -913,8 +996,45 @@ See `data-model-101.md` for full documentation.
 
 **Future:** Announcement sequencing added to backlog (foundation compatible).
 
+### Sprint: Group Friend Links (Complete ✅)
+
+**December 19, 2025**
+
+**Goal:** Enable group invites where everyone who joins becomes friends with each other.
+
+**Schema Changes:**
+- [x] Added `isHidden`, `inviteCode`, `autoFriend` fields to List model
+- [x] Added `GROUP_MEMBER_JOINED` notification type
+- [x] Migration: `20251219000000_add_group_invite_fields`
+
+**API Routes:**
+- [x] `POST /api/groups` — Create group link with auto-generated invite code
+- [x] `GET /api/groups` — List user's groups (created + joined)
+- [x] `DELETE /api/groups/[id]` — Delete group (owner only, keeps friendships)
+- [x] `GET /api/groups/join/[code]` — Preview group + members
+- [x] `POST /api/groups/join/[code]` — Join group, auto-friend all members
+
+**Data Layer (`src/db/communities.ts`):**
+- [x] `createGroupLink()` — Creates hidden community with invite code
+- [x] `getGroupByInviteCode()` — Fetch group for preview
+- [x] `getUserGroupLinks()` — Get created + joined groups
+- [x] `joinGroupLink()` — Auto-friend all members in transaction
+- [x] `deleteGroupLink()` — Remove group, preserve friendships
+- [x] Updated `getUserCommunities()` to exclude hidden groups from main UI
+
+**Components:**
+- [x] `GroupJoinContent.tsx` — Join page at `/g/[code]` with member preview
+- [x] `YourGroups.tsx` — "Friend Groups" section on Friends page
+- [x] `CreateGroupModal.tsx` — Name input + link generation
+- [x] Updated `InviteLinkCard.tsx` — Unified card with Personal + Group link options
+- [x] Batched notifications: One "X joined [Group]" per member (not per friendship)
+
+**Specs Archived:**
+- `friend-links-spec.md` → Phase 1 & 2 complete, Phase 4 deferred to Communities v1
+- `engagement brainstorm.md` → All items complete, DB migration done
+
 ---
 
-**Last Updated:** December 16, 2025
+**Last Updated:** December 19, 2025
 **Active Spec:** `notes/event-discovery-spec.md` (Blocks A, D)
 

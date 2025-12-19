@@ -346,11 +346,17 @@ model List {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  // Group Link fields (Phase 2: Friend Links)
+  isHidden   Boolean  @default(false) // Hidden from communities UI, used for group invite links
+  inviteCode String?  @unique         // Short join code for group invite link (e.g., "abc123")
+  autoFriend Boolean  @default(true)  // Auto-friend all members when joining via invite link
+
   owner   User         @relation("OwnedLists", fields: [ownerId], references: [id], onDelete: Cascade)
   members ListMember[]
 
   @@index([ownerId])
   @@index([isPublic])
+  @@index([inviteCode])
 }
 
 // ListMember - membership in a list or community
@@ -641,4 +647,7 @@ enum NotificationType {
 
   // Plan details
   PLAN_MEETUP_CREATED // Meetup time/location set for a plan
+
+  // Group invites
+  GROUP_MEMBER_JOINED // Someone joined a group you're in
 }
