@@ -43,7 +43,7 @@ export async function Header() {
               href="/login"
               className="btn-primary px-4 py-2 text-sm font-medium rounded-lg transition-colors"
             >
-              Sign in
+              Get Started
             </Link>
           )}
         </nav>

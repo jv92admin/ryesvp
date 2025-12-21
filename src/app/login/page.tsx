@@ -101,7 +101,7 @@ export default function LoginPage() {
           <p className="text-xs text-gray-500 text-center mt-4">
             {inviterName 
               ? `Sign up to connect with ${inviterName}`
-              : 'Existing user? Sign in. New? You\'ll need an invite code.'
+              : 'Can\'t find your invite code? Ask a friend on RyesVP to add you from their Friends page.'
             }
           </p>
         </div>
