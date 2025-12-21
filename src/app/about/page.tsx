@@ -75,8 +75,8 @@ export default function AboutPage() {
                 />
               </div>
               <p className="text-gray-600 text-sm leading-relaxed max-w-[240px] mx-auto">
-                Scroll concerts, comedy, sports, and more — and curate your nights 
-                with rich filters instead of ten different tabs.
+                Find concerts, comedy, sports, and more around Austin — and curate 
+                your nights with venue, genre, and date filters.
               </p>
             </div>
 
@@ -100,8 +100,8 @@ export default function AboutPage() {
                 />
               </div>
               <p className="text-gray-600 text-sm leading-relaxed max-w-[240px] mx-auto">
-                Add friends so your feed becomes their events, and it&apos;s easy 
-                to spot &quot;oh, that would be fun with them.&quot;
+                Add friends so you see what they&apos;re interested in (and they 
+                see you too) — making it easy to spot &quot;oh, that would be fun with them.&quot;
               </p>
             </div>
 
@@ -125,8 +125,8 @@ export default function AboutPage() {
                 />
               </div>
               <p className="text-gray-600 text-sm leading-relaxed max-w-[240px] mx-auto">
-                Start a plan when it feels real. Track who&apos;s in, tickets, and 
-                meetup details instead of burying everything in group chats.
+                Start a plan to make it happen. Track who&apos;s in, tickets, and 
+                meetup details — and adjust anytime plans change.
               </p>
             </div>
           </div>
