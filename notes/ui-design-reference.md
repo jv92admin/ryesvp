@@ -1199,6 +1199,8 @@ These pages don't exist yet. Document design decisions here as they're built.
 | Dec 21, 2025 | About Page | New `/about` page — intro, how it works (Discover/Connect/Plan/Go), roadmap notes |
 | Dec 21, 2025 | About Page | Green-accented "Go" card, patch-notes style "What's next" section |
 | Dec 21, 2025 | Header | Made sticky across all pages (`sticky top-0 z-50`) |
+| Dec 21, 2025 | Groups | Expandable member list — click avatars to see all members with profile links |
+| Dec 21, 2025 | Avatar | Fixed crash when displayName and email are null/empty |
 
 ---
 

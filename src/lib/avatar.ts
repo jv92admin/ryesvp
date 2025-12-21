@@ -43,20 +43,27 @@ export function getAvatarGradient(userId: string): string {
 }
 
 // Get initials from display name or email
-export function getInitials(displayName: string | null, email: string): string {
+export function getInitials(displayName: string | null, email?: string | null): string {
   if (displayName) {
-    return displayName
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
+    const parts = displayName.split(' ').filter(n => n.length > 0);
+    if (parts.length > 0) {
+      return parts
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+    }
   }
-  return email[0].toUpperCase();
+  if (email && email.length > 0) {
+    return email[0].toUpperCase();
+  }
+  return '?';
 }
 
 // Get display name or fallback to email username
-export function getDisplayName(displayName: string | null, email: string): string {
-  return displayName || email.split('@')[0];
+export function getDisplayName(displayName: string | null, email?: string | null): string {
+  if (displayName) return displayName;
+  if (email && email.length > 0) return email.split('@')[0];
+  return 'Unknown';
 }
 

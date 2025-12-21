@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import { getAvatarStyle, getInitials, getDisplayName } from '@/lib/avatar';
 import { CreateGroupModal } from '@/components/CreateGroupModal';
 
@@ -37,6 +38,7 @@ export function GroupsTab() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const fetchGroups = useCallback(async () => {
     try {
@@ -180,6 +182,8 @@ ${inviteUrl}`;
             isOwner={true}
             copiedId={copiedId}
             deletingId={deletingId}
+            isExpanded={expandedId === group.id}
+            onToggleExpand={() => setExpandedId(expandedId === group.id ? null : group.id)}
             onShare={() => handleShareLink(group)}
             onDelete={() => handleDelete(group.id)}
           />
@@ -193,6 +197,8 @@ ${inviteUrl}`;
             isOwner={false}
             copiedId={copiedId}
             deletingId={deletingId}
+            isExpanded={expandedId === group.id}
+            onToggleExpand={() => setExpandedId(expandedId === group.id ? null : group.id)}
             onShare={() => handleShareLink(group)}
             onDelete={() => {}}
           />
@@ -214,6 +220,8 @@ function GroupCard({
   isOwner,
   copiedId,
   deletingId,
+  isExpanded,
+  onToggleExpand,
   onShare,
   onDelete,
 }: {
@@ -221,6 +229,8 @@ function GroupCard({
   isOwner: boolean;
   copiedId: string | null;
   deletingId: string | null;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
   onShare: () => void;
   onDelete: () => void;
 }) {
@@ -246,8 +256,11 @@ function GroupCard({
             )}
           </div>
           
-          {/* Member avatars */}
-          <div className="flex items-center gap-2">
+          {/* Member avatars - clickable to expand */}
+          <button
+            onClick={onToggleExpand}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
             <div className="flex -space-x-1.5">
               {allMembers.slice(0, 5).map((member) => {
                 const avatarStyle = getAvatarStyle(member.id);
@@ -269,10 +282,18 @@ function GroupCard({
                 </div>
               )}
             </div>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500 flex items-center gap-1">
               {memberCount} member{memberCount !== 1 ? 's' : ''}
+              <svg 
+                className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
             </span>
-          </div>
+          </button>
         </div>
 
         {/* Actions */}
@@ -311,6 +332,46 @@ function GroupCard({
           )}
         </div>
       </div>
+
+      {/* Expanded member list */}
+      {isExpanded && (
+        <div className="mt-4 pt-4 border-t border-gray-100">
+          <div className="space-y-2">
+            {allMembers.map((member) => {
+              const avatarStyle = getAvatarStyle(member.id);
+              const initials = getInitials(member.displayName, member.email);
+              const displayName = getDisplayName(member.displayName, member.email);
+              const isGroupOwner = member.id === group.owner.id;
+              
+              return (
+                <Link
+                  key={member.id}
+                  href={`/users/${member.id}`}
+                  className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium"
+                    style={avatarStyle}
+                  >
+                    {initials}
+                  </div>
+                  <span className="flex-1 text-sm font-medium text-gray-900">
+                    {displayName}
+                  </span>
+                  {isGroupOwner && (
+                    <span className="text-xs text-gray-400">
+                      Creator
+                    </span>
+                  )}
+                  <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

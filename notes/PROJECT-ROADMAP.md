@@ -1098,6 +1098,15 @@ See `data-model-101.md` for full documentation.
 - [x] Deleted `InviteLinkCard.tsx` (replaced by `AddFriendCard.tsx`)
 - [x] Deleted `YourGroups.tsx` (replaced by `GroupsTab.tsx`)
 
+**Bug Fixes:**
+- [x] Fixed avatar crash when displayName and email are both null/empty
+
+**Group Member Expansion:**
+- [x] Click member avatars to expand full member list
+- [x] Each member links to their profile (`/users/[id]`)
+- [x] Shows "Creator" badge for group owner
+- [x] Chevron rotation animation on expand/collapse
+
 ### Sprint: About Page (Complete ✅)
 
 **December 21, 2025**
