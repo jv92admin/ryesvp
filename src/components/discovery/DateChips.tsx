@@ -64,8 +64,11 @@ export function DateChips() {
     // Clear preset when using explicit dates
     params.delete('when');
     
-    if (start) {
-      params.set('startDate', start);
+    // If only end date is set, default start to today
+    const effectiveStart = start || (end ? today : '');
+    
+    if (effectiveStart) {
+      params.set('startDate', effectiveStart);
     } else {
       params.delete('startDate');
     }
@@ -103,6 +106,9 @@ export function DateChips() {
     }
     return `Until ${new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
   };
+
+  // Get today's date for min attribute
+  const today = new Date().toISOString().split('T')[0];
 
   const chips: { id: DatePreset; label: string }[] = [
     { id: 'thisWeek', label: 'This Week' },
@@ -145,43 +151,64 @@ export function DateChips() {
         </ToggleChip>
         
         {showDatePicker && (
-          <div className="absolute top-full left-0 mt-1 p-3 bg-white border border-gray-200 rounded-lg shadow-lg z-20 min-w-[200px]">
-            <div className="space-y-2">
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">From</label>
-                <input
-                  type="date"
-                  value={localStart}
-                  onChange={(e) => {
-                    setLocalStart(e.target.value);
-                    handleDateChange(e.target.value, localEnd);
-                  }}
-                  className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md 
-                           focus:outline-none focus:ring-1 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)]"
-                />
+          <div className="fixed sm:absolute top-32 sm:top-full left-4 right-4 sm:left-0 sm:right-auto mt-2 p-3 bg-white border border-gray-200 rounded-lg shadow-lg z-50 sm:min-w-[280px]">
+            <div className="space-y-3">
+              {/* Combined date range display */}
+              <div className="flex items-center gap-2">
+                <div className="flex-1">
+                  <label className="block text-xs text-gray-500 mb-1">From</label>
+                  <input
+                    type="date"
+                    value={localStart}
+                    min={today}
+                    onChange={(e) => {
+                      setLocalStart(e.target.value);
+                      handleDateChange(e.target.value, localEnd);
+                    }}
+                    className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md 
+                             text-gray-900 placeholder:text-gray-400
+                             focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent"
+                  />
+                </div>
+                <span className="text-gray-400 mt-5">→</span>
+                <div className="flex-1">
+                  <label className="block text-xs text-gray-500 mb-1">To</label>
+                  <input
+                    type="date"
+                    value={localEnd}
+                    min={localStart || today}
+                    onChange={(e) => {
+                      setLocalEnd(e.target.value);
+                      handleDateChange(localStart, e.target.value);
+                    }}
+                    className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md
+                             text-gray-900 placeholder:text-gray-400
+                             focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">To</label>
-                <input
-                  type="date"
-                  value={localEnd}
-                  onChange={(e) => {
-                    setLocalEnd(e.target.value);
-                    handleDateChange(localStart, e.target.value);
-                  }}
-                  className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md
-                           focus:outline-none focus:ring-1 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)]"
-                />
-              </div>
-              {hasCustomDates && (
+              
+              {/* Footer */}
+              <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                {hasCustomDates ? (
+                  <button
+                    type="button"
+                    onClick={clearDates}
+                    className="text-xs text-gray-500 hover:text-gray-700"
+                  >
+                    Clear
+                  </button>
+                ) : (
+                  <span />
+                )}
                 <button
                   type="button"
-                  onClick={clearDates}
-                  className="w-full text-xs text-gray-500 hover:text-gray-700 mt-1"
+                  onClick={() => setShowDatePicker(false)}
+                  className="px-3 py-1 text-xs font-medium text-white bg-[var(--brand-primary)] rounded-md hover:bg-[var(--brand-primary-hover)]"
                 >
-                  Clear dates
+                  Done
                 </button>
-              )}
+              </div>
             </div>
           </div>
         )}

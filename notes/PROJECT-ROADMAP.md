@@ -1107,6 +1107,14 @@ See `data-model-101.md` for full documentation.
 - [x] Shows "Creator" badge for group owner
 - [x] Chevron rotation animation on expand/collapse
 
+**Friend Avatar Stack (Social Signals Redesign):**
+- [x] Created `FriendAvatarStack` component in `ui/`
+- [x] Extended `EventSocialSignals` to include friend objects (not just counts)
+- [x] Updated `EventCard` — shows friend avatars instead of "3 going" text
+- [x] Updated `FriendsAndStatusCard` — friend avatars in planning row
+- [x] Updated `SocialSectionA` and `SocialSectionB` — avatar-based display
+- [x] Deprecated `FriendCountBadge` in favor of `FriendAvatarStack`
+
 ### Sprint: About Page (Complete ✅)
 
 **December 21, 2025**

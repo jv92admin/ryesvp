@@ -1,11 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { EventDisplay, EnrichmentDisplay } from '@/db/events';
 import { EventCardActions } from './EventCardActions';
-import { FriendCountBadge } from './ui/StatusBadge';
+import { FriendAvatarStack } from './ui/FriendAvatarStack';
+import { CombinedAttendanceModal } from './CombinedAttendanceModal';
 import { formatEventDate, isNewListing } from '@/lib/utils';
 import { type TMPresale, isRelevantPresale } from '@/lib/presales';
+import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 
 // Get presale info for display - returns text for the presale row
 function getPresaleInfo(enrichment: EnrichmentDisplay | undefined): {
@@ -83,6 +86,14 @@ interface EventCardProps {
 }
 
 export function EventCard({ event }: EventCardProps) {
+  const [showFriendsModal, setShowFriendsModal] = useState(false);
+  const { saveScrollPosition, savePaginationState } = useScrollRestoration();
+  
+  // Combined save function for both scroll and pagination
+  const handleNavigate = () => {
+    saveScrollPosition();
+    // Pagination state is saved by EventListWithPagination on loadMore
+  };
   const social = event.social;
   const enrichment = event.enrichment;
   const isNew = isNewListing(event.createdAt);
@@ -91,6 +102,13 @@ export function EventCard({ event }: EventCardProps) {
   
   // Get presale info
   const presaleInfo = getPresaleInfo(enrichment);
+  
+  // Calculate friend list for avatars
+  const friendsList = [
+    ...(social?.friendsGoingList || []),
+    ...(social?.friendsInterestedList || []),
+  ].slice(0, 5);
+  const hasFriends = friendsList.length > 0;
   
   const categoryColors: Record<string, string> = {
     CONCERT: 'bg-violet-100 text-violet-800',
@@ -124,7 +142,7 @@ export function EventCard({ event }: EventCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all p-4">
       {/* Main clickable area - links to event page */}
-      <Link href={`/events/${event.id}`} className="block">
+      <Link href={`/events/${event.id}`} className="block" onClick={handleNavigate}>
         <div className="flex gap-3">
           {/* Event Image */}
           {event.imageUrl ? (
@@ -202,11 +220,23 @@ export function EventCard({ event }: EventCardProps) {
             </a>
           )}
           
-          {/* Friend count */}
-          <FriendCountBadge 
-            goingCount={social?.friendsGoing} 
-            interestedCount={social?.friendsInterested}
-          />
+          {/* Friend avatars - clickable to open modal */}
+          {hasFriends && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowFriendsModal(true);
+              }}
+              className="flex items-center hover:opacity-80 transition-opacity"
+            >
+              <FriendAvatarStack
+                friends={friendsList}
+                maxVisible={3}
+                size="sm"
+              />
+            </button>
+          )}
           
           {/* Community attendance */}
           {social?.communitiesGoing.slice(0, 1).map((c) => (
@@ -236,6 +266,16 @@ export function EventCard({ event }: EventCardProps) {
           />
         </div>
       </div>
+      
+      {/* Friends modal */}
+      {showFriendsModal && (
+        <CombinedAttendanceModal
+          eventId={event.id}
+          goingCount={social?.friendsGoing || 0}
+          interestedCount={social?.friendsInterested || 0}
+          onClose={() => setShowFriendsModal(false)}
+        />
+      )}
     </div>
   );
 }

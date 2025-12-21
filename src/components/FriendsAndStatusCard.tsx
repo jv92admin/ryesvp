@@ -5,6 +5,7 @@ import { AttendanceStatus } from '@prisma/client';
 import { EventDetailedSocial } from '@/db/events';
 import { SmartSquadButton } from './SmartSquadButton';
 import { CombinedAttendanceModal } from './CombinedAttendanceModal';
+import { FriendAvatarStack } from './ui/FriendAvatarStack';
 import { useEngagementToast } from './EngagementToast';
 import Link from 'next/link';
 
@@ -145,23 +146,19 @@ export function FriendsAndStatusCard({
     }
   };
 
-  // Friends tile content
-  const renderFriendsTileContent = () => {
-    if (totalFriends > 0) {
-      const count = friendsGoing > 0 ? friendsGoing : friendsInterested;
-      const label = friendsGoing > 0 ? 'going' : 'interested';
-      return (
-        <span className="text-[13px] font-medium text-green-800">
-          👥 {count} {count === 1 ? 'friend' : 'friends'} {label}
-        </span>
-      );
-    }
-    return (
-      <span className="text-[13px] text-gray-500">
-        👥 No friends yet
-      </span>
-    );
-  };
+  // Get friends for avatar display
+  const friendsForAvatars = [
+    ...(socialSignals?.friends.filter(f => f.status === 'GOING') || []).map(f => ({
+      id: f.id,
+      displayName: f.displayName,
+      email: f.email,
+    })),
+    ...(socialSignals?.friends.filter(f => f.status === 'INTERESTED') || []).map(f => ({
+      id: f.id,
+      displayName: f.displayName,
+      email: f.email,
+    })),
+  ].slice(0, 5);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 mb-6">
@@ -213,22 +210,29 @@ export function FriendsAndStatusCard({
 
         {/* ROW 2: Planning strip (SECONDARY) - Friends + Start Plan */}
         {isLoggedIn && (
-          <div className="grid grid-cols-2 gap-1.5">
-            {/* Left tile: Friends going */}
-            <button
-              onClick={() => totalFriends > 0 && setShowFriendsModal(true)}
-              className={`
-                flex items-center justify-center px-3 py-2 rounded-md transition-colors
-                ${totalFriends > 0 
-                  ? 'bg-green-50 border border-green-100 hover:bg-green-100 cursor-pointer' 
-                  : 'bg-gray-50 border border-gray-100 cursor-default'
-                }
-              `}
-            >
-              {renderFriendsTileContent()}
-            </button>
+          <div className="flex items-center justify-between gap-3">
+            {/* Left: Friend avatars */}
+            {totalFriends > 0 ? (
+              <button
+                onClick={() => setShowFriendsModal(true)}
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              >
+                <FriendAvatarStack
+                  friends={friendsForAvatars}
+                  maxVisible={4}
+                  size="md"
+                />
+                <span className="text-xs text-gray-500">
+                  {totalFriends} friend{totalFriends !== 1 ? 's' : ''}
+                </span>
+              </button>
+            ) : (
+              <span className="text-[13px] text-gray-400">
+                No friends marked yet
+              </span>
+            )}
             
-            {/* Right tile: Start Plan */}
+            {/* Right: Start Plan */}
             <SmartSquadButton
               eventId={eventId}
               userSquadId={userSquad?.id || null}
@@ -236,7 +240,7 @@ export function FriendsAndStatusCard({
               friendsInterested={friendsInterested}
               event={event}
               alwaysShow={true}
-              className="flex-1 justify-center py-2 text-[13px] rounded-md"
+              className="justify-center py-2 text-[13px] rounded-md"
             />
           </div>
         )}

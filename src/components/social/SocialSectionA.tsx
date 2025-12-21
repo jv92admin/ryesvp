@@ -1,10 +1,12 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { formatInTimeZone } from 'date-fns-tz';
 import { EventDisplay } from '@/db/events';
 import { SmartSquadButton } from '../SmartSquadButton';
-import { StatusBadge, FriendCountBadge } from '../ui/StatusBadge';
+import { FriendAvatarStack } from '../ui/FriendAvatarStack';
+import { CombinedAttendanceModal } from '../CombinedAttendanceModal';
 
 const AUSTIN_TIMEZONE = 'America/Chicago';
 
@@ -14,6 +16,7 @@ interface SocialSectionAProps {
 }
 
 export function SocialSectionA({ events, recentSquadIds = [] }: SocialSectionAProps) {
+  const [modalEventId, setModalEventId] = useState<string | null>(null);
   // Group events: recent squads first (based on unread notifications), then time buckets
   const twoWeeksOut = new Date();
   twoWeeksOut.setDate(twoWeeksOut.getDate() + 14);
@@ -58,15 +61,35 @@ export function SocialSectionA({ events, recentSquadIds = [] }: SocialSectionAPr
             {formatInTimeZone(event.startDateTime, AUSTIN_TIMEZONE, 'EEE, MMM d • h:mm a')} • {event.venue.name}
           </p>
           
-          {/* Status + Plan button row */}
-          <div className="flex items-center justify-between mt-2">
+          {/* Friend avatars + Plan button row */}
+            <div className="flex items-center justify-between mt-2">
             <div className="flex items-center gap-2">
-              <StatusBadge status={event.social?.userStatus} />
-              <FriendCountBadge 
-                goingCount={event.social?.friendsGoing} 
-                interestedCount={event.social?.friendsInterested}
-                variant="text"
-              />
+              {(() => {
+                const friendsList = [
+                  ...((event as any).friendsGoing || []),
+                  ...((event as any).friendsInterested || []),
+                ].slice(0, 5).map((f: any) => ({
+                  id: f.userId,
+                  displayName: f.displayName,
+                  email: f.email,
+                }));
+                return friendsList.length > 0 ? (
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setModalEventId(event.id);
+                    }}
+                    className="flex items-center hover:opacity-80 transition-opacity"
+                  >
+                    <FriendAvatarStack
+                      friends={friendsList}
+                      maxVisible={3}
+                      size="sm"
+                    />
+                  </button>
+                ) : null;
+              })()}
             </div>
             
             <SmartSquadButton
@@ -156,6 +179,16 @@ export function SocialSectionA({ events, recentSquadIds = [] }: SocialSectionAPr
           </>
         )}
       </div>
+      
+      {/* Friends modal */}
+      {modalEventId && (
+        <CombinedAttendanceModal
+          eventId={modalEventId}
+          goingCount={events.find(e => e.id === modalEventId)?.social?.friendsGoing || 0}
+          interestedCount={events.find(e => e.id === modalEventId)?.social?.friendsInterested || 0}
+          onClose={() => setModalEventId(null)}
+        />
+      )}
     </div>
   );
 }

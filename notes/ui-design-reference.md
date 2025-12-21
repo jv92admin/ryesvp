@@ -99,16 +99,44 @@ Located in `src/components/ui/`:
 |-----------|------|---------|
 | `Button` | `ui/Button.tsx` | Primary, secondary, ghost, danger variants |
 | `StatusBadge` | `ui/StatusBadge.tsx` | User status (Going, Interested, Need/Have Tickets) |
-| `FriendCountBadge` | `ui/StatusBadge.tsx` | Friend counts with pill/text variants |
+| `FriendAvatarStack` | `ui/FriendAvatarStack.tsx` | Stacked friend avatars (replaces FriendCountBadge) |
 | `TagChip` | `ui/TagChip.tsx` | Removable filter chips |
 | `Chip` | `ui/Chip.tsx` | Generic chip component |
 | `Badge` | `ui/Badge.tsx` | Category and status badges |
 
 **Usage Guidelines:**
-- Import shared components: `import { StatusBadge, FriendCountBadge } from '@/components/ui/StatusBadge'`
+- Import shared components: `import { StatusBadge } from '@/components/ui/StatusBadge'`
 - Use `StatusBadge` for all user status displays (EventCard, SocialSectionA/B)
-- Use `FriendCountBadge` for friend activity counts (variant="pill" for cards, variant="text" for compact)
+- Use `FriendAvatarStack` for friend social signals — shows actual friend avatars, not counts
 - Extend shared components rather than creating one-off styled elements
+
+### FriendAvatarStack Pattern
+
+**Purpose:** Replace text-based "3 going" with actual friend avatars.
+
+**Display:**
+- 1-3 friends: Shows all avatars
+- 4+ friends: Shows first 3 + `+N` overflow badge
+
+**Sizes:**
+- `size="sm"` (default): 24px avatars, `text-[10px]` initials
+- `size="md"`: 28px avatars, `text-xs` initials
+
+**Props:**
+```tsx
+<FriendAvatarStack
+  friends={[...]}        // Array of { id, displayName, email }
+  maxVisible={3}         // How many to show before overflow
+  size="sm"              // "sm" | "md"
+  onClick={() => {}}     // Optional click handler (opens modal)
+  linkToProfiles={false} // If true, each avatar links to /users/[id]
+/>
+```
+
+**Used in:**
+- EventCard (event list)
+- FriendsAndStatusCard (event detail page)
+- SocialSectionA/B (Your Events tab)
 
 ### Brand Assets
 
@@ -1201,6 +1229,8 @@ These pages don't exist yet. Document design decisions here as they're built.
 | Dec 21, 2025 | Header | Made sticky across all pages (`sticky top-0 z-50`) |
 | Dec 21, 2025 | Groups | Expandable member list — click avatars to see all members with profile links |
 | Dec 21, 2025 | Avatar | Fixed crash when displayName and email are null/empty |
+| Dec 21, 2025 | Social Signals | FriendAvatarStack replaces FriendCountBadge — shows actual avatars instead of counts |
+| Dec 21, 2025 | Data Layer | EventSocialSignals now includes friendsGoingList/friendsInterestedList for avatar display |
 
 ---
 

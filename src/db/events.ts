@@ -212,12 +212,23 @@ export type EnrichmentDisplay = {
 };
 
 /**
+ * Friend info for avatar display
+ */
+export type FriendForAvatar = {
+  id: string;
+  displayName: string | null;
+  email: string;
+};
+
+/**
  * Social signals for an event
  */
 export type EventSocialSignals = {
   userStatus: 'GOING' | 'INTERESTED' | null;
   friendsGoing: number;
   friendsInterested: number;
+  friendsGoingList: FriendForAvatar[];      // First 5 friends for avatar display
+  friendsInterestedList: FriendForAvatar[]; // First 5 friends for avatar display
   communitiesGoing: { communityId: string; communityName: string; count: number }[];
 };
 
@@ -679,6 +690,8 @@ export async function getEventSocialSignals(
       userStatus: null,
       friendsGoing: 0,
       friendsInterested: 0,
+      friendsGoingList: [],
+      friendsInterestedList: [],
       communitiesGoing: [],
     });
   }
@@ -709,7 +722,7 @@ export async function getEventSocialSignals(
   // Get user's communities
   const communities = await getUserCommunities(userId);
   
-  // Query friends' attendance
+  // Query friends' attendance with user details for avatar display
   if (friendIds.length > 0) {
     const friendAttendance = await prisma.userEvent.findMany({
       where: {
@@ -720,16 +733,37 @@ export async function getEventSocialSignals(
       select: {
         eventId: true,
         status: true,
+        user: {
+          select: {
+            id: true,
+            displayName: true,
+            email: true,
+          },
+        },
       },
     });
     
     for (const att of friendAttendance) {
       const signals = signalsMap.get(att.eventId);
       if (signals) {
+        const friendInfo: FriendForAvatar = {
+          id: att.user.id,
+          displayName: att.user.displayName,
+          email: att.user.email,
+        };
+        
         if (att.status === 'GOING') {
           signals.friendsGoing++;
+          // Keep first 5 for avatar display
+          if (signals.friendsGoingList.length < 5) {
+            signals.friendsGoingList.push(friendInfo);
+          }
         } else {
           signals.friendsInterested++;
+          // Keep first 5 for avatar display
+          if (signals.friendsInterestedList.length < 5) {
+            signals.friendsInterestedList.push(friendInfo);
+          }
         }
       }
     }

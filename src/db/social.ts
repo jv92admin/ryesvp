@@ -68,7 +68,9 @@ export async function getYourPlans(userId: string, filters?: SocialFilters): Pro
             { userId: { in: friendIds } }, // Friend statuses for social signals
           ],
         },
-        select: { userId: true, status: true },
+        include: {
+          user: { select: { id: true, displayName: true, email: true } },
+        },
       },
       squads: {
         where: {
@@ -105,9 +107,9 @@ export async function getYourPlans(userId: string, filters?: SocialFilters): Pro
     const hasSquad = !!userSquad;
     const status = userEvent?.status;
     
-    // Calculate friend counts
-    const friendsGoingCount = friendEvents.filter(fe => fe.status === AttendanceStatus.GOING).length;
-    const friendsInterestedCount = friendEvents.filter(fe => fe.status === AttendanceStatus.INTERESTED).length;
+    // Calculate friend counts and lists
+    const friendsGoingEvents = friendEvents.filter(fe => fe.status === AttendanceStatus.GOING);
+    const friendsInterestedEvents = friendEvents.filter(fe => fe.status === AttendanceStatus.INTERESTED);
     
     // Determine priority level (lower number = higher priority)
     let priority = 5; // default
@@ -131,9 +133,20 @@ export async function getYourPlans(userId: string, filters?: SocialFilters): Pro
       enrichment: event.enrichment ? mapEnrichmentForDisplay(event.enrichment) : undefined,
       social: {
         userStatus: status as 'GOING' | 'INTERESTED' || null,
-        friendsGoing: friendsGoingCount,
-        friendsInterested: friendsInterestedCount,
+        friendsGoing: friendsGoingEvents.length,
+        friendsInterested: friendsInterestedEvents.length,
         communitiesGoing: [],
+        // Friend lists for avatar display
+        friendsGoingList: friendsGoingEvents.slice(0, 5).map(fe => ({
+          id: fe.user.id,
+          displayName: fe.user.displayName,
+          email: fe.user.email,
+        })),
+        friendsInterestedList: friendsInterestedEvents.slice(0, 5).map(fe => ({
+          id: fe.user.id,
+          displayName: fe.user.displayName,
+          email: fe.user.email,
+        })),
       },
       // Squad information for smart buttons
       userSquad: userSquad ? {
@@ -266,6 +279,17 @@ export async function getAlmostPlans(userId: string, filters?: SocialFilters): P
         friendsGoing: friendEvents.filter(fe => fe.status === AttendanceStatus.GOING).length,
         friendsInterested: friendEvents.filter(fe => fe.status === AttendanceStatus.INTERESTED).length,
         communitiesGoing: [],
+        // Friend lists for avatar display
+        friendsGoingList: friendEvents.filter(fe => fe.status === AttendanceStatus.GOING).slice(0, 5).map(fe => ({
+          id: fe.user.id,
+          displayName: fe.user.displayName,
+          email: fe.user.email,
+        })),
+        friendsInterestedList: friendEvents.filter(fe => fe.status === AttendanceStatus.INTERESTED).slice(0, 5).map(fe => ({
+          id: fe.user.id,
+          displayName: fe.user.displayName,
+          email: fe.user.email,
+        })),
       },
       // Squad information for smart buttons
       userSquad: userSquad ? {
@@ -277,16 +301,6 @@ export async function getAlmostPlans(userId: string, filters?: SocialFilters): P
       _userHasInterest: userHasInterest,
       _isWithin2Weeks: isWithin2Weeks,
       _friendCount: friendCount,
-      friendsGoing: friendEvents.filter(fe => fe.status === AttendanceStatus.GOING).map(fe => ({
-        userId: fe.user.id,
-        displayName: fe.user.displayName,
-        email: fe.user.email,
-      })),
-      friendsInterested: friendEvents.filter(fe => fe.status === AttendanceStatus.INTERESTED).map(fe => ({
-        userId: fe.user.id,
-        displayName: fe.user.displayName,
-        email: fe.user.email,
-      })),
     };
   }).filter((event): event is NonNullable<typeof event> => event !== null); // Remove null entries with type guard
 
