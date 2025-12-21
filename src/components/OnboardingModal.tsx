@@ -71,7 +71,7 @@ export function OnboardingModal() {
         if (navigator.share) {
           await navigator.share({
             title: 'Add me on RyesVP',
-            text: 'Add me as a friend on RyesVP! We can discover Austin events together.',
+            text: 'Add me as a friend on RyesVP so we can spot Austin events and actually make plans to go.',
             url: fullUrl,
           });
         } else {
@@ -101,9 +101,12 @@ export function OnboardingModal() {
         </button>
 
         {/* Title */}
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
           Discover. Connect. Plan. Go.
         </h2>
+        <p className="text-gray-600 mb-6">
+          Find events with friends and keep each plan in one place.
+        </p>
 
         {/* Bullets */}
         <ul className="space-y-4 mb-8 text-gray-700">

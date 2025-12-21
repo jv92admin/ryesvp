@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getAvatarStyle, getInitials, getDisplayName } from '@/lib/avatar';
+import { storeGroupInvite } from '@/lib/invite';
 
 type GroupMember = {
   id: string;
@@ -243,7 +244,8 @@ export function GroupJoinContent({ code }: GroupJoinContentProps) {
           ) : (
             <div className="space-y-3">
               <Link
-                href={`/login?redirect=/g/${code}`}
+                href={`/login?next=/g/${code}`}
+                onClick={() => storeGroupInvite(code)}
                 className="block w-full px-6 py-3 text-sm font-medium text-center text-white bg-[var(--brand-primary)] rounded-lg hover:bg-[var(--brand-primary-hover)] transition-colors"
               >
                 Sign In to Join

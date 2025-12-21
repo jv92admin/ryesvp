@@ -65,7 +65,7 @@ export function SocialEngagementPanel({ isLoggedIn }: SocialEngagementPanelProps
     if (!stats?.inviteCode) return;
     
     const inviteUrl = `${window.location.origin}?ref=${stats.inviteCode}`;
-    const shareText = `Join me on RyesVP to discover Austin events! ${inviteUrl}`;
+    const shareText = `Add me as a friend on RyesVP so we can spot Austin events and actually make plans to go. ${inviteUrl}`;
     
     // Try native share first (mobile)
     if (navigator.share) {

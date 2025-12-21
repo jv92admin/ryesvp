@@ -47,7 +47,7 @@ export function ShareIconButton({ title, venueName, dateFormatted, eventUrl, isL
 
 ${shareUrl}
 
-👋 Join me on RyesVP!`
+👋 Join me on RyesVP so we can see who's in and make a plan.`
     : `Hey! Check out this event:
 
 🎵 ${title}

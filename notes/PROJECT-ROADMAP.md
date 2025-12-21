@@ -10,6 +10,7 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 - `squads-social-spec.md` - Squads, Social Tab, Ticket Exchange
 - `ui-polish-spec.md` - Visual improvements, event cards, layout
 - `ui-design-reference.md` - Design system, component patterns
+- `customer-comms-reference.md` - Share texts, toasts, notifications, copy guidelines
 - `scheduled-jobs-spec.md` - Cron for scraping + enrichment
 
 **Archived Specs (Complete):**
@@ -1034,8 +1035,38 @@ See `data-model-101.md` for full documentation.
 - `friend-links-spec.md` → Phase 1 & 2 complete, Phase 4 deferred to Communities v1
 - `engagement brainstorm.md` → All items complete, DB migration done
 
+### Sprint: Launch Prep & Branding (Complete ✅)
+
+**December 21, 2025**
+
+**Goal:** Fix bugs, polish branding, and audit all customer-facing copy before broader launch.
+
+**Bug Fixes:**
+- [x] Group invite links work for new users (store code, bypass invite gate)
+- [x] Notifications show user's actual name (use OAuth `full_name` not `display_name`)
+- [x] Domain fallback: `ryesvp.com` → `ryesvp.me`
+
+**Branding & Metadata:**
+- [x] Added `public/logo.svg` (static version of header logo)
+- [x] Added `public/og-image.png` for social shares
+- [x] Configured favicon to use logo.svg
+- [x] Full OG/Twitter metadata in `layout.tsx`
+- [x] Updated group join page metadata
+- [x] Deleted unused Next.js boilerplate files
+- [x] Updated Supabase project name to "RyesVP"
+- [x] Configured Google OAuth consent screen branding
+
+**Customer Comms Audit:**
+- [x] Created `notes/customer-comms-reference.md` — comprehensive copy reference
+- [x] Updated ALL share texts → "social + plans/logistics" messaging
+- [x] Updated onboarding modal subhead + tips copy
+- [x] Fixed stale text in `ShareIconButton.tsx`, `SocialEngagementPanel.tsx`
+- [x] Documented all toasts, notifications, and onboarding copy
+
+**Files Updated:** 15+ components with consistent copy
+
 ---
 
-**Last Updated:** December 19, 2025
+**Last Updated:** December 21, 2025
 **Active Spec:** `notes/event-discovery-spec.md` (Blocks A, D)
 

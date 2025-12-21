@@ -168,7 +168,7 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
         });
       } else {
         showToast({
-          message: 'Plan created! Add friends to invite them.',
+          message: 'Plan created! Add friends to start planning together.',
           type: 'success',
         });
       }

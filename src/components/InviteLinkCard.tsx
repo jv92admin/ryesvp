@@ -42,7 +42,7 @@ export function InviteLinkCard({ variant = 'default', className = '', onGroupCre
   const handleShare = async () => {
     if (!addFriendLink) return;
 
-    const shareText = `Add me as a friend on RyesVP! We can discover Austin events together.
+    const shareText = `Add me as a friend on RyesVP so we can spot Austin events and actually make plans to go.
 
 ${addFriendLink}`;
 

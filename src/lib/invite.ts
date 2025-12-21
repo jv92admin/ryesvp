@@ -2,6 +2,7 @@
 
 const INVITE_REF_KEY = 'ryesvp_invite_ref';
 const INVITE_RETURN_URL_KEY = 'ryesvp_invite_return_url';
+const GROUP_INVITE_KEY = 'ryesvp_group_invite';
 
 /**
  * Store invite ref code before OAuth redirect
@@ -40,6 +41,24 @@ export function clearInviteData() {
   
   localStorage.removeItem(INVITE_REF_KEY);
   localStorage.removeItem(INVITE_RETURN_URL_KEY);
+  localStorage.removeItem(GROUP_INVITE_KEY);
+}
+
+/**
+ * Store group invite code before OAuth redirect
+ * Used when user clicks a /g/[code] link while logged out
+ */
+export function storeGroupInvite(code: string) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(GROUP_INVITE_KEY, code);
+}
+
+/**
+ * Get stored group invite code
+ */
+export function getStoredGroupInvite(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem(GROUP_INVITE_KEY);
 }
 
 /**

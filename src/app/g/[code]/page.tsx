@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: GroupJoinPageProps): Promise<
       const data = await res.json();
       return {
         title: `Join ${data.group.name} | RyesVP`,
-        description: `Join ${data.group.name} and connect with ${data.group.memberCount} people on RyesVP`,
+        description: `Join ${data.group.name}, connect with ${data.group.memberCount} people, and make future plans easier on RyesVP.`,
       };
     }
   } catch {

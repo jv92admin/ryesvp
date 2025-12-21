@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { getStoredInviteRef, clearInviteData } from '@/lib/invite';
+import { getStoredInviteRef, getStoredGroupInvite, clearInviteData } from '@/lib/invite';
 
 function InviteRequiredContent() {
   const router = useRouter();
@@ -15,15 +15,20 @@ function InviteRequiredContent() {
   const [error, setError] = useState<string | null>(null);
   const [autoRedeeming, setAutoRedeeming] = useState(false);
 
-  // On mount, check localStorage for stored invite code
+  // On mount, check localStorage for stored invite code or group invite
   useEffect(() => {
     const storedCode = getStoredInviteRef();
+    const groupCode = getStoredGroupInvite();
     
     if (storedCode) {
       setInviteCode(storedCode);
       // Auto-redeem the stored code
       setAutoRedeeming(true);
       redeemInvite(storedCode);
+    } else if (groupCode) {
+      // Group invite code - complete signup without friend invite
+      setAutoRedeeming(true);
+      completeGroupSignup(groupCode);
     } else {
       setLoading(false);
     }
@@ -58,6 +63,41 @@ function InviteRequiredContent() {
 
       // Redirect to the app
       router.push(next);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setLoading(false);
+      setAutoRedeeming(false);
+    }
+  };
+
+  const completeGroupSignup = async (groupCode: string) => {
+    setError(null);
+    setLoading(true);
+
+    try {
+      // Validate the group code exists
+      const validateRes = await fetch(`/api/groups/join/${groupCode}`);
+      if (!validateRes.ok) {
+        throw new Error('Invalid group link');
+      }
+
+      // Create the user account WITHOUT a friend invite (group invite is sufficient)
+      const createRes = await fetch('/api/auth/complete-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ groupInviteCode: groupCode }),
+      });
+
+      if (!createRes.ok) {
+        const data = await createRes.json();
+        throw new Error(data.error || 'Failed to complete signup');
+      }
+
+      // Clear the stored data
+      clearInviteData();
+
+      // Redirect to the group join page (they still need to click "Join")
+      router.push(`/g/${groupCode}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
       setLoading(false);

@@ -74,14 +74,17 @@ export function generateSharePlanText(
   const buyingForCount = userMember.buyingForIds?.length || 0;
 
   if (buyingForCount > 0) {
-    return `I'm organizing ${eventName} on ${eventDate} at ${eventTime} (${venueName}). I'm getting tickets for people who confirm they're in${deadlineText}. Mark your status here: ${eventLink}${squadSummary}`;
+    const deadlinePart = squad.deadline 
+      ? ` by ${formatInTimeZone(new Date(squad.deadline), AUSTIN_TIMEZONE, 'EEE h:mm a')}`
+      : '';
+    return `I'm organizing ${eventName} on ${eventDate} at ${eventTime} (${venueName}). I'm getting tickets for people who say they're in${deadlinePart}. Mark your status in the plan so I can sort tickets and logistics: ${eventLink}`;
   }
   
   if (userMember.ticketStatus === 'YES') {
-    return `Going to ${eventName} on ${eventDate} at ${eventTime}. If you're in, mark it and grab your ticket so we can coordinate: ${eventLink}${squadSummary}`;
+    return `I'm going to ${eventName} on ${eventDate} at ${eventTime}. If you're in, mark it in the plan and grab your ticket here so we can coordinate: ${eventLink}`;
   }
   
-  return `Interested in ${eventName} on ${eventDate} at ${eventTime} (${venueName}). Mark if you're in & your ticket situation (click "View Squad"): ${eventLink}${squadSummary}`;
+  return `Thinking about ${eventName} on ${eventDate} at ${eventTime} (${venueName}). Mark if you're in and your ticket situation in the plan so we can see if this one comes together: ${eventLink}`;
 }
 
 /**
@@ -115,7 +118,7 @@ export function generateDayOfText(squad: Squad): string {
     text += `\n\n👥 Going: ${memberNames}`;
   }
   
-  text += `\n\nView squad & event details: ${eventLink}`;
+  text += `\n\nOpen the plan for all the details: ${eventLink}`;
   
   return text;
 }
@@ -130,5 +133,5 @@ function generateGenericShareText(squad: Squad): string {
   const venueName = squad.event.venue.name;
   const eventLink = `${typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL || ''}/events/${squad.event.id}`;
   
-  return `Planning to go to ${eventName} on ${eventDate} at ${eventTime} (${venueName}). Join our squad (click "View Squad" on event page): ${eventLink}`;
+  return `Thinking about ${eventName} on ${eventDate} at ${eventTime} (${venueName}). Mark if you're in and your ticket situation in the plan so we can see if this one comes together: ${eventLink}`;
 }

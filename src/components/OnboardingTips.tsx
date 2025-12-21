@@ -65,7 +65,7 @@ export function OnboardingTips() {
       const data = await res.json();
       
       const addFriendLink = `${window.location.origin}/?ref=${data.code}`;
-      const shareText = `Add me as a friend on RyesVP! We can discover Austin events together.\n\n${addFriendLink}`;
+      const shareText = `Add me as a friend on RyesVP so we can spot Austin events and actually make plans to go.\n\n${addFriendLink}`;
 
       if (navigator.share) {
         try {
@@ -107,13 +107,7 @@ export function OnboardingTips() {
             <span className="font-medium text-[var(--brand-primary)]">Going</span>
             {' '}or{' '}
             <span className="font-medium text-amber-600">Interested</span>
-            {' '}and they&apos;ll show up in{' '}
-            <Link 
-              href="/?view=social" 
-              className="font-medium text-[var(--brand-primary)] hover:underline"
-            >
-              Your Events
-            </Link>.
+            {' '}to start building your plans.
           </p>
           <button
             onClick={handleDismissTip1}
@@ -137,7 +131,7 @@ export function OnboardingTips() {
             >
               {copied ? 'Link copied!' : 'Add friends'}
             </button>
-            {' '}to see who&apos;s going to events you&apos;re interested in.
+            {' '}to see what they&apos;re into and make plans together.
           </p>
           <button
             onClick={handleDismissTip2}

@@ -93,7 +93,7 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
               Group Created!
             </h2>
             <p className="text-sm text-gray-600 text-center mb-4">
-              Share this link with your friends. Everyone who joins will become friends with each other.
+              Share this link with your friends. Everyone who joins becomes friends with each other so future plans are easier.
             </p>
             
             <div className="bg-gray-50 rounded-lg p-3 flex items-center gap-2 mb-4">
