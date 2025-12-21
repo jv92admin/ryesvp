@@ -66,13 +66,9 @@ export function SocialSectionA({ events, recentSquadIds = [] }: SocialSectionAPr
             <div className="flex items-center gap-2">
               {(() => {
                 const friendsList = [
-                  ...((event as any).friendsGoing || []),
-                  ...((event as any).friendsInterested || []),
-                ].slice(0, 5).map((f: any) => ({
-                  id: f.userId,
-                  displayName: f.displayName,
-                  email: f.email,
-                }));
+                  ...(event.social?.friendsGoingList || []),
+                  ...(event.social?.friendsInterestedList || []),
+                ].slice(0, 5);
                 return friendsList.length > 0 ? (
                   <button
                     onClick={(e) => {
