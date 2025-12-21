@@ -1065,6 +1065,65 @@ See `data-model-101.md` for full documentation.
 
 **Files Updated:** 15+ components with consistent copy
 
+### Sprint: Friends Page Redesign (Complete ✅)
+
+**December 21, 2025**
+
+**Goal:** Streamline Friends page UI for clarity and consistency.
+
+**Page Structure:**
+- [x] Renamed header: "Friends & Lists" → "Friends"
+- [x] Simplified tabs: Friends | Groups | Requests (removed Lists, removed Add tab)
+- [x] Deprecated Lists feature (hidden from UI, code remains)
+
+**AddFriendCard Redesign:**
+- [x] Two clear sections: "Invite a Friend" / "Invite a Group"
+- [x] Visual accents: colored left borders (emerald for solo, blue for group)
+- [x] Small caps section labels in matching colors
+- [x] Buttons: Share Link, Find by Email, Create Group, View Groups
+- [x] Inline email search (expandable on click)
+- [x] Removed "X added" counter and green header gradient
+
+**GroupsTab:**
+- [x] Moved from inline section to dedicated tab
+- [x] Native share API for group links (not just clipboard)
+- [x] Empty state with CTA to create first group
+
+**Input Field Consistency:**
+- [x] Fixed pale placeholder text across 9 components
+- [x] Added `text-gray-900 placeholder:text-gray-400` standard
+- [x] Documented pattern in `ui-design-reference.md`
+
+**Cleanup:**
+- [x] Deleted `InviteLinkCard.tsx` (replaced by `AddFriendCard.tsx`)
+- [x] Deleted `YourGroups.tsx` (replaced by `GroupsTab.tsx`)
+
+### Sprint: About Page (Complete ✅)
+
+**December 21, 2025**
+
+**Goal:** Create a lightweight explainer page for external sharing and onboarding context.
+
+**Page Structure (`/about`):**
+- [x] Intro: Centered personal statement, conversational prose, inline links
+- [x] How It Works: 3-column grid (Discover, Connect, Plan) with screenshots
+- [x] "Go" section: Green-accented card as elegant endpoint
+- [x] What's Next: Patch-notes style roadmap (Smarter discovery, User events, Communities)
+- [x] Fixes/Improvements: Email CTA with button style
+
+**Design Decisions:**
+- [x] No large header — leads with personal statement in brand green
+- [x] How It Works cards: colored labels (emerald/blue/purple), phone-frame images
+- [x] Go card: white bg, green border, green drop shadow, bold "Go." text
+- [x] Sticky header (global change)
+- [x] No "Start exploring" CTA at bottom — clean ending
+
+**Copy Iterations:**
+- [x] Combined "What is it" + "Why I built it" into single intro
+- [x] Updated share texts to "social + plans/logistics" messaging
+- [x] Removed redundant phrases, tightened vertical spacing
+- [x] Made email callout larger with "Send me a note" button
+
 ---
 
 **Last Updated:** December 21, 2025

@@ -51,37 +51,15 @@ export function OnboardingModal() {
     }
   };
 
-  const handleStartExploring = () => {
+  const handleExploreEvents = () => {
     handleDismiss();
-    // Stay on current page
+    // Stay on current page (home/events)
   };
 
-  const handleAddFriends = async () => {
+  const handleLearnMore = () => {
     handleDismiss();
-    // Trigger the add friend share flow
-    const shareUrl = `${window.location.origin}/?ref=`;
-    
-    // Try to get the user's invite code
-    try {
-      const res = await fetch('/api/users/me');
-      if (res.ok) {
-        const data = await res.json();
-        const fullUrl = `${window.location.origin}/?ref=${data.user.inviteCode}`;
-        
-        if (navigator.share) {
-          await navigator.share({
-            title: 'Add me on RyesVP',
-            text: 'Add me as a friend on RyesVP so we can spot Austin events and actually make plans to go.',
-            url: fullUrl,
-          });
-        } else {
-          await navigator.clipboard.writeText(fullUrl);
-          // Could show a toast here
-        }
-      }
-    } catch {
-      // Fallback - just dismiss
-    }
+    // Navigate to about page
+    window.location.href = '/about';
   };
 
   if (!show) return null;
@@ -139,16 +117,16 @@ export function OnboardingModal() {
         {/* Buttons */}
         <div className="flex flex-col gap-3">
           <button
-            onClick={handleStartExploring}
+            onClick={handleExploreEvents}
             className="w-full btn-primary px-6 py-3 text-base font-medium rounded-lg transition-colors"
           >
-            Start exploring
+            Explore Events
           </button>
           <button
-            onClick={handleAddFriends}
+            onClick={handleLearnMore}
             className="w-full px-6 py-3 text-base font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)] border border-[var(--brand-primary)] hover:border-[var(--brand-primary-hover)] rounded-lg transition-colors"
           >
-            Add friends
+            Learn More
           </button>
         </div>
       </div>

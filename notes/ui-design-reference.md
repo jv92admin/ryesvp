@@ -1070,6 +1070,85 @@ These pages don't exist yet. Document design decisions here as they're built.
 
 ---
 
+## About Page
+
+**Route:** `/about`  
+**File:** `src/app/about/page.tsx`  
+**Last updated:** December 2025
+
+### Layout Overview
+
+```
+┌─────────────────────────────────────────┐
+│ [Header - sticky]                       │
+├─────────────────────────────────────────┤
+│                                         │
+│   I built RyesVP for my friends         │  ← Centered, brand green
+│       (and maybe yours)                 │  ← Gray, normal weight
+│                                         │
+│ Conversational prose about what/why...  │
+│ Links: invite friends, email me         │
+├─────────────────────────────────────────┤
+│           How It Works                  │
+│     Discover · Connect · Plan · Go      │
+│                                         │
+│ ┌─────────┐ ┌─────────┐ ┌─────────┐    │
+│ │Discover │ │ Connect │ │  Plan   │    │
+│ │ [img]   │ │ [img]   │ │ [img]   │    │
+│ │  copy   │ │  copy   │ │  copy   │    │
+│ └─────────┘ └─────────┘ └─────────┘    │
+│                                         │
+│ ┌───────────────────────────────────┐   │
+│ │   Then just… Go.                  │   │  ← Green accent card
+│ └───────────────────────────────────┘   │
+├─────────────────────────────────────────┤
+│ What I'm working on next                │  ← Gray-50 background
+│                                         │
+│ • Smarter discovery                     │
+│ • User-created events                   │
+│ • Communities                           │
+│                                         │
+│ Fixes / Improvements                    │
+│ [Send me a note] (email CTA)            │
+├─────────────────────────────────────────┤
+│ © 2025 RyesVP · Austin, TX              │
+└─────────────────────────────────────────┘
+```
+
+### Design Decisions
+
+**Opening Statement:**
+- Centered, `text-xl`, brand green, `font-semibold`
+- "(and maybe yours)" on new line, gray-500, normal weight
+- No large header — leads directly with personal statement
+
+**How It Works — Card Grid:**
+- 3-column grid on `md:` (stacked on mobile)
+- Each card: label (colored small-caps) | headline, then image, then description
+- Label colors: emerald (Discover), blue (Connect), purple (Plan)
+- Image container: `w-[200px] h-[360px]`, rounded-2xl, shadow-xl
+
+**Go Section:**
+- White card with green border (`border-2 border-[var(--brand-primary)]`)
+- Green drop shadow: `shadow-[0_4px_20px_rgba(22,163,74,0.15)]`
+- "Go." in bold brand green
+- Simple, elegant endpoint — not a CTA button
+
+**What's Next — Patch Notes Style:**
+- Gray-50 background, distinct from white sections
+- Clear hierarchy: section header, subheading, then items
+- Each item: bold title, descriptive paragraph
+- "Fixes / Improvements" separated by border-t
+- Email CTA: button style with envelope icon, light green bg
+
+**Page Philosophy:**
+- Minimal, personal, "founder voice"
+- No marketing fluff — direct and conversational
+- Inline links rather than buttons where appropriate
+- Sticky header carried over from rest of app
+
+---
+
 ## Changelog
 
 | Date | Page | Change |
@@ -1117,8 +1196,11 @@ These pages don't exist yet. Document design decisions here as they're built.
 | Dec 12, 2025 | Filters | Date picker dropdown (From/To), replaces Today chip |
 | Dec 12, 2025 | Chips | Added subtle borders + green hover accents for visual relief |
 | Dec 12, 2025 | Deleted | EventFilters.tsx, DiscoveryStrip.tsx (replaced by discovery/ components) |
+| Dec 21, 2025 | About Page | New `/about` page — intro, how it works (Discover/Connect/Plan/Go), roadmap notes |
+| Dec 21, 2025 | About Page | Green-accented "Go" card, patch-notes style "What's next" section |
+| Dec 21, 2025 | Header | Made sticky across all pages (`sticky top-0 z-50`) |
 
 ---
 
-*Last Updated: December 12, 2025*
+*Last Updated: December 21, 2025*
 
