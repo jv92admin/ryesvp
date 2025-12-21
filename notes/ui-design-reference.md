@@ -39,6 +39,38 @@ From `product-vision.md`:
 - SVG icons scale better and match brand colors
 - Consistent interaction language across the app
 
+### Input Fields & Forms
+
+All text inputs, textareas, and form fields should follow this consistent pattern:
+
+```tsx
+className="w-full px-3 py-2 border border-gray-300 rounded-lg 
+           text-gray-900 placeholder:text-gray-400 
+           focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+```
+
+**Required classes:**
+- `text-gray-900` — Ensures typed text is dark and readable
+- `placeholder:text-gray-400` — Ensures placeholder text is visible but clearly secondary
+- `focus:ring-2 focus:ring-green-500` — Brand-consistent focus state
+
+**Why `placeholder:text-gray-400`?**
+Browser defaults for placeholder text are often too pale (gray-300 or lighter). Using `gray-400` ensures:
+- Placeholder text is readable without squinting
+- Clear visual distinction from actual input (gray-400 vs gray-900)
+- Consistent appearance across browsers
+
+**Example:**
+```tsx
+<input
+  type="text"
+  placeholder="Enter your name..."
+  className="w-full px-3 py-2 border border-gray-300 rounded-lg 
+             text-gray-900 placeholder:text-gray-400 
+             focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+/>
+```
+
 ---
 
 ## Design System & Shared Components

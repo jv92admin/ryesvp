@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { SocialSectionA } from './social/SocialSectionA';
 import { SocialSectionB } from './social/SocialSectionB';
 import { SocialSummaryChips } from './social/SocialSummaryChips';
-import { AddFriendCard } from './InviteLinkCard';
+import { AddFriendCard } from './AddFriendCard';
 import { EventDisplay } from '@/db/events';
 
 interface SocialData {

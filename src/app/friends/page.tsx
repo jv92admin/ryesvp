@@ -8,9 +8,9 @@ export default function FriendsPage() {
       <main className="min-h-screen bg-gray-50">
         <div className="max-w-2xl mx-auto px-4 py-8">
           <header className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Friends & Lists</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Friends</h1>
             <p className="text-gray-600 mt-2">
-              Manage friends and create lists to filter events
+              Connect with friends and plan events together
             </p>
           </header>
 

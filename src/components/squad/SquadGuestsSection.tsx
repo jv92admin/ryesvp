@@ -69,7 +69,7 @@ export function SquadGuestsSection({ squadId, currentGuestCount, onUpdate }: Squ
               max="99"
               value={customCount}
               onChange={(e) => setCustomCount(e.target.value)}
-              className="w-12 px-2 py-1 text-xs border border-gray-300 rounded-lg focus:ring-1 focus:ring-green-500 text-gray-900"
+              className="w-12 px-2 py-1 text-xs border border-gray-300 rounded-lg focus:ring-1 focus:ring-green-500 text-gray-900 placeholder:text-gray-400"
               placeholder="3+"
             />
             <Button

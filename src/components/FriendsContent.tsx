@@ -1,15 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { UserSearch } from '@/components/UserSearch';
+import { useState, useEffect, useCallback } from 'react';
 import { FriendCard } from '@/components/FriendCard';
 import { FriendRequestCard } from '@/components/FriendRequestCard';
-import { ListCard } from '@/components/ListCard';
-import { CreateListModal } from '@/components/CreateListModal';
-import { ListDetailModal } from '@/components/ListDetailModal';
-import { AddFriendCard } from '@/components/InviteLinkCard';
-import { YourGroups, YourGroupsRef } from '@/components/YourGroups';
-import { useRef } from 'react';
+import { AddFriendCard } from '@/components/AddFriendCard';
+import { GroupsTab } from '@/components/GroupsTab';
 
 type User = {
   id: string;
@@ -45,27 +40,14 @@ type FriendsData = {
   pendingCount: number;
 };
 
-type ListWithCount = {
-  id: string;
-  name: string;
-  description: string | null;
-  ownerId: string;
-  isPublic: boolean;
-  createdAt: string;
-  _count: { members: number };
-};
-
 export function FriendsContent() {
   const [data, setData] = useState<FriendsData | null>(null);
-  const [lists, setLists] = useState<ListWithCount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'friends' | 'requests' | 'search' | 'lists'>('friends');
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedListId, setSelectedListId] = useState<string | null>(null);
-  const groupsRef = useRef<YourGroupsRef>(null);
+  const [activeTab, setActiveTab] = useState<'friends' | 'groups' | 'requests'>('friends');
+  const [groupsKey, setGroupsKey] = useState(0);
 
-  const fetchFriends = async () => {
+  const fetchFriends = useCallback(async () => {
     try {
       const res = await fetch('/api/friends');
       if (!res.ok) {
@@ -82,24 +64,11 @@ export function FriendsContent() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const fetchLists = async () => {
-    try {
-      const res = await fetch('/api/lists');
-      if (res.ok) {
-        const json = await res.json();
-        setLists(json.lists || []);
-      }
-    } catch (err) {
-      console.error('Error fetching lists:', err);
-    }
-  };
+  }, []);
 
   useEffect(() => {
     fetchFriends();
-    fetchLists();
-  }, []);
+  }, [fetchFriends]);
 
   const handleAccept = async (friendshipId: string) => {
     try {
@@ -142,69 +111,18 @@ export function FriendsContent() {
     }
   };
 
-  const handleSendRequest = async (userId: string) => {
-    try {
-      const res = await fetch('/api/friends/request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ addresseeId: userId }),
-      });
-      if (!res.ok) {
-        const json = await res.json();
-        throw new Error(json.error || 'Failed to send request');
-      }
-      await fetchFriends();
-      setActiveTab('requests');
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to send request');
-    }
-  };
-
-  const handleCreateList = async (name: string, description: string, memberIds: string[]) => {
-    try {
-      const res = await fetch('/api/lists', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, description }),
-      });
-      if (!res.ok) throw new Error('Failed to create list');
-      const { list } = await res.json();
-
-      for (const friendId of memberIds) {
-        await fetch(`/api/lists/${list.id}/members`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ friendId }),
-        });
-      }
-
-      await fetchLists();
-      setShowCreateModal(false);
-    } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to create list');
-    }
-  };
-
-  const handleDeleteList = async (listId: string) => {
-    if (!confirm('Are you sure you want to delete this list?')) return;
-    try {
-      const res = await fetch(`/api/lists/${listId}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete list');
-      await fetchLists();
-    } catch (err) {
-      console.error('Error deleting list:', err);
-    }
+  const handleGroupCreated = () => {
+    setGroupsKey((k) => k + 1);
+    setActiveTab('groups');
   };
 
   return (
     <>
-      {/* Add Friend Link Card */}
-      <AddFriendCard onGroupCreated={() => groupsRef.current?.refresh()} />
-
-      {/* Friend Groups */}
-      <div className="mb-6">
-        <YourGroups ref={groupsRef} />
-      </div>
+      {/* Add Friend Card */}
+      <AddFriendCard 
+        onGroupCreated={handleGroupCreated}
+        onSwitchToGroups={() => setActiveTab('groups')}
+      />
 
       {/* Tabs */}
       <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-lg">
@@ -217,6 +135,16 @@ export function FriendsContent() {
           }`}
         >
           Friends {data && data.friends.length > 0 && `(${data.friends.length})`}
+        </button>
+        <button
+          onClick={() => setActiveTab('groups')}
+          className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+            activeTab === 'groups'
+              ? 'bg-white text-gray-900 shadow-sm'
+              : 'text-gray-600 hover:text-gray-900'
+          }`}
+        >
+          Groups
         </button>
         <button
           onClick={() => setActiveTab('requests')}
@@ -232,26 +160,6 @@ export function FriendsContent() {
               {data.pendingReceived.length}
             </span>
           )}
-        </button>
-        <button
-          onClick={() => setActiveTab('lists')}
-          className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-            activeTab === 'lists'
-              ? 'bg-white text-gray-900 shadow-sm'
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          Lists {lists.length > 0 && `(${lists.length})`}
-        </button>
-        <button
-          onClick={() => setActiveTab('search')}
-          className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-            activeTab === 'search'
-              ? 'bg-white text-gray-900 shadow-sm'
-              : 'text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          Add
         </button>
       </div>
 
@@ -282,9 +190,8 @@ export function FriendsContent() {
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-1">No friends yet</h3>
                   <p className="text-gray-500 text-sm mb-4 max-w-xs mx-auto">
-                    Add friends to see who&apos;s going to events and coordinate plans together.
+                    Share your personal link or create a group link to start adding friends.
                   </p>
-                  <AddFriendCard variant="compact" />
                 </div>
               ) : (
                 data.friends.map((f) => (
@@ -296,6 +203,11 @@ export function FriendsContent() {
                 ))
               )}
             </div>
+          )}
+
+          {/* Groups Tab */}
+          {activeTab === 'groups' && (
+            <GroupsTab key={groupsKey} />
           )}
 
           {/* Requests Tab */}
@@ -342,70 +254,7 @@ export function FriendsContent() {
               </section>
             </div>
           )}
-
-          {/* Lists Tab */}
-          {activeTab === 'lists' && (
-            <div className="space-y-4">
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="w-full px-4 py-3 text-sm font-medium text-[var(--brand-primary)] bg-[var(--brand-primary-light)] border-2 border-dashed border-green-200 rounded-lg hover:bg-green-100 transition-colors"
-              >
-                + Create New List
-              </button>
-
-              {lists.length === 0 ? (
-                <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
-                  <p className="text-gray-500 mb-2">No lists yet</p>
-                  <p className="text-sm text-gray-400">
-                    Create lists to organize friends (e.g., "Concert Crew", "Work Friends")
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {lists.map((list) => (
-                    <ListCard
-                      key={list.id}
-                      list={list}
-                      onView={() => setSelectedListId(list.id)}
-                      onDelete={() => handleDeleteList(list.id)}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Search Tab */}
-          {activeTab === 'search' && (
-            <UserSearch
-              onSendRequest={handleSendRequest}
-              existingFriendIds={data.friends.map((f) => f.friend.id)}
-              pendingRequestIds={[
-                ...data.pendingReceived.map((r) => r.requester.id),
-                ...data.pendingSent.map((r) => r.addressee.id),
-              ]}
-            />
-          )}
         </>
-      )}
-
-      {/* Create List Modal */}
-      {showCreateModal && (
-        <CreateListModal
-          onClose={() => setShowCreateModal(false)}
-          onCreate={handleCreateList}
-        />
-      )}
-
-      {/* List Detail Modal */}
-      {selectedListId && (
-        <ListDetailModal
-          listId={selectedListId}
-          onClose={() => {
-            setSelectedListId(null);
-            fetchLists();
-          }}
-        />
       )}
     </>
   );

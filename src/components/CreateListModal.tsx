@@ -88,7 +88,7 @@ export function CreateListModal({ onClose, onCreate }: CreateListModalProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g., Concert Crew, Work Friends"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 autoFocus
               />
             </div>
@@ -103,7 +103,7 @@ export function CreateListModal({ onClose, onCreate }: CreateListModalProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What's this list for?"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
             </div>
 

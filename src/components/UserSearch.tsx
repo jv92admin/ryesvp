@@ -13,9 +13,10 @@ interface UserSearchProps {
   onSendRequest: (userId: string) => void;
   existingFriendIds: string[];
   pendingRequestIds: string[];
+  compact?: boolean;
 }
 
-export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds }: UserSearchProps) {
+export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds, compact = false }: UserSearchProps) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
@@ -54,30 +55,32 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
 
   return (
     <div>
-      <div className="flex gap-2 mb-6">
+      <div className={`flex gap-2 ${compact ? 'mb-3' : 'mb-6'}`}>
         <input
           type="email"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Enter exact email address..."
-          className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          placeholder={compact ? "Search by email..." : "Enter exact email address..."}
+          className={`flex-1 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${compact ? 'px-3 py-1.5 text-sm' : 'px-4 py-2'}`}
         />
         <button
           onClick={handleSearch}
           disabled={query.length < 3 || loading}
-          className="btn-primary px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className={`btn-primary font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${compact ? 'px-3 py-1.5 text-xs' : 'px-4 py-2 text-sm'}`}
         >
-          {loading ? 'Searching...' : 'Search'}
+          {loading ? '...' : 'Search'}
         </button>
       </div>
 
       {searched && results.length === 0 && !loading && (
-        <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
-          <p className="text-gray-500">No user found with email "{query}"</p>
-          <p className="text-sm text-gray-400 mt-1">
-            Enter the exact email address of the person you want to add
-          </p>
+        <div className={`text-center bg-white rounded-lg border border-gray-200 ${compact ? 'py-4' : 'py-8'}`}>
+          <p className="text-gray-500 text-sm">No user found with &quot;{query}&quot;</p>
+          {!compact && (
+            <p className="text-sm text-gray-400 mt-1">
+              Enter the exact email address of the person you want to add
+            </p>
+          )}
         </div>
       )}
 
@@ -129,11 +132,11 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
         </div>
       )}
 
-      {!searched && (
+      {!searched && !compact && (
         <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
-          <p className="text-gray-500">Enter a friend's email address</p>
+          <p className="text-gray-500">Enter a friend&apos;s email address</p>
           <p className="text-sm text-gray-400 mt-1">
-            You'll need their exact email to find them
+            You&apos;ll need their exact email to find them
           </p>
         </div>
       )}

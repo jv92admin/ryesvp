@@ -101,7 +101,7 @@ export function SquadLogistics({ squad, onLogisticsUpdate }: SquadLogisticsProps
               type="time"
               value={meetTime}
               onChange={(e) => setMeetTime(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-green-500 focus:border-green-500"
               placeholder="e.g. 19:30"
             />
             <p className="text-xs text-gray-500 mt-1">
@@ -118,7 +118,7 @@ export function SquadLogistics({ squad, onLogisticsUpdate }: SquadLogisticsProps
               type="text"
               value={meetSpot}
               onChange={(e) => setMeetSpot(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-green-500 focus:border-green-500"
               placeholder="e.g. Lazarus Brewing, East 6th"
             />
             <p className="text-xs text-gray-500 mt-1">

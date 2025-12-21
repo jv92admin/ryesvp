@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getAvatarStyle, getInitials } from '@/lib/avatar';
-import { AddFriendCard } from '@/components/InviteLinkCard';
+import { AddFriendCard } from '@/components/AddFriendCard';
 import { StartPlanButton } from '@/components/StartPlanButton';
 
 type UserProfile = {
