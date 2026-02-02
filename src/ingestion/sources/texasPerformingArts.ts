@@ -1,4 +1,4 @@
-import { NormalizedEvent } from '../types';
+import { NormalizedEvent, normalizeTitle } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
 import { launchBrowser } from '@/lib/browser';
@@ -181,8 +181,8 @@ export async function fetchEventsFromTPA(): Promise<NormalizedEvent[]> {
       }
     }
     
-    console.log(`TPA: Successfully scraped ${events.length} events`);
-    
+    console.log(`TPA: Scraped ${events.length} events from listing page`);
+
   } catch (error) {
     console.error('TPA: Error scraping:', error);
   } finally {
@@ -190,8 +190,12 @@ export async function fetchEventsFromTPA(): Promise<NormalizedEvent[]> {
       await browser.close();
     }
   }
-  
-  return events;
+
+  // Enrich events with actual times from UT Calendar
+  const enrichedEvents = await enrichWithUTCalendarTimes(events);
+
+  console.log(`TPA: Returning ${enrichedEvents.length} events after UT Calendar enrichment`);
+  return enrichedEvents;
 }
 
 /**
@@ -371,5 +375,155 @@ function inferTPACategory(presenter: string, title: string): EventCategory {
   
   // Default to THEATER for TPA (most common)
   return EventCategory.THEATER;
+}
+
+/**
+ * Fetch event times from the UT Events Calendar for Bass Concert Hall.
+ * The UT Calendar is server-rendered and includes JSON-LD structured data
+ * with exact ISO 8601 timestamps for each performance.
+ *
+ * Returns a map of normalized title -> array of start times (Date objects).
+ */
+const UT_CALENDAR_URL = 'https://calendar.utexas.edu/bass_concert_hall_performing_arts_center_pac_304';
+
+async function fetchTPATimesFromUTCalendar(): Promise<Map<string, Date[]>> {
+  const timeMap = new Map<string, Date[]>();
+
+  const response = await fetch(UT_CALENDAR_URL, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`UT Calendar returned ${response.status}`);
+  }
+
+  const html = await response.text();
+  const $ = load(html);
+
+  // Extract JSON-LD blocks containing event data
+  $('script[type="application/ld+json"]').each((_, el) => {
+    try {
+      const json = JSON.parse($(el).text());
+
+      // JSON-LD can be a single object or an array
+      const items = Array.isArray(json) ? json : [json];
+
+      for (const item of items) {
+        if (item['@type'] !== 'Event' || !item.name || !item.startDate) continue;
+
+        const title = normalizeTitle(item.name);
+        const startDate = new Date(item.startDate);
+
+        if (isNaN(startDate.getTime())) continue;
+        // Only include future events
+        if (startDate < new Date()) continue;
+
+        const existing = timeMap.get(title) || [];
+        existing.push(startDate);
+        timeMap.set(title, existing);
+      }
+    } catch {
+      // Skip malformed JSON-LD blocks
+    }
+  });
+
+  return timeMap;
+}
+
+/**
+ * Enrich scraped TPA events with actual times from the UT Events Calendar.
+ *
+ * For single-show matches: overrides the 7:30 PM default with the real time.
+ * For multi-show matches: creates separate NormalizedEvent entries per showtime.
+ * For unmatched events: keeps the original 7:30 PM default.
+ */
+async function enrichWithUTCalendarTimes(events: NormalizedEvent[]): Promise<NormalizedEvent[]> {
+  let utCalendarTimes: Map<string, Date[]>;
+
+  try {
+    utCalendarTimes = await fetchTPATimesFromUTCalendar();
+    console.log(`TPA: Fetched ${utCalendarTimes.size} unique events from UT Calendar`);
+  } catch (error) {
+    console.warn('TPA: Failed to fetch UT Calendar times, using defaults:', error);
+    return events;
+  }
+
+  const enrichedEvents: NormalizedEvent[] = [];
+
+  for (const event of events) {
+    const normalizedTitle = normalizeTitle(event.title);
+    const utTimes = utCalendarTimes.get(normalizedTitle);
+
+    if (!utTimes || utTimes.length === 0) {
+      // No UT Calendar match — keep 7:30 PM default
+      console.log(`TPA: No UT Calendar match for "${event.title}" — using default time`);
+      enrichedEvents.push(event);
+      continue;
+    }
+
+    // Filter UT times to those within this event's date range
+    const relevantTimes = filterTimesToDateRange(utTimes, event.startDateTime, event.endDateTime);
+
+    if (relevantTimes.length === 0) {
+      console.log(`TPA: UT Calendar times for "${event.title}" don't match date range — using default`);
+      enrichedEvents.push(event);
+      continue;
+    }
+
+    if (relevantTimes.length === 1) {
+      // Single showtime — override time, keep original sourceEventId
+      console.log(`TPA: Matched "${event.title}" → ${relevantTimes[0].toISOString()}`);
+      enrichedEvents.push({
+        ...event,
+        startDateTime: relevantTimes[0],
+      });
+    } else {
+      // Multiple showtimes — create separate entries per performance
+      console.log(`TPA: Matched "${event.title}" → ${relevantTimes.length} showtimes`);
+      for (const time of relevantTimes) {
+        const timeSuffix = formatDateSuffix(time);
+        enrichedEvents.push({
+          ...event,
+          startDateTime: time,
+          sourceEventId: event.sourceEventId ? `${event.sourceEventId}-${timeSuffix}` : null,
+        });
+      }
+    }
+  }
+
+  return enrichedEvents;
+}
+
+/**
+ * Filter UT Calendar times to those within the TPA event's date range.
+ * For single-date events, matches times on that same calendar date.
+ * For date-range events (e.g. "Dec 2-14"), matches all times in that range.
+ */
+function filterTimesToDateRange(utTimes: Date[], start: Date, end: Date | null | undefined): Date[] {
+  // Get the calendar date boundaries in Austin time
+  // start already has 7:30 PM baked in, so use start-of-day
+  const rangeStart = new Date(start);
+  rangeStart.setHours(0, 0, 0, 0);
+
+  const rangeEnd = end ? new Date(end) : new Date(start);
+  rangeEnd.setHours(23, 59, 59, 999);
+
+  return utTimes
+    .filter(t => t >= rangeStart && t <= rangeEnd)
+    .sort((a, b) => a.getTime() - b.getTime());
+}
+
+/**
+ * Format a Date as YYYYMMDD-HHmm for use in sourceEventId suffixes.
+ */
+function formatDateSuffix(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  const h = String(date.getHours()).padStart(2, '0');
+  const min = String(date.getMinutes()).padStart(2, '0');
+  return `${y}${m}${d}-${h}${min}`;
 }
 
