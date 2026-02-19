@@ -162,13 +162,14 @@
 
 ### Texas Performing Arts ✅ HAS SUB-VENUE
 
-**Source URL:** https://texasperformingarts.org/events/events/  
+**Source URL:** https://texasperformingarts.org/events/events/
 **Scraper:** `texasPerformingArts.ts` (Puppeteer)
 
 **Currently Captures:**
 - ✅ Title, Date, Image, URL
 - ✅ **Sub-venue** (Bass Concert Hall, McCullough Theatre, Bates Recital)
 - ✅ **Series/presenter** (Broadway in Austin, Texas Welcomes, etc.)
+- ✅ **Actual event times** enriched from UT Calendar (calendar.utexas.edu JSON-LD). Multi-show events (e.g. matinee + evening) get separate entries. Falls back to 7:30 PM default for unmatched/far-future events.
 
 ---
 

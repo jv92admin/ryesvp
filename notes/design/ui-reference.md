@@ -948,7 +948,7 @@ showToast({
 ### displayTitle
 - **ALWAYS** use `displayTitle` from data layer
 - **NEVER** compute title in components
-- See `notes/data-model-101.md`
+- See `notes/architecture/data-model.md`
 
 ### Enrichment
 - List views: Use `EnrichmentDisplay` subset (spotifyUrl, tmUrl, genres)

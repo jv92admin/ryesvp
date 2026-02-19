@@ -4,7 +4,7 @@
 
 > **Philosophy:** Audit first, document findings, THEN make schema decisions. Don't pre-engineer based on assumptions.
 
-> **Cross-reference:** This spec drives Blocks A and D in `PROJECT-ROADMAP.md`. The Performer model here replaces the original "Artist Foundation" (Phase 5). Phase 3 (Spotify) here covers what was originally "Phase 6".
+> **Cross-reference:** This spec drives Blocks A and D in `ROADMAP.md`. The Performer model here replaces the original "Artist Foundation" (Phase 5). Phase 3 (Spotify) here covers what was originally "Phase 6".
 
 ---
 
@@ -82,7 +82,7 @@
 **Goal:** Expand coverage to priority venues identified in 1.1.
 
 **Results:**
-- **11 priority venue scrapers** built (see `notes/priority-venues.md`)
+- **11 priority venue scrapers** built (see `notes/ingestion/priority-venues.md`)
 - **19 total venues** now covered
 - **~711 future events** in database
 - All scrapers tested, events ingested, enriched, and backdated
@@ -110,7 +110,7 @@
 
 **Goal:** Now that ALL scrapers exist, document what metadata is available across the COMPLETE landscape.
 
-**Output:** `notes/scraping docs/source-data-audit.md`
+**Output:** `notes/ingestion/source-audit.md`
 
 **For EACH source (original + new), document:**
 
@@ -163,7 +163,7 @@ List ALL fields visible in source, whether we use them or not:
 - External IDs: Explicit columns (spotifyId, ticketmasterId, espnId)
 - Universal `tags` array for genres/styles/leagues
 
-**Output:** `notes/project archives/performer-model-design.md`
+**Output:** `notes/archive/performer-model-design.md`
 
 ### 1.5 Performer Entity Implementation ✅ COMPLETE
 
@@ -212,7 +212,7 @@ List ALL fields visible in source, whether we use them or not:
 
 **New Components:** `src/components/discovery/`
 
-**Output:** `notes/discovery-filters-spec.md` (detailed spec)
+**Output:** `notes/archive/discovery-filters-spec.md` (detailed spec)
 
 ---
 
@@ -222,7 +222,7 @@ List ALL fields visible in source, whether we use them or not:
 
 **Timing:** After Phase 1.6 is complete (all of Event Discovery Foundation done).
 
-**Cross-reference:** This is "Block B" and "Block C" in `PROJECT-ROADMAP.md`.
+**Cross-reference:** This is "Block B" and "Block C" in `ROADMAP.md`.
 
 ### UX Quick Wins (Block B)
 
@@ -343,7 +343,7 @@ Ship polish before inviting real users:
 
 ## Phase 3 – Personalization & Recommendations
 
-**Note:** This phase covers what was originally "Phase 6: Spotify v1" in `PROJECT-ROADMAP.md`.
+**Note:** This phase covers what was originally "Phase 6: Spotify v1" in `ROADMAP.md`.
 
 ### 3.1 Spotify Integration
 
@@ -420,7 +420,7 @@ Ship polish before inviting real users:
 
 ## Future: User-Created Events
 
-**Deferred.** See "Create-Your-Own Event" in `PROJECT-ROADMAP.md`.
+**Deferred.** See "Create-Your-Own Event" in `ROADMAP.md`.
 
 **When ready:**
 - Reuse Performer/Venue/Event models
@@ -457,10 +457,10 @@ Ship polish before inviting real users:
 
 | Phase | Document | Status |
 |-------|----------|--------|
-| 1.1 | `notes/scraping docs/priority-venues.md` | ✅ Complete |
-| 1.3 | `notes/scraping docs/source-data-audit.md` | ✅ Complete |
-| 1.4 | `notes/project archives/performer-model-design.md` | ✅ Complete |
-| 1.6 | `notes/project archives/discovery-filters-spec.md` | ✅ Complete |
+| 1.1 | `notes/ingestion/priority-venues.md` | ✅ Complete |
+| 1.3 | `notes/ingestion/source-audit.md` | ✅ Complete |
+| 1.4 | `notes/archive/performer-model-design.md` | ✅ Complete |
+| 1.6 | `notes/archive/discovery-filters-spec.md` | ✅ Complete |
 | 2.1 | `docs/enrichment-use-cases.md` | 🔲 Phase 2 |
 | 2.2 | `docs/enrichment-schema.md` | 🔲 Phase 2 |
 | 2.3-2.5 | `docs/*-enrichment-process.md` | 🔲 Phase 2 |
@@ -480,5 +480,5 @@ Ship polish before inviting real users:
 *Created: December 6, 2025*
 *Updated: December 19, 2025*
 *Status: Block A (Phase 1) COMPLETE, Block B (UX) IN PROGRESS → Transactional Emails next*
-*Cross-reference: PROJECT-ROADMAP.md (Blocks A, B, C, D)*
+*Cross-reference: ROADMAP.md (Blocks A, B, C, D)*
 

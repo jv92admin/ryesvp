@@ -2,7 +2,7 @@
 
 > **How we build it.** Stack, architecture, data pipeline, and key technical decisions.
 
-For *what* we build and *why*, see `product-vision.md`.
+For *what* we build and *why*, see `../vision/product-vision.md`.
 
 ---
 
@@ -92,7 +92,7 @@ Enriched Event
 
 > **displayTitle is computed ONCE at the data layer, never in components.**
 
-See `data-model-101.md` for full conventions.
+See `data-model.md` for full conventions.
 
 ### Key Types
 
