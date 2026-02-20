@@ -18,6 +18,7 @@ import { getEventEnrichment } from '@/db/enrichment';
 import { formatInTimeZone } from 'date-fns-tz';
 import { isNewListing } from '@/lib/utils';
 import { headers } from 'next/headers';
+import { categoryColors, eventStatusConfig } from '@/lib/constants';
 
 const AUSTIN_TIMEZONE = 'America/Chicago';
 
@@ -66,26 +67,6 @@ export default async function EventPage({ params }: EventPageProps) {
   // Format date for share message
   const dateFormatted = formatInTimeZone(event.startDateTime, AUSTIN_TIMEZONE, 'EEEE, MMMM d \'at\' h:mm a');
 
-  const categoryColors: Record<string, string> = {
-    CONCERT: 'bg-purple-100 text-purple-800',
-    COMEDY: 'bg-yellow-100 text-yellow-800',
-    THEATER: 'bg-pink-100 text-pink-800',
-    MOVIE: 'bg-red-100 text-red-800',
-    SPORTS: 'bg-green-100 text-green-800',
-    FESTIVAL: 'bg-orange-100 text-orange-800',
-    OTHER: 'bg-gray-100 text-gray-800',
-  };
-
-  const categoryEmojis: Record<string, string> = {
-    CONCERT: '🎵',
-    COMEDY: '😂',
-    THEATER: '🎭',
-    MOVIE: '🎬',
-    SPORTS: '🏆',
-    FESTIVAL: '🎪',
-    OTHER: '📅',
-  };
-
   return (
     <>
       <Header />
@@ -119,8 +100,8 @@ export default async function EventPage({ params }: EventPageProps) {
             />
           </div>
         ) : (
-          <div className="w-full h-48 sm:h-64 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center mb-6">
-            <span className="text-6xl">{categoryEmojis[event.category] || '📅'}</span>
+          <div className="w-full h-48 sm:h-64 rounded-xl bg-gradient-to-br from-[var(--surface-inset)] to-[var(--border-default)] flex items-center justify-center mb-6">
+            <span className="text-lg font-medium text-[var(--text-muted)] uppercase tracking-wider">{event.category}</span>
           </div>
         )}
 
@@ -128,21 +109,16 @@ export default async function EventPage({ params }: EventPageProps) {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
           <div className="flex items-center gap-2 mb-3">
             {isNew && (
-              <span className="px-2 py-0.5 text-xs font-semibold bg-emerald-500 text-white rounded">
+              <span className="px-2 py-0.5 text-xs font-semibold bg-[var(--action-primary)] text-[var(--action-primary-text)] rounded">
                 NEW
               </span>
             )}
-            <span className={`px-2 py-0.5 text-xs font-medium rounded ${categoryColors[event.category]}`}>
+            <span className={`px-2 py-0.5 text-xs font-medium rounded ${categoryColors[event.category] || 'bg-gray-100 text-gray-800'}`}>
               {event.category}
             </span>
-            {event.status !== 'SCHEDULED' && (
-              <span className={`
-                px-2 py-0.5 text-xs font-medium rounded
-                ${event.status === 'SOLD_OUT' ? 'bg-red-100 text-red-800' : ''}
-                ${event.status === 'CANCELLED' ? 'bg-gray-100 text-gray-800' : ''}
-                ${event.status === 'POSTPONED' ? 'bg-yellow-100 text-yellow-800' : ''}
-              `}>
-                {event.status.replace('_', ' ')}
+            {event.status !== 'SCHEDULED' && eventStatusConfig[event.status as keyof typeof eventStatusConfig] && (
+              <span className={`px-2 py-0.5 text-xs font-medium rounded ${eventStatusConfig[event.status as keyof typeof eventStatusConfig].colors}`}>
+                {eventStatusConfig[event.status as keyof typeof eventStatusConfig].label}
               </span>
             )}
           </div>
@@ -178,7 +154,10 @@ export default async function EventPage({ params }: EventPageProps) {
           {/* Compact venue with location pin and event website link */}
           <div className="text-sm sm:text-base text-gray-600">
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-lg">📍</span>
+              <svg className="w-4 h-4 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+              </svg>
               <span className="font-medium">{event.venue.name}</span>
               {event.venue.city && event.venue.state && (
                 <span className="text-gray-500">, {event.venue.city}, {event.venue.state}</span>
@@ -190,7 +169,7 @@ export default async function EventPage({ params }: EventPageProps) {
                     href={event.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:text-blue-800 hover:underline text-sm"
+                    className="text-[var(--signal-info)] hover:text-[var(--text-primary)] hover:underline text-sm"
                   >
                     Visit event website
                   </a>

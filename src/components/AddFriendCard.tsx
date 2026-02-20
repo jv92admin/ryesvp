@@ -43,14 +43,14 @@ export function AddFriendCard({ variant = 'default', className = '', onGroupCrea
   const handleShare = async () => {
     if (!addFriendLink) return;
 
-    const shareText = `Add me as a friend on RyesVP so we can spot Austin events and actually make plans to go.
+    const shareText = `Add me as a friend on Lark so we can spot Austin events and actually make plans to go.
 
 ${addFriendLink}`;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Add me on RyesVP',
+          title: 'Add me on Lark',
           text: shareText,
         });
         return;
@@ -121,9 +121,9 @@ ${addFriendLink}`;
     <>
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden mb-6">
         {/* Invite One Friend Section */}
-        <div className="p-4 border-l-4 border-l-emerald-400">
+        <div className="p-4 border-l-4 border-l-[var(--border-strong)]">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-[var(--text-primary)] uppercase tracking-wider">
               Invite a Friend
             </span>
           </div>
@@ -136,7 +136,7 @@ ${addFriendLink}`;
               onClick={handleShare}
               className={`flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                 copied
-                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  ? 'bg-[var(--surface-inset)] text-[var(--text-primary)] border border-[var(--border-strong)]'
                   : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
               }`}
             >
@@ -147,7 +147,7 @@ ${addFriendLink}`;
               onClick={() => setShowEmailSearch(!showEmailSearch)}
               className={`flex-1 px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                 showEmailSearch
-                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                  ? 'bg-[var(--surface-inset)] text-[var(--text-primary)] border border-[var(--border-strong)]'
                   : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100'
               }`}
             >
@@ -172,9 +172,9 @@ ${addFriendLink}`;
         <div className="border-t border-gray-100" />
 
         {/* Invite a Group Section */}
-        <div className="p-4 border-l-4 border-l-blue-400">
+        <div className="p-4 border-l-4 border-l-[var(--border-strong)]">
           <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-[var(--text-primary)] uppercase tracking-wider">
               Invite a Group
             </span>
           </div>

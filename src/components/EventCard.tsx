@@ -9,6 +9,7 @@ import { CombinedAttendanceModal } from './CombinedAttendanceModal';
 import { formatEventDate, isNewListing } from '@/lib/utils';
 import { type TMPresale, isRelevantPresale } from '@/lib/presales';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
+import { categoryColors as categoryColorMap, eventStatusConfig, externalBrands } from '@/lib/constants';
 
 // SVG icons for presale states
 const PresaleIcons = {
@@ -168,26 +169,12 @@ export function EventCard({ event }: EventCardProps) {
   ].slice(0, 5);
   const hasFriends = friendsList.length > 0;
   
-  const categoryColors: Record<string, string> = {
-    CONCERT: 'bg-violet-100 text-violet-800',
-    COMEDY: 'bg-yellow-100 text-yellow-800',
-    THEATER: 'bg-pink-100 text-pink-800',
-    MOVIE: 'bg-red-100 text-red-800',
-    SPORTS: 'bg-green-100 text-green-800',
-    FESTIVAL: 'bg-orange-100 text-orange-800',
-    OTHER: 'bg-gray-100 text-gray-800',
-  };
-
   const categoryIcon = CategoryIcons[event.category] || CategoryIcons.OTHER;
 
   // Status badge for non-scheduled events
   const showStatusBadge = event.status !== 'SCHEDULED';
-  const statusBadgeClasses: Record<string, string> = {
-    SOLD_OUT: 'bg-red-100 text-red-800',
-    CANCELLED: 'bg-gray-100 text-gray-800 line-through',
-    POSTPONED: 'bg-yellow-100 text-yellow-800',
-  };
-  const statusBadgeClass = statusBadgeClasses[event.status] || '';
+  const statusConfig = eventStatusConfig[event.status as keyof typeof eventStatusConfig];
+  const statusBadgeClass = statusConfig?.colors || '';
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all p-4">
@@ -217,7 +204,7 @@ export function EventCard({ event }: EventCardProps) {
                 {displayTitle}
               </h3>
               {isNew && (
-                <span className="flex-shrink-0 px-1.5 py-0.5 text-[10px] font-semibold bg-emerald-500 text-white rounded">
+                <span className="flex-shrink-0 px-1.5 py-0.5 text-[10px] font-semibold bg-[var(--action-primary)] text-[var(--action-primary-text)] rounded">
                   NEW
                 </span>
               )}
@@ -230,7 +217,7 @@ export function EventCard({ event }: EventCardProps) {
             
             {/* Row 3: Presale row (only if present) - plain text, truncated */}
             {presaleInfo && (
-              <p className={`text-xs mt-1.5 truncate flex items-center gap-1 ${presaleInfo.isActive ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
+              <p className={`text-xs mt-1.5 truncate flex items-center gap-1 ${presaleInfo.isActive ? 'text-[var(--signal-info)] font-medium' : 'text-gray-500'}`}>
                 {presaleInfo.icon} {presaleInfo.text}
               </p>
             )}
@@ -243,7 +230,7 @@ export function EventCard({ event }: EventCardProps) {
         {/* Left side: Category + Spotify + Status + Social */}
         <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
           {/* Category badge */}
-          <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${categoryColors[event.category]}`}>
+          <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${categoryColorMap[event.category] || 'bg-gray-100 text-gray-800'}`}>
             {event.category}
           </span>
           
@@ -261,7 +248,8 @@ export function EventCard({ event }: EventCardProps) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="w-5 h-5 rounded-full bg-[#1DB954] hover:bg-[#1ed760] flex items-center justify-center transition-colors"
+              className="w-5 h-5 rounded-full flex items-center justify-center transition-colors"
+              style={{ backgroundColor: externalBrands.spotify.bg }}
               title="Listen on Spotify"
             >
               <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="currentColor">

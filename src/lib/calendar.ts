@@ -96,11 +96,11 @@ export function generateICS(squad: Squad, baseUrl: string): string {
   const icsContent = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//RyesVP//Plan Export//EN',
+    'PRODID:-//Lark//Plan Export//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
     'BEGIN:VEVENT',
-    `UID:ryesvp-squad-${squad.id}@ryesvp.me`,
+    `UID:lark-squad-${squad.id}@lark.events`,
     `DTSTAMP:${formatICSDate(new Date())}`,
     `DTSTART:${formatICSDate(startDate)}`,
     `DTEND:${formatICSDate(endDate)}`,

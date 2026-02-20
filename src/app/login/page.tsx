@@ -65,7 +65,7 @@ export default function LoginPage() {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link href="/" className="text-2xl font-bold text-gray-900">
-            RyesVP
+            Lark
           </Link>
           <p className="text-gray-600 mt-2">
             Discover Austin events and go with friends
@@ -101,7 +101,7 @@ export default function LoginPage() {
           <p className="text-xs text-gray-500 text-center mt-4">
             {inviterName 
               ? `Sign up to connect with ${inviterName}`
-              : 'Can\'t find your invite code? Ask a friend on RyesVP to add you from their Friends page.'
+              : 'Can\'t find your invite code? Ask a friend on Lark to add you from their Friends page.'
             }
           </p>
         </div>

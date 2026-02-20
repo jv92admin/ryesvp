@@ -162,7 +162,7 @@ export function CommunitiesContent() {
             <div className="space-y-4">
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="w-full px-4 py-3 text-sm font-medium text-[var(--brand-primary)] bg-[var(--brand-primary-light)] border-2 border-dashed border-green-200 rounded-lg hover:bg-green-100 transition-colors"
+                className="w-full px-4 py-3 text-sm font-medium text-[var(--text-secondary)] bg-[var(--surface-inset)] border-2 border-dashed border-[var(--border-default)] rounded-lg hover:bg-[var(--border-default)] transition-colors"
               >
                 + Create New Community
               </button>

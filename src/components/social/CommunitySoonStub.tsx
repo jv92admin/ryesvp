@@ -17,13 +17,13 @@ export function CommunitySoonStub() {
   };
 
   return (
-    <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-2 border-dashed border-green-200 rounded-lg p-6">
+    <div className="bg-[var(--surface-inset)] border-2 border-dashed border-[var(--border-default)] rounded-lg p-6">
       <div className="text-center space-y-4">
         {/* Header */}
         <div>
           <span className="text-2xl mb-2 block">🚧</span>
           <h3 className="font-semibold text-gray-900 mb-2">Coming Soon</h3>
-          <h4 className="text-lg font-medium text-[var(--brand-primary)] mb-1">Community & Tickets</h4>
+          <h4 className="text-lg font-medium text-[var(--text-primary)] mb-1">Community & Tickets</h4>
         </div>
 
         {/* Features Preview */}
@@ -61,7 +61,7 @@ export function CommunitySoonStub() {
               value={notifyEmail}
               onChange={(e) => setNotifyEmail(e.target.value)}
               placeholder="Get notified when ready"
-              className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-green-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white/80"
+              className="w-full px-3 py-2 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-muted)] border border-[var(--border-default)] rounded-lg focus:ring-2 focus:ring-[var(--border-strong)] focus:border-[var(--border-strong)] bg-white/80"
               required
             />
             <button
@@ -73,7 +73,7 @@ export function CommunitySoonStub() {
           </form>
         ) : (
           <div className="py-4">
-            <div className="text-green-600 font-medium text-sm flex items-center justify-center gap-2">
+            <div className="text-[var(--signal-going)] font-medium text-sm flex items-center justify-center gap-2">
               <span>✓</span>
               Thanks! We'll let you know.
             </div>
@@ -81,9 +81,9 @@ export function CommunitySoonStub() {
         )}
 
         {/* Timeline */}
-        <div className="pt-4 border-t border-green-200/50">
-          <div className="text-xs text-gray-500">
-            <strong className="text-[var(--brand-primary)]">Phase 2</strong> • Expected: Early 2025
+        <div className="pt-4 border-t border-[var(--border-default)]">
+          <div className="text-xs text-[var(--text-muted)]">
+            <strong className="text-[var(--text-secondary)]">Phase 2</strong> • Coming soon
           </div>
         </div>
       </div>

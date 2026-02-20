@@ -1,4 +1,5 @@
 import { Enrichment } from '@prisma/client';
+import { externalBrands } from '@/lib/constants';
 
 // Type for TM external links stored as JSON
 type TMExternalLinks = {
@@ -78,7 +79,7 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
                 {genres.slice(0, 3).map((genre) => (
                   <span
                     key={genre}
-                    className="px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded-full"
+                    className="px-2 py-0.5 bg-[var(--surface-inset)] text-[var(--text-secondary)] text-xs font-medium rounded-full"
                   >
                     {genre}
                   </span>
@@ -94,20 +95,22 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
                   href={enrichment.spotifyUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1DB954] text-white text-sm font-medium rounded-full hover:bg-[#1ed760] transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-white text-sm font-medium rounded-full hover:opacity-90 transition-colors"
+                  style={{ backgroundColor: externalBrands.spotify.bg }}
                 >
                   <SpotifyIcon />
                   Spotify
                 </a>
               )}
-              
+
               {/* External Links from TM */}
               {tmLinks?.youtube && (
                 <a
                   href={tmLinks.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#FF0000] text-white text-sm font-medium rounded-full hover:bg-[#cc0000] transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-white text-sm font-medium rounded-full hover:opacity-90 transition-colors"
+                  style={{ backgroundColor: externalBrands.youtube.bg }}
                 >
                   <YouTubeIcon />
                   YouTube
@@ -118,7 +121,7 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
                   href={tmLinks.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] text-white text-sm font-medium rounded-full hover:opacity-90 transition-colors"
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r ${externalBrands.instagram.gradient} text-white text-sm font-medium rounded-full hover:opacity-90 transition-colors`}
                 >
                   <InstagramIcon />
                   Instagram
@@ -154,7 +157,7 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2 text-white font-medium rounded-lg transition-colors hover:opacity-90"
-              style={{ backgroundColor: '#1DB954' }}
+              style={{ backgroundColor: externalBrands.spotify.bg }}
             >
               <SpotifyIcon />
               Spotify
@@ -165,7 +168,8 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
               href={tmLinks.youtube}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#FF0000] text-white font-medium rounded-lg hover:bg-[#cc0000] transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 text-white font-medium rounded-lg hover:opacity-90 transition-colors"
+              style={{ backgroundColor: externalBrands.youtube.bg }}
             >
               <YouTubeIcon />
               YouTube
@@ -176,7 +180,7 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
               href={tmLinks.instagram}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#F77737] text-white font-medium rounded-lg hover:opacity-90 transition-colors"
+              className={`inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r ${externalBrands.instagram.gradient} text-white font-medium rounded-lg hover:opacity-90 transition-colors`}
             >
               <InstagramIcon />
               Instagram

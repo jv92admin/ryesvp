@@ -2,8 +2,8 @@ import { Header } from '@/components/Header';
 import Image from 'next/image';
 
 export const metadata = {
-  title: 'About | RyesVP',
-  description: 'What is RyesVP, how it works, and why I\'m building it.',
+  title: 'About | Lark',
+  description: 'What is Lark, how it works, and why I\'m building it.',
 };
 
 export default function AboutPage() {
@@ -15,14 +15,14 @@ export default function AboutPage() {
         <section className="bg-white">
           <div className="max-w-2xl mx-auto px-6 py-10">
             <p className="text-xl text-center text-[var(--brand-primary)] font-semibold leading-relaxed mb-6">
-              I built RyesVP for my friends
+              I built Lark for my friends
               <br />
               <span className="text-gray-500 font-normal">(and maybe yours)</span>
             </p>
             <p className="text-gray-600 leading-relaxed mb-4">
               I think Austin&apos;s full of great shows, games, and nights out, but a lot 
               of them are scattered across websites, social media, and chats. 
-              RyesVP helps you see what&apos;s happening, shows you what your friends are 
+              Lark helps you see what&apos;s happening, shows you what your friends are 
               into, and gives each night its own plan so you can make plans together.
             </p>
             <p className="text-gray-600 leading-relaxed">
@@ -33,7 +33,7 @@ export default function AboutPage() {
               >
                 invite a few friends
               </a>
-              {' '}to join you on RyesVP, and feel free to{' '}
+              {' '}to join you on Lark, and feel free to{' '}
               <a 
                 href="mailto:vignesh.jeyaraman@gmail.com" 
                 className="font-medium text-[var(--brand-primary)] hover:underline"
@@ -58,7 +58,7 @@ export default function AboutPage() {
             {/* Discover */}
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <span className="text-sm font-bold text-emerald-600 uppercase tracking-wider">
+                <span className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider">
                   Discover
                 </span>
                 <span className="text-gray-300">|</span>
@@ -69,7 +69,7 @@ export default function AboutPage() {
               <div className="relative w-[200px] h-[360px] mx-auto rounded-2xl overflow-hidden shadow-xl border border-gray-200 bg-gray-100 mb-4">
                 <Image
                   src="/about/discover.png"
-                  alt="RyesVP Discover - Events feed"
+                  alt="Lark Discover - Events feed"
                   fill
                   className="object-cover object-top"
                 />
@@ -83,7 +83,7 @@ export default function AboutPage() {
             {/* Connect */}
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <span className="text-sm font-bold text-blue-600 uppercase tracking-wider">
+                <span className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider">
                   Connect
                 </span>
                 <span className="text-gray-300">|</span>
@@ -94,7 +94,7 @@ export default function AboutPage() {
               <div className="relative w-[200px] h-[360px] mx-auto rounded-2xl overflow-hidden shadow-xl border border-gray-200 bg-gray-100 mb-4">
                 <Image
                   src="/about/connect.png"
-                  alt="RyesVP Connect - Friends"
+                  alt="Lark Connect - Friends"
                   fill
                   className="object-cover object-top"
                 />
@@ -108,7 +108,7 @@ export default function AboutPage() {
             {/* Plan */}
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-4">
-                <span className="text-sm font-bold text-purple-600 uppercase tracking-wider">
+                <span className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider">
                   Plan
                 </span>
                 <span className="text-gray-300">|</span>
@@ -119,7 +119,7 @@ export default function AboutPage() {
               <div className="relative w-[200px] h-[360px] mx-auto rounded-2xl overflow-hidden shadow-xl border border-gray-200 bg-gray-100 mb-4">
                 <Image
                   src="/about/plan.png"
-                  alt="RyesVP Plan - Coordination"
+                  alt="Lark Plan - Coordination"
                   fill
                   className="object-cover object-top"
                 />
@@ -170,7 +170,7 @@ export default function AboutPage() {
                 </h3>
                 <p className="text-gray-600 text-sm leading-relaxed">
                   House shows, game nights, dinners—plans that start from your home or 
-                  your group, not just venue pages. The goal is for RyesVP to be where 
+                  your group, not just venue pages. The goal is for Lark to be where 
                   all your events live, whether it&apos;s a big show in town or something 
                   you&apos;re hosting yourself.
                 </p>
@@ -199,7 +199,7 @@ export default function AboutPage() {
                 </p>
                 <a
                   href="mailto:vignesh.jeyaraman@gmail.com"
-                  className="inline-flex items-center gap-2 px-4 py-2 text-base font-medium text-[var(--brand-primary)] bg-[var(--brand-primary-light)] rounded-lg hover:bg-green-100 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 text-base font-medium text-[var(--text-primary)] bg-[var(--surface-inset)] rounded-lg hover:bg-[var(--border-default)] transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -215,7 +215,7 @@ export default function AboutPage() {
         <section className="border-t border-gray-100">
           <div className="max-w-2xl mx-auto px-6 py-8 text-center">
             <p className="text-sm text-gray-400">
-              © {new Date().getFullYear()} RyesVP · Austin, TX
+              © {new Date().getFullYear()} Lark · Austin, TX
             </p>
           </div>
         </section>

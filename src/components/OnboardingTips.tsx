@@ -65,11 +65,11 @@ export function OnboardingTips() {
       const data = await res.json();
       
       const addFriendLink = `${window.location.origin}/?ref=${data.code}`;
-      const shareText = `Add me as a friend on RyesVP so we can spot Austin events and actually make plans to go.\n\n${addFriendLink}`;
+      const shareText = `Add me as a friend on Lark so we can spot Austin events and actually make plans to go.\n\n${addFriendLink}`;
 
       if (navigator.share) {
         try {
-          await navigator.share({ title: 'Add me on RyesVP', text: shareText });
+          await navigator.share({ title: 'Add me on Lark', text: shareText });
           return;
         } catch (e) {
           if ((e as Error).name === 'AbortError') return;

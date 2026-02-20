@@ -62,7 +62,7 @@ export function GroupsTab() {
     const baseUrl = window.location.origin;
     const inviteUrl = `${baseUrl}/g/${group.inviteCode}`;
     
-    const shareText = `Join ${group.name} on RyesVP! Everyone who joins becomes friends with each other so future plans are easier.
+    const shareText = `Join ${group.name} on Lark! Everyone who joins becomes friends with each other so future plans are easier.
 
 ${inviteUrl}`;
 
@@ -70,7 +70,7 @@ ${inviteUrl}`;
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Join ${group.name} on RyesVP`,
+          title: `Join ${group.name} on Lark`,
           text: shareText,
         });
         return;
@@ -166,7 +166,7 @@ ${inviteUrl}`;
         {/* Create New Button */}
         <button
           onClick={() => setShowCreateModal(true)}
-          className="w-full px-4 py-3 text-sm font-medium text-[var(--brand-primary)] bg-[var(--brand-primary-light)] border-2 border-dashed border-green-200 rounded-lg hover:bg-green-100 transition-colors flex items-center justify-center gap-2"
+          className="w-full px-4 py-3 text-sm font-medium text-[var(--text-secondary)] bg-[var(--surface-inset)] border-2 border-dashed border-[var(--border-default)] rounded-lg hover:bg-[var(--border-default)] transition-colors flex items-center justify-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

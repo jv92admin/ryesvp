@@ -18,8 +18,8 @@ export async function generateMetadata({ params }: GroupJoinPageProps): Promise<
     if (res.ok) {
       const data = await res.json();
       return {
-        title: `Join ${data.group.name} | RyesVP`,
-        description: `Join ${data.group.name}, connect with ${data.group.memberCount} people, and make future plans easier on RyesVP.`,
+        title: `Join ${data.group.name} | Lark`,
+        description: `Join ${data.group.name}, connect with ${data.group.memberCount} people, and make future plans easier on Lark.`,
       };
     }
   } catch {
@@ -27,8 +27,8 @@ export async function generateMetadata({ params }: GroupJoinPageProps): Promise<
   }
   
   return {
-    title: 'Join Group | RyesVP',
-    description: 'Join a group and connect with friends on RyesVP',
+    title: 'Join Group | Lark',
+    description: 'Join a group and connect with friends on Lark',
   };
 }
 

@@ -55,13 +55,13 @@ export function SocialSectionA({ events, recentSquadIds = [] }: SocialSectionAPr
             {/* New plan invites - highlighted */}
             {recentSquadEvents.length > 0 && (
               <div className="bg-[var(--brand-primary-light)]/30">
-                <div className="px-4 py-2 border-b border-green-200">
+                <div className="px-4 py-2 border-b border-[var(--border-default)]">
                   <span className="text-xs font-semibold text-[var(--brand-primary)] uppercase tracking-wide">
                     New invites ({recentSquadEvents.length})
                   </span>
                 </div>
                 {recentSquadEvents.map((event, idx) => (
-                  <div key={event.id} className={idx < recentSquadEvents.length - 1 ? 'border-b-2 border-green-200' : ''}>
+                  <div key={event.id} className={idx < recentSquadEvents.length - 1 ? 'border-b-2 border-[var(--border-default)]' : ''}>
                     <SocialEventCard event={event} highlighted onAvatarClick={setModalEventId} />
                   </div>
                 ))}

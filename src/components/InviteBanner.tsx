@@ -55,7 +55,7 @@ export function InviteBanner({ isLoggedIn }: InviteBannerProps) {
           <span className="text-2xl">👋</span>
           <div>
             <p className="font-semibold">
-              {inviterName} invited you to RyesVP!
+              {inviterName} invited you to Lark!
             </p>
             <p className="text-sm text-white/80">
               Sign up to connect and track events together

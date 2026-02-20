@@ -99,7 +99,7 @@ export function CalendarSidebar({ isLoggedIn }: CalendarSidebarProps) {
                 >
                   {isNew && (
                     <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-xs px-1.5 py-0.5 rounded font-medium bg-green-100 text-green-700">
+                      <span className="text-xs px-1.5 py-0.5 rounded font-medium bg-[var(--action-primary)] text-[var(--action-primary-text)]">
                         NEW
                       </span>
                     </div>
@@ -171,7 +171,7 @@ export function CalendarSidebar({ isLoggedIn }: CalendarSidebarProps) {
             {presaleEvents.length > 4 && (
               <Link 
                 href="/?discovery=presales"
-                className="block text-xs text-[var(--brand-primary)] hover:text-green-700 font-medium pt-1"
+                className="block text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-medium pt-1"
               >
                 Show all {presaleEvents.length} presales →
               </Link>
@@ -181,7 +181,7 @@ export function CalendarSidebar({ isLoggedIn }: CalendarSidebarProps) {
       </div>
 
       {/* Recommendations/Discover */}
-      <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-2 border-dashed border-green-200 rounded-lg p-4">
+      <div className="bg-[var(--surface-inset)] border-2 border-dashed border-[var(--border-default)] rounded-lg p-4">
         <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
           <span>🎯</span>
           Recommendations
@@ -214,18 +214,18 @@ export function CalendarSidebar({ isLoggedIn }: CalendarSidebarProps) {
         </div>
 
         {/* Timeline */}
-        <div className="pt-3 mt-3 border-t border-green-200/50">
-          <div className="text-xs text-gray-500 text-center">
-            <strong className="text-[var(--brand-primary)]">Smart Discovery</strong> • Coming Q1 2025
+        <div className="pt-3 mt-3 border-t border-[var(--border-default)]">
+          <div className="text-xs text-[var(--text-muted)] text-center">
+            <strong className="text-[var(--text-secondary)]">Smart Discovery</strong> • Coming soon
           </div>
         </div>
       </div>
 
       {/* Not logged in CTA */}
       {!isLoggedIn && (
-        <div className="bg-[var(--brand-primary-light)] border border-green-200 rounded-lg p-4">
-          <h3 className="font-semibold text-green-900 mb-2">👋 Join RyesVP</h3>
-          <p className="text-sm text-green-800 mb-3">
+        <div className="bg-[var(--surface-inset)] border border-[var(--border-default)] rounded-lg p-4">
+          <h3 className="font-semibold text-[var(--text-primary)] mb-2">Join Lark</h3>
+          <p className="text-sm text-[var(--text-secondary)] mb-3">
             Sign in to track your events and see social features
           </p>
           <Link

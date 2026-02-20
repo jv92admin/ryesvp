@@ -131,7 +131,7 @@ function InviteRequiredContent() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <Link href="/" className="text-xl font-bold text-gray-900">
-            RyesVP
+            Lark
           </Link>
         </div>
       </header>
@@ -145,7 +145,7 @@ function InviteRequiredContent() {
               </div>
               <h1 className="text-2xl font-bold text-gray-900">Invite Required</h1>
               <p className="text-gray-600 mt-2">
-                RyesVP is invite-only. Enter your invite code to complete signup.
+                Lark is invite-only. Enter your invite code to complete signup.
               </p>
             </div>
 
@@ -186,7 +186,7 @@ function InviteRequiredContent() {
             <div className="mt-6 pt-6 border-t border-gray-200">
               <p className="text-sm text-gray-500 text-center">
                 Don't have an invite code?{' '}
-                <span className="text-gray-700">Ask a friend who's already on RyesVP!</span>
+                <span className="text-gray-700">Ask a friend who's already on Lark!</span>
               </p>
             </div>
 
@@ -194,7 +194,7 @@ function InviteRequiredContent() {
             <div className="mt-4 text-center">
               <button
                 onClick={() => router.push('/')}
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:underline"
               >
                 Or browse events without an account →
               </button>

@@ -47,7 +47,7 @@ export function ShareButton({ title, venueName, dateFormatted, eventUrl, isLogge
 
 ${shareUrl}
 
-👋 Join me on RyesVP so we can see who's in and make a plan.`
+👋 Join me on Lark so we can see who's in and make a plan.`
     : `Hey! Check out this event:
 
 🎵 ${title}

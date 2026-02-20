@@ -21,7 +21,7 @@ export function RyesVPLogo({ size = 48, className = '' }: RyesVPLogoProps) {
       width={size} 
       height={size}
       className={className}
-      aria-label="RyesVP Logo"
+      aria-label="Lark Logo"
     >
       {/* White background with rounded corners */}
       <rect 
@@ -97,15 +97,11 @@ export function RyesVPLogo({ size = 48, className = '' }: RyesVPLogoProps) {
  */
 export function RyesVPWordmark({ className = '' }: { className?: string }) {
   return (
-    <span 
-      className={`font-bold tracking-tighter ${className}`}
-      style={{ color: 'var(--brand-black, #171717)' }}
+    <span
+      className={`font-bold tracking-tight ${className}`}
+      style={{ color: 'var(--text-primary, #171717)' }}
     >
-      R
-      <span style={{ color: 'var(--brand-primary, #16A34A)' }}>y</span>
-      es
-      <span style={{ color: 'var(--brand-primary, #16A34A)' }}>V</span>
-      P
+      Lark
     </span>
   );
 }

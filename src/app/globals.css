@@ -3,32 +3,62 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  
-  /* ========================================
-     RYESVP BRAND DESIGN TOKENS
-     ======================================== */
-  
-  /* THE ACTION COLOR - "Go" / "Yes" */
-  /* Used for: Primary buttons, active states, Logo checkmark */
-  --brand-primary: #16A34A;        /* Tailwind green-600 */
-  --brand-primary-hover: #15803D;  /* Tailwind green-700 */
-  --brand-primary-light: #DCFCE7;  /* Tailwind green-100 - for backgrounds */
-  
-  /* THE GROUNDING COLOR */
-  /* Used for: Wordmark text, headers, body text */
-  --brand-black: #171717;          /* Tailwind neutral-900 */
-  
-  /* THE CANVAS */
-  /* Used for: Card backgrounds, subtle containers */
-  --brand-gray: #FAFAFA;           /* Tailwind neutral-50 */
-  --brand-gray-100: #F5F5F5;       /* Tailwind neutral-100 */
-  --brand-border: #E5E5E5;         /* Tailwind neutral-200 */
-  
-  /* SEMANTIC COLORS */
-  --brand-danger: #DC2626;         /* Tailwind red-600 */
-  --brand-danger-hover: #B91C1C;   /* Tailwind red-700 */
-  --brand-warning: #F59E0B;        /* Tailwind amber-500 */
-  --brand-info: #3B82F6;           /* Tailwind blue-500 */
+
+  /* ==========================================
+     LARK DESIGN TOKENS
+     Monochrome-first. Color is signal, not decoration.
+     ========================================== */
+
+  /* SURFACES — the canvas */
+  --surface-bg: #FAFAFA;              /* page background */
+  --surface-card: #FFFFFF;            /* card / elevated */
+  --surface-inset: #F5F5F5;           /* recessed areas, input backgrounds */
+
+  /* TEXT — high contrast */
+  --text-primary: #171717;            /* headlines, body */
+  --text-secondary: #525252;          /* supporting text */
+  --text-muted: #A3A3A3;             /* hints, placeholders */
+
+  /* BORDERS */
+  --border-default: #E5E5E5;          /* card borders, dividers */
+  --border-strong: #D4D4D4;           /* hover borders, emphasis */
+
+  /* ACTION — monochrome primary */
+  --action-primary: #171717;          /* primary CTA buttons (dark) */
+  --action-primary-hover: #404040;    /* hover state */
+  --action-primary-text: #FFFFFF;     /* text on primary buttons */
+  --action-secondary: #FFFFFF;        /* secondary buttons (white) */
+  --action-secondary-border: #D4D4D4; /* secondary button border */
+  --action-secondary-hover: #F5F5F5;  /* secondary button hover bg */
+
+  /* SIGNAL COLORS — color only as state indicator */
+  --signal-going: #16A34A;            /* going, confirmed, active */
+  --signal-going-hover: #15803D;      /* going hover/press */
+  --signal-going-light: #DCFCE7;      /* going background tint */
+  --signal-interested: #F59E0B;       /* interested, warm intent */
+  --signal-interested-light: #FEF3C7; /* interested background tint */
+  --signal-danger: #DC2626;           /* error, destructive */
+  --signal-danger-hover: #B91C1C;     /* danger hover/press */
+  --signal-info: #3B82F6;             /* links, informational */
+
+  /* ANIMATION */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+
+  /* LEGACY ALIASES — keep during migration, remove when done */
+  --brand-primary: var(--signal-going);
+  --brand-primary-hover: var(--signal-going-hover);
+  --brand-primary-light: var(--signal-going-light);
+  --brand-black: var(--text-primary);
+  --brand-gray: var(--surface-bg);
+  --brand-gray-100: var(--surface-inset);
+  --brand-border: var(--border-default);
+  --brand-danger: var(--signal-danger);
+  --brand-danger-hover: var(--signal-danger-hover);
+  --brand-warning: var(--signal-interested);
+  --brand-info: var(--signal-info);
 }
 
 @theme inline {
@@ -36,8 +66,20 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  
-  /* Expose brand colors to Tailwind */
+
+  /* Expose tokens to Tailwind */
+  --color-surface-bg: var(--surface-bg);
+  --color-surface-card: var(--surface-card);
+  --color-surface-inset: var(--surface-inset);
+  --color-action-primary: var(--action-primary);
+  --color-action-primary-hover: var(--action-primary-hover);
+  --color-signal-going: var(--signal-going);
+  --color-signal-going-light: var(--signal-going-light);
+  --color-signal-interested: var(--signal-interested);
+  --color-signal-danger: var(--signal-danger);
+  --color-signal-info: var(--signal-info);
+
+  /* Legacy Tailwind aliases (remove after full migration) */
   --color-brand-primary: var(--brand-primary);
   --color-brand-primary-hover: var(--brand-primary-hover);
   --color-brand-primary-light: var(--brand-primary-light);
@@ -62,25 +104,34 @@ body {
 }
 
 /* ========================================
-   BRAND UTILITY CLASSES
+   UTILITY CLASSES
    ======================================== */
 
-/* Primary button - green "Go" action */
+/* Primary button — dark monochrome CTA */
 .btn-primary {
-  background-color: var(--brand-primary);
-  color: white;
+  background-color: var(--action-primary);
+  color: var(--action-primary-text);
 }
 .btn-primary:hover {
-  background-color: var(--brand-primary-hover);
+  background-color: var(--action-primary-hover);
 }
 
-/* Danger button - red destructive action */
+/* Signal button — green "going" state */
+.btn-going {
+  background-color: var(--signal-going);
+  color: white;
+}
+.btn-going:hover {
+  background-color: var(--signal-going-hover);
+}
+
+/* Danger button — red destructive action */
 .btn-danger {
-  background-color: var(--brand-danger);
+  background-color: var(--signal-danger);
   color: white;
 }
 .btn-danger:hover {
-  background-color: var(--brand-danger-hover);
+  background-color: var(--signal-danger-hover);
 }
 
 /* Date input styling - smaller calendar icon */
@@ -96,7 +147,16 @@ body {
   opacity: 0.8;
 }
 
-/* Toast animation - only animate vertical position and opacity, not horizontal */
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Toast animation */
 @keyframes slide-up {
   from {
     opacity: 0;
@@ -109,5 +169,5 @@ body {
 }
 
 .animate-slide-up {
-  animation: slide-up 0.3s ease-out;
+  animation: slide-up var(--duration-normal) var(--ease-out-expo);
 }

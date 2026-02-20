@@ -65,13 +65,13 @@ export function SocialEngagementPanel({ isLoggedIn }: SocialEngagementPanelProps
     if (!stats?.inviteCode) return;
     
     const inviteUrl = `${window.location.origin}?ref=${stats.inviteCode}`;
-    const shareText = `Add me as a friend on RyesVP so we can spot Austin events and actually make plans to go. ${inviteUrl}`;
+    const shareText = `Add me as a friend on Lark so we can spot Austin events and actually make plans to go. ${inviteUrl}`;
     
     // Try native share first (mobile)
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Join me on RyesVP',
+          title: 'Join me on Lark',
           text: shareText,
         });
         return;
@@ -133,7 +133,7 @@ export function SocialEngagementPanel({ isLoggedIn }: SocialEngagementPanelProps
           <span className="text-2xl">👋</span>
           <div className="flex-1">
             <h3 className="font-semibold text-gray-900 mb-1">
-              Get more out of RyesVP
+              Get more out of Lark
             </h3>
             <p className="text-gray-600 text-sm mb-3">
               Add friends to see who&apos;s going to events

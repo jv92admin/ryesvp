@@ -45,17 +45,19 @@ export function InviteRedemptionHandler() {
 
   return (
     <div className="fixed bottom-4 right-4 z-50 animate-in slide-in-from-bottom-4 fade-in duration-300">
-      <div className="bg-emerald-600 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3">
-        <span className="text-2xl">🎉</span>
+      <div className="bg-[var(--action-primary)] text-[var(--action-primary-text)] px-6 py-4 rounded-lg shadow-lg flex items-center gap-3">
+        <svg className="w-6 h-6 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
         <div>
           <p className="font-semibold">You&apos;re now connected!</p>
-          <p className="text-sm text-emerald-100">
+          <p className="text-sm opacity-80">
             You and {toast.inviterName} are now friends
           </p>
         </div>
         <button
           onClick={() => setToast({ show: false, inviterName: '' })}
-          className="ml-2 text-emerald-200 hover:text-white"
+          className="ml-2 opacity-60 hover:opacity-100"
         >
           ✕
         </button>

@@ -1,5 +1,7 @@
 'use client';
 
+import { statusConfig } from '@/lib/constants';
+
 type UserStatus = 'GOING' | 'INTERESTED' | 'NEED_TICKETS' | 'HAVE_TICKETS' | null | undefined;
 
 interface StatusBadgeProps {
@@ -7,27 +9,11 @@ interface StatusBadgeProps {
   className?: string;
 }
 
-const STATUS_CONFIG: Record<string, { icon: string; label: string; colors: string }> = {
-  GOING: {
-    icon: '✓',
-    label: 'Going',
-    colors: 'bg-emerald-100 text-emerald-700',
-  },
-  INTERESTED: {
-    icon: '★',
-    label: 'Interested',
-    colors: 'bg-amber-100 text-amber-700',
-  },
-  NEED_TICKETS: {
-    icon: '🎫',
-    label: 'Need Tickets',
-    colors: 'bg-blue-100 text-blue-700',
-  },
-  HAVE_TICKETS: {
-    icon: '🎟️',
-    label: 'Have Tickets',
-    colors: 'bg-purple-100 text-purple-700',
-  },
+const STATUS_ICONS: Record<string, string> = {
+  GOING: '✓',
+  INTERESTED: '★',
+  NEED_TICKETS: '🎫',
+  HAVE_TICKETS: '🎟️',
 };
 
 /**
@@ -37,12 +23,12 @@ const STATUS_CONFIG: Record<string, { icon: string; label: string; colors: strin
 export function StatusBadge({ status, className = '' }: StatusBadgeProps) {
   if (!status) return null;
   
-  const config = STATUS_CONFIG[status];
+  const config = statusConfig[status as keyof typeof statusConfig];
   if (!config) return null;
-  
+
   return (
     <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded ${config.colors} ${className}`}>
-      {config.icon} {config.label}
+      {STATUS_ICONS[status] || ''} {config.label}
     </span>
   );
 }
@@ -79,7 +65,7 @@ export function FriendCountBadge({
   
   if (variant === 'text') {
     return (
-      <span className={`text-xs font-medium ${highlight ? 'text-[var(--brand-primary)]' : 'text-gray-600'} ${className}`}>
+      <span className={`text-xs font-medium ${highlight ? 'text-[var(--signal-going)]' : 'text-gray-600'} ${className}`}>
         {text}
       </span>
     );
@@ -87,8 +73,8 @@ export function FriendCountBadge({
   
   // Pill variant - matches EventCard style
   const pillColors = isGoing
-    ? 'bg-[var(--brand-primary-light)] text-[var(--brand-primary)]'
-    : 'bg-amber-50 text-amber-700';
+    ? 'bg-[var(--signal-going-light)] text-[var(--signal-going)]'
+    : 'bg-[var(--signal-interested-light)] text-amber-700';
   
   return (
     <span className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full ${pillColors} ${className}`}>
