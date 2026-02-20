@@ -26,6 +26,7 @@ export function FilterStrip() {
   const categoriesParam = searchParams.get('categories');
   const selectedCategories = categoriesParam ? categoriesParam.split(',').filter(Boolean) : [];
   const isConcertActive = selectedCategories.includes('CONCERT');
+  const isFriendsActive = searchParams.get('friendsGoing') === 'true';
 
   // ─── Overflow filter state (for badge count + active tags) ───
   const startDate = searchParams.get('startDate') || '';
@@ -97,6 +98,13 @@ export function FilterStrip() {
     });
   };
 
+  const toggleFriends = () => {
+    updateParams((p) => {
+      if (isFriendsActive) p.delete('friendsGoing');
+      else p.set('friendsGoing', 'true');
+    });
+  };
+
   // ─── Tag dismissal helpers ───
   const removeCategory = (id: string) => {
     updateParams((p) => {
@@ -165,6 +173,9 @@ export function FilterStrip() {
         </ToggleChip>
         <ToggleChip active={isConcertActive} onClick={toggleConcert}>
           Concerts
+        </ToggleChip>
+        <ToggleChip active={isFriendsActive} onClick={toggleFriends}>
+          Friends
         </ToggleChip>
 
         {/* Filters overflow button */}

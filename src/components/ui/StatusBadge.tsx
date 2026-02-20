@@ -18,7 +18,7 @@ const STATUS_ICONS: Record<string, string> = {
 
 /**
  * Shared status badge component for user event status
- * Used in: EventCard, SocialSectionA, SocialSectionB
+ * Used in: EventCard
  */
 export function StatusBadge({ status, className = '' }: StatusBadgeProps) {
   if (!status) return null;
@@ -43,7 +43,7 @@ interface FriendCountBadgeProps {
 
 /**
  * Shared friend count badge for showing social signals
- * Used in: EventCard, SocialSectionB
+ * Used in: EventCard
  * 
  * variant="pill" (default): Shows as a colored pill badge
  * variant="text": Shows as plain text (for compact layouts)

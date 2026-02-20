@@ -3,7 +3,7 @@
 > The complete UX architecture redesign.
 > Structured as 9 mutable increments (0-7 + 3.5), each shippable independently.
 > Brand direction informed by `references/lark-proposal-final.pdf`.
-> Date: 2026-02-19 · Updated: 2026-02-20 (Inc 3 shipped, Inc 3.5 Editorial Polish added)
+> Date: 2026-02-19 · Updated: 2026-02-20 (Inc 3–4 shipped, Inc 3.5 Editorial Polish added)
 
 ---
 
@@ -56,9 +56,9 @@ INC 2    Filter Cleanup             ✅ FilterDrawer, FilterStrip rewrite, old c
   ↓
 INC 3    Lark Visual Identity       ✅ warm tokens, de-SaaS cards, unified badges, chip migration
   ↓
-INC 3.5  Editorial Polish           ← typography, density, badges → text, breathing room
+INC 3.5  Editorial Polish           ✅ text-only badges, editorial headers, breathing room, underline tabs
   ↓
-INC 4    Social-First Home          ← kill tabs, inline social signals, plans strip
+INC 4    Social-First Home          ✅ kill ViewToggle, PlansStrip, Friends chip, 7 components deleted
   ↓
 INC 5    Event Page Zones           ← zone-based layout, promote Buy, separate social
   ↓

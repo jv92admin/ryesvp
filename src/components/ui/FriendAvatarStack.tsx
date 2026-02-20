@@ -24,7 +24,7 @@ interface FriendAvatarStackProps {
  * - 4+ friends: Shows maxVisible avatars + "+N" overflow
  * - Click opens modal (via onClick prop) or links to profiles
  * 
- * Used in: EventCard, FriendsAndStatusCard, SocialSectionA, SocialSectionB
+ * Used in: EventCard, FriendsAndStatusCard
  */
 export function FriendAvatarStack({
   friends,
