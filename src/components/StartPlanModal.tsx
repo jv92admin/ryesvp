@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { formatEventDate } from '@/lib/utils';
 import { useToast } from '@/contexts/ToastContext';
 import { Chip } from '@/components/ui';
+import { Dialog, DialogHeader, DialogTitle, DialogBody, DialogFooter } from '@/components/ui/dialog';
 
 interface Event {
   id: string;
@@ -26,7 +27,7 @@ type DatePreset = 'thisWeek' | 'weekend' | null;
 export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPlanModalProps) {
   const router = useRouter();
   const { showToast } = useToast();
-  
+
   // Search & filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
@@ -35,7 +36,7 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
   const [customEndDate, setCustomEndDate] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const datePickerRef = useRef<HTMLDivElement>(null);
-  
+
   // Event list state
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,17 +65,17 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
   // Fetch events with search + date filters
   const fetchEvents = useCallback(async () => {
     if (!isOpen) return;
-    
+
     setLoading(true);
     try {
       const params = new URLSearchParams();
       params.set('limit', '100');
-      
+
       // Add search query
       if (debouncedQuery.trim()) {
         params.set('q', debouncedQuery.trim());
       }
-      
+
       // Add date filters
       if (datePreset) {
         params.set('when', datePreset);
@@ -82,7 +83,7 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
         if (customStartDate) params.set('startDate', customStartDate);
         if (customEndDate) params.set('endDate', customEndDate);
       }
-      
+
       const res = await fetch(`/api/events?${params.toString()}`);
       if (res.ok) {
         const data = await res.json();
@@ -155,7 +156,7 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
   const handleCreatePlan = async (eventId: string) => {
     setCreating(true);
     setSelectedEventId(eventId);
-    
+
     try {
       // Check if user already has a squad for this event
       const checkRes = await fetch(`/api/events/${eventId}/squad`);
@@ -169,7 +170,7 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ userId: preSelectedFriendId }),
             });
-            
+
             showToast({
               message: 'Your friend has been added to your existing plan and notified.',
               type: 'success',
@@ -185,7 +186,7 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
       const createRes = await fetch('/api/squads', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           eventId,
           inviteFriendIds: preSelectedFriendId ? [preSelectedFriendId] : []
         }),
@@ -194,7 +195,7 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
       if (createRes.ok) {
         const data = await createRes.json();
         const selectedEvent = events.find(e => e.id === eventId);
-        
+
         // Show toast based on whether friend was pre-added
         if (preSelectedFriendId) {
           showToast({
@@ -213,7 +214,7 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
             type: 'success',
           });
         }
-        
+
         router.push(`/squads/${data.squad.id}`);
         onClose();
       } else if (createRes.status === 409) {
@@ -228,7 +229,7 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userId: preSelectedFriendId }),
               });
-              
+
               showToast({
                 message: 'Your friend has been added to your existing plan and notified.',
                 type: 'success',
@@ -252,223 +253,199 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/50 transition-opacity"
-        onClick={onClose}
-      />
-      
-      {/* Modal */}
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] flex flex-col border border-gray-100">
-          {/* Header */}
-          <div className="px-6 py-4 border-b border-gray-100">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-900">
-                Start a Plan
-              </h2>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <p className="text-sm text-gray-600 mt-1">
-              Pick an event to plan with friends
-            </p>
-          </div>
+    <Dialog open={isOpen} onOpenChange={() => onClose()} size="lg">
+      <DialogHeader onClose={onClose}>
+        <DialogTitle>Start a Plan</DialogTitle>
+        <p className="text-sm text-[var(--text-secondary)] mt-1">
+          Pick an event to plan with friends
+        </p>
+      </DialogHeader>
 
-          {/* Search + Date Filters */}
-          <div className="px-6 py-3 border-b border-gray-100 bg-gray-50 space-y-3">
-            {/* Search Input */}
-            <input
-              type="text"
-              placeholder="Lady Gaga, indie rock, Moody Center..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent transition-all"
-            />
-            
-            {/* Date Chips */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <Chip
-                variant="toggle"
-                color="primary"
-                size="sm"
-                active={datePreset === 'thisWeek'}
-                onClick={() => handleDatePresetClick('thisWeek')}
-              >
-                This Week
-              </Chip>
-              <Chip
-                variant="toggle"
-                color="primary"
-                size="sm"
-                active={datePreset === 'weekend'}
-                onClick={() => handleDatePresetClick('weekend')}
-              >
-                This Weekend
-              </Chip>
-              
-              {/* Date Picker Dropdown */}
-              <div className="relative" ref={datePickerRef}>
-                <Chip
-                  variant="toggle"
-                  color="primary"
-                  size="sm"
-                  active={!!hasCustomDates && !datePreset}
-                  onClick={() => setShowDatePicker(!showDatePicker)}
+      {/* Search + Date Filters */}
+      <div className="px-6 py-3 border-b border-[var(--border-default)] bg-[var(--surface-inset)] space-y-3 flex-shrink-0">
+        {/* Search Input */}
+        <input
+          type="text"
+          placeholder="Lady Gaga, indie rock, Moody Center..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full px-4 py-2.5 border border-[var(--border-default)] rounded-xl text-sm bg-[var(--surface-card)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--border-strong)] focus:border-transparent transition-all"
+        />
+
+        {/* Date Chips */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <Chip
+            variant="toggle"
+            color="primary"
+            size="sm"
+            active={datePreset === 'thisWeek'}
+            onClick={() => handleDatePresetClick('thisWeek')}
+          >
+            This Week
+          </Chip>
+          <Chip
+            variant="toggle"
+            color="primary"
+            size="sm"
+            active={datePreset === 'weekend'}
+            onClick={() => handleDatePresetClick('weekend')}
+          >
+            This Weekend
+          </Chip>
+
+          {/* Date Picker Dropdown */}
+          <div className="relative" ref={datePickerRef}>
+            <Chip
+              variant="toggle"
+              color="primary"
+              size="sm"
+              active={!!hasCustomDates && !datePreset}
+              onClick={() => setShowDatePicker(!showDatePicker)}
+            >
+              <span className="flex items-center gap-1">
+                {formatDateLabel()}
+                <svg
+                  className={`w-3 h-3 transition-transform ${showDatePicker ? 'rotate-180' : ''}`}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
-                  <span className="flex items-center gap-1">
-                    {formatDateLabel()}
-                    <svg 
-                      className={`w-3 h-3 transition-transform ${showDatePicker ? 'rotate-180' : ''}`} 
-                      fill="none" 
-                      stroke="currentColor" 
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </span>
-                </Chip>
-                
-                {showDatePicker && (
-                  <div className="absolute top-full left-0 mt-1 p-3 bg-white border border-gray-200 rounded-lg shadow-lg z-20 min-w-[200px]">
-                    <div className="space-y-2">
-                      <div>
-                        <label className="block text-xs text-gray-500 mb-1">From</label>
-                        <input
-                          type="date"
-                          value={customStartDate}
-                          onChange={(e) => handleCustomDateChange(e.target.value, customEndDate)}
-                          className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md 
-                                   focus:outline-none focus:ring-1 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)]"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs text-gray-500 mb-1">To</label>
-                        <input
-                          type="date"
-                          value={customEndDate}
-                          onChange={(e) => handleCustomDateChange(customStartDate, e.target.value)}
-                          className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md
-                                   focus:outline-none focus:ring-1 focus:ring-[var(--brand-primary)] focus:border-[var(--brand-primary)]"
-                        />
-                      </div>
-                      {hasCustomDates && (
-                        <button
-                          type="button"
-                          onClick={clearDates}
-                          className="w-full text-xs text-gray-500 hover:text-gray-700 mt-1"
-                        >
-                          Clear dates
-                        </button>
-                      )}
-                    </div>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            </Chip>
+
+            {showDatePicker && (
+              <div className="absolute top-full left-0 mt-1 p-3 bg-[var(--surface-card)] border border-[var(--border-default)] rounded-lg shadow-lg z-20 min-w-[200px]">
+                <div className="space-y-2">
+                  <div>
+                    <label className="block text-xs text-[var(--text-muted)] mb-1">From</label>
+                    <input
+                      type="date"
+                      value={customStartDate}
+                      onChange={(e) => handleCustomDateChange(e.target.value, customEndDate)}
+                      className="w-full px-2 py-1.5 text-sm border border-[var(--border-default)] rounded-md
+                               focus:outline-none focus:ring-1 focus:ring-[var(--border-strong)] focus:border-[var(--border-strong)]"
+                    />
                   </div>
-                )}
-              </div>
-
-              {/* Clear all dates */}
-              {hasAnyDateFilter && (
-                <button
-                  onClick={clearDates}
-                  className="text-xs text-gray-500 hover:text-gray-700 ml-1"
-                >
-                  Clear
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Event List */}
-          <div className="flex-1 overflow-y-auto px-6 py-3">
-            {loading ? (
-              <div className="text-center py-8 text-gray-500">
-                <svg className="animate-spin h-5 w-5 mx-auto mb-2 text-gray-400" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                Searching events...
-              </div>
-            ) : events.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                {debouncedQuery || hasAnyDateFilter 
-                  ? 'No events match your search' 
-                  : 'No upcoming events'}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {events.map((event) => (
-                  <button
-                    key={event.id}
-                    onClick={() => handleCreatePlan(event.id)}
-                    disabled={creating}
-                    className={`
-                      w-full flex items-center gap-3 p-3 rounded-xl border text-left
-                      transition-all
-                      ${selectedEventId === event.id 
-                        ? 'border-[var(--brand-primary)] bg-[var(--brand-primary-light)] ring-2 ring-[var(--brand-primary)]/20' 
-                        : 'border-gray-200 hover:border-[var(--brand-primary)]/30 hover:bg-gray-50'
-                      }
-                      ${creating && selectedEventId !== event.id ? 'opacity-50' : ''}
-                    `}
-                  >
-                    {/* Event Image */}
-                    {event.imageUrl ? (
-                      <div className="w-14 h-14 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100 ring-1 ring-gray-200">
-                        <img 
-                          src={event.imageUrl} 
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-14 h-14 flex-shrink-0 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                        <span className="text-2xl">📅</span>
-                      </div>
-                    )}
-                    
-                    {/* Event Info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 truncate">
-                        {event.displayTitle}
-                      </p>
-                      <p className="text-sm text-gray-500 truncate">
-                        {event.venue.name} • {formatEventDate(new Date(event.startDateTime))}
-                      </p>
-                    </div>
-
-                    {/* Loading indicator */}
-                    {creating && selectedEventId === event.id && (
-                      <div className="flex-shrink-0">
-                        <svg className="animate-spin h-5 w-5 text-[var(--brand-primary)]" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
-                      </div>
-                    )}
-                  </button>
-                ))}
+                  <div>
+                    <label className="block text-xs text-[var(--text-muted)] mb-1">To</label>
+                    <input
+                      type="date"
+                      value={customEndDate}
+                      onChange={(e) => handleCustomDateChange(customStartDate, e.target.value)}
+                      className="w-full px-2 py-1.5 text-sm border border-[var(--border-default)] rounded-md
+                               focus:outline-none focus:ring-1 focus:ring-[var(--border-strong)] focus:border-[var(--border-strong)]"
+                    />
+                  </div>
+                  {hasCustomDates && (
+                    <button
+                      type="button"
+                      onClick={clearDates}
+                      className="w-full text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] mt-1"
+                    >
+                      Clear dates
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>
 
-          {/* Footer hint */}
-          <div className="px-6 py-3 border-t border-gray-100 bg-[var(--brand-primary-light)] rounded-b-2xl">
-            <p className="text-xs text-gray-600 text-center font-medium">
-              Select an event to start planning • You can invite friends after
-            </p>
-          </div>
+          {/* Clear all dates */}
+          {hasAnyDateFilter && (
+            <button
+              onClick={clearDates}
+              className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] ml-1"
+            >
+              Clear
+            </button>
+          )}
         </div>
       </div>
-    </div>
+
+      {/* Event List */}
+      <DialogBody>
+        {loading ? (
+          <div className="text-center py-8 text-[var(--text-muted)]">
+            <svg className="animate-spin h-5 w-5 mx-auto mb-2 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            Searching events...
+          </div>
+        ) : events.length === 0 ? (
+          <div className="text-center py-8 text-[var(--text-muted)]">
+            {debouncedQuery || hasAnyDateFilter
+              ? 'No events match your search'
+              : 'No upcoming events'}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {events.map((event) => (
+              <button
+                key={event.id}
+                onClick={() => handleCreatePlan(event.id)}
+                disabled={creating}
+                className={`
+                  w-full flex items-center gap-3 p-3 rounded-xl border text-left
+                  transition-all
+                  ${selectedEventId === event.id
+                    ? 'border-[var(--action-primary)] bg-[var(--action-primary)]/10 ring-2 ring-[var(--action-primary)]/20'
+                    : 'border-[var(--border-default)] hover:border-[var(--action-primary)]/30 hover:bg-[var(--surface-inset)]'
+                  }
+                  ${creating && selectedEventId !== event.id ? 'opacity-50' : ''}
+                `}
+              >
+                {/* Event Image */}
+                {event.imageUrl ? (
+                  <div className="w-14 h-14 flex-shrink-0 rounded-xl overflow-hidden bg-[var(--surface-inset)] ring-1 ring-[var(--border-default)]">
+                    <img
+                      src={event.imageUrl}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-14 h-14 flex-shrink-0 rounded-xl bg-[var(--surface-inset)] flex items-center justify-center">
+                    <svg className="w-6 h-6 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+                    </svg>
+                  </div>
+                )}
+
+                {/* Event Info */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-[var(--text-primary)] truncate">
+                    {event.displayTitle}
+                  </p>
+                  <p className="text-sm text-[var(--text-muted)] truncate">
+                    {event.venue.name} • {formatEventDate(new Date(event.startDateTime))}
+                  </p>
+                </div>
+
+                {/* Loading indicator */}
+                {creating && selectedEventId === event.id && (
+                  <div className="flex-shrink-0">
+                    <svg className="animate-spin h-5 w-5 text-[var(--action-primary)]" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                  </div>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+      </DialogBody>
+
+      {/* Footer hint */}
+      <DialogFooter className="justify-center">
+        <p className="text-xs text-[var(--text-secondary)] text-center font-medium">
+          Select an event to start planning • You can invite friends after
+        </p>
+      </DialogFooter>
+    </Dialog>
   );
 }

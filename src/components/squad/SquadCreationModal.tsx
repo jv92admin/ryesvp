@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogHeader, DialogTitle, DialogBody, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui';
 import { formatInTimeZone } from 'date-fns-tz';
 import { useToast } from '@/contexts/ToastContext';
@@ -54,7 +54,7 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
 
       try {
         const response = await fetch(`/api/events/${event.id}/friends`);
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch friends');
         }
@@ -92,7 +92,7 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
 
   const handleJoinSquad = async (squadId: string, friendName: string) => {
     if (joiningSquad) return;
-    
+
     setJoiningSquad(squadId);
     setError(null);
 
@@ -187,145 +187,139 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
   const otherFriends = friends.filter(f => !f.isInterested);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm sm:max-w-md p-0">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold">
-              Start a plan
-            </DialogTitle>
-          </DialogHeader>
+    <Dialog open={isOpen} onOpenChange={onClose} size="md">
+      <DialogHeader onClose={onClose}>
+        <DialogTitle>Start a Plan</DialogTitle>
+      </DialogHeader>
+
+      <DialogBody className="space-y-4">
+        {/* Event Info */}
+        <div className="text-center border-b border-[var(--border-default)] pb-4">
+          <h3 className="font-medium text-[var(--text-primary)] mb-1">
+            {event.title}
+          </h3>
+          <p className="text-sm text-[var(--text-secondary)]">
+            {formatInTimeZone(new Date(event.startDateTime), AUSTIN_TIMEZONE, 'EEE, MMM d • h:mm a')}
+            {' • '}
+            {event.venue.name}
+          </p>
         </div>
 
-        <div className="px-6 py-4 space-y-4">
-          {/* Event Info */}
-          <div className="text-center border-b border-gray-200 pb-4">
-            <h3 className="font-medium text-gray-900 mb-1">
-              {event.title}
-            </h3>
-            <p className="text-sm text-gray-600">
-              {formatInTimeZone(new Date(event.startDateTime), AUSTIN_TIMEZONE, 'EEE, MMM d • h:mm a')}
-              {' • '}
-              {event.venue.name}
-            </p>
-          </div>
-
-          {loading && (
-            <div className="py-4 text-center text-gray-500">
-              Loading friends...
-            </div>
-          )}
-
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
-              {error}
-            </div>
-          )}
-
-          {!loading && !error && (
-            <>
-              <div>
-                <h4 className="font-medium text-gray-900 mb-3">
-                  Who do you want to invite? ({selectedFriends.size} selected)
-                </h4>
-
-                {friends.length === 0 ? (
-                  <div className="text-center py-6 text-gray-500">
-                    <p className="text-sm">No friends to invite yet.</p>
-                    <p className="text-xs mt-1">Add friends to coordinate with them!</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3 max-h-60 overflow-y-auto">
-                    {/* Interested Friends First */}
-                    {interestedFriends.length > 0 && (
-                      <div>
-                        <h5 className="text-sm font-medium text-green-700 mb-2">
-                          Already Interested
-                        </h5>
-                        <div className="space-y-2">
-                          {interestedFriends.map((friend) => (
-                            friend.hasSquad ? (
-                              <FriendSquadCard
-                                key={friend.id}
-                                friend={friend}
-                                onJoinSquad={handleJoinSquad}
-                                isJoining={joiningSquad === friend.squadId}
-                              />
-                            ) : (
-                              <FriendCheckbox
-                                key={friend.id}
-                                friend={friend}
-                                isSelected={selectedFriends.has(friend.id)}
-                                onToggle={() => handleFriendToggle(friend.id)}
-                              />
-                            )
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Other Friends */}
-                    {otherFriends.length > 0 && (
-                      <div>
-                        {interestedFriends.length > 0 && (
-                          <h5 className="text-sm font-medium text-gray-700 mb-2 mt-4">
-                            Other Friends
-                          </h5>
-                        )}
-                        <div className="space-y-2">
-                          {otherFriends.map((friend) => (
-                            friend.hasSquad ? (
-                              <FriendSquadCard
-                                key={friend.id}
-                                friend={friend}
-                                onJoinSquad={handleJoinSquad}
-                                isJoining={joiningSquad === friend.squadId}
-                              />
-                            ) : (
-                              <FriendCheckbox
-                                key={friend.id}
-                                friend={friend}
-                                isSelected={selectedFriends.has(friend.id)}
-                                onToggle={() => handleFriendToggle(friend.id)}
-                              />
-                            )
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-            </>
-          )}
-        </div>
-
-        {/* Action Buttons */}
-        {!loading && !error && (
-          <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={onClose}
-              disabled={creating}
-              className="flex-1"
-            >
-              Cancel
-            </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={handleCreateSquad}
-              disabled={creating}
-              loading={creating}
-              className="flex-1"
-            >
-              {creating ? 'Creating...' : `Start Plan${selectedFriends.size > 0 ? ` (${selectedFriends.size + 1})` : ''}`}
-            </Button>
+        {loading && (
+          <div className="py-4 text-center text-[var(--text-muted)]">
+            Loading friends...
           </div>
         )}
-      </DialogContent>
+
+        {error && (
+          <div className="p-3 bg-[var(--signal-danger)]/10 border border-[var(--signal-danger)]/20 rounded-lg text-[var(--signal-danger)] text-sm">
+            {error}
+          </div>
+        )}
+
+        {!loading && !error && (
+          <>
+            <div>
+              <h4 className="font-medium text-[var(--text-primary)] mb-3">
+                Who do you want to invite? ({selectedFriends.size} selected)
+              </h4>
+
+              {friends.length === 0 ? (
+                <div className="text-center py-6 text-[var(--text-muted)]">
+                  <p className="text-sm">No friends to invite yet.</p>
+                  <p className="text-xs mt-1">Add friends to coordinate with them!</p>
+                </div>
+              ) : (
+                <div className="space-y-3 max-h-60 overflow-y-auto">
+                  {/* Interested Friends First */}
+                  {interestedFriends.length > 0 && (
+                    <div>
+                      <h5 className="text-sm font-medium text-[var(--signal-going)] mb-2">
+                        Already Interested
+                      </h5>
+                      <div className="space-y-2">
+                        {interestedFriends.map((friend) => (
+                          friend.hasSquad ? (
+                            <FriendSquadCard
+                              key={friend.id}
+                              friend={friend}
+                              onJoinSquad={handleJoinSquad}
+                              isJoining={joiningSquad === friend.squadId}
+                            />
+                          ) : (
+                            <FriendCheckbox
+                              key={friend.id}
+                              friend={friend}
+                              isSelected={selectedFriends.has(friend.id)}
+                              onToggle={() => handleFriendToggle(friend.id)}
+                            />
+                          )
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Other Friends */}
+                  {otherFriends.length > 0 && (
+                    <div>
+                      {interestedFriends.length > 0 && (
+                        <h5 className="text-sm font-medium text-[var(--text-secondary)] mb-2 mt-4">
+                          Other Friends
+                        </h5>
+                      )}
+                      <div className="space-y-2">
+                        {otherFriends.map((friend) => (
+                          friend.hasSquad ? (
+                            <FriendSquadCard
+                              key={friend.id}
+                              friend={friend}
+                              onJoinSquad={handleJoinSquad}
+                              isJoining={joiningSquad === friend.squadId}
+                            />
+                          ) : (
+                            <FriendCheckbox
+                              key={friend.id}
+                              friend={friend}
+                              isSelected={selectedFriends.has(friend.id)}
+                              onToggle={() => handleFriendToggle(friend.id)}
+                            />
+                          )
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+          </>
+        )}
+      </DialogBody>
+
+      {/* Action Buttons */}
+      {!loading && !error && (
+        <DialogFooter>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onClose}
+            disabled={creating}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={handleCreateSquad}
+            disabled={creating}
+            loading={creating}
+            className="flex-1"
+          >
+            {creating ? 'Creating...' : `Start Plan${selectedFriends.size > 0 ? ` (${selectedFriends.size + 1})` : ''}`}
+          </Button>
+        </DialogFooter>
+      )}
     </Dialog>
   );
 }
@@ -347,10 +341,10 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
     if (!friend.status) return null;
 
     const statusConfig = {
-      INTERESTED: { emoji: '★', color: 'bg-amber-100 text-amber-700' },
-      GOING: { emoji: '✓', color: 'bg-green-100 text-green-700' },
-      NEED_TICKETS: { emoji: '🔍', color: 'bg-amber-50 text-amber-600' },
-      HAVE_TICKETS: { emoji: '🎫', color: 'bg-green-100 text-green-700' },
+      INTERESTED: { label: '★', color: 'bg-[var(--signal-interested)]/10 text-[var(--signal-interested)]' },
+      GOING: { label: '✓', color: 'bg-[var(--signal-going)]/10 text-[var(--signal-going)]' },
+      NEED_TICKETS: { label: '?', color: 'bg-[var(--signal-interested)]/10 text-[var(--signal-interested)]' },
+      HAVE_TICKETS: { label: '✓', color: 'bg-[var(--signal-going)]/10 text-[var(--signal-going)]' },
     };
 
     const config = statusConfig[friend.status as keyof typeof statusConfig];
@@ -358,16 +352,16 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
 
     return (
       <span className={`text-xs px-1.5 py-0.5 rounded ${config.color}`}>
-        {config.emoji}
+        {config.label}
       </span>
     );
   };
 
   return (
     <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
-      isSelected 
-        ? 'bg-[var(--brand-primary-light)] border-[var(--brand-primary)] ring-2 ring-[var(--brand-primary)]/20' 
-        : 'border-gray-200 hover:border-[var(--brand-primary)]/30 hover:bg-gray-50'
+      isSelected
+        ? 'bg-[var(--action-primary)]/10 border-[var(--action-primary)] ring-2 ring-[var(--action-primary)]/20'
+        : 'border-[var(--border-default)] hover:border-[var(--action-primary)]/30 hover:bg-[var(--surface-inset)]'
     }`}>
       {/* Custom Checkbox */}
       <div className="relative flex-shrink-0">
@@ -378,9 +372,9 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
           className="sr-only"
         />
         <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-          isSelected 
-            ? 'bg-[var(--brand-primary)] border-[var(--brand-primary)]' 
-            : 'bg-white border-gray-300'
+          isSelected
+            ? 'bg-[var(--action-primary)] border-[var(--action-primary)]'
+            : 'bg-[var(--surface-card)] border-[var(--border-default)]'
         }`}>
           {isSelected && (
             <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -389,16 +383,16 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
           )}
         </div>
       </div>
-      
+
       <div className="flex items-center gap-2 flex-1 min-w-0">
-        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600 flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-[var(--surface-inset)] flex items-center justify-center text-xs font-medium text-[var(--text-muted)] flex-shrink-0">
           {friend.displayName.charAt(0).toUpperCase()}
         </div>
-        
-        <span className="text-sm font-medium text-gray-900 flex-1 truncate">
+
+        <span className="text-sm font-medium text-[var(--text-primary)] flex-1 truncate">
           {friend.displayName}
         </span>
-        
+
         {getStatusBadge()}
       </div>
     </label>
@@ -410,10 +404,10 @@ function FriendSquadCard({ friend, onJoinSquad, isJoining }: FriendSquadCardProp
     if (!friend.status) return null;
 
     const statusConfig = {
-      INTERESTED: { emoji: '★', color: 'bg-amber-100 text-amber-700' },
-      GOING: { emoji: '✓', color: 'bg-green-100 text-green-700' },
-      NEED_TICKETS: { emoji: '🔍', color: 'bg-amber-50 text-amber-600' },
-      HAVE_TICKETS: { emoji: '🎫', color: 'bg-green-100 text-green-700' },
+      INTERESTED: { label: '★', color: 'bg-[var(--signal-interested)]/10 text-[var(--signal-interested)]' },
+      GOING: { label: '✓', color: 'bg-[var(--signal-going)]/10 text-[var(--signal-going)]' },
+      NEED_TICKETS: { label: '?', color: 'bg-[var(--signal-interested)]/10 text-[var(--signal-interested)]' },
+      HAVE_TICKETS: { label: '✓', color: 'bg-[var(--signal-going)]/10 text-[var(--signal-going)]' },
     };
 
     const config = statusConfig[friend.status as keyof typeof statusConfig];
@@ -421,31 +415,31 @@ function FriendSquadCard({ friend, onJoinSquad, isJoining }: FriendSquadCardProp
 
     return (
       <span className={`text-xs px-1.5 py-0.5 rounded ${config.color}`}>
-        {config.emoji}
+        {config.label}
       </span>
     );
   };
 
   return (
-    <div className="flex items-center gap-3 p-2 rounded-lg bg-[var(--brand-primary-light)] border border-green-200">
+    <div className="flex items-center gap-3 p-2 rounded-lg bg-[var(--signal-going)]/10 border border-[var(--signal-going)]/20">
       <div className="flex items-center gap-2 flex-1">
-        <div className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600">
+        <div className="w-6 h-6 rounded-full bg-[var(--surface-inset)] flex items-center justify-center text-xs font-medium text-[var(--text-muted)]">
           {friend.displayName.charAt(0).toUpperCase()}
         </div>
-        
+
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-900">
+            <span className="text-sm text-[var(--text-primary)]">
               {friend.displayName}
             </span>
             {getStatusBadge()}
           </div>
-          <div className="text-xs text-gray-600 mt-0.5">
+          <div className="text-xs text-[var(--text-muted)] mt-0.5">
             In a plan with {friend.squadMemberNames}
           </div>
         </div>
       </div>
-      
+
       <Button
         variant="primary"
         size="xs"

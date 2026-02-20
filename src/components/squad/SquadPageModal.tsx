@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogBody } from '@/components/ui/dialog';
 import { PlanModeView } from './PlanModeView';
 import { DayOfModeView } from './DayOfModeView';
 import { SquadInviteModal } from './SquadInviteModal';
@@ -95,7 +95,7 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
 
       try {
         const response = await fetch(`/api/squads/${squadId}`);
-        
+
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.error || 'Failed to load plan');
@@ -130,7 +130,7 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
 
   const handleStatusUpdate = async (updates: { status?: 'THINKING' | 'IN' | 'OUT' }) => {
     if (!squad) return;
-    
+
     try {
       const response = await fetch(`/api/squads/${squad.id}/status`, {
         method: 'PUT',
@@ -151,7 +151,7 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
 
   const handleLeaveSquad = async () => {
     if (!squad) return;
-    
+
     const confirmed = window.confirm('Are you sure you want to leave this plan?');
     if (!confirmed) return;
 
@@ -177,12 +177,12 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
 
   const handleSharePlan = async () => {
     if (!squad || !currentUserId) return;
-    
+
     setCopying('plan');
     try {
       const shareText = generateSharePlanText(squad, currentUserId);
       const shareUrl = `${window.location.origin}/squads/${squad.id}`;
-      
+
       // Try native share first (mobile)
       if (navigator.share) {
         try {
@@ -200,7 +200,7 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
           }
         }
       }
-      
+
       await navigator.clipboard.writeText(shareText);
       setTimeout(() => setCopying(null), 1000);
     } catch (err) {
@@ -211,11 +211,11 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
 
   const handleShareDayOf = async () => {
     if (!squad) return;
-    
+
     setCopying('dayof');
     try {
       const shareText = generateDayOfText(squad);
-      
+
       // Try native share first (mobile)
       if (navigator.share) {
         try {
@@ -232,7 +232,7 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
           }
         }
       }
-      
+
       await navigator.clipboard.writeText(shareText);
       setTimeout(() => setCopying(null), 1000);
     } catch (err) {
@@ -248,94 +248,95 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
   const isOrganizer = squad?.members.find(m => m.userId === currentUserId)?.isOrganizer || false;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto p-0">
-        {loading && (
+    <Dialog open={isOpen} onOpenChange={onClose} size="lg">
+      {loading && (
+        <DialogBody>
           <div className="py-12 text-center">
-            <div className="animate-pulse text-gray-500">Loading...</div>
+            <div className="animate-pulse text-[var(--text-muted)]">Loading...</div>
           </div>
-        )}
+        </DialogBody>
+      )}
 
-        {error && (
-          <div className="p-4 m-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+      {error && (
+        <DialogBody>
+          <div className="p-4 bg-[var(--signal-danger)]/10 border border-[var(--signal-danger)]/20 rounded-lg text-[var(--signal-danger)] text-sm">
             {error}
           </div>
-        )}
+        </DialogBody>
+      )}
 
-        {squad && currentUserId && (
-          <div className="p-4">
-            {/* Mode Toggle - Apple-style full-width */}
-            <div className="mb-4 bg-gray-100 rounded-full p-0.5">
-              <div className="relative flex">
-                <button
-                  onClick={() => setMode('plan')}
-                  className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full transition-all relative z-10 ${
-                    mode === 'plan'
-                      ? 'text-gray-900'
-                      : 'text-gray-500'
-                  }`}
-                >
-                  Plan
-                </button>
-                <button
-                  onClick={() => setMode('dayof')}
-                  className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full transition-all relative z-10 ${
-                    mode === 'dayof'
-                      ? 'text-gray-900'
-                      : 'text-gray-500'
-                  }`}
-                >
-                  Day-of
-                </button>
-                {/* Sliding background */}
-                <div
-                  className={`absolute top-0.5 bottom-0.5 w-1/2 bg-white rounded-full shadow-sm transition-transform duration-200 ${
-                    mode === 'dayof' ? 'translate-x-full' : 'translate-x-0'
-                  }`}
-                  style={{ left: '2px', right: '2px', width: 'calc(50% - 2px)' }}
-                />
-              </div>
+      {squad && currentUserId && (
+        <DialogBody>
+          {/* Mode Toggle - Apple-style full-width */}
+          <div className="mb-4 bg-[var(--surface-inset)] rounded-full p-0.5">
+            <div className="relative flex">
+              <button
+                onClick={() => setMode('plan')}
+                className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full transition-all relative z-10 ${
+                  mode === 'plan'
+                    ? 'text-[var(--text-primary)]'
+                    : 'text-[var(--text-muted)]'
+                }`}
+              >
+                Plan
+              </button>
+              <button
+                onClick={() => setMode('dayof')}
+                className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full transition-all relative z-10 ${
+                  mode === 'dayof'
+                    ? 'text-[var(--text-primary)]'
+                    : 'text-[var(--text-muted)]'
+                }`}
+              >
+                Day-of
+              </button>
+              {/* Sliding background */}
+              <div
+                className={`absolute top-0.5 bottom-0.5 w-1/2 bg-[var(--surface-card)] rounded-full shadow-sm transition-transform duration-200 ${
+                  mode === 'dayof' ? 'translate-x-full' : 'translate-x-0'
+                }`}
+                style={{ left: '2px', right: '2px', width: 'calc(50% - 2px)' }}
+              />
             </div>
-
-            {/* Content based on mode */}
-            {mode === 'plan' ? (
-              <PlanModeView
-                squad={squad}
-                currentUserId={currentUserId}
-                isOrganizer={isOrganizer}
-                onStatusUpdate={handleStatusUpdate}
-                onSquadRefresh={refreshSquad}
-                onSharePlan={handleSharePlan}
-                onShareDayOf={handleShareDayOf}
-                onInvite={handleInvite}
-                onLeaveSquad={handleLeaveSquad}
-                copying={copying}
-              />
-            ) : (
-              <DayOfModeView
-                squad={squad}
-                currentUserId={currentUserId}
-                onSquadRefresh={refreshSquad}
-                enrichment={null}  // Modal doesn't fetch enrichment, KBYG shows on full page
-              />
-            )}
           </div>
-        )}
 
-        {/* Invite Modal */}
-        {showInviteModal && squad && (
-          <SquadInviteModal
-            squad={squad}
-            isOpen={showInviteModal}
-            onClose={() => setShowInviteModal(false)}
-            onMemberAdded={async () => {
-              setShowInviteModal(false);
-              await refreshSquad();
-            }}
-          />
-        )}
-      </DialogContent>
+          {/* Content based on mode */}
+          {mode === 'plan' ? (
+            <PlanModeView
+              squad={squad}
+              currentUserId={currentUserId}
+              isOrganizer={isOrganizer}
+              onStatusUpdate={handleStatusUpdate}
+              onSquadRefresh={refreshSquad}
+              onSharePlan={handleSharePlan}
+              onShareDayOf={handleShareDayOf}
+              onInvite={handleInvite}
+              onLeaveSquad={handleLeaveSquad}
+              copying={copying}
+            />
+          ) : (
+            <DayOfModeView
+              squad={squad}
+              currentUserId={currentUserId}
+              onSquadRefresh={refreshSquad}
+              enrichment={null}  // Modal doesn't fetch enrichment, KBYG shows on full page
+            />
+          )}
+        </DialogBody>
+      )}
+
+      {/* Invite Modal */}
+      {showInviteModal && squad && (
+        <SquadInviteModal
+          squad={squad}
+          isOpen={showInviteModal}
+          onClose={() => setShowInviteModal(false)}
+          onMemberAdded={async () => {
+            setShowInviteModal(false);
+            await refreshSquad();
+          }}
+        />
+      )}
     </Dialog>
   );
 }
-

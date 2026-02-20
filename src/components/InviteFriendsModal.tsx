@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getAvatarStyle, getInitials, getDisplayName } from '@/lib/avatar';
+import { Dialog, DialogHeader, DialogTitle, DialogBody, DialogFooter } from '@/components/ui/dialog';
 
 type User = {
   id: string;
@@ -63,82 +64,71 @@ export function InviteFriendsModal({ communityId, communityName, onClose }: Invi
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[80vh] flex flex-col">
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">Invite to {communityName}</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
-            >
-              ×
-            </button>
+    <Dialog open={true} onOpenChange={() => onClose()} size="md">
+      <DialogHeader onClose={onClose}>
+        <DialogTitle>Invite to {communityName}</DialogTitle>
+        <p className="text-sm text-[var(--text-muted)] mt-1">
+          Only friends can be invited (spam prevention)
+        </p>
+      </DialogHeader>
+
+      <DialogBody>
+        {loading ? (
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--action-primary)] mx-auto"></div>
           </div>
-          <p className="text-sm text-gray-500 mt-1">
-            Only friends can be invited (spam prevention)
-          </p>
-        </div>
-
-        <div className="flex-1 overflow-auto p-6">
-          {loading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--brand-primary)] mx-auto"></div>
-            </div>
-          ) : friends.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <p>No friends to invite</p>
-              <p className="text-sm text-gray-400 mt-1">
-                All your friends are already members or invited
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {friends.map((friend) => (
+        ) : friends.length === 0 ? (
+          <div className="text-center py-8 text-[var(--text-muted)]">
+            <p>No friends to invite</p>
+            <p className="text-sm mt-1">
+              All your friends are already members or invited
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {friends.map((friend) => (
+              <div
+                key={friend.id}
+                className="flex items-center gap-3 p-3 bg-[var(--surface-inset)] rounded-lg"
+              >
                 <div
-                  key={friend.id}
-                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm"
+                  style={getAvatarStyle(friend.id)}
+                  title={getDisplayName(friend.displayName, friend.email)}
                 >
-                  <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm"
-                    style={getAvatarStyle(friend.id)}
-                    title={getDisplayName(friend.displayName, friend.email)}
-                  >
-                    {getInitials(friend.displayName, friend.email)}
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900">
-                      {getDisplayName(friend.displayName, friend.email)}
-                    </p>
-                    <p className="text-xs text-gray-500">{friend.email}</p>
-                  </div>
-                  {invited.has(friend.id) ? (
-                    <span className="text-sm text-green-600 font-medium">✓ Invited</span>
-                  ) : (
-                    <button
-                      onClick={() => handleInvite(friend.id)}
-                      disabled={inviting.has(friend.id)}
-                      className="btn-primary px-3 py-1.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
-                    >
-                      {inviting.has(friend.id) ? '...' : 'Invite'}
-                    </button>
-                  )}
+                  {getInitials(friend.displayName, friend.email)}
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                <div className="flex-1">
+                  <p className="font-medium text-[var(--text-primary)]">
+                    {getDisplayName(friend.displayName, friend.email)}
+                  </p>
+                  <p className="text-xs text-[var(--text-muted)]">{friend.email}</p>
+                </div>
+                {invited.has(friend.id) ? (
+                  <span className="text-sm text-[var(--signal-going)] font-medium">✓ Invited</span>
+                ) : (
+                  <button
+                    onClick={() => handleInvite(friend.id)}
+                    disabled={inviting.has(friend.id)}
+                    className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors bg-[var(--action-primary)] text-[var(--action-primary-text)] hover:bg-[var(--action-primary-hover)] disabled:opacity-50"
+                  >
+                    {inviting.has(friend.id) ? '...' : 'Invite'}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </DialogBody>
 
-        <div className="p-6 border-t border-gray-100">
-          <button
-            onClick={onClose}
-            className="w-full px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            Done
-          </button>
-        </div>
-      </div>
-    </div>
+      <DialogFooter>
+        <button
+          onClick={onClose}
+          className="w-full px-4 py-2 text-sm font-medium text-[var(--text-secondary)] bg-[var(--surface-inset)] rounded-lg hover:bg-[var(--border-default)] transition-colors"
+        >
+          Done
+        </button>
+      </DialogFooter>
+    </Dialog>
   );
 }
-

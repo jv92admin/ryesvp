@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Dialog, DialogHeader, DialogTitle, DialogBody, DialogFooter } from '@/components/ui/dialog';
 
 type User = {
   id: string;
@@ -56,7 +57,7 @@ export function CreateListModal({ onClose, onCreate }: CreateListModalProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    
+
     setLoading(true);
     await onCreate(name.trim(), description.trim(), Array.from(selectedIds));
     setLoading(false);
@@ -70,16 +71,16 @@ export function CreateListModal({ onClose, onCreate }: CreateListModalProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[85vh] flex flex-col">
-        <div className="p-6 border-b border-gray-100">
-          <h2 className="text-xl font-bold text-gray-900">Create New List</h2>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
-          <div className="p-6 space-y-4 overflow-auto flex-1">
+    <Dialog open={true} onOpenChange={() => onClose()} size="md">
+      <form onSubmit={handleSubmit} className="flex flex-col max-h-[85vh]">
+        <DialogHeader onClose={onClose}>
+          <DialogTitle>Create New List</DialogTitle>
+        </DialogHeader>
+
+        <DialogBody>
+          <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="name" className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
                 List Name
               </label>
               <input
@@ -88,13 +89,13 @@ export function CreateListModal({ onClose, onCreate }: CreateListModalProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g., Concert Crew, Work Friends"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-[var(--border-default)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--border-strong)] focus:border-transparent"
                 autoFocus
               />
             </div>
-            
+
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="description" className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
                 Description (optional)
               </label>
               <input
@@ -103,41 +104,40 @@ export function CreateListModal({ onClose, onCreate }: CreateListModalProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What's this list for?"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-[var(--border-default)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--border-strong)] focus:border-transparent"
               />
             </div>
 
-            {/* Add Friends Section */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
                 Add Friends ({selectedIds.size} selected)
               </label>
-              
+
               {loadingFriends ? (
-                <div className="text-sm text-gray-500">Loading friends...</div>
+                <div className="text-sm text-[var(--text-muted)]">Loading friends...</div>
               ) : friends.length === 0 ? (
-                <div className="text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
+                <div className="text-sm text-[var(--text-muted)] bg-[var(--surface-inset)] p-3 rounded-lg">
                   No friends yet. You can add friends after creating the list.
                 </div>
               ) : (
-                <div className="space-y-2 max-h-48 overflow-auto border border-gray-200 rounded-lg p-2">
+                <div className="space-y-2 max-h-48 overflow-auto border border-[var(--border-default)] rounded-lg p-2">
                   {friends.map((f) => (
                     <label
                       key={f.friend.id}
                       className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${
-                        selectedIds.has(f.friend.id) ? 'bg-green-50 border border-green-200' : 'hover:bg-gray-50'
+                        selectedIds.has(f.friend.id) ? 'bg-[var(--surface-inset)] border border-[var(--border-strong)]' : 'hover:bg-[var(--surface-inset)]'
                       }`}
                     >
                       <input
                         type="checkbox"
                         checked={selectedIds.has(f.friend.id)}
                         onChange={() => toggleFriend(f.friend.id)}
-                        className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                        className="w-4 h-4 text-[var(--action-primary)] border-[var(--border-default)] rounded focus:ring-[var(--border-strong)]"
                       />
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center text-white text-xs font-medium">
+                      <div className="w-8 h-8 rounded-full bg-[var(--surface-inset)] flex items-center justify-center text-[var(--text-secondary)] text-xs font-medium">
                         {getInitials(f.friend)}
                       </div>
-                      <span className="text-sm text-gray-700">
+                      <span className="text-sm text-[var(--text-primary)]">
                         {f.friend.displayName || f.friend.email.split('@')[0]}
                       </span>
                     </label>
@@ -146,25 +146,25 @@ export function CreateListModal({ onClose, onCreate }: CreateListModalProps) {
               )}
             </div>
           </div>
-          
-          <div className="p-6 border-t border-gray-100 flex gap-3 justify-end">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={!name.trim() || loading}
-              className="btn-primary px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
-            >
-              {loading ? 'Creating...' : 'Create List'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </DialogBody>
+
+        <DialogFooter className="justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-inset)] rounded-lg transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={!name.trim() || loading}
+            className="px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-[var(--action-primary)] text-[var(--action-primary-text)] hover:bg-[var(--action-primary-hover)] disabled:opacity-50"
+          >
+            {loading ? 'Creating...' : 'Create List'}
+          </button>
+        </DialogFooter>
+      </form>
+    </Dialog>
   );
 }

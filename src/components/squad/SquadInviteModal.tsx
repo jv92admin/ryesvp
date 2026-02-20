@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogHeader, DialogTitle, DialogBody, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui';
 import { useToast } from '@/contexts/ToastContext';
 
@@ -57,11 +57,11 @@ export function SquadInviteModal({ squad, isOpen, onClose, onMemberAdded }: Squa
         }
 
         const data = await response.json();
-        
+
         // Filter out friends who are already in the squad
         const existingMemberIds = new Set(squad.members.map(m => m.userId));
         const availableFriends = data.friends.filter((f: Friend) => !existingMemberIds.has(f.id));
-        
+
         setFriends(availableFriends);
       } catch (err) {
         console.error('Error fetching friends:', err);
@@ -116,9 +116,9 @@ export function SquadInviteModal({ squad, isOpen, onClose, onMemberAdded }: Squa
         .map(f => f.displayName)
         .slice(0, 2)
         .join(' and ');
-      
+
       showToast({
-        message: friendCount === 1 
+        message: friendCount === 1
           ? `${friendNames} has been added to your plan and notified.`
           : friendCount === 2
           ? `${friendNames} have been added to your plan and notified.`
@@ -145,109 +145,104 @@ export function SquadInviteModal({ squad, isOpen, onClose, onMemberAdded }: Squa
   const otherFriends = friends.filter(f => !f.isInterested);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm sm:max-w-md max-h-[90vh] overflow-y-auto p-0">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Invite friends to your plan</DialogTitle>
-          </DialogHeader>
-        </div>
+    <Dialog open={isOpen} onOpenChange={onClose} size="md">
+      <DialogHeader onClose={onClose}>
+        <DialogTitle>Invite Friends to Your Plan</DialogTitle>
+      </DialogHeader>
 
-        <div className="px-6 py-4 space-y-4">
-          {loading && (
-            <div className="text-center py-6 text-gray-500">
-              <div className="animate-pulse">Loading friends...</div>
-            </div>
-          )}
+      <DialogBody className="space-y-4">
+        {loading && (
+          <div className="text-center py-6 text-[var(--text-muted)]">
+            <div className="animate-pulse">Loading friends...</div>
+          </div>
+        )}
 
-          {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-              {error}
-            </div>
-          )}
+        {error && (
+          <div className="p-3 bg-[var(--signal-danger)]/10 border border-[var(--signal-danger)]/20 rounded-lg text-[var(--signal-danger)] text-sm">
+            {error}
+          </div>
+        )}
 
-          {!loading && !error && (
-            <div>
-              <h4 className="font-medium text-gray-900 mb-3">
-                Select friends to invite ({selectedFriends.size} selected)
-              </h4>
+        {!loading && !error && (
+          <div>
+            <h4 className="font-medium text-[var(--text-primary)] mb-3">
+              Select friends to invite ({selectedFriends.size} selected)
+            </h4>
 
-              {friends.length === 0 ? (
-                <div className="text-center py-6 text-gray-500">
-                  <p className="text-sm">No more friends to invite!</p>
-                  <p className="text-xs mt-1">Everyone is already in the plan or not friends yet.</p>
-                </div>
-              ) : (
-                <div className="space-y-3 max-h-60 overflow-y-auto">
-                  {/* Interested Friends First */}
-                  {interestedFriends.length > 0 && (
-                    <div>
-                      <h5 className="text-sm font-medium text-green-700 mb-2">
-                        Already Interested
+            {friends.length === 0 ? (
+              <div className="text-center py-6 text-[var(--text-muted)]">
+                <p className="text-sm">No more friends to invite!</p>
+                <p className="text-xs mt-1">Everyone is already in the plan or not friends yet.</p>
+              </div>
+            ) : (
+              <div className="space-y-3 max-h-60 overflow-y-auto">
+                {/* Interested Friends First */}
+                {interestedFriends.length > 0 && (
+                  <div>
+                    <h5 className="text-sm font-medium text-[var(--signal-going)] mb-2">
+                      Already Interested
+                    </h5>
+                    <div className="space-y-2">
+                      {interestedFriends.map((friend) => (
+                        <FriendCheckbox
+                          key={friend.id}
+                          friend={friend}
+                          isSelected={selectedFriends.has(friend.id)}
+                          onToggle={() => handleFriendToggle(friend.id)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Other Friends */}
+                {otherFriends.length > 0 && (
+                  <div>
+                    {interestedFriends.length > 0 && (
+                      <h5 className="text-sm font-medium text-[var(--text-secondary)] mb-2 mt-4">
+                        Other Friends
                       </h5>
-                      <div className="space-y-2">
-                        {interestedFriends.map((friend) => (
-                          <FriendCheckbox
-                            key={friend.id}
-                            friend={friend}
-                            isSelected={selectedFriends.has(friend.id)}
-                            onToggle={() => handleFriendToggle(friend.id)}
-                          />
-                        ))}
-                      </div>
+                    )}
+                    <div className="space-y-2">
+                      {otherFriends.map((friend) => (
+                        <FriendCheckbox
+                          key={friend.id}
+                          friend={friend}
+                          isSelected={selectedFriends.has(friend.id)}
+                          onToggle={() => handleFriendToggle(friend.id)}
+                        />
+                      ))}
                     </div>
-                  )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </DialogBody>
 
-                  {/* Other Friends */}
-                  {otherFriends.length > 0 && (
-                    <div>
-                      {interestedFriends.length > 0 && (
-                        <h5 className="text-sm font-medium text-gray-700 mb-2 mt-4">
-                          Other Friends
-                        </h5>
-                      )}
-                      <div className="space-y-2">
-                        {otherFriends.map((friend) => (
-                          <FriendCheckbox
-                            key={friend.id}
-                            friend={friend}
-                            isSelected={selectedFriends.has(friend.id)}
-                            onToggle={() => handleFriendToggle(friend.id)}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-        </div>
-
-        {/* Action Buttons */}
-        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={onClose}
-            disabled={inviting}
-            className="flex-1"
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={handleInvite}
-            disabled={inviting || selectedFriends.size === 0}
-            loading={inviting}
-            className="flex-1"
-          >
-            {inviting ? 'Inviting...' : `Invite${selectedFriends.size > 0 ? ` (${selectedFriends.size})` : ''}`}
-          </Button>
-        </div>
-      </DialogContent>
+      {/* Action Buttons */}
+      <DialogFooter>
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={onClose}
+          disabled={inviting}
+          className="flex-1"
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="primary"
+          size="sm"
+          onClick={handleInvite}
+          disabled={inviting || selectedFriends.size === 0}
+          loading={inviting}
+          className="flex-1"
+        >
+          {inviting ? 'Inviting...' : `Invite${selectedFriends.size > 0 ? ` (${selectedFriends.size})` : ''}`}
+        </Button>
+      </DialogFooter>
     </Dialog>
   );
 }
@@ -263,10 +258,10 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
     if (!friend.status) return null;
 
     const statusConfig = {
-      INTERESTED: { emoji: '★', color: 'bg-amber-100 text-amber-700' },
-      GOING: { emoji: '✓', color: 'bg-green-100 text-green-700' },
-      NEED_TICKETS: { emoji: '🔍', color: 'bg-amber-50 text-amber-600' },
-      HAVE_TICKETS: { emoji: '🎫', color: 'bg-green-100 text-green-700' },
+      INTERESTED: { label: '★', color: 'bg-[var(--signal-interested)]/10 text-[var(--signal-interested)]' },
+      GOING: { label: '✓', color: 'bg-[var(--signal-going)]/10 text-[var(--signal-going)]' },
+      NEED_TICKETS: { label: '?', color: 'bg-[var(--signal-interested)]/10 text-[var(--signal-interested)]' },
+      HAVE_TICKETS: { label: '✓', color: 'bg-[var(--signal-going)]/10 text-[var(--signal-going)]' },
     };
 
     const config = statusConfig[friend.status as keyof typeof statusConfig];
@@ -274,16 +269,16 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
 
     return (
       <span className={`text-xs px-1.5 py-0.5 rounded ${config.color}`}>
-        {config.emoji}
+        {config.label}
       </span>
     );
   };
 
   return (
     <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
-      isSelected 
-        ? 'bg-[var(--brand-primary-light)] border-[var(--brand-primary)] ring-2 ring-[var(--brand-primary)]/20' 
-        : 'border-gray-200 hover:border-[var(--brand-primary)]/30 hover:bg-gray-50'
+      isSelected
+        ? 'bg-[var(--action-primary)]/10 border-[var(--action-primary)] ring-2 ring-[var(--action-primary)]/20'
+        : 'border-[var(--border-default)] hover:border-[var(--action-primary)]/30 hover:bg-[var(--surface-inset)]'
     }`}>
       {/* Custom Checkbox */}
       <div className="relative flex-shrink-0">
@@ -294,9 +289,9 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
           className="sr-only"
         />
         <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-          isSelected 
-            ? 'bg-[var(--brand-primary)] border-[var(--brand-primary)]' 
-            : 'bg-white border-gray-300'
+          isSelected
+            ? 'bg-[var(--action-primary)] border-[var(--action-primary)]'
+            : 'bg-[var(--surface-card)] border-[var(--border-default)]'
         }`}>
           {isSelected && (
             <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -305,16 +300,16 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
           )}
         </div>
       </div>
-      
+
       <div className="flex items-center gap-2 flex-1 min-w-0">
-        <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600 flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-[var(--surface-inset)] flex items-center justify-center text-xs font-medium text-[var(--text-muted)] flex-shrink-0">
           {friend.displayName.charAt(0).toUpperCase()}
         </div>
-        
-        <span className="text-sm font-medium text-gray-900 flex-1 truncate">
+
+        <span className="text-sm font-medium text-[var(--text-primary)] flex-1 truncate">
           {friend.displayName}
         </span>
-        
+
         {getStatusBadge()}
       </div>
     </label>
