@@ -46,15 +46,12 @@ export function AttendanceButtons({ eventId, initialStatus, isLoggedIn }: Attend
   };
 
   if (!isLoggedIn) {
+    const disabled = 'px-3 py-2.5 rounded-lg border border-[var(--border-default)] text-[var(--text-muted)] cursor-not-allowed text-sm font-medium';
     return (
       <div>
         <div className="grid grid-cols-2 gap-2">
-          <button disabled className="px-3 py-2.5 border border-[var(--border-default)] rounded-lg text-[var(--text-muted)] cursor-not-allowed text-sm font-medium">
-            Interested
-          </button>
-          <button disabled className="px-3 py-2.5 border border-[var(--border-default)] rounded-lg text-[var(--text-muted)] cursor-not-allowed text-sm font-medium">
-            Going
-          </button>
+          <button disabled className={disabled}>Interested</button>
+          <button disabled className={disabled}>Going</button>
         </div>
         <p className="text-xs text-[var(--text-muted)] text-center mt-2">
           <Link href="/login" className="text-[var(--action-engage)] hover:underline">Sign in</Link> to mark your status
@@ -63,34 +60,29 @@ export function AttendanceButtons({ eventId, initialStatus, isLoggedIn }: Attend
     );
   }
 
+  const base = 'px-3 py-2.5 rounded-lg font-medium transition-colors text-sm border disabled:opacity-50 disabled:cursor-not-allowed';
+  const inactive = 'bg-[var(--surface-card)] border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-[var(--surface-inset)] hover:border-[var(--border-strong)]';
+
   return (
     <>
       <div className="grid grid-cols-2 gap-2">
         <button
           onClick={() => handleChange('INTERESTED')}
           disabled={isLoading}
-          className={`
-            px-3 py-2.5 rounded-lg font-medium transition-colors text-sm
-            ${status === 'INTERESTED'
-              ? 'bg-amber-500 text-white hover:bg-amber-600'
-              : 'bg-[var(--surface-card)] border border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-[var(--surface-inset)]'
-            }
-            disabled:opacity-50 disabled:cursor-not-allowed
-          `}
+          className={`${base} ${status === 'INTERESTED'
+            ? 'bg-[var(--signal-interested-light)] text-[var(--signal-interested)] border-[var(--signal-interested)]'
+            : inactive
+          }`}
         >
           Interested
         </button>
         <button
           onClick={() => handleChange('GOING')}
           disabled={isLoading}
-          className={`
-            px-3 py-2.5 rounded-lg font-medium transition-colors text-sm
-            ${status === 'GOING'
-              ? 'bg-[var(--signal-going)] text-white'
-              : 'bg-[var(--surface-card)] border border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-[var(--surface-inset)]'
-            }
-            disabled:opacity-50 disabled:cursor-not-allowed
-          `}
+          className={`${base} ${status === 'GOING'
+            ? 'bg-[var(--signal-going-light)] text-[var(--signal-going)] border-[var(--signal-going)]'
+            : inactive
+          }`}
         >
           Going
         </button>

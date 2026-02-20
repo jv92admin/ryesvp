@@ -121,47 +121,38 @@ export function SocialProofCard({
             friendsInterested={friendsInterested}
             event={event}
             alwaysShow={true}
-            className="justify-center py-2 text-sm rounded-lg"
           />
         )}
 
         {/* Ticket exchange */}
         {isLoggedIn && (
-          <>
-            <div className="border-t border-[var(--border-default)] pt-3">
-              <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-2">Ticket Exchange</p>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  onClick={() => handleTicketChange('NEED_TICKETS')}
-                  disabled={isLoading}
-                  className={`
-                    px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                    ${ticketStatus === 'NEED_TICKETS'
-                      ? 'bg-amber-100 text-amber-700 border border-amber-200'
-                      : 'bg-[var(--surface-card)] text-[var(--text-muted)] border border-[var(--border-default)] hover:border-[var(--border-strong)] hover:text-[var(--text-secondary)]'
-                    }
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                  `}
-                >
-                  Need Tickets
-                </button>
-                <button
-                  onClick={() => handleTicketChange('HAVE_TICKETS')}
-                  disabled={isLoading}
-                  className={`
-                    px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                    ${ticketStatus === 'HAVE_TICKETS'
-                      ? 'bg-green-100 text-green-700 border border-green-200'
-                      : 'bg-[var(--surface-card)] text-[var(--text-muted)] border border-[var(--border-default)] hover:border-[var(--border-strong)] hover:text-[var(--text-secondary)]'
-                    }
-                    disabled:opacity-50 disabled:cursor-not-allowed
-                  `}
-                >
-                  Selling Tickets
-                </button>
-              </div>
+          <div className="border-t border-[var(--border-default)] pt-3">
+            <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-2">Ticket Exchange</p>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => handleTicketChange('NEED_TICKETS')}
+                disabled={isLoading}
+                className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border disabled:opacity-50 disabled:cursor-not-allowed ${
+                  ticketStatus === 'NEED_TICKETS'
+                    ? 'bg-[var(--signal-interested-light)] text-[var(--signal-interested)] border-[var(--signal-interested)]'
+                    : 'bg-[var(--surface-card)] text-[var(--text-secondary)] border-[var(--border-default)] hover:border-[var(--border-strong)] hover:bg-[var(--surface-inset)]'
+                }`}
+              >
+                Need Tickets
+              </button>
+              <button
+                onClick={() => handleTicketChange('HAVE_TICKETS')}
+                disabled={isLoading}
+                className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border disabled:opacity-50 disabled:cursor-not-allowed ${
+                  ticketStatus === 'HAVE_TICKETS'
+                    ? 'bg-[var(--action-engage-light)] text-[var(--action-engage)] border-[var(--action-engage)]'
+                    : 'bg-[var(--surface-card)] text-[var(--text-secondary)] border-[var(--border-default)] hover:border-[var(--border-strong)] hover:bg-[var(--surface-inset)]'
+                }`}
+              >
+                Selling Tickets
+              </button>
             </div>
-          </>
+          </div>
         )}
       </div>
 

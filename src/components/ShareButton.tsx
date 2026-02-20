@@ -8,9 +8,10 @@ interface ShareButtonProps {
   dateFormatted: string;
   eventUrl: string;
   isLoggedIn?: boolean;
+  className?: string;
 }
 
-export function ShareButton({ title, venueName, dateFormatted, eventUrl, isLoggedIn }: ShareButtonProps) {
+export function ShareButton({ title, venueName, dateFormatted, eventUrl, isLoggedIn, className }: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
   const [inviteCode, setInviteCode] = useState<string | null>(null);
 
@@ -81,14 +82,16 @@ ${shareUrl}`;
     }
   };
 
+  const defaultStyle = `flex items-center justify-center gap-1.5 text-sm font-medium transition-colors ${
+    copied
+      ? 'text-[var(--signal-going)]'
+      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+  }`;
+
   return (
     <button
       onClick={handleShare}
-      className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${
-        copied 
-          ? 'text-green-600' 
-          : 'text-gray-600 hover:text-green-600'
-      }`}
+      className={className || defaultStyle}
     >
       {copied ? (
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

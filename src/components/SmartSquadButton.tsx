@@ -102,15 +102,19 @@ export function SmartSquadButton({
     venue: { name: 'Venue' }
   };
 
+  const styles = variant === 'compact'
+    ? 'min-w-[5.5rem] px-2.5 py-1.5 text-xs font-semibold rounded-md'
+    : 'w-full px-3 py-2.5 text-sm font-medium rounded-lg';
+
   return (
     <>
       <button
         onClick={handleClick}
         className={`
-          min-w-[5.5rem] px-2.5 py-1 text-xs font-semibold rounded-md
-          text-[var(--action-engage)] bg-white
-          border-2 border-amber-700/30
-          hover:bg-[var(--action-engage-light)] hover:border-[var(--action-engage)]
+          ${styles}
+          text-[var(--action-engage-text)] bg-[var(--action-engage)]
+          border border-[var(--action-engage)]
+          hover:bg-[var(--action-engage-hover)]
           transition-colors
           ${className}
         `}
