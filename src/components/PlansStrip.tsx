@@ -71,9 +71,6 @@ export function PlansStrip() {
                 {friendCount > 0 && `${friendCount} friend${friendCount !== 1 ? 's' : ''} · `}
                 {event.venue.name}
               </p>
-              <p className="text-xs font-medium text-[var(--action-engage)] mt-1.5">
-                View Plan →
-              </p>
             </Link>
           );
         })}

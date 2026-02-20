@@ -69,6 +69,19 @@ INC 7    Groups Surfacing           ← group labels, group filter, group activi
 
 Each increment is independently shippable. Later increments benefit from earlier ones but don't hard-block (except Inc 0, which everything depends on).
 
+### Known Color Debt (post Inc 4)
+
+The monochrome-first principle is working for layout/structure but several color sources still create visual noise:
+
+| Source | Issue | Fix approach |
+|--------|-------|-------------|
+| **User avatars** | Random bright colors (green, blue, etc.) from `getAvatarStyle()` | Shift to muted/neutral palette (grays, warm tones) |
+| **Category text labels** | Purple, amber, pink, etc. — subtle but adds color scatter | Consider all-gray or reduce to 2-3 muted tones |
+| **Spotify badge** | Bright green (#1DB954) circle on every card with a link | Dim to grayscale, colorize on hover? |
+| **External brand colors** | YouTube red, Instagram gradient in ExploreCard | Same approach — muted default, color on hover |
+
+These aren't blockers but they prevent the page from feeling truly monochrome-first. Candidate for a dedicated "Color Discipline" pass after Inc 5-7 ship, or folded into a future polish increment.
+
 ---
 
 ## Increment 0: Design Foundation ✅ COMPLETE
