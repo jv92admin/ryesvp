@@ -34,7 +34,7 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 | **UX** | **UX Revamp: Lark Visual Identity (Inc 3)** | Warm gold CTAs, de-SaaS cards, monochrome badges, chip migration | ✅ Complete |
 | **UX** | **UX Revamp: Editorial Polish (Inc 3.5)** | Typography density, text-only badges, breathing room, action button polish | ✅ Complete |
 | **UX** | **UX Revamp: Social-First Home (Inc 4)** | Kill ViewToggle, PlansStrip, inline social on EventCard, Friends chip | ✅ Complete |
-| **UX** | **UX Revamp: Event Page Hierarchy (Inc 5)** | Zone-based layout, promote Buy, separate social proof | 🔲 |
+| **UX** | **UX Revamp: Event Page Hierarchy (Inc 5)** | 5-zone layout, Buy above fold, split FriendsAndStatusCard | ✅ Complete |
 | **UX** | **UX Revamp: Plan-on-Event-Page (Inc 6)** | Inline plan panel, kill navigate-away | 🔲 |
 | **UX** | **UX Revamp: Groups Surfacing (Inc 7)** | Group labels, group filter, group activity | 🔲 |
 | **C** | **User Testing** | Invite 20-30 users, collect feedback | 🔲 |
@@ -72,6 +72,7 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 | UX.3 | Lark Visual Identity | Warm gold CTAs, de-SaaS cards, monochrome badges, 15 files changed | ✅ Complete |
 | UX.3.5 | Editorial Polish | Text-only badges, editorial date headers, card breathing room, underline tabs | ✅ Complete |
 | UX.4 | Social-First Home | Kill ViewToggle, PlansStrip, Friends chip, delete 7 social components | ✅ Complete |
+| UX.5 | Event Page Zones | 5-zone layout, Buy above fold, AttendanceButtons + SocialProofCard | ✅ Complete |
 
 ---
 

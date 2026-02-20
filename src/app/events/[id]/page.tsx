@@ -3,8 +3,8 @@ import { getEventDisplay, getEventDetailedSocial } from '@/db/events';
 import { BackToEventsLink } from '@/components/BackToEventsLink';
 import { Header } from '@/components/Header';
 import { ShareButton } from '@/components/ShareButton';
-import { FriendsAndStatusCard } from '@/components/FriendsAndStatusCard';
-import { PrimaryCTACard } from '@/components/PrimaryCTACard';
+import { AttendanceButtons } from '@/components/AttendanceButtons';
+import { SocialProofCard } from '@/components/SocialProofCard';
 import { AboutCard } from '@/components/AboutCard';
 import { ExploreCard } from '@/components/ExploreCard';
 import { InviteBanner } from '@/components/InviteBanner';
@@ -28,76 +28,47 @@ interface EventPageProps {
 
 export default async function EventPage({ params }: EventPageProps) {
   const { id } = await params;
-  
-  // Use getEventDisplay for canonical event data with displayTitle computed
+
   const event = await getEventDisplay(id);
+  if (!event) notFound();
 
-  if (!event) {
-    notFound();
-  }
-
-  // displayTitle is already computed at data layer
   const { displayTitle, enrichment: basicEnrichment } = event;
 
-  // Get current user's attendance status (if logged in)
   const user = await getCurrentUser();
   const userEvent = user ? await getUserEventByEventId(user.dbUser.id, id) : null;
-  
-  // Get user's squad for this event (if logged in)
   const userSquad = user ? await getUserSquadForEvent(user.dbUser.id, id) : null;
-  
-  // Get attendance counts
   const attendance = await getEventAttendance(id);
-  
-  // Get social signals (friends/communities going) if logged in
   const socialSignals = user ? await getEventDetailedSocial(id, user.dbUser.id) : null;
-  
-  // Get FULL enrichment data for ExploreCard (Spotify, artist image, bio, etc.)
   const fullEnrichment = await getEventEnrichment(id);
-  
-  // Check if event is new
   const isNew = isNewListing(event.createdAt);
-  
-  // Get the current URL for sharing
+
   const headersList = await headers();
   const host = headersList.get('host') || 'localhost:3000';
   const protocol = host.includes('localhost') ? 'http' : 'https';
   const eventUrl = `${protocol}://${host}/events/${id}`;
-  
-  // Format date for share message
   const dateFormatted = formatInTimeZone(event.startDateTime, AUSTIN_TIMEZONE, 'EEEE, MMMM d \'at\' h:mm a');
+
+  const tmUrl = basicEnrichment?.tmUrl;
 
   return (
     <>
       <Header />
       <main className="min-h-screen bg-gray-50">
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        {/* Invite Banner - shows for non-logged in users with ?ref= */}
+      <div className="max-w-3xl mx-auto px-4 py-8">
         <InviteBanner isLoggedIn={!!user} />
-        
-        {/* Invite Redemption Handler - redeems invite after login */}
         {user && <InviteRedemptionHandler />}
 
-        {/* Back link and Share button */}
-        <div className="flex items-center justify-between mb-6">
+        {/* ═══ ZONE 1: IDENTITY ═══ */}
+
+        {/* Back link */}
+        <div className="mb-6">
           <BackToEventsLink />
-          <ShareButton 
-            title={displayTitle}
-            venueName={event.venue.name}
-            dateFormatted={dateFormatted}
-            eventUrl={eventUrl}
-            isLoggedIn={!!user}
-          />
         </div>
 
         {/* Hero Image */}
         {event.imageUrl ? (
           <div className="w-full h-48 sm:h-64 md:h-80 rounded-xl overflow-hidden mb-6">
-            <img 
-              src={event.imageUrl} 
-              alt={event.title}
-              className="w-full h-full object-cover"
-            />
+            <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" />
           </div>
         ) : (
           <div className="w-full h-48 sm:h-64 rounded-xl bg-gradient-to-br from-[var(--surface-inset)] to-[var(--border-default)] flex items-center justify-center mb-6">
@@ -105,8 +76,8 @@ export default async function EventPage({ params }: EventPageProps) {
           </div>
         )}
 
-        {/* Event header - tightened */}
-        <div className="bg-white rounded-lg border border-[var(--border-default)] p-4 sm:p-6 mb-6">
+        {/* Event metadata */}
+        <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
             {isNew && (
               <span className="px-2 py-0.5 text-xs font-semibold bg-[var(--action-primary)] text-[var(--action-primary-text)] rounded">
@@ -123,89 +94,110 @@ export default async function EventPage({ params }: EventPageProps) {
             )}
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mb-1">
             {displayTitle}
           </h1>
 
-          {/* Main Performer - clickable to open modal */}
           {event.performer && (
-            <div className="text-sm text-gray-600 mb-2">
+            <div className="text-sm text-[var(--text-secondary)] mb-2">
               by <PerformerLink performerId={event.performer.id} performerName={event.performer.name} />
             </div>
           )}
 
-          {/* Supporting Acts */}
           {fullEnrichment?.tmSupportingActs && fullEnrichment.tmSupportingActs.length > 0 && (
-            <p className="text-sm text-gray-500 mb-3">
+            <p className="text-sm text-[var(--text-muted)] mb-3">
               With: {fullEnrichment.tmSupportingActs.join(', ')}
             </p>
           )}
 
-          {/* Compact date + time on single line */}
-          <div className="text-sm sm:text-base text-gray-600 mb-2">
+          <div className="text-sm sm:text-base text-[var(--text-secondary)] mb-2">
             <span className="font-medium">
               {formatInTimeZone(event.startDateTime, AUSTIN_TIMEZONE, 'EEE, MMM d')}
-              {' • '}
+              {' · '}
               {formatInTimeZone(event.startDateTime, AUSTIN_TIMEZONE, 'h:mm a')}
-              {event.endDateTime && ` - ${formatInTimeZone(event.endDateTime, AUSTIN_TIMEZONE, 'h:mm a')}`}
+              {event.endDateTime && ` – ${formatInTimeZone(event.endDateTime, AUSTIN_TIMEZONE, 'h:mm a')}`}
             </span>
           </div>
 
-          {/* Compact venue with location pin and event website link */}
-          <div className="text-sm sm:text-base text-gray-600">
-            <div className="flex items-center gap-2 flex-wrap">
+          <div className="text-sm sm:text-base text-[var(--text-secondary)]">
+            <div className="flex items-center gap-2">
               <svg className="w-4 h-4 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
               </svg>
               <span className="font-medium">{event.venue.name}</span>
               {event.venue.city && event.venue.state && (
-                <span className="text-gray-500">, {event.venue.city}, {event.venue.state}</span>
-              )}
-              {event.url && (
-                <>
-                  <span className="text-gray-300">•</span>
-                  <a
-                    href={event.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[var(--signal-info)] hover:text-[var(--text-primary)] hover:underline text-sm"
-                  >
-                    Visit event website
-                  </a>
-                </>
+                <span className="text-[var(--text-muted)]">, {event.venue.city}, {event.venue.state}</span>
               )}
             </div>
           </div>
         </div>
 
-        {/* Friends & Status Card */}
-        <FriendsAndStatusCard
+        {/* ═══ ZONE 2: ACTIONS ═══ */}
+        <div className="space-y-3 mb-6">
+          <AttendanceButtons
+            eventId={id}
+            initialStatus={userEvent?.status || null}
+            isLoggedIn={!!user}
+          />
+
+          {tmUrl && (
+            <a
+              href={tmUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors bg-[var(--action-primary)] text-[var(--action-primary-text)] hover:bg-[var(--action-primary-hover)]"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+              </svg>
+              Buy Tickets
+            </a>
+          )}
+
+          <div className="flex items-center gap-4">
+            {event.url && (
+              <a
+                href={event.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:underline transition-colors"
+              >
+                Event Website
+              </a>
+            )}
+            <ShareButton
+              title={displayTitle}
+              venueName={event.venue.name}
+              dateFormatted={dateFormatted}
+              eventUrl={eventUrl}
+              isLoggedIn={!!user}
+            />
+          </div>
+        </div>
+
+        {/* ═══ ZONE 3: SOCIAL PROOF ═══ */}
+        <SocialProofCard
           eventId={id}
           socialSignals={socialSignals}
           attendance={attendance}
-          userEvent={userEvent}
           userSquad={userSquad}
           event={{
             id: event.id,
             title: displayTitle,
             startDateTime: typeof event.startDateTime === 'string' ? event.startDateTime : event.startDateTime.toISOString(),
-            venue: {
-              name: event.venue.name
-            }
+            venue: { name: event.venue.name }
           }}
           isLoggedIn={!!user}
+          initialTicketStatus={userEvent?.status || null}
         />
 
-        {/* Buy and Explore - side by side on desktop */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <PrimaryCTACard
-            tmUrl={basicEnrichment?.tmUrl}
-          />
+        {/* ═══ ZONE 4: EXPLORE ═══ */}
+        <div className="mb-6">
           <ExploreCard enrichment={fullEnrichment} />
         </div>
 
-        {/* About Card - last */}
+        {/* ═══ ZONE 5: ABOUT ═══ */}
         <AboutCard
           description={event.description}
           venue={event.venue}
@@ -215,4 +207,3 @@ export default async function EventPage({ params }: EventPageProps) {
     </>
   );
 }
-

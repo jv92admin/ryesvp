@@ -1,6 +1,6 @@
 /**
  * External service brand colors.
- * Single source of truth — previously hardcoded in ExploreCard.tsx, PrimaryCTACard.tsx.
+ * Single source of truth — used in ExploreCard.tsx and event detail page.
  *
  * These are the ONLY place where hex brand colors for third parties live.
  * Components use these constants, never raw hex values.

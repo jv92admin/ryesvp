@@ -60,7 +60,7 @@ INC 3.5  Editorial Polish           ✅ text-only badges, editorial headers, bre
   ↓
 INC 4    Social-First Home          ✅ kill ViewToggle, PlansStrip, Friends chip, 7 components deleted
   ↓
-INC 5    Event Page Zones           ← zone-based layout, promote Buy, separate social
+INC 5    Event Page Zones           ✅ 5-zone layout, Buy above fold, AttendanceButtons + SocialProofCard
   ↓
 INC 6    Plan-on-Event-Page         ← inline plan panel, kill navigate-away
   ↓
