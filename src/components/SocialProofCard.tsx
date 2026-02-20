@@ -23,7 +23,6 @@ interface SocialProofCardProps {
     venue: { name: string };
   };
   isLoggedIn: boolean;
-  initialTicketStatus?: string | null;
 }
 
 export function SocialProofCard({
@@ -33,14 +32,7 @@ export function SocialProofCard({
   userSquad,
   event,
   isLoggedIn,
-  initialTicketStatus,
 }: SocialProofCardProps) {
-  const [ticketStatus, setTicketStatus] = useState<'NEED_TICKETS' | 'HAVE_TICKETS' | null>(
-    initialTicketStatus === 'NEED_TICKETS' || initialTicketStatus === 'HAVE_TICKETS'
-      ? initialTicketStatus
-      : null
-  );
-  const [isLoading, setIsLoading] = useState(false);
   const [showFriendsModal, setShowFriendsModal] = useState(false);
 
   const friendsGoing = socialSignals?.friends.filter(f => f.status === 'GOING').length || 0;
@@ -60,93 +52,36 @@ export function SocialProofCard({
     })),
   ].slice(0, 5);
 
-  const handleTicketChange = async (newTicketStatus: 'NEED_TICKETS' | 'HAVE_TICKETS') => {
-    const previous = ticketStatus;
-    setIsLoading(true);
-    const next = ticketStatus === newTicketStatus ? null : newTicketStatus;
-    setTicketStatus(next);
-
-    try {
-      if (next !== null) {
-        await fetch(`/api/events/${eventId}/attendance`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: next }),
-        });
-      }
-    } catch {
-      setTicketStatus(previous);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (!isLoggedIn && totalFriends === 0) return null;
-
-  const ticketText = 'text-sm transition-colors disabled:opacity-50';
-  const ticketInactive = 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]';
+  if (totalFriends === 0 && !userSquad) return null;
 
   return (
     <>
-      <div className="mb-6 border-t border-[var(--border-default)]">
-        {/* Friends row */}
+      <div className="flex items-center gap-3 flex-wrap mb-6">
+        {/* Friends */}
         {totalFriends > 0 && (
-          <div className="flex items-center justify-between py-3">
-            <button
-              onClick={() => setShowFriendsModal(true)}
-              className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
-            >
-              <FriendAvatarStack friends={friendsForAvatars} maxVisible={3} size="md" />
-              <span className="text-sm text-[var(--text-primary)]">
-                {friendsGoing > 0 && <><strong>{friendsGoing}</strong> going</>}
-                {friendsGoing > 0 && friendsInterested > 0 && ' · '}
-                {friendsInterested > 0 && <><strong>{friendsInterested}</strong> interested</>}
-              </span>
-            </button>
-            <button
-              onClick={() => setShowFriendsModal(true)}
-              className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
-            >
-              See all
-            </button>
-          </div>
+          <button
+            onClick={() => setShowFriendsModal(true)}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
+            <FriendAvatarStack friends={friendsForAvatars} maxVisible={3} size="sm" />
+            <span className="text-sm text-[var(--text-primary)]">
+              {friendsGoing > 0 && <><strong>{friendsGoing}</strong> going</>}
+              {friendsGoing > 0 && friendsInterested > 0 && <span className="text-[var(--text-muted)]"> · </span>}
+              {friendsInterested > 0 && <><strong>{friendsInterested}</strong> interested</>}
+            </span>
+          </button>
         )}
 
-        {/* Plan + Ticket row */}
+        {/* Plan link */}
         {isLoggedIn && (
-          <div className="flex items-center gap-3 py-3 border-t border-[var(--border-default)]">
-            <SmartSquadButton
-              eventId={eventId}
-              userSquadId={userSquad?.id || null}
-              friendsGoing={friendsGoing}
-              friendsInterested={friendsInterested}
-              event={event}
-              alwaysShow={true}
-            />
-            <span className="text-[var(--border-default)]" aria-hidden>|</span>
-            <button
-              onClick={() => handleTicketChange('NEED_TICKETS')}
-              disabled={isLoading}
-              className={`${ticketText} ${
-                ticketStatus === 'NEED_TICKETS'
-                  ? 'font-medium text-[var(--signal-interested)]'
-                  : ticketInactive
-              }`}
-            >
-              Need Tickets
-            </button>
-            <button
-              onClick={() => handleTicketChange('HAVE_TICKETS')}
-              disabled={isLoading}
-              className={`${ticketText} ${
-                ticketStatus === 'HAVE_TICKETS'
-                  ? 'font-medium text-[var(--action-engage)]'
-                  : ticketInactive
-              }`}
-            >
-              Selling
-            </button>
-          </div>
+          <SmartSquadButton
+            eventId={eventId}
+            userSquadId={userSquad?.id || null}
+            friendsGoing={friendsGoing}
+            friendsInterested={friendsInterested}
+            event={event}
+            alwaysShow={totalFriends > 0}
+          />
         )}
       </div>
 
