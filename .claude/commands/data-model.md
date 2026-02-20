@@ -40,12 +40,27 @@ Full enrichment (30+ fields) only fetched via `getEventEnrichment(id)` for detai
 ## Auth Flow
 
 ```
-API Route → requireAuth() → user.dbUser.id → pass to data functions
+API Route → requireAuthAPI() → user.dbUser.id → pass to data functions
+Page      → requireAuth()    → user.dbUser.id → pass to data functions
 ```
 
-- `requireAuth()` from `src/lib/auth.ts` — redirects to login if unauthenticated
+- `requireAuthAPI()` from `src/lib/auth.ts` — throws `AuthRequiredError` if unauthenticated (API routes)
+- `requireAuth()` — redirects to `/login` if unauthenticated (page server components only)
 - `getCurrentUser()` — returns null if unauthenticated (for optional auth)
+- `handleAPIError(error)` — standard catch handler for API routes (maps `AuthRequiredError` → 401, others → 500)
 - Always extract `user.dbUser.id` and pass to data layer. Never pass Supabase auth context to DB functions.
+
+```typescript
+// Standard API route pattern:
+export async function GET() {
+  try {
+    const user = await requireAuthAPI();
+    // ... use user.dbUser.id
+  } catch (error) {
+    return handleAPIError(error);
+  }
+}
+```
 
 ## Data Access Patterns
 
@@ -141,6 +156,7 @@ Keep `EnrichmentDisplay` lean — don't add fields you don't need in list views.
 - Creating alternative event types for specific views
 - Fetching events without enrichment (will show wrong title)
 - Inline Prisma queries in API routes (use `src/db/` functions)
+- Using `requireAuth()` in API routes (redirects instead of returning 401 — use `requireAuthAPI()`)
 - Passing Supabase auth context to data functions (pass `user.dbUser.id`)
 - N+1 queries (use batch + Map pattern)
 

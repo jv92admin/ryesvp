@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth';
+import { requireAuthAPI, handleAPIError } from '@/lib/auth';
 import { getFriends, getPendingRequests, getSentRequests, getPendingRequestCount } from '@/db/friends';
 
 // GET /api/friends - List user's friends and pending requests
 export async function GET() {
   try {
-    const user = await requireAuth();
+    const user = await requireAuthAPI();
     const userId = user.dbUser.id;
 
     const [friends, pendingReceived, pendingSent, pendingCount] = await Promise.all([
@@ -22,11 +22,6 @@ export async function GET() {
       pendingCount,
     });
   } catch (error) {
-    console.error('Error fetching friends:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch friends' },
-      { status: 500 }
-    );
+    return handleAPIError(error);
   }
 }
-

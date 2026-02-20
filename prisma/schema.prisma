@@ -56,7 +56,8 @@ model Event {
 
   @@unique([source, sourceEventId]) // Dedup by source + external ID
   @@index([venueId])
-  @@index([startDateTime])
+  @@index([startDateTime, status]) // Most common filter combo: upcoming + scheduled
+  @@index([startDateTime, status, category]) // Category-filtered feeds
   @@index([status])
   @@index([category])
   @@index([performerId])
@@ -201,6 +202,7 @@ model Enrichment {
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 
+  @@index([eventId, status]) // getEnrichmentForDisplay() filters both
   @@index([status])
   @@index([kgEntityId])
   @@index([spotifyId])
@@ -293,7 +295,7 @@ model UserEvent {
 
   @@unique([userId, eventId]) // One status per user per event
   @@index([userId])
-  @@index([eventId])
+  @@index([eventId, status]) // Attendee counts by event + status
 }
 
 // Enums

@@ -69,14 +69,16 @@ showToast({
 ```
 Primitives (Button, Badge, Chip, Toast, Dialog)
     ↓
-Components (EventCard, FriendsAndStatusCard, SquadMemberList)
+Components (EventCard, SocialEventCard, FriendsAndStatusCard, SquadMemberList)
     ↓
 Sections (SocialSectionA/B, PlanModeView, DayOfModeView)
     ↓
 Pages (HomePageContent, SquadPage, UserProfileContent)
 ```
 
-Build from existing primitives. Create new primitives only when a pattern repeats 3+ times.
+- `SocialEventCard` (`src/components/social/SocialEventCard.tsx`) — shared event card for social feed sections. Used by SocialSectionA and SocialSectionB.
+- `EventCard` uses SVG `CategoryIcons` and `PresaleIcons` for category fallback images and presale indicators (no emoji icons).
+- Build from existing primitives. Create new primitives only when a pattern repeats 3+ times.
 
 ## Responsive Patterns (Mobile-First)
 

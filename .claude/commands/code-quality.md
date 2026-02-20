@@ -13,7 +13,7 @@ You are working on testing, type safety, linting, or code health.
 
 - All data access through `src/db/` (not inline Prisma in routes)
 - Display types computed at data layer before reaching components
-- Auth checked in API routes via `requireAuth()` before any data access
+- Auth checked in API routes via `requireAuthAPI()` + `handleAPIError()` (returns 401). Use `requireAuth()` only in page server components (redirects to login).
 - Batch queries with Map pattern to avoid N+1
 
 ## Stub

@@ -12,7 +12,7 @@ Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, PostgreSQL via Su
 - **displayTitle:** Computed ONCE at the data layer (`src/db/`), never in components. See `/data-model`.
 - **EventDisplay:** THE canonical event type for UI. No creating alternative event types.
 - **Data access:** All DB queries live in `src/db/`. API routes call data functions, never inline Prisma.
-- **Auth flow:** `requireAuth()` in API routes, pass `user.dbUser.id` to data functions.
+- **Auth flow:** `requireAuthAPI()` in API routes (returns 401), `requireAuth()` in pages (redirects). Pass `user.dbUser.id` to data functions. Use `handleAPIError()` in route catch blocks.
 - **Brand:** Green `#16A34A`, no decorative emojis (use SVG icons), Geist Sans, mobile-first.
 - **Copy:** Title Case for button CTAs, sentence case for headers. "RyesVP" (capital R and VP).
 

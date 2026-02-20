@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCurrentUser } from '@/lib/auth';
+import { requireAuthAPI, handleAPIError } from '@/lib/auth';
 import { getUserSquadForEvent } from '@/db/squads';
 
 // GET /api/events/[id]/squad - Check if user has a squad for this event
@@ -9,26 +9,15 @@ export async function GET(
 ) {
   try {
     const { id: eventId } = await params;
-    const user = await getCurrentUser();
-    
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
+    const user = await requireAuthAPI();
 
     const squad = await getUserSquadForEvent(user.dbUser.id, eventId);
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       hasSquad: !!squad,
       squadId: squad?.id || null,
     });
   } catch (error) {
-    console.error('Error checking user squad for event:', error);
-    return NextResponse.json(
-      { error: 'Failed to check plan status' },
-      { status: 500 }
-    );
+    return handleAPIError(error);
   }
 }
