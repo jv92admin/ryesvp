@@ -67,6 +67,87 @@ font-semibold uppercase tracking-wide text-[10px]
 
 `max-w-6xl` for home page, `max-w-5xl` for event detail page, `max-w-lg` for squad page.
 
+### Motion & Transitions
+
+Motion communicates state changes. It's not decorative. The UI feels alive but never distracting.
+
+#### Easing Curves (from `globals.css`)
+
+```css
+--ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);       /* default — hover colors, fades, opacity */
+--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);     /* slides, reveals, toasts — snappy deceleration */
+--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);   /* chip toggles, popovers — slight overshoot */
+```
+
+#### Duration Tokens
+
+| Token | Value | When |
+|-------|-------|------|
+| `--duration-fast` | `150ms` | Hover states, color changes — feedback must feel instant |
+| `--duration-normal` | `250ms` | Toast entrances, reveals, chip state changes |
+| `--duration-slow` | `400ms` | Page-level transitions, large layout shifts (rare) |
+
+#### Transition Property by Element
+
+| Element | Property | Duration | Notes |
+|---------|----------|----------|-------|
+| Buttons | `transition-colors` | fast | Color only — never `transition-all` |
+| Chips/Filters | `transition-colors` | fast | Active state: color + border |
+| Cards (desktop hover) | `transition-colors` | fast | Border reveal from transparent |
+| Links | `transition-colors` | fast | Text color shift |
+| Toasts | `@keyframes slide-up` | normal | `--ease-out-expo` — enters from bottom |
+| Modals | `animate-in fade-in` | normal | `--ease-out-expo` — fade + scale |
+| Icon micro-motion | `transition-transform` | fast | Arrow shift on `group-hover:` only |
+| Avatar pop | `transition-transform` | fast | `hover:scale-110` with `--ease-spring` |
+| Loading | `animate-spin` | — | Continuous, linear — spinners only |
+| Skeleton | `animate-pulse` | — | Content placeholders during loading |
+
+#### Hover State Catalog
+
+| Component | Hover Treatment | Mobile |
+|-----------|----------------|--------|
+| Button (primary) | `bg → --action-primary-hover` | No hover |
+| Button (engage) | `bg → --action-engage-hover` | No hover |
+| Button (secondary) | `bg → --action-secondary-hover`, `border → --border-strong` | No hover |
+| Button (ghost) | `bg → --surface-inset`, `text → --text-primary` | No hover |
+| Chip (inactive) | `border → --border-strong`, `bg → --surface-inset` | No hover |
+| Chip (active engage) | Slightly deeper warm gold | No hover |
+| EventCard (desktop) | `border → --border-default` (reveal from transparent) | **No hover** — `border-b` only |
+| Link (text) | `text → --text-primary` + underline | Tap state |
+| Link (avatar/image) | `opacity → 0.8` | Tap state |
+| IconButton (ghost) | `bg → --surface-inset`, `text → --text-primary` | No hover |
+| FriendAvatar | `scale → 1.1` | No scale |
+
+#### Motion Anti-Patterns
+
+- ✅ `transition-colors duration-[var(--duration-fast)]` — fast, scoped
+- ❌ `transition-all` on buttons — too broad, animates padding/margin
+- ❌ `delay-*` on hover states — interaction feedback must be instant
+- ❌ Staggered fade-in on list items — feels SaaS, cards appear immediately
+- ❌ Pulsing CTAs, bouncing badges, parallax — motion is feedback, not decoration
+- ❌ Animating `width`/`height`/`top`/`left` — use `transform` properties instead
+
+### Typography Scale
+
+Geist Sans. Clean, readable, no decorative fonts.
+
+| Level | Classes | Use |
+|-------|---------|-----|
+| Page title | `text-2xl font-bold` | Page headers, hero headings |
+| Section title | `text-lg font-semibold` | Card titles, modal headers, feature callouts |
+| Body | `text-base` (+ `leading-relaxed` for long copy) | Descriptions, about sections |
+| UI label | `text-sm font-medium` | Button labels, form labels, chips, secondary headers |
+| Caption | `text-xs font-medium` | Timestamps, metadata, helper text |
+| Micro label | `text-[10px] font-semibold tracking-wide uppercase` | Status badges (NEW, PRESALE, SOLD OUT) |
+| Section marker | `text-xs font-semibold tracking-wider uppercase` | Section dividers, group headers |
+
+**Typography rules:**
+- No `text-xl` — skip from `text-lg` to `text-2xl` for clean hierarchy
+- `leading-snug` for multi-line headings (event titles wrapping to 2 lines)
+- `leading-relaxed` for body copy and descriptions
+- `line-clamp-2` for titles, `line-clamp-3` for descriptions
+- `font-medium` for interactions, `font-semibold` for local emphasis, `font-bold` for page-level only
+
 ---
 
 ## Design Principles

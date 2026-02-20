@@ -71,6 +71,99 @@ All status markers (NEW, PRESALE, SOLD OUT) use one treatment: `font-semibold up
 
 **Utility classes:** `.btn-primary` (dark), `.btn-engage` (warm gold), `.btn-going` (green state), `.btn-danger` (red).
 
+## Motion & Transitions
+
+The UI should feel alive but never distracting. Motion communicates state changes — it doesn't decorate.
+
+### Motion Philosophy
+
+- **Fast and purposeful.** 150ms for hovers, 250ms for reveals. Nothing lingers.
+- **Decelerate into position.** Elements arrive fast and settle — never linear, never bounce excessively.
+- **Earn every animation.** If it doesn't help the user understand a state change, don't animate it.
+- **Respect the user.** `prefers-reduced-motion` disables all animation (already in globals.css).
+
+### Easing Curves (from `globals.css`)
+
+| Token | Curve | When |
+|-------|-------|------|
+| `--ease-smooth` | `cubic-bezier(0.4, 0, 0.2, 1)` | **Default.** Hover color shifts, fades, opacity changes |
+| `--ease-out-expo` | `cubic-bezier(0.16, 1, 0.3, 1)` | Slides, reveals, toasts — snappy deceleration |
+| `--ease-spring` | `cubic-bezier(0.34, 1.56, 0.64, 1)` | Chip toggles, popovers, scale pops — slight overshoot |
+
+### Duration Tokens
+
+| Token | Value | When |
+|-------|-------|------|
+| `--duration-fast` | `150ms` | Hover states, color changes, micro-interactions |
+| `--duration-normal` | `250ms` | Toast entrances, content reveals, chip state changes |
+| `--duration-slow` | `400ms` | Page-level transitions, large layout shifts (rare) |
+
+### Transition Patterns by Element Type
+
+| Element | Transition | Duration | Easing | Example |
+|---------|-----------|----------|--------|---------|
+| **Buttons** | `transition-colors` | `--duration-fast` | default | All `Button`, `IconButton` |
+| **Chips/Filters** | `transition-all` | `--duration-fast` | default | Active state: color + border |
+| **Cards (desktop)** | `transition-colors` | `--duration-fast` | default | Border reveal on hover |
+| **Links** | `transition-colors` | `--duration-fast` | default | Text color shift |
+| **Toasts** | `@keyframes slide-up` | `--duration-normal` | `--ease-out-expo` | Enter from bottom |
+| **Modals/Dialogs** | `animate-in fade-in` | `--duration-normal` | `--ease-out-expo` | Fade + scale |
+| **Loading spinners** | `animate-spin` | — | linear | Continuous rotation |
+| **Skeleton loaders** | `animate-pulse` | — | default | Content placeholders |
+| **Icon micro-motion** | `transition-transform` | `--duration-fast` | default | Arrow shift on group-hover |
+
+### Rules
+
+1. **`transition-colors` is the default.** Use it unless you're animating size, position, or opacity.
+2. **`transition-all` is for cards only** — when shadow + border + color change together.
+3. **Never animate layout properties** (`width`, `height`, `top`, `left`) — use `transform` instead.
+4. **No delays** (`delay-*`) on hover states — interaction feedback must be instant.
+5. **Loading states use `animate-spin`** (small spinners) or `animate-pulse` (skeleton screens).
+6. **Group hovers** (`group-hover:`) only for icon micro-motion (arrow slides, chevron shifts).
+
+### Hover States by Component
+
+| Component | Hover Behavior |
+|-----------|----------------|
+| **Button (primary)** | `bg → --action-primary-hover` (darker) |
+| **Button (secondary)** | `bg → --action-secondary-hover` + `border → --border-strong` |
+| **Button (ghost)** | `text → --text-primary` + `bg → --surface-inset` |
+| **Button (engage)** | `bg → --action-engage-hover` (deeper gold) |
+| **Chip (inactive)** | `border → --border-strong` + `bg → --surface-inset` |
+| **Chip (active engage)** | Already warm gold — slightly deeper on hover |
+| **Card (desktop)** | `border → --border-default` (reveal from transparent) |
+| **Card (mobile)** | No hover effect — touch targets, not pointer |
+| **Link (text)** | `text → --text-primary` + underline |
+| **Link (avatar/image)** | `opacity → 0.8` |
+| **IconButton** | `text → --text-primary` + `bg → --surface-inset` (ghost) |
+| **FriendAvatar** | `scale → 1.1` (subtle pop) |
+
+## Typography Scale
+
+Geist Sans. Clean, readable, no decorative fonts. The type does the work.
+
+### Hierarchy
+
+| Level | Size | Weight | Tracking | Use |
+|-------|------|--------|----------|-----|
+| **Page title** | `text-2xl` | `font-bold` | default | Page headers, hero headings |
+| **Section title** | `text-lg` | `font-semibold` | default | Card titles, modal headers |
+| **Body** | `text-base` | regular | default | Descriptions, long-form content |
+| **UI label** | `text-sm` | `font-medium` | default | Button labels, form labels, chips, secondary headers |
+| **Caption** | `text-xs` | `font-medium` | default | Timestamps, metadata, helper text |
+| **Micro label** | `text-[10px]` | `font-semibold` | `tracking-wide` | Uppercase badges (NEW, PRESALE, SOLD OUT) |
+| **Section marker** | `text-xs uppercase` | `font-semibold` | `tracking-wider` | Section dividers, group headers |
+
+### Rules
+
+- **`font-medium` for interactions** — buttons, chips, links, form labels
+- **`font-semibold` for local hierarchy** — card titles, section headers, badge text
+- **`font-bold` for page-level emphasis** — page titles, brand headers only
+- **`leading-snug` for multi-line headings** — event titles that wrap to 2 lines
+- **`leading-relaxed` for body copy** — descriptions, about sections, long text
+- **No `text-xl`** — jump from `text-lg` to `text-2xl` keeps the hierarchy clean
+- **`line-clamp-2`** for event titles, `line-clamp-3` for descriptions — truncate, don't overflow
+
 ## Shared Primitives (`src/components/ui/`)
 
 | Component | Variants | Usage |

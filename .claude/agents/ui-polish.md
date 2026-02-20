@@ -142,11 +142,76 @@ Standard patterns:
 - Element gaps: `gap-2` (8px) between siblings
 - Badge padding: `px-1.5 py-0.5` (6px/2px) or `px-2 py-0.5` (8px/2px)
 
-### 6. Transitions Are Consistent
+### 6. Motion Is Purposeful, Not Decorative
 
-All interactive elements use `transition-colors` with Tailwind defaults. No custom durations unless the component warrants it (Toast slide-up is the only exception at 300ms).
+Motion communicates state changes. It doesn't exist for visual interest. Every animation must answer: "What did the user just do, and what changed?"
 
-Standard: `hover:bg-gray-50 transition-colors` for list items and subtle hovers.
+#### Easing Curves (`globals.css`)
+
+| Token | When |
+|-------|------|
+| `--ease-smooth` | **Default.** Hover color shifts, fades, opacity changes |
+| `--ease-out-expo` | Slides, reveals, toasts — snappy deceleration |
+| `--ease-spring` | Chip toggles, popovers, scale pops — slight overshoot for physicality |
+
+#### Duration Rules
+
+| Token | Value | Use |
+|-------|-------|-----|
+| `--duration-fast` | `150ms` | Hover states, color changes — interaction must feel instant |
+| `--duration-normal` | `250ms` | Toast entrances, content reveals, chip state changes |
+| `--duration-slow` | `400ms` | Page-level transitions only. Rare. |
+
+#### Transition Property Selection
+
+- **`transition-colors`** — the default for everything. Buttons, chips, links, icons.
+- **`transition-all`** — only for cards where shadow + border + color change together (and even then, prefer `transition-colors` after de-SaaS removes shadows).
+- **`transition-transform`** — only for icon micro-motion (`group-hover:-translate-x-0.5` on arrows).
+- **`transition-opacity`** — only for avatar/image hover dimming.
+- **Never `transition-all` on buttons or chips** — too broad, animates padding/margin unexpectedly.
+
+#### Hover State Standards
+
+| Element | Hover Treatment |
+|---------|----------------|
+| Button (primary) | `bg → --action-primary-hover` |
+| Button (engage) | `bg → --action-engage-hover` |
+| Button (ghost) | `bg → --surface-inset`, `text → --text-primary` |
+| Chip (inactive) | `border → --border-strong`, `bg → --surface-inset` |
+| Card (desktop) | `border → --border-default` (reveal from transparent) |
+| Card (mobile) | **No hover.** Touch targets don't hover. |
+| Link (text) | `text → --text-primary` + underline |
+| Link (avatar) | `opacity → 0.8` |
+| IconButton | `text → --text-primary`, `bg → --surface-inset` |
+| FriendAvatar | `scale → 1.1` (subtle pop via `--ease-spring`) |
+
+#### What NOT to Animate
+
+- **Layout properties** — never animate `width`, `height`, `top`, `left`. Use `transform`.
+- **Delays on hover** — interaction feedback must be instant. No `delay-*`.
+- **Entrance animations on list items** — staggered fade-ins feel SaaS. Cards appear immediately.
+- **Decorative motion** — no pulsing CTAs, no bouncing badges, no parallax. Motion is feedback, not decoration.
+
+### 7. Typography Is Clean and Hierarchical
+
+#### Scale (Geist Sans)
+
+| Level | Classes | Use |
+|-------|---------|-----|
+| Page title | `text-2xl font-bold` | Page headers |
+| Section title | `text-lg font-semibold` | Card titles, modal headers |
+| Body | `text-base` | Descriptions, content |
+| UI label | `text-sm font-medium` | Buttons, chips, form labels |
+| Caption | `text-xs font-medium` | Timestamps, metadata |
+| Micro label | `text-[10px] font-semibold tracking-wide uppercase` | Badges (NEW, PRESALE) |
+
+#### Rules
+
+- **No `text-xl`** — skip from `text-lg` to `text-2xl` for clear hierarchy
+- **`leading-snug`** for multi-line headings (event titles wrapping)
+- **`leading-relaxed`** for body copy and descriptions
+- **`line-clamp-2`** for titles, `line-clamp-3`** for descriptions — truncate, don't overflow
+- **`font-medium` for interactions**, `font-semibold` for local emphasis, `font-bold` for page-level only
 
 ## Known Debt (From Audit + Lark Visual Identity)
 

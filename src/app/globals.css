@@ -47,11 +47,13 @@
   --signal-danger-hover: #B91C1C;     /* danger hover/press */
   --signal-info: #3B82F6;             /* links, informational */
 
-  /* ANIMATION */
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-  --duration-fast: 150ms;
-  --duration-normal: 250ms;
-  --duration-slow: 400ms;
+  /* ANIMATION — motion tokens */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);   /* snappy deceleration — toasts, slides, reveals */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);  /* slight overshoot — chip toggles, popovers, scale pops */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);       /* material-style — general purpose, fades, color shifts */
+  --duration-fast: 150ms;    /* hover states, color changes, micro-interactions */
+  --duration-normal: 250ms;  /* toasts, reveals, content transitions */
+  --duration-slow: 400ms;    /* page transitions, large layout shifts */
 
   /* LEGACY ALIASES — keep during migration, remove when done */
   --brand-primary: var(--signal-going);
@@ -87,6 +89,11 @@
   --color-signal-interested: var(--signal-interested);
   --color-signal-danger: var(--signal-danger);
   --color-signal-info: var(--signal-info);
+
+  /* Motion — expose to Tailwind */
+  --ease-out-expo: var(--ease-out-expo);
+  --ease-spring: var(--ease-spring);
+  --ease-smooth: var(--ease-smooth);
 
   /* Legacy Tailwind aliases (remove after full migration) */
   --color-brand-primary: var(--brand-primary);
