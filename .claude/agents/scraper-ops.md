@@ -171,11 +171,21 @@ Every new scraper, fixed field gap, or pipeline change must be reflected in the 
 
 A future session that loads `/ingestion` should see the world as it actually is, not as it was before your changes.
 
-## Verification
+## Verification (DevTools MCP Required)
 
-After any scraper change:
-1. Run the scraper: `POST /api/cron/scrape?name=venue-slug`
-2. Verify event count is reasonable
-3. Spot-check 3-5 events for field completeness
-4. Confirm `sourceEventId` is present on all events
-5. If adding a new field, verify it persists through `upsertEvents()`
+After any scraper change, you MUST validate with Chrome DevTools MCP. This is not optional.
+
+### Scraper Verification Workflow
+
+1. **Fetch the venue page** — use DevTools MCP (`navigate_page`) to load the venue's actual event listing page. `take_snapshot` to see what the venue currently shows.
+2. **Compare captured vs. available** — cross-reference the snapshot against what the scraper extracts. Are we missing fields the venue provides? Report any gaps.
+3. **Run the scraper** — `POST /api/cron/scrape?name=venue-slug` via bash. Verify:
+   - Event count is reasonable (compare to venue page)
+   - No error events in output
+   - `sourceEventId` present on all events
+4. **Spot-check rendered events** — navigate to the app's event listing, find scraped events, `take_snapshot` to verify data renders correctly (title, date, venue, image).
+5. **Verify new field persistence** — if adding a new field, check the event detail page to confirm the field made it through `upsertEvents()` and renders in the UI.
+
+### When DevTools MCP Is Unavailable
+
+Flag it to the user: "DevTools MCP not available — venue page comparison not performed. Please manually verify the venue's page against scraper output." Never silently skip venue validation.

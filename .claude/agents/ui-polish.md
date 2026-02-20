@@ -159,10 +159,28 @@ Every new primitive, extracted constant, or pattern change must be reflected in 
 
 A future session that loads `/ui-system` should see the world as it actually is, not as it was before your changes.
 
-## Verification
+## Verification (DevTools MCP Required)
 
-After any visual change:
-1. Check the dev server renders correctly (`npm run dev`)
-2. If DevTools MCP is available, screenshot at 375px and 1024px+
-3. Grep for any hardcoded values you may have introduced: `grep -r "#[0-9A-Fa-f]\{6\}" src/components/`
-4. Verify the changed component still uses shared primitives where applicable
+After any visual change, you MUST validate with Chrome DevTools MCP. This is not optional.
+
+### Visual Verification Workflow
+
+1. **Take a snapshot** (`take_snapshot`) of the affected page to confirm DOM structure and accessibility tree are correct.
+2. **Screenshot at mobile** (`take_screenshot` with viewport 375px via `emulate`) — mobile is the primary breakpoint. Check:
+   - No horizontal overflow
+   - Touch targets >= 44px
+   - Text readable, not truncated
+   - Single-column layout correct
+3. **Screenshot at desktop** (`take_screenshot` at 1024px+) — verify grid layouts, side-by-side cards, modal sizing.
+4. **Before/after comparison** — when modifying existing UI, screenshot BEFORE making changes, then AFTER. Report both to the user.
+5. **Check accessibility** — use `take_snapshot` with `verbose: true` to verify aria-labels, heading hierarchy, and semantic structure.
+
+### Code Verification
+
+6. Grep for any hardcoded values you may have introduced: `grep -r "#[0-9A-Fa-f]\{6\}" src/components/`
+7. Verify the changed component still uses shared primitives where applicable.
+8. Run `npx tsc --noEmit` to confirm no type errors.
+
+### When DevTools MCP Is Unavailable
+
+If the browser isn't connected, flag it to the user: "DevTools MCP not available — visual verification skipped. Please review manually at mobile and desktop widths." Never silently skip visual validation.

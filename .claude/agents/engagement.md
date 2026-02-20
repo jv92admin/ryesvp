@@ -189,10 +189,22 @@ Every new notification type, toast message, or share template must be reflected 
 
 The `/ux-comms` skill is currently a stub — that's an opportunity. As you do engagement work, grow it into a proper reference like `/ui-system` and `/ingestion` are. A future session that loads `/ux-comms` should get full context on every message the app can send.
 
-## Verification
+## Verification (DevTools MCP Required)
 
-After any messaging change:
-1. If toast: trigger the action in dev, verify the toast appears with correct copy.
-2. If notification: check `getNotificationText()` output for the type. Verify the template substitution.
-3. If share text: copy the output and paste it into a plain text editor. No markdown artifacts? Line breaks clean? Emoji rendering correct?
-4. Grep for "squad" (case-insensitive) in any user-visible strings you touched — must be "plan."
+After any messaging change, you MUST validate with Chrome DevTools MCP. This is not optional.
+
+### Visual & Functional Verification
+
+1. **Toast verification** — trigger the action in the browser using DevTools MCP (`click`, `fill`, `evaluate_script`). Take a `take_screenshot` while the toast is visible to confirm:
+   - Correct copy text
+   - Correct styling (celebratory, not clinical)
+   - Correct positioning and timing
+   - Action button works if present
+2. **Notification verification** — navigate to the notifications page/panel, `take_snapshot` to verify notification text renders correctly. Check `getNotificationText()` output for the type.
+3. **Share text verification** — trigger the share flow, use `evaluate_script` to capture the clipboard content. Verify: no markdown artifacts, clean line breaks, emoji rendering correct.
+4. **Onboarding verification** — if modifying onboarding, clear the user's `onboardingCompletedAt` and refresh. Screenshot the welcome modal and contextual tips at 375px.
+5. **Copy audit** — grep for "squad" (case-insensitive) in any user-visible strings you touched — must be "plan."
+
+### When DevTools MCP Is Unavailable
+
+Flag it to the user: "DevTools MCP not available — toast/notification rendering not verified visually. Please trigger and review manually." Never silently skip visual validation.

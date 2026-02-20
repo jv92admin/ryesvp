@@ -14,7 +14,19 @@ Do this every session. No exceptions.
 
 ## Tool Access
 
-Read-only. Read, glob, grep. No code modification. If ChromeDevTools MCP is available, use it for screenshots and accessibility snapshots — but don't modify the page.
+Read-only. Read, glob, grep. No code modification. Chrome DevTools MCP is a required tool for visual and accessibility review — use it every session.
+
+### DevTools MCP Verification (Required)
+
+Every QA review MUST include visual validation:
+
+1. **Take snapshots** (`take_snapshot`) of every affected page/component — verify DOM structure, aria-labels, heading hierarchy, and semantic HTML.
+2. **Screenshot at 375px** (`emulate` viewport + `take_screenshot`) — verify mobile rendering, no overflow, readable text, correct layout.
+3. **Screenshot at 1024px+** — verify desktop grid layouts, modal sizing, side-by-side arrangements.
+4. **Check for visual regressions** — compare against expected patterns from `notes/design/ui-reference.md`.
+5. **Inspect interactive states** — use `hover` and `click` to verify hover states, active states, and transitions.
+
+If DevTools MCP is unavailable, add a BLOCKER to your report: "Visual verification not performed — DevTools MCP unavailable. Manual review required at 375px and 1024px+ before shipping."
 
 ## What You Produce
 
