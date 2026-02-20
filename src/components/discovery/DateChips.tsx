@@ -7,10 +7,9 @@ import { ToggleChip } from '@/components/ui';
 type DatePreset = 'thisWeek' | 'weekend';
 
 /**
- * Date range chips for quick filtering.
- * 
- * Uses ?when= param for presets, ?startDate= + ?endDate= for custom range.
- * Includes a "Pick dates" dropdown for custom date range selection.
+ * @deprecated Replaced by FilterDrawer (When section) + FilterStrip quick chips.
+ * Logic inlined into FilterDrawer.tsx and FilterStrip.tsx as of Inc 2.
+ * Safe to delete once verified no other imports exist.
  */
 export function DateChips() {
   const router = useRouter();

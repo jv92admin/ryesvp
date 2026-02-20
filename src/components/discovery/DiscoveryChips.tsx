@@ -7,10 +7,9 @@ import { Chip } from '@/components/ui';
 type DiscoveryFilter = 'new' | 'presales';
 
 /**
- * Discovery filter chips (New, Presales) with live counts.
- * 
- * Uses URL params (?new=true, ?presales=true) for instant apply.
- * Fetches counts from API on mount.
+ * @deprecated Replaced by FilterDrawer (Discovery section).
+ * Logic inlined into FilterDrawer.tsx as of Inc 2.
+ * Safe to delete once verified no other imports exist.
  */
 export function DiscoveryChips() {
   const router = useRouter();

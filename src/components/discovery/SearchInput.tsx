@@ -17,7 +17,7 @@ interface SearchInputProps {
  * - Syncs with URL on mount (for back/forward nav)
  */
 export function SearchInput({ 
-  placeholder = 'Lady Gaga, indie rock, Moody Center...',
+  placeholder = 'What kind of night are we having?',
   className = ''
 }: SearchInputProps) {
   const router = useRouter();
@@ -71,9 +71,9 @@ export function SearchInput({
         type="button"
         onClick={submitSearch}
         className={`absolute left-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded transition-colors
-          ${hasUnsearchedValue 
-            ? 'text-[var(--brand-primary)] hover:bg-green-50' 
-            : 'text-gray-400 cursor-default'
+          ${hasUnsearchedValue
+            ? 'text-[var(--action-primary)] hover:bg-[var(--surface-inset)]'
+            : 'text-[var(--text-muted)] cursor-default'
           }`}
         title={hasUnsearchedValue ? 'Search' : ''}
       >
@@ -98,9 +98,9 @@ export function SearchInput({
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="w-full pl-9 pr-8 py-2 text-sm border border-gray-200 rounded-lg 
-                   bg-white text-gray-900 placeholder:text-gray-400
-                   focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent
+        className="w-full pl-9 pr-8 py-2 text-sm border border-[var(--border-default)] rounded-lg
+                   bg-[var(--surface-card)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]
+                   focus:outline-none focus:ring-2 focus:ring-[var(--border-strong)] focus:border-transparent
                    transition-shadow"
       />
       
@@ -109,7 +109,7 @@ export function SearchInput({
         <button
           type="button"
           onClick={handleClear}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
           aria-label="Clear search"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -11,10 +11,9 @@ interface CategoryChip {
 }
 
 /**
- * Quick category filter chips (top 4 most popular).
- * 
- * Uses ?categories= param with multi-select (OR logic within categories).
- * Clicking a chip toggles it on/off.
+ * @deprecated Replaced by FilterDrawer (Category section) + FilterStrip Concerts quick chip.
+ * Logic inlined into FilterDrawer.tsx and FilterStrip.tsx as of Inc 2.
+ * Safe to delete once verified no other imports exist.
  */
 export function CategoryChips() {
   const router = useRouter();

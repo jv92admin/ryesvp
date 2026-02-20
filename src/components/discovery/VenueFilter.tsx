@@ -10,8 +10,9 @@ interface Venue {
 }
 
 /**
- * Multi-select venue filter with dropdown.
- * Uses URL params for state persistence.
+ * @deprecated Replaced by FilterDrawer (Venues section).
+ * Logic inlined into FilterDrawer.tsx as of Inc 2.
+ * Safe to delete once verified no other imports exist.
  */
 export function VenueFilter() {
   const router = useRouter();

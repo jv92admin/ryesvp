@@ -6,8 +6,6 @@
  */
 
 export { FilterStrip } from './FilterStrip';
+export { FilterDrawer } from './FilterDrawer';
 export { SearchInput } from './SearchInput';
-export { DateChips } from './DateChips';
-export { CategoryChips } from './CategoryChips';
-export { DiscoveryChips } from './DiscoveryChips';
 
