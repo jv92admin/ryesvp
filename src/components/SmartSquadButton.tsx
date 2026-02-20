@@ -108,9 +108,9 @@ export function SmartSquadButton({
         onClick={handleClick}
         className={`
           min-w-[5.5rem] px-2.5 py-1 text-xs font-semibold rounded-md
-          text-[var(--brand-primary)] bg-white
-          border-2 border-green-300
-          hover:bg-[var(--brand-primary-light)] hover:border-green-400
+          text-[var(--action-engage)] bg-white
+          border-2 border-amber-700/30
+          hover:bg-[var(--action-engage-light)] hover:border-[var(--action-engage)]
           transition-colors
           ${className}
         `}

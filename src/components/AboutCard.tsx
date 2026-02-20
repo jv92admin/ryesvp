@@ -26,7 +26,7 @@ export function AboutCard({ description, venue }: AboutCardProps) {
     : venue.url || '#';
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
+    <div className="bg-white rounded-lg border border-[var(--border-default)] p-4 sm:p-6 mb-6">
       {/* Header */}
       <div className="mb-4">
         <h2 className="font-semibold text-gray-900 text-base sm:text-lg">About</h2>
@@ -41,7 +41,7 @@ export function AboutCard({ description, venue }: AboutCardProps) {
           {shouldTruncate && (
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="mt-2 text-sm text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)] hover:underline"
+              className="mt-2 text-sm text-[var(--signal-info)] hover:text-[var(--text-primary)] hover:underline"
             >
               {isExpanded ? 'Read less' : 'Read more'}
             </button>
@@ -50,7 +50,7 @@ export function AboutCard({ description, venue }: AboutCardProps) {
       )}
 
       {/* Venue link */}
-      <div className="pt-4 border-t border-gray-100">
+      <div className="pt-4 border-t border-[var(--border-default)]">
         <a
           href={venueLink}
           target={venueLink.startsWith('http') ? '_blank' : undefined}

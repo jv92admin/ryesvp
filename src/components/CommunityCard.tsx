@@ -22,7 +22,7 @@ export function CommunityCard({ community }: CommunityCardProps) {
   const stats = community.eventStats;
   
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:border-gray-300 hover:shadow-sm transition-all cursor-pointer">
+    <div className="bg-white rounded-lg border border-[var(--border-default)] p-4 hover:border-[var(--border-strong)] transition-colors cursor-pointer">
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
           {community.name[0].toUpperCase()}

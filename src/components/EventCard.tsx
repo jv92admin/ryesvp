@@ -177,7 +177,7 @@ export function EventCard({ event }: EventCardProps) {
   const statusBadgeClass = statusConfig?.colors || '';
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all p-4">
+    <div className="bg-white rounded-lg border-b border-[var(--border-default)] md:border md:border-transparent md:hover:border-[var(--border-default)] md:border-b-0 transition-colors p-4">
       {/* Main clickable area - links to event page */}
       <Link href={`/events/${event.id}`} className="block" onClick={handleNavigate}>
         <div className="flex gap-3">
@@ -200,7 +200,7 @@ export function EventCard({ event }: EventCardProps) {
           <div className="flex-1 min-w-0">
             {/* Row 1: Title + NEW badge */}
             <div className="flex items-start gap-2">
-              <h3 className="font-semibold text-gray-900 line-clamp-2 leading-snug flex-1 min-w-0">
+              <h3 className="font-semibold text-[var(--text-primary)] line-clamp-2 leading-snug flex-1 min-w-0">
                 {displayTitle}
               </h3>
               {isNew && (
@@ -211,13 +211,13 @@ export function EventCard({ event }: EventCardProps) {
             </div>
             
             {/* Row 2: Venue + Date */}
-            <p className="text-sm text-gray-500 mt-1 truncate">
+            <p className="text-sm text-[var(--text-secondary)] mt-1 truncate">
               {event.venue.name} • {formatEventDate(event.startDateTime)}
             </p>
-            
+
             {/* Row 3: Presale row (only if present) - plain text, truncated */}
             {presaleInfo && (
-              <p className={`text-xs mt-1.5 truncate flex items-center gap-1 ${presaleInfo.isActive ? 'text-[var(--signal-info)] font-medium' : 'text-gray-500'}`}>
+              <p className={`text-xs mt-1.5 truncate flex items-center gap-1 ${presaleInfo.isActive ? 'text-[var(--signal-info)] font-medium' : 'text-[var(--text-secondary)]'}`}>
                 {presaleInfo.icon} {presaleInfo.text}
               </p>
             )}
@@ -226,17 +226,17 @@ export function EventCard({ event }: EventCardProps) {
       </Link>
       
       {/* Row 4: Meta tags + Social + Actions */}
-      <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-[var(--border-default)]">
         {/* Left side: Category + Spotify + Status + Social */}
         <div className="flex flex-wrap items-center gap-1.5 flex-1 min-w-0">
           {/* Category badge */}
-          <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${categoryColorMap[event.category] || 'bg-gray-100 text-gray-800'}`}>
+          <span className={`px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded ${categoryColorMap[event.category] || 'bg-gray-100 text-gray-800'}`}>
             {event.category}
           </span>
-          
+
           {/* Status badge (Sold Out, Cancelled, etc.) */}
           {showStatusBadge && (
-            <span className={`px-1.5 py-0.5 text-[10px] font-medium rounded ${statusBadgeClass}`}>
+            <span className={`px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded ${statusBadgeClass}`}>
               {event.status.replace('_', ' ')}
             </span>
           )}

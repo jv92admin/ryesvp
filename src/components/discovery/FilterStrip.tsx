@@ -173,7 +173,7 @@ export function FilterStrip() {
           onClick={() => setDrawerOpen(true)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full border transition-colors
             ${overflowCount > 0
-              ? 'bg-[var(--action-primary)]/10 border-[var(--action-primary)] text-[var(--action-primary)]'
+              ? 'bg-[var(--action-engage-light)] border-[var(--action-engage)] text-[var(--action-engage)]'
               : 'bg-[var(--surface-card)] border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:bg-[var(--surface-inset)]'
             }`}
         >

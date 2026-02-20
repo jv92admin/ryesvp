@@ -92,7 +92,7 @@ export default async function EventPage({ params }: EventPageProps) {
 
         {/* Hero Image */}
         {event.imageUrl ? (
-          <div className="w-full h-48 sm:h-64 md:h-80 rounded-xl overflow-hidden mb-6 shadow-sm">
+          <div className="w-full h-48 sm:h-64 md:h-80 rounded-xl overflow-hidden mb-6">
             <img 
               src={event.imageUrl} 
               alt={event.title}
@@ -106,18 +106,18 @@ export default async function EventPage({ params }: EventPageProps) {
         )}
 
         {/* Event header - tightened */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
+        <div className="bg-white rounded-lg border border-[var(--border-default)] p-4 sm:p-6 mb-6">
           <div className="flex items-center gap-2 mb-3">
             {isNew && (
               <span className="px-2 py-0.5 text-xs font-semibold bg-[var(--action-primary)] text-[var(--action-primary-text)] rounded">
                 NEW
               </span>
             )}
-            <span className={`px-2 py-0.5 text-xs font-medium rounded ${categoryColors[event.category] || 'bg-gray-100 text-gray-800'}`}>
+            <span className={`px-2 py-0.5 text-xs font-semibold uppercase tracking-wide rounded ${categoryColors[event.category] || 'bg-gray-100 text-gray-800'}`}>
               {event.category}
             </span>
             {event.status !== 'SCHEDULED' && eventStatusConfig[event.status as keyof typeof eventStatusConfig] && (
-              <span className={`px-2 py-0.5 text-xs font-medium rounded ${eventStatusConfig[event.status as keyof typeof eventStatusConfig].colors}`}>
+              <span className={`px-2 py-0.5 text-xs font-semibold uppercase tracking-wide rounded ${eventStatusConfig[event.status as keyof typeof eventStatusConfig].colors}`}>
                 {eventStatusConfig[event.status as keyof typeof eventStatusConfig].label}
               </span>
             )}

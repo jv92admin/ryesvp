@@ -43,7 +43,7 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
   // If we have image + Spotify, use the picture + listen layout
   if (hasImage && hasSpotify) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 h-full flex flex-col">
+      <div className="bg-white rounded-lg border border-[var(--border-default)] p-4 sm:p-6 h-full flex flex-col">
         <h2 className="font-semibold text-gray-900 text-base sm:text-lg mb-4">Explore</h2>
         <div className="flex gap-4">
           {/* Image */}
@@ -148,7 +148,7 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
   // Fallback: Links without full artist info
   if (hasSpotify || hasExternalLinks) {
     return (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 h-full flex flex-col">
+      <div className="bg-white rounded-lg border border-[var(--border-default)] p-4 sm:p-6 h-full flex flex-col">
         <h2 className="font-semibold text-gray-900 text-base sm:text-lg mb-4">Explore</h2>
         <div className="flex flex-wrap gap-2">
           {enrichment.spotifyUrl && (

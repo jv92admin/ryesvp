@@ -9,7 +9,7 @@ export function PrimaryCTACard({ tmUrl }: PrimaryCTACardProps) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 h-full flex flex-col">
+    <div className="bg-white rounded-lg border border-[var(--border-default)] p-4 sm:p-6 h-full flex flex-col">
       <div className="flex flex-col gap-3">
         {/* Ticketmaster button - prominent, centered, full-width */}
         {tmUrl && (

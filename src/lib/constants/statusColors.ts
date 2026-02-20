@@ -38,14 +38,14 @@ export type UserStatus = keyof typeof statusConfig;
 export const eventStatusConfig = {
   SOLD_OUT: {
     label: 'Sold Out',
-    colors: 'bg-red-100 text-red-800',
+    colors: 'bg-[var(--surface-inset)] text-[var(--text-primary)]',
   },
   CANCELLED: {
     label: 'Cancelled',
-    colors: 'bg-gray-100 text-gray-800',
+    colors: 'bg-[var(--surface-inset)] text-[var(--text-secondary)]',
   },
   POSTPONED: {
     label: 'Postponed',
-    colors: 'bg-yellow-100 text-yellow-800',
+    colors: 'bg-[var(--surface-inset)] text-[var(--text-primary)]',
   },
 } as const;

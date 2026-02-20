@@ -18,8 +18,8 @@ export function EventSocialSection({ social }: EventSocialSectionProps) {
   const friendsInterested = social.friends.filter(f => f.status === 'INTERESTED');
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-      <h2 className="font-semibold text-gray-900 mb-4">Who's Going</h2>
+    <div className="bg-white rounded-lg border border-[var(--border-default)] p-6 mb-6">
+      <h2 className="font-semibold text-[var(--text-primary)] mb-4">Who's Going</h2>
       
       {/* Friends Section */}
       {hasFriends && (

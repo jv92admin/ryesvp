@@ -69,9 +69,9 @@ export function EventCardActions({
         disabled={isLoading}
         className={`
           w-7 h-7 rounded-full flex items-center justify-center transition-colors
-          ${status === 'GOING' 
-            ? 'bg-[var(--brand-primary)] text-white' 
-            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+          ${status === 'GOING'
+            ? 'bg-[var(--signal-going)] text-white'
+            : 'bg-gray-100 text-[var(--text-muted)] hover:bg-gray-200'
           }
           disabled:opacity-50
         `}

@@ -17,11 +17,11 @@ type ChipSize = 'xs' | 'sm' | 'md';
 /**
  * Semantic colors for chips:
  * - default: Gray (unselected/neutral)
- * - primary: Brand green (active/selected)
- * - accent: Brand primary for highlighted info
- * - category: Blue tint for category filters (legacy, will migrate)
+ * - primary: Warm gold (engagement/social — active filter chips, selections)
+ * - accent: Warm gold solid (highlighted engagement)
+ * - category: Blue tint for category filters
  * - warning: Amber for "needs attention" states
- * - success: Green for confirmed states
+ * - success: Green for going/confirmed signal states
  */
 type ChipColor = 'default' | 'primary' | 'accent' | 'category' | 'warning' | 'success';
 
@@ -46,34 +46,34 @@ const sizeStyles: Record<ChipSize, string> = {
 // Borders added for visual definition per UX feedback
 const colorStyles: Record<ChipColor, { active: string; inactive: string }> = {
   default: {
-    active: 'bg-gray-200 text-gray-900 border border-gray-300',
-    inactive: 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300 hover:bg-gray-50',
+    active: 'bg-gray-200 text-[var(--text-primary)] border border-gray-300',
+    inactive: 'bg-white text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-gray-300 hover:bg-gray-50',
   },
   primary: {
-    active: 'bg-[var(--brand-primary-light)] text-[var(--brand-primary)] border border-green-300',
-    inactive: 'bg-white text-gray-600 border border-gray-200 hover:border-green-300 hover:bg-green-50',
+    active: 'bg-[var(--action-engage-light)] text-[var(--action-engage)] border border-amber-700/30',
+    inactive: 'bg-white text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-amber-700/30 hover:bg-[var(--action-engage-light)]',
   },
   accent: {
-    active: 'bg-[var(--brand-primary)] text-white border border-[var(--brand-primary)]',
-    inactive: 'bg-[var(--brand-primary-light)] text-[var(--brand-primary)] border border-green-200 hover:bg-green-200',
+    active: 'bg-[var(--action-engage)] text-white border border-[var(--action-engage)]',
+    inactive: 'bg-[var(--action-engage-light)] text-[var(--action-engage)] border border-amber-200 hover:bg-amber-100',
   },
   category: {
     active: 'bg-blue-100 text-blue-800 border border-blue-300',
-    inactive: 'bg-white text-gray-600 border border-gray-200 hover:border-blue-300 hover:bg-blue-50',
+    inactive: 'bg-white text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-blue-300 hover:bg-blue-50',
   },
   warning: {
     active: 'bg-amber-100 text-amber-700 border border-amber-300',
-    inactive: 'bg-white text-gray-600 border border-gray-200 hover:border-amber-300 hover:bg-amber-50',
+    inactive: 'bg-white text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-amber-300 hover:bg-amber-50',
   },
   success: {
-    active: 'bg-green-100 text-green-700 border border-green-300',
-    inactive: 'bg-white text-gray-600 border border-gray-200 hover:border-green-300 hover:bg-green-50',
+    active: 'bg-[var(--signal-going-light)] text-[var(--signal-going)] border border-green-300',
+    inactive: 'bg-white text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-green-300 hover:bg-green-50',
   },
 };
 
 // Variant-specific styling
 const variantStyles: Record<ChipVariant, string> = {
-  toggle: 'rounded-full font-medium cursor-pointer transition-all',
+  toggle: 'rounded-full font-medium cursor-pointer transition-colors',
   tag: 'rounded-full font-normal',
   status: 'rounded-md font-medium',
   info: 'rounded-full font-normal',

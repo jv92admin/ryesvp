@@ -10,8 +10,9 @@ import { clsx } from 'clsx';
  * - ghost: Text-only, minimal visual weight — inline actions
  * - danger: Red destructive — "Delete", "Leave"
  * - signal: Green for status confirmations — "Going", "RSVP" (green = signal, not brand)
+ * - engage: Warm gold for social CTAs — "Start Plan", "Invite", "Add Friend"
  */
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'signal';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'signal' | 'engage';
 type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -51,6 +52,12 @@ const variantStyles: Record<ButtonVariant, string> = {
     'bg-[var(--signal-going)] text-white',
     'hover:bg-[var(--signal-going-hover)]',
     'focus:ring-2 focus:ring-[var(--signal-going)] focus:ring-offset-2',
+    'disabled:bg-[var(--border-default)] disabled:text-[var(--text-muted)]',
+  ].join(' '),
+  engage: [
+    'bg-[var(--action-engage)] text-[var(--action-engage-text)]',
+    'hover:bg-[var(--action-engage-hover)]',
+    'focus:ring-2 focus:ring-[var(--action-engage)] focus:ring-offset-2',
     'disabled:bg-[var(--border-default)] disabled:text-[var(--text-muted)]',
   ].join(' '),
 };

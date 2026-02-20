@@ -161,7 +161,7 @@ export function FriendsAndStatusCard({
   ].slice(0, 5);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 mb-6">
+    <div className="bg-white rounded-lg border border-[var(--border-default)] p-4 sm:p-5 mb-6">
       <div className="space-y-2">
         {/* ROW 1: Attendance (PRIMARY) - Interested / Going */}
         <div className="grid grid-cols-2 gap-1.5">
@@ -187,8 +187,8 @@ export function FriendsAndStatusCard({
                 className={`
                   px-3 py-2 rounded-md font-medium transition-colors text-[13px]
                   ${status === 'GOING'
-                    ? 'bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)]'
-                    : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50'
+                    ? 'bg-[var(--signal-going)] text-white hover:bg-[var(--signal-going-hover)]'
+                    : 'bg-white border border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-[var(--surface-inset)]'
                   }
                   disabled:opacity-50 disabled:cursor-not-allowed
                 `}
@@ -287,7 +287,7 @@ export function FriendsAndStatusCard({
         {/* Sign in prompt for non-logged in users */}
         {!isLoggedIn && (
           <p className="text-xs text-gray-500 text-center pt-1">
-            <Link href="/login" className="text-[var(--brand-primary)] hover:underline">
+            <Link href="/login" className="text-[var(--signal-info)] hover:underline">
               Sign in
             </Link> to mark your status
           </p>
