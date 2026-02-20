@@ -45,11 +45,11 @@
 ## Increment Overview
 
 ```
-INC 0  Design Foundation          ← tokens, constants, primitives (NO UX changes)
+INC 0  Design Foundation          ✅ tokens, constants, primitives, monochrome palette
   ↓
-INC 1  Modal & People System      ← shared Modal, PeopleList, migrate 12 modals
+INC 1  Modal & People System      ✅ Dialog primitive, PeopleList, 4 modals migrated
   ↓
-INC 2  Filter Cleanup             ← collapsible filters, FilterDrawer
+INC 2  Filter Cleanup             ✅ FilterDrawer, FilterStrip rewrite, old chips deprecated
   ↓
 INC 3  Social-First Home          ← kill tabs, inline social signals, plans strip
   ↓
@@ -64,11 +64,13 @@ Each increment is independently shippable. Later increments benefit from earlier
 
 ---
 
-## Increment 0: Design Foundation
+## Increment 0: Design Foundation ✅ COMPLETE
 
 **Goal:** Establish the constants, tokens, and color discipline that every subsequent increment builds on. No user-visible UX changes — purely infrastructure.
 
 **Agent:** `ui-polish` (primary), `qa-reviewer` (gate)
+
+**Shipped:** Feb 2026 · Branch `revamp/ux-architecture`
 
 **Why first:** We're about to build ~6 new components and restructure ~10 existing ones. If colors and constants aren't clean, we'll build new things with old inconsistencies.
 
@@ -248,13 +250,15 @@ Priority files:
 
 ---
 
-## Increment 1: Modal & People System
+## Increment 1: Modal & People System ✅ COMPLETE
 
 **Goal:** Unified modal behavior and a shared people display component. Currently 12 modal components, each hand-rolling backdrop/card/close/scroll. One shared system, used everywhere.
 
 **Agent:** `ui-polish` (primary), `qa-reviewer` (gate)
 
 **Depends on:** Inc 0 (tokens, IconButton for close button)
+
+**Shipped:** Feb 2026 · 4 of 12 modals migrated (SquadCreation, SquadInvite, SquadPage, StartPlan). Remaining 8 modals deferred — lower-traffic surfaces, will migrate opportunistically.
 
 ### 1A. Upgrade Dialog Primitive
 
@@ -338,13 +342,15 @@ This is mechanical but high-impact. Every modal gets: consistent border radius, 
 
 ---
 
-## Increment 2: Filter Cleanup
+## Increment 2: Filter Cleanup ✅ COMPLETE
 
 **Goal:** Tame the 12-element FilterStrip into search + 3-4 quick chips + overflow drawer. Home page should show events, not a wall of filter buttons.
 
 **Agent:** `ui-polish` (primary), `engagement` (copy/empty states), `qa-reviewer` (gate)
 
 **Depends on:** Inc 0 (tokens, Input primitive), Inc 1 (Dialog for FilterDrawer on mobile)
+
+**Shipped:** Feb 2026 · FilterDrawer (sheet), FilterStrip rewrite, SearchInput token updates, 4 old chip components deprecated. Validated at 375px and 1280px via DevTools MCP.
 
 ### 2A. FilterStrip Redesign
 

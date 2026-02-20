@@ -28,6 +28,13 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 | **B** | **UX: Group Friend Links** | Community backend (hidden), group join flow | ✅ Complete |
 | **B** | **UX: Transactional Emails** | Welcome, invites, reminders | 🔲 |
 | **B** | **UX: Bug Fixes** | Issues identified during build | 🔲 |
+| **UX** | **UX Revamp: Design Foundation (Inc 0)** | Tokens, constants, primitives, monochrome palette | ✅ Complete |
+| **UX** | **UX Revamp: Modal & People System (Inc 1)** | Dialog primitive, PeopleList, 4 modal migrations | ✅ Complete |
+| **UX** | **UX Revamp: Filter Cleanup (Inc 2)** | FilterDrawer, FilterStrip rewrite, search → 3 chips → overflow | ✅ Complete |
+| **UX** | **UX Revamp: Social-First Home (Inc 3)** | Kill ViewToggle, PlansStrip, inline social on EventCard | 🔲 |
+| **UX** | **UX Revamp: Event Page Hierarchy (Inc 4)** | Zone-based layout, promote Buy, separate social proof | 🔲 |
+| **UX** | **UX Revamp: Plan-on-Event-Page (Inc 5)** | Inline plan panel, kill navigate-away | 🔲 |
+| **UX** | **UX Revamp: Groups Surfacing (Inc 6)** | Group labels, group filter, group activity | 🔲 |
 | **C** | **User Testing** | Invite 20-30 users, collect feedback | 🔲 |
 | **D** | **Event Discovery 2.x** | Data enrichment (venue, event, performer) | 🔲 |
 | **D** | **Event Discovery 3.x** | Personalization + Spotify OAuth | 🔲 |
@@ -57,6 +64,9 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 | — | Delete Account | Cascade delete + Supabase Auth | ✅ Complete |
 | — | Design System | Brand tokens, shared UI components | ✅ Complete |
 | — | About Page | `/about` with How It Works | ✅ Complete |
+| UX.0 | Design Foundation | Lark tokens, constants, monochrome palette shift | ✅ Complete |
+| UX.1 | Modal & People System | Dialog primitive (focus trap, sheet), PeopleList, 4 modals migrated | ✅ Complete |
+| UX.2 | Filter Cleanup | FilterDrawer (sheet), FilterStrip rewrite, deprecated old chips | ✅ Complete |
 
 ---
 
@@ -65,6 +75,25 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 **See:** `specs/event-discovery-spec.md` for full details.
 
 All phases (0–1.6) complete. 19 venue scrapers, 700+ events, 500+ performers, fuzzy search, instant-apply filters. Key design decisions documented in `architecture/data-model.md`.
+
+---
+
+## UX Revamp (branch: `revamp/ux-architecture`)
+
+**Spec:** `specs/ux-revamp-spec.md`
+**Goal:** Redesign the UI architecture toward the Lark brand — monochrome-first, progressive disclosure, social signal as the product.
+
+| Inc | Name | Status | Key Deliverables |
+|-----|------|--------|------------------|
+| 0 | Design Foundation | ✅ | Lark token system (`--surface-*`, `--text-*`, `--action-*`, `--signal-*`), constants extraction (categoryColors, statusColors, externalBrands), Button/IconButton/Input primitives, legacy aliases for incremental migration |
+| 1 | Modal & People System | ✅ | Dialog primitive (focus trap, scroll lock, escape, fade+scale, 4 size variants incl. sheet), PeopleList component, 4 modals migrated (SquadCreation, SquadInvite, SquadPage, StartPlan) |
+| 2 | Filter Cleanup | ✅ | FilterDrawer (Dialog sheet, 4 sections: When/Category/Discovery/Venues), FilterStrip rewrite (search → 3 quick chips → Filters overflow), active filter tags with dismissal, venue name resolution, old chips deprecated |
+| 3 | Social-First Home | 🔲 | Kill ViewToggle, PlansStrip, social signals on EventCard, Friends Going filter |
+| 4 | Event Page Hierarchy | 🔲 | 5-zone layout, Buy above fold, SocialProofCard separated |
+| 5 | Plan-on-Event-Page | 🔲 | Inline plan panel on event page, kill navigate-away |
+| 6 | Groups Surfacing | 🔲 | Group labels on avatars, group filter, group activity in PlansStrip |
+
+**Design audit & open questions:** See `specs/ux-revamp-audit.md`
 
 ---
 
@@ -236,5 +265,5 @@ Friend Links, Group Links, and Onboarding are complete. Remaining:
 
 ---
 
-**Last Updated:** February 2026
-**Active Spec:** `specs/event-discovery-spec.md` (Blocks A, D)
+**Last Updated:** February 19, 2026
+**Active Specs:** `specs/event-discovery-spec.md` (Blocks A, D), `specs/ux-revamp-spec.md` (UX Revamp)
