@@ -81,24 +81,26 @@ export function SocialProofCard({
     }
   };
 
-  // Don't render if logged out and no public social signals
   if (!isLoggedIn && totalFriends === 0) return null;
 
+  const ticketText = 'text-sm transition-colors disabled:opacity-50';
+  const ticketInactive = 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]';
+
   return (
-    <div className="bg-[var(--surface-card)] rounded-lg border border-[var(--border-default)] p-4 sm:p-5 mb-6">
-      <div className="space-y-3">
-        {/* Friend avatars + count */}
-        {totalFriends > 0 ? (
-          <div className="flex items-center justify-between">
+    <>
+      <div className="mb-6 border-t border-[var(--border-default)]">
+        {/* Friends row */}
+        {totalFriends > 0 && (
+          <div className="flex items-center justify-between py-3">
             <button
               onClick={() => setShowFriendsModal(true)}
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2.5 hover:opacity-80 transition-opacity"
             >
-              <FriendAvatarStack friends={friendsForAvatars} maxVisible={4} size="md" />
-              <span className="text-sm text-[var(--text-secondary)]">
-                {friendsGoing > 0 && `${friendsGoing} going`}
+              <FriendAvatarStack friends={friendsForAvatars} maxVisible={3} size="md" />
+              <span className="text-sm text-[var(--text-primary)]">
+                {friendsGoing > 0 && <><strong>{friendsGoing}</strong> going</>}
                 {friendsGoing > 0 && friendsInterested > 0 && ' · '}
-                {friendsInterested > 0 && `${friendsInterested} interested`}
+                {friendsInterested > 0 && <><strong>{friendsInterested}</strong> interested</>}
               </span>
             </button>
             <button
@@ -108,55 +110,46 @@ export function SocialProofCard({
               See all
             </button>
           </div>
-        ) : isLoggedIn ? (
-          <p className="text-sm text-[var(--text-muted)]">No friends marked yet</p>
-        ) : null}
-
-        {/* Plan button */}
-        {isLoggedIn && (
-          <SmartSquadButton
-            eventId={eventId}
-            userSquadId={userSquad?.id || null}
-            friendsGoing={friendsGoing}
-            friendsInterested={friendsInterested}
-            event={event}
-            alwaysShow={true}
-          />
         )}
 
-        {/* Ticket exchange */}
+        {/* Plan + Ticket row */}
         {isLoggedIn && (
-          <div className="border-t border-[var(--border-default)] pt-3">
-            <p className="text-xs text-[var(--text-muted)] uppercase tracking-wider mb-2">Ticket Exchange</p>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => handleTicketChange('NEED_TICKETS')}
-                disabled={isLoading}
-                className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border disabled:opacity-50 disabled:cursor-not-allowed ${
-                  ticketStatus === 'NEED_TICKETS'
-                    ? 'bg-[var(--signal-interested-light)] text-[var(--signal-interested)] border-[var(--signal-interested)]'
-                    : 'bg-[var(--surface-card)] text-[var(--text-secondary)] border-[var(--border-default)] hover:border-[var(--border-strong)] hover:bg-[var(--surface-inset)]'
-                }`}
-              >
-                Need Tickets
-              </button>
-              <button
-                onClick={() => handleTicketChange('HAVE_TICKETS')}
-                disabled={isLoading}
-                className={`px-3 py-2.5 rounded-lg text-sm font-medium transition-colors border disabled:opacity-50 disabled:cursor-not-allowed ${
-                  ticketStatus === 'HAVE_TICKETS'
-                    ? 'bg-[var(--action-engage-light)] text-[var(--action-engage)] border-[var(--action-engage)]'
-                    : 'bg-[var(--surface-card)] text-[var(--text-secondary)] border-[var(--border-default)] hover:border-[var(--border-strong)] hover:bg-[var(--surface-inset)]'
-                }`}
-              >
-                Selling Tickets
-              </button>
-            </div>
+          <div className="flex items-center gap-3 py-3 border-t border-[var(--border-default)]">
+            <SmartSquadButton
+              eventId={eventId}
+              userSquadId={userSquad?.id || null}
+              friendsGoing={friendsGoing}
+              friendsInterested={friendsInterested}
+              event={event}
+              alwaysShow={true}
+            />
+            <span className="text-[var(--border-default)]" aria-hidden>|</span>
+            <button
+              onClick={() => handleTicketChange('NEED_TICKETS')}
+              disabled={isLoading}
+              className={`${ticketText} ${
+                ticketStatus === 'NEED_TICKETS'
+                  ? 'font-medium text-[var(--signal-interested)]'
+                  : ticketInactive
+              }`}
+            >
+              Need Tickets
+            </button>
+            <button
+              onClick={() => handleTicketChange('HAVE_TICKETS')}
+              disabled={isLoading}
+              className={`${ticketText} ${
+                ticketStatus === 'HAVE_TICKETS'
+                  ? 'font-medium text-[var(--action-engage)]'
+                  : ticketInactive
+              }`}
+            >
+              Selling
+            </button>
           </div>
         )}
       </div>
 
-      {/* Friends modal */}
       {showFriendsModal && (
         <CombinedAttendanceModal
           eventId={eventId}
@@ -165,6 +158,6 @@ export function SocialProofCard({
           onClose={() => setShowFriendsModal(false)}
         />
       )}
-    </div>
+    </>
   );
 }
