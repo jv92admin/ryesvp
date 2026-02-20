@@ -1,9 +1,9 @@
 # UX Revamp Spec
 
 > The complete UX architecture redesign.
-> Structured as 7 mutable increments, each shippable independently.
+> Structured as 8 mutable increments (0-7), each shippable independently.
 > Brand direction informed by `references/lark-proposal-final.pdf`.
-> Date: 2026-02-19
+> Date: 2026-02-19 · Updated: 2026-02-20 (Lark Visual Identity + warm engagement)
 
 ---
 
@@ -24,6 +24,8 @@
 
 **What this means for our code (now):**
 - Palette tokens shift toward monochrome-primary, green becomes accent (not primary action color)
+- **Warm gold (`#B45309`) for engagement CTAs** — Start Plan, Invite, active filter chips, Friends filter. Distinct from structural dark and signal green.
+- Three-tier CTA hierarchy: dark (structural) → warm gold (engagement/social) → green (state only)
 - New copy we write follows Lark's voice (warm, social, natural)
 - Components designed with the Lark aesthetic even while still called RyesVP in code
 - When the rename happens, the UI is already aligned — it's just string changes
@@ -38,7 +40,8 @@
 4. **Consistency compounds.** Same Modal, same PeopleList, same color tokens everywhere. Build it once in Increment 0, use it in every increment after.
 5. **Mobile-first, desktop-enhanced.** Design at 375px, then add desktop features (sidebar, wider grid, hover states).
 6. **Monochrome-first, color as signal.** Black, white, and gray are the foundation. Color appears only to signal state (going = green, interested = amber, danger = red). This aligns with Lark's "house lights go down" aesthetic and makes the social signals pop.
-7. **The plugged-in friend.** Every piece of copy sounds like a friend who knows what's happening — not a robot, not a marketer, not a concierge. Warm, brief, social.
+7. **Warm for engagement, dark for structure.** Social/friend actions (Start Plan, Invite, active chips) use warm gold (`--action-engage`). Commercial/navigation actions (Buy Tickets, Done, Get Started) use dark (`--action-primary`). Green is **never** a CTA — it's a state signal only (Going badge).
+8. **The plugged-in friend.** Every piece of copy sounds like a friend who knows what's happening — not a robot, not a marketer, not a concierge. Warm, brief, social.
 
 ---
 
@@ -51,13 +54,15 @@ INC 1  Modal & People System      ✅ Dialog primitive, PeopleList, 4 modals mig
   ↓
 INC 2  Filter Cleanup             ✅ FilterDrawer, FilterStrip rewrite, old chips deprecated
   ↓
-INC 3  Social-First Home          ← kill tabs, inline social signals, plans strip
+INC 3  Lark Visual Identity       ← warm tokens, de-SaaS cards, unified badges, chip migration
   ↓
-INC 4  Event Page Hierarchy       ← zone-based layout, promote Buy, separate social
+INC 4  Social-First Home          ← kill tabs, inline social signals, plans strip
   ↓
-INC 5  Plan-on-Event-Page         ← inline plan panel, kill navigate-away
+INC 5  Event Page Zones           ← zone-based layout, promote Buy, separate social
   ↓
-INC 6  Groups Surfacing           ← group labels, group filter, group activity
+INC 6  Plan-on-Event-Page         ← inline plan panel, kill navigate-away
+  ↓
+INC 7  Groups Surfacing           ← group labels, group filter, group activity
 ```
 
 Each increment is independently shippable. Later increments benefit from earlier ones but don't hard-block (except Inc 0, which everything depends on).
@@ -131,6 +136,7 @@ The Lark brand doc calls for **high-contrast monochrome** — a stark black-and-
 | Muted text | `gray-400` (#9CA3AF) | Light gray | `--text-muted` |
 | Borders | `gray-200` (#E5E5E5) | Subtle gray | `--border-default` |
 | **Action / CTA** | **Green (#16A34A)** | **Near-black or dark** | `--action-primary` |
+| **Engagement / social** | — | **Warm gold (#B45309)** | `--action-engage` |
 | Going / confirmed | Green | Green (kept as state) | `--signal-going` |
 | Interested / warm | Amber | Amber (kept as state) | `--signal-interested` |
 | Danger / error | Red | Red (kept as state) | `--signal-danger` |
@@ -428,15 +434,87 @@ All existing filter logic stays — URL params, instant apply. We're just reorga
 
 ---
 
-## Increment 3: Social-First Home
+## Increment 3: Lark Visual Identity
+
+**Goal:** Apply the warm engagement palette, de-SaaS card treatment, and unified badge system across the existing UI. This is a cosmetic skin change — no structural layout changes, no new features. Every component exits this increment looking like Lark, not a SaaS dashboard.
+
+**Agent:** `ui-polish` (primary), `qa-reviewer` (gate)
+
+**Depends on:** Inc 0 (tokens), Inc 2 (FilterStrip chips to migrate)
+
+### 3A. Warm Engagement Token Migration
+
+Migrate all social/friend CTAs from green (`--brand-primary`) to warm gold (`--action-engage`):
+
+| Component | Current | Target |
+|-----------|---------|--------|
+| `ToggleChip` active | `--brand-primary-light` + `border-green-300` | `--action-engage-light` + `border-amber-700/30` |
+| `StartPlanButton` (all 3 variants) | `--brand-primary` green | `.btn-engage` warm gold |
+| `SmartSquadButton` | Green variants | `.btn-engage` warm gold |
+| `FilterStrip` Filters button (active) | `--action-primary` border | `--action-engage` border |
+| `FriendsAndStatusCard` action buttons | Green-tinted | Warm gold for social CTAs, green for Going state only |
+
+**Rule:** After this sub-increment, green (`--signal-going`) appears ONLY on Going/Confirmed badges. Never on a clickable CTA.
+
+### 3B. De-SaaS Card Treatment
+
+Remove shadows and soften card treatment across all card components:
+
+- **Mobile:** Remove `shadow-sm` / `shadow-md`. Use whitespace + `border-b border-[var(--border-default)]` as separators.
+- **Desktop:** `border border-transparent hover:border-[var(--border-default)]` — borders appear on hover, not at rest.
+- **EventCard:** Drop `shadow-sm rounded-lg` → no shadow, `border-b` on mobile, hover border on desktop.
+- **FriendsAndStatusCard, SocialProofCard:** Same treatment.
+- **Principle:** Shadows are SaaS. Whitespace and borders are editorial.
+
+### 3C. Unified Badge System
+
+Consolidate all marker badges (NEW, PRESALE, SOLD OUT, category) into one visual language:
+
+**Current fragmentation:**
+- NEW → green primary pill (`StatusBadge` variant)
+- PRESALE → blue info pill (`StatusBadge` variant)
+- SOLD OUT → red danger pill (`StatusBadge` variant)
+- Category → colored background pills (purple, yellow, etc.)
+
+**Target:**
+- All status markers: `font-semibold uppercase tracking-wide text-[10px]` monochrome treatment
+- Category badges: Keep subtle color tint (informational, not interactive) but harmonize sizing
+- One `BadgeMarker` component or unified `StatusBadge` variant for all markers
+
+### 3D. Legacy Token Cleanup
+
+With warm tokens in place, remove legacy aliases that are no longer referenced:
+
+1. Grep for `--brand-primary` usage across all components
+2. Replace with appropriate new token (`--action-engage` for CTAs, `--signal-going` for state)
+3. Remove alias from `globals.css` once zero references remain
+4. Repeat for `--brand-primary-hover`, `--brand-primary-light`, `--brand-border`, etc.
+
+**Note:** This is opportunistic — only remove aliases that reach zero references in this increment.
+
+### 3E. Definition of Done
+
+- [ ] Zero green CTAs — `--signal-going` used only for Going/Confirmed badges
+- [ ] All social CTAs use `--action-engage` (warm gold)
+- [ ] No `shadow-sm` or `shadow-md` on event cards or content cards
+- [ ] All status markers (NEW, PRESALE, SOLD OUT) use unified typographic treatment
+- [ ] Category badges harmonized in size with status markers
+- [ ] Input focus rings use `--action-engage` (not green)
+- [ ] Legacy alias usage reduced (track count before/after)
+- [ ] Mobile (375px) and desktop (1024px+) verified via DevTools MCP
+- [ ] `qa-reviewer` audit passes with zero BLOCKERs
+
+---
+
+## Increment 4: Social-First Home
 
 **Goal:** Kill the All Events / Your Events tab split. Surface social signals inline on every event card. Plans strip at top.
 
 **Agent:** `ui-polish` (layout + cards), `engagement` (copy, empty states, social messaging), `qa-reviewer` (gate)
 
-**Depends on:** Inc 0 (tokens), Inc 1 (PeopleList for friend display), Inc 2 (filter cleanup — "Friends Going" becomes a quick filter chip)
+**Depends on:** Inc 0 (tokens), Inc 1 (PeopleList for friend display), Inc 2 (filter cleanup — "Friends Going" becomes a quick filter chip), Inc 3 (visual identity — cards and chips already styled)
 
-### 3A. Kill ViewToggle
+### 4A. Kill ViewToggle
 
 Remove the `ViewToggle` component and the two-tab paradigm. One unified feed.
 
@@ -444,7 +522,7 @@ Remove the `ViewToggle` component and the two-tab paradigm. One unified feed.
 
 **New:** Single feed. Social signals woven into every card. Social-specific views are filters, not separate tabs.
 
-### 3B. Plans Strip
+### 4B. Plans Strip
 
 A horizontal scrolling strip at the top of the feed showing the user's active plans. This replaces the "Your Plans" section from SocialTab.
 
@@ -463,7 +541,7 @@ YOUR PLANS (2)
 - Tapping opens the plan-on-event-page (Inc 5) or squad page
 - Subtle highlight on cards with unread plan notifications
 
-### 3C. Social Signals on EventCard
+### 4C. Social Signals on EventCard
 
 Every EventCard in the main feed gains inline social signals:
 
@@ -482,7 +560,7 @@ Every EventCard in the main feed gains inline social signals:
 
 Data source: `EventDisplay` already includes `socialSignals.friends` — we just need to render them on the card instead of only in the Social tab.
 
-### 3D. "Friends Going" Quick Filter
+### 4D. "Friends Going" Quick Filter
 
 Add a "Friends" chip to the FilterStrip quick chips:
 
@@ -492,7 +570,7 @@ Add a "Friends" chip to the FilterStrip quick chips:
 
 When active: filters to only events where at least one friend is Going or Interested. Uses existing `?friendsGoing=true` param.
 
-### 3E. Component Changes
+### 4E. Component Changes
 
 | Component | Change |
 |-----------|--------|
@@ -504,13 +582,13 @@ When active: filters to only events where at least one friend is Going or Intere
 | NEW: `PlansStrip.tsx` | Horizontal scroll strip of user's active plans |
 | `FilterStrip.tsx` | Add "Friends" quick chip |
 
-### 3F. Data Changes
+### 4F. Data Changes
 
 The `getEventsWithSocialSignals()` query already returns friend data. The `EventDisplay` type already includes it. No schema changes needed — this is purely a UI restructuring.
 
 If performance is a concern (social signals on every card), the data layer already computes this server-side. We just need to pass it through.
 
-### 3G. Definition of Done
+### 4G. Definition of Done
 
 - [ ] No tab toggle on home page — single unified feed
 - [ ] Plans strip shows at top for logged-in users with plans
@@ -523,15 +601,15 @@ If performance is a concern (social signals on every card), the data layer alrea
 
 ---
 
-## Increment 4: Event Detail Page Hierarchy
+## Increment 5: Event Page Zones
 
 **Goal:** Zone-based layout that puts the highest-intent actions above the fold and separates attendance, commerce, and social into clear zones.
 
 **Agent:** `ui-polish` (primary), `engagement` (CTA copy, social proof messaging), `qa-reviewer` (gate)
 
-**Depends on:** Inc 0 (tokens, IconButton for Share/Website), Inc 1 (Dialog + PeopleList for friend modal)
+**Depends on:** Inc 0 (tokens, IconButton for Share/Website), Inc 1 (Dialog + PeopleList for friend modal), Inc 3 (warm CTAs, de-SaaS card treatment already applied)
 
-### 4A. Zone-Based Layout
+### 5A. Zone-Based Layout
 
 **Current (top to bottom):**
 Back+Share → Hero → Header (badges, title, date, venue) → FriendsAndStatusCard (6 buttons) → Buy+Explore → About
@@ -584,7 +662,7 @@ ZONE 5: ABOUT
   └────────────────────────────────────────────────────┘
 ```
 
-### 4B. Key Design Decisions
+### 5B. Key Design Decisions
 
 1. **Buy Tickets promoted into the action zone.** It's the highest commercial intent — above the fold, full-width, brand-colored button. Currently buried below FriendsAndStatusCard.
 
@@ -596,7 +674,7 @@ ZONE 5: ABOUT
 
 5. **Back button stays top-left.** Universal navigation pattern.
 
-### 4C. Component Changes
+### 5C. Component Changes
 
 | Component | Change |
 |-----------|--------|
@@ -609,7 +687,7 @@ ZONE 5: ABOUT
 | NEW: `AttendanceButtons.tsx` | Just Interested/Going, extracted from FriendsAndStatusCard |
 | NEW: `SocialProofCard.tsx` | Friends + Plan CTA + Ticket exchange |
 
-### 4D. Definition of Done
+### 5D. Definition of Done
 
 - [ ] Buy Tickets visible above the fold on mobile (375px)
 - [ ] Interested/Going buttons in action zone (Zone 2)
@@ -622,15 +700,15 @@ ZONE 5: ABOUT
 
 ---
 
-## Increment 5: Plan-on-Event-Page
+## Increment 6: Plan-on-Event-Page
 
 **Goal:** When a user has a plan for an event, the plan experience lives on the event page itself — not a separate `/squads/[id]` route. The squad page becomes a deep-link fallback.
 
 **Agent:** `ui-polish` (layout, panel UI), `engagement` (plan messaging, share texts), `data-model` (plan data on event page), `qa-reviewer` (gate)
 
-**Depends on:** Inc 4 (event page zones — plan panel extends Zone 3)
+**Depends on:** Inc 5 (event page zones — plan panel extends Zone 3)
 
-### 5A. Plan Panel on Event Page
+### 6A. Plan Panel on Event Page
 
 When the user taps "View Plan" in the SocialProofCard (Zone 3), instead of navigating away, a collapsible panel expands inline:
 
@@ -660,7 +738,7 @@ ZONE 3: SOCIAL PROOF (expanded with plan)
   └────────────────────────────────────────────────────┘
 ```
 
-### 5B. SmartSquadButton Behavior Change
+### 6B. SmartSquadButton Behavior Change
 
 **Current behavior:**
 - Mobile: navigate to `/squads/[id]`
@@ -671,7 +749,7 @@ ZONE 3: SOCIAL PROOF (expanded with plan)
 - "View Plan" → expand inline Plan Panel on event page
 - Deep link `/squads/[id]` still works (for shared links, notifications) but redirects to `/events/[eventId]?plan=open`
 
-### 5C. Data Requirements
+### 6C. Data Requirements
 
 The event detail page already fetches `userSquad` (ID only). For the inline plan panel, we need to also fetch:
 - Squad members with status
@@ -680,13 +758,13 @@ The event detail page already fetches `userSquad` (ID only). For the inline plan
 
 This is a small extension to the existing `events/[id]/page.tsx` server query or a client-side fetch when the panel opens.
 
-### 5D. What Stays
+### 6D. What Stays
 
 - `/squads/[id]` route continues to exist as a landing page for shared plan links
 - It redirects logged-in users who are members to the event page with plan open
-- For non-members viewing a shared link, it shows a preview + sign-up CTA (future: Inc 6 in Layer 5 — Plan Link Onboarding)
+- For non-members viewing a shared link, it shows a preview + sign-up CTA (future: Inc 7 in Layer 5 — Plan Link Onboarding)
 
-### 5E. Definition of Done
+### 6E. Definition of Done
 
 - [ ] "View Plan" expands inline panel on event page (not navigate away)
 - [ ] Plan panel shows members, meetup details, invite + share actions
@@ -698,15 +776,15 @@ This is a small extension to the existing `events/[id]/page.tsx` server query or
 
 ---
 
-## Increment 6: Groups Surfacing
+## Increment 7: Groups Surfacing
 
 **Goal:** Groups become visible on the home page and event pages. Currently they're 3 clicks deep and serve only as a friend-adding mechanism. They should answer "what's my crew doing?"
 
 **Agent:** `ui-polish` (layout), `engagement` (group messaging, empty states), `data-model` (group activity queries), `qa-reviewer` (gate)
 
-**Depends on:** Inc 3 (social-first home — groups surface on the home feed), Inc 1 (PeopleList for group member display)
+**Depends on:** Inc 4 (social-first home — groups surface on the home feed), Inc 1 (PeopleList for group member display)
 
-### 6A. Group Labels on Friend Avatars
+### 7A. Group Labels on Friend Avatars
 
 When friends from the same group are attending an event, label them:
 
@@ -723,7 +801,7 @@ On SocialProofCard (event page):
 
 This surfaces groups without a separate UI — the group context appears naturally on the social signals that already exist.
 
-### 6B. Group Filter
+### 7B. Group Filter
 
 Add "Groups" to the FilterDrawer (Inc 2):
 
@@ -734,9 +812,9 @@ Groups
 
 When active: shows events where any member of that group is Going or Interested.
 
-### 6C. Group Activity in Plans Strip
+### 7C. Group Activity in Plans Strip
 
-If the user has groups with upcoming activity, show it in the PlansStrip (Inc 3):
+If the user has groups with upcoming activity, show it in the PlansStrip (Inc 4):
 
 ```
 YOUR PLANS (2)                    CONCERT CREW (3 events)
@@ -747,7 +825,7 @@ YOUR PLANS (2)                    CONCERT CREW (3 events)
 └──────────────┘ └──────────────┘ └──────────────┘
 ```
 
-### 6D. Data Requirements
+### 7D. Data Requirements
 
 New query: "For a given group, what events are members attending?"
 
@@ -764,7 +842,7 @@ getGroupActivity(groupId: string): Promise<{
 
 This query powers both the group filter and the group activity in PlansStrip.
 
-### 6E. Definition of Done
+### 7E. Definition of Done
 
 - [ ] Friend avatar stacks show group labels when applicable
 - [ ] Group filter available in FilterDrawer
@@ -782,10 +860,11 @@ This query powers both the group filter and the group activity in PlansStrip.
 | 0: Design Foundation | `ui-polish` | — | `qa-reviewer` |
 | 1: Modal & People | `ui-polish` | — | `qa-reviewer` |
 | 2: Filter Cleanup | `ui-polish` | `engagement` (copy) | `qa-reviewer` |
-| 3: Social-First Home | `ui-polish` | `engagement` (empty states), `data-model` (if query changes needed) | `qa-reviewer` |
-| 4: Event Page Hierarchy | `ui-polish` | `engagement` (CTA copy) | `qa-reviewer` |
-| 5: Plan-on-Event-Page | `ui-polish` | `engagement` (plan messaging), `data-model` (plan data) | `qa-reviewer` |
-| 6: Groups Surfacing | `ui-polish` | `engagement` (group copy), `data-model` (group queries) | `qa-reviewer` |
+| 3: Lark Visual Identity | `ui-polish` | — | `qa-reviewer` |
+| 4: Social-First Home | `ui-polish` | `engagement` (empty states), `data-model` (if query changes needed) | `qa-reviewer` |
+| 5: Event Page Zones | `ui-polish` | `engagement` (CTA copy) | `qa-reviewer` |
+| 6: Plan-on-Event-Page | `ui-polish` | `engagement` (plan messaging), `data-model` (plan data) | `qa-reviewer` |
+| 7: Groups Surfacing | `ui-polish` | `engagement` (group copy), `data-model` (group queries) | `qa-reviewer` |
 
 ### Agent Workflow Per Increment
 
@@ -816,7 +895,7 @@ This query powers both the group filter and the group activity in PlansStrip.
 While UX increments proceed sequentially (0→1→2→3→4→5→6), other Layer 0/1 work from the revamp synthesis runs in parallel:
 
 ```
-TRACK A (this spec):     Inc 0 → Inc 1 → Inc 2 → Inc 3 → Inc 4 → Inc 5 → Inc 6
+TRACK A (this spec):     Inc 0 → Inc 1 → Inc 2 → Inc 3 → Inc 4 → Inc 5 → Inc 6 → Inc 7
 TRACK B (scraper-ops):   Timezone fixes → Field coverage → Enrichment pipeline
 TRACK C (engagement):    alert()→toast → squad leak → CommunitySoonStub → notification wiring
 ```
@@ -829,9 +908,10 @@ Track B and C have zero dependencies on Track A. The `scraper-ops` and `engageme
 
 | Risk | Mitigation |
 |------|-----------|
-| Inc 3 (kill tabs) breaks social data loading | SocialTab data fetching moves to page.tsx server component — test thoroughly |
-| Inc 5 (plan-on-event-page) increases event page data payload | Lazy-load plan data client-side when panel opens |
-| Inc 6 (groups) requires new DB queries | Index exists on GroupMember.groupId — verify with EXPLAIN |
+| Inc 3 (visual identity) warm gold unfamiliar to users | A/B testable — tokens make rollback easy. Test with real content for readability. |
+| Inc 4 (kill tabs) breaks social data loading | SocialTab data fetching moves to page.tsx server component — test thoroughly |
+| Inc 6 (plan-on-event-page) increases event page data payload | Lazy-load plan data client-side when panel opens |
+| Inc 7 (groups) requires new DB queries | Index exists on GroupMember.groupId — verify with EXPLAIN |
 | Design token migration touches many files | Do in Inc 0, not interleaved with UX changes. Mechanical find-replace. |
 | 12 modal migrations (Inc 1) is tedious | Batch by similarity: all simple modals first, then complex ones |
 | PlansStrip (Inc 3) needs real-time plan data | Client-side fetch, same as current SocialTab — just different UI |
@@ -884,7 +964,7 @@ This is the only place the definition appears. Never in marketing copy, push not
 
 ---
 
-## Success Criteria (Post-Inc 6)
+## Success Criteria (Post-Inc 7)
 
 After all increments ship:
 
@@ -896,5 +976,6 @@ After all increments ship:
 6. **Zero hardcoded colors** — everything traces to tokens or constants
 7. **FilterStrip is < 1 row on mobile** — no filter wall before events
 8. **Design system compliance > 95%** — up from ~70% today
-9. **Monochrome palette** — color only as signal (going/interested/danger), not decoration
-10. **Lark voice in all copy** — warm, social, "plugged-in friend" tone everywhere
+9. **Three-tier CTA hierarchy** — dark (structural), warm gold (engagement), green (state only). No green CTAs.
+10. **De-SaaS aesthetic** — no card shadows, editorial whitespace, unified typographic badges
+11. **Lark voice in all copy** — warm, social, "plugged-in friend" tone everywhere

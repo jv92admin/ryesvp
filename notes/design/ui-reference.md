@@ -4,6 +4,71 @@
 
 ---
 
+## Lark Visual Direction
+
+> Added Feb 2026. Defines the visual identity for all UI work going forward. See `notes/specs/ux-revamp-audit.md` (Resolution section) for full rationale.
+
+### The Canvas
+
+Monochrome foundation. The UI is high-contrast black-on-white. Color enters only as signal (state) or warmth (engagement). The event content — images, artist names, dates — is the star. The chrome disappears.
+
+### CTA Hierarchy (Three Tiers)
+
+Every interactive element maps to exactly one tier:
+
+| Tier | Color | Token | Examples |
+|------|-------|-------|----------|
+| **Structural** | Dark `#171717` | `--action-primary` | Buy Tickets, Done, Close, Get Started |
+| **Engagement** | Warm gold `#B45309` | `--action-engage` | Start Plan, Invite, active filter chips, Friends filter |
+| **Signal** | Green/Amber/Red | `--signal-*` | Going badge, Interested badge, Leave Plan |
+
+**Rules:**
+- Green (`--signal-going`) is **never** a CTA button. It's a state indicator only.
+- Warm gold = "do something social with friends." Dark = "navigate or transact."
+- If you're unsure which tier, ask: "Is this a friend/social action?" → warm gold. "Is this commerce/navigation?" → dark.
+
+### Warm Engagement Palette
+
+```css
+--action-engage: #B45309;         /* 5.2:1 contrast w/ white — WCAG AA */
+--action-engage-hover: #92400E;   /* darker on press */
+--action-engage-text: #FFFFFF;    /* white text on gold */
+--action-engage-light: #FFFBEB;   /* warm glow for active chip backgrounds */
+```
+
+### De-SaaS Card Treatment
+
+Shadows are SaaS. Whitespace and borders are editorial.
+
+- **Mobile:** No `shadow-sm`, no `shadow-md`. Use `border-b border-[var(--border-default)]` between cards. Content breathes.
+- **Desktop:** `border border-transparent hover:border-[var(--border-default)]` — borders reveal on hover, invisible at rest.
+- **EventCard:** No shadow, no heavy border radius. Clean whitespace separation.
+
+### Unified Badge System
+
+All status markers use one typographic treatment:
+
+```
+font-semibold uppercase tracking-wide text-[10px]
+```
+
+- **NEW, PRESALE, SOLD OUT:** Monochrome (neutral text color). No colored pills.
+- **Category badges:** Keep subtle color tint (informational, not interactive) but match sizing.
+- One visual language for all markers. No blue presale pills, no green "new" pills.
+
+### Breakpoint Strategy
+
+| Breakpoint | Width | What Changes |
+|------------|-------|-------------|
+| Base (mobile) | < 640px | Single column, `p-4`, no shadows, `border-b` separators |
+| `sm` | 640px | Padding increases, text scales slightly |
+| `md` | 768px | Tagline visible, modal sizing shifts |
+| `lg` | 1024px | Sidebar appears, 2-col grid, hover borders on cards |
+
+`max-w-6xl` for home page, `max-w-5xl` for event detail page, `max-w-lg` for squad page.
+
+---
+
 ## Design Principles
 
 From `product-vision.md`:
@@ -23,16 +88,17 @@ From `product-vision.md`:
 - ❌ Avoid random emojis as visual decoration
 - ✅ Use SVG icons for consistent styling and better accessibility
 - ✅ Emojis acceptable for: category badges, user-generated content
-- ✅ Icons should be monochrome (gray → green on hover)
+- ✅ Icons should be monochrome (gray → dark on hover)
 
 **Navigation elements should be text links, not buttons:**
 - ❌ `bg-white border border-gray-300 rounded-lg` (boxy, dated)
 - ✅ `text-gray-600 hover:text-gray-900` (clean, minimal)
 
 **Interaction patterns:**
-- Hover: Text color change (gray → green or gray → dark)
-- Active: Green text/icon color
-- Copied/Success: Green checkmark icon
+- Hover: Text color change (gray → dark)
+- Active engagement: Warm gold text/background (`--action-engage`) for social actions
+- Active state: Green only for Going/Confirmed badges (`--signal-going`)
+- Copied/Success: Green checkmark icon (state feedback, not action)
 
 **Why this matters:**
 - Cleaner aesthetic keeps focus on content
@@ -44,15 +110,15 @@ From `product-vision.md`:
 All text inputs, textareas, and form fields should follow this consistent pattern:
 
 ```tsx
-className="w-full px-3 py-2 border border-gray-300 rounded-lg 
-           text-gray-900 placeholder:text-gray-400 
-           focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+className="w-full px-3 py-2 border border-[var(--border-default)] rounded-lg
+           text-[var(--text-primary)] placeholder:text-[var(--text-muted)]
+           focus:outline-none focus:ring-2 focus:ring-[var(--action-engage)] focus:border-transparent"
 ```
 
 **Required classes:**
-- `text-gray-900` — Ensures typed text is dark and readable
-- `placeholder:text-gray-400` — Ensures placeholder text is visible but clearly secondary
-- `focus:ring-2 focus:ring-green-500` — Brand-consistent focus state
+- `text-[var(--text-primary)]` — Ensures typed text is dark and readable
+- `placeholder:text-[var(--text-muted)]` — Ensures placeholder text is visible but clearly secondary
+- `focus:ring-2 focus:ring-[var(--action-engage)]` — Warm gold focus state (engagement, not green)
 
 **Why `placeholder:text-gray-400`?**
 Browser defaults for placeholder text are often too pale (gray-300 or lighter). Using `gray-400` ensures:
@@ -65,9 +131,9 @@ Browser defaults for placeholder text are often too pale (gray-300 or lighter). 
 <input
   type="text"
   placeholder="Enter your name..."
-  className="w-full px-3 py-2 border border-gray-300 rounded-lg 
-             text-gray-900 placeholder:text-gray-400 
-             focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+  className="w-full px-3 py-2 border border-[var(--border-default)] rounded-lg
+             text-[var(--text-primary)] placeholder:text-[var(--text-muted)]
+             focus:outline-none focus:ring-2 focus:ring-[var(--action-engage)] focus:border-transparent"
 />
 ```
 
@@ -77,19 +143,44 @@ Browser defaults for placeholder text are often too pale (gray-300 or lighter). 
 
 ### Brand Color Tokens
 
-All brand colors are defined as CSS variables in `src/app/globals.css`. Use these for consistent theming:
+All tokens defined in `src/app/globals.css`. The Lark palette:
 
 ```css
---brand-primary: #16A34A;        /* Green "Go" action - buttons, active states */
---brand-primary-hover: #15803D;  /* Hover state */
---brand-primary-light: #DCFCE7;  /* Light backgrounds, highlights */
---brand-black: #171717;          /* Headers, body text */
---brand-gray: #FAFAFA;           /* Card backgrounds */
---brand-border: #E5E5E5;         /* Borders, dividers */
---brand-danger: #DC2626;         /* Destructive actions */
+/* SURFACES */
+--surface-bg: #FAFAFA;              /* page background */
+--surface-card: #FFFFFF;            /* card / elevated */
+--surface-inset: #F5F5F5;           /* recessed areas, input backgrounds */
+
+/* TEXT */
+--text-primary: #171717;            /* headlines, body */
+--text-secondary: #525252;          /* supporting text */
+--text-muted: #A3A3A3;             /* hints, placeholders */
+
+/* BORDERS */
+--border-default: #E5E5E5;          /* card borders, dividers */
+--border-strong: #D4D4D4;           /* hover borders, emphasis */
+
+/* ACTION — structural (dark) */
+--action-primary: #171717;          /* Buy Tickets, Done, Close, Get Started */
+--action-primary-hover: #404040;
+--action-primary-text: #FFFFFF;
+
+/* ACTION — engagement (warm gold) */
+--action-engage: #B45309;            /* Start Plan, Invite, active chips */
+--action-engage-hover: #92400E;
+--action-engage-text: #FFFFFF;
+--action-engage-light: #FFFBEB;      /* warm glow for active chip backgrounds */
+
+/* SIGNALS — state only, never CTAs */
+--signal-going: #16A34A;            /* Going badge */
+--signal-interested: #F59E0B;       /* Interested badge */
+--signal-danger: #DC2626;           /* errors, Leave Plan */
+--signal-info: #3B82F6;             /* links, informational */
 ```
 
-**Usage:** Always reference via `var(--brand-primary)` rather than hardcoding hex values. This enables future theme changes from a single file.
+**Legacy aliases** (`--brand-primary`, `--brand-border`, etc.) still exist in `globals.css` for backward compatibility during migration. Prefer the new token names in all new code.
+
+**Usage:** Always reference via `var(--token-name)`. Never hardcode hex values.
 
 ### Shared UI Components
 
@@ -249,7 +340,7 @@ Same order, but:
 #### Navigation Bar
 - **Back button:** Clean text link with left chevron, animated on hover
 - **Share button:** Clean text link with share icon (no border, no background)
-- **Styling:** `text-sm font-medium text-gray-600 hover:text-green-600`
+- **Styling:** `text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]`
 - **Rationale:** Minimal UI keeps focus on event content. Matches squad page aesthetic.
 
 #### Share Button
@@ -411,7 +502,7 @@ const categoryColors = {
 
 #### Quick Actions Row
 - **Layout:** Flex row with space-between, positioned below event header
-- **Share:** Text link with share icon, green on hover
+- **Share:** Text link with share icon, dark on hover
 - **Calendar:** Text link with dropdown arrow, remembers preference
 - **Styling:** Matches navigation header (clean text links, no borders)
 

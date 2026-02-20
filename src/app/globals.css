@@ -31,6 +31,12 @@
   --action-secondary-border: #D4D4D4; /* secondary button border */
   --action-secondary-hover: #F5F5F5;  /* secondary button hover bg */
 
+  /* ENGAGEMENT — warm gold for social/friend actions */
+  --action-engage: #B45309;            /* engagement CTAs (Start Plan, Invite, active chips) */
+  --action-engage-hover: #92400E;      /* engagement hover/press */
+  --action-engage-text: #FFFFFF;       /* text on engagement buttons */
+  --action-engage-light: #FFFBEB;      /* warm glow for active chips, backgrounds */
+
   /* SIGNAL COLORS — color only as state indicator */
   --signal-going: #16A34A;            /* going, confirmed, active */
   --signal-going-hover: #15803D;      /* going hover/press */
@@ -73,6 +79,9 @@
   --color-surface-inset: var(--surface-inset);
   --color-action-primary: var(--action-primary);
   --color-action-primary-hover: var(--action-primary-hover);
+  --color-action-engage: var(--action-engage);
+  --color-action-engage-hover: var(--action-engage-hover);
+  --color-action-engage-light: var(--action-engage-light);
   --color-signal-going: var(--signal-going);
   --color-signal-going-light: var(--signal-going-light);
   --color-signal-interested: var(--signal-interested);
@@ -132,6 +141,15 @@ body {
 }
 .btn-danger:hover {
   background-color: var(--signal-danger-hover);
+}
+
+/* Engagement button — warm gold for social/friend actions */
+.btn-engage {
+  background-color: var(--action-engage);
+  color: var(--action-engage-text);
+}
+.btn-engage:hover {
+  background-color: var(--action-engage-hover);
 }
 
 /* Date input styling - smaller calendar icon */

@@ -210,3 +210,101 @@ Are we building toward a monochrome product where green is exclusively a social 
 ---
 
 *This audit is intentionally harsh. The work is solid — Inc 0-2 shipped clean, passes type checks, and the UI is measurably less cluttered. But the design philosophy needs to be sharpened before we build 4 more increments on top of it.*
+
+---
+
+## Resolution: The Lark Visual Identity
+
+> Added Feb 20, 2026, after external design review (Gemini) and founder alignment.
+
+### Answering "The Big Question"
+
+**Hybrid — but with a clear hierarchy, not an accident.**
+
+The answer is neither "monochrome everything" nor "green everything." It's a three-tier CTA hierarchy where each color has exactly one job:
+
+| Tier | Color | Token | When |
+|------|-------|-------|------|
+| **Structural** | Dark `#171717` | `--action-primary` | Buy Tickets, Done, Close, Get Started — commercial/navigation actions |
+| **Engagement** | Warm gold `#B45309` | `--action-engage` | Start Plan, Invite, active filter chips, Friends filter — social/friend actions |
+| **Signal: Going** | Green `#16A34A` | `--signal-going` | Going badge only — **never** a CTA button |
+| **Signal: Interested** | Amber `#F59E0B` | `--signal-interested` | Interested badge only |
+| **Signal: Danger** | Red `#DC2626` | `--signal-danger` | Leave Plan, errors |
+| **Informational** | Category tints | per-category | Concert purple, Comedy yellow — subtle, not interactive |
+
+### Why Warm Gold (`#B45309`)
+
+Green was doing double duty: "you're confirmed for this event" AND "tap this to do something social." Those are fundamentally different signals. A friend's Going badge and a Start Plan button should not look the same.
+
+Warm gold solves this:
+- **Distinct from Going** (green) — no visual confusion between state and action
+- **Distinct from Interested** (bright amber `#F59E0B`) — deeper, richer, clearly a CTA not a state
+- **5.2:1 contrast ratio** against white — WCAG AA compliant
+- **Nightlife-appropriate** — warm, inviting, "golden hour before the show." Aligns with Lark's brand voice
+
+### Warm Engagement Palette
+
+```css
+--action-engage: #B45309;         /* deep warm gold */
+--action-engage-hover: #92400E;   /* darker on press */
+--action-engage-text: #FFFFFF;    /* white text on gold */
+--action-engage-light: #FFFBEB;   /* warm glow for active chip backgrounds */
+```
+
+### De-SaaS Card Treatment
+
+The external review called out our cards as "SaaS dashboard" — soft shadows, rounded corners, pastel pills. The fix:
+
+- **Mobile:** No `shadow-sm`. No rounded borders. Whitespace + `border-b` separator between cards. Content breathes.
+- **Desktop:** `border-transparent hover:border-[var(--border-default)]` — borders appear on interaction, not at rest.
+- **Principle:** Shadows are SaaS. Whitespace and borders are editorial.
+
+### Unified Badge System
+
+Currently fragmented: NEW = green pill, PRESALE = blue pill, SOLD OUT = red pill, category = colored backgrounds. Five different treatments for markers.
+
+**One treatment for all markers:**
+- `font-semibold uppercase tracking-wide text-[10px]`
+- Monochrome (neutral text color)
+- Category badges keep subtle color tint (informational, not interactive)
+- Everything else — NEW, PRESALE, SOLD OUT — gets the same neutral typographic treatment
+- No blue presale pills. No green "new" pills. One visual language.
+
+### Component Migration Map
+
+| Component | Current | Target |
+|-----------|---------|--------|
+| `ToggleChip` (active) | `--brand-primary-light` + green borders | `--action-engage-light` + warm borders |
+| `StartPlanButton` (all variants) | `--brand-primary` green | `--action-engage` warm gold |
+| `SmartSquadButton` | Green variants | `.btn-engage` warm gold |
+| `EventCard` | `shadow-sm rounded-lg` | No shadow, `border-b` mobile, hover border desktop |
+| `StatusBadge` (NEW) | Green primary pill | Monochrome typographic |
+| `StatusBadge` (PRESALE) | Blue info pill | Monochrome typographic |
+| `Badge` (category) | Colored backgrounds | Subtle tint (kept, but harmonized) |
+| `FriendsAndStatusCard` Going | Green button | Green **badge** (state, not CTA) |
+| `FilterStrip` Filters button | Action primary border when active | Warm engage border when active |
+
+### Increment Restructuring
+
+This resolution introduces a new **Inc 3: Lark Visual Identity** — a cosmetic skin change that applies the warm palette, de-SaaS cards, and unified badges before the structural changes in Inc 4+. The old Inc 3-6 become Inc 4-7:
+
+```
+INC 0  Design Foundation          ✅
+INC 1  Modal & People System      ✅
+INC 2  Filter Cleanup             ✅
+INC 3  Lark Visual Identity       ← NEW: warm tokens, de-SaaS cards, unified badges, chip migration
+INC 4  Social-First Home          ← was Inc 3
+INC 5  Event Page Zones           ← was Inc 4
+INC 6  Plan-on-Event-Page         ← was Inc 5
+INC 7  Groups Surfacing           ← was Inc 6
+```
+
+### What This Changes for All Agents
+
+- **`/ui-system` skill**: Full palette rewrite — warm engagement tokens, CTA hierarchy, de-SaaS card rules, unified badge spec
+- **`/ux-comms` skill**: Expanded with Lark voice, copy patterns, warm gold for engagement surfaces
+- **`ui-polish` agent**: Brand Direction updated with warm palette, de-SaaS criteria, known debt queue
+- **`qa-reviewer` agent**: New BLOCKER items — green used as CTA, shadows on cards, inconsistent badges
+- **`engagement` agent**: Visual Tone section — warm gold = social action, dark = commercial
+
+Every skill, agent, and spec now describes the same target. When Inc 3 begins, the agent reads `/ui-system`, sees warm gold, and builds accordingly.

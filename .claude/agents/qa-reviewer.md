@@ -59,10 +59,14 @@ Use this for every review. Not every item applies to every change — skip what'
 ### Design System Compliance
 
 - [ ] All colors reference CSS custom properties or documented constants (no raw hex/rgb/hsl in components)
-- [ ] Tailwind color classes match design tokens (e.g., `text-blue-600` when `--brand-info` is blue-500 is a mismatch)
+- [ ] **CTA hierarchy correct:** social/friend actions use `--action-engage` (warm gold), structural use `--action-primary` (dark)
+- [ ] **No green CTAs** — `--signal-going` appears only on Going/Confirmed state badges, never clickable buttons
+- [ ] **Active filter chips use warm gold** — `--action-engage-light` background, not green
+- [ ] **No card shadows** — no `shadow-sm` or `shadow-md` on EventCards or content cards
+- [ ] **Unified badges** — NEW, PRESALE, SOLD OUT use monochrome typographic treatment, not colored pills
 - [ ] Category colors and status colors come from centralized constants, not inline maps
 - [ ] External brand colors (Spotify, Ticketmaster) are constants, not inline hex
-- [ ] All borders use `--brand-border` or documented variants (not arbitrary `border-gray-*`)
+- [ ] All borders use `--border-default` or documented variants (not arbitrary `border-gray-*`)
 - [ ] Spacing follows 4px base unit system
 - [ ] Interactive elements have hover states using `transition-colors`
 - [ ] No decorative emojis in UI chrome (SVG icons only)
@@ -123,12 +127,16 @@ Use this for every review. Not every item applies to every change — skip what'
 - "Squad" visible to users
 - Hardcoded color that should be a token (when the token exists)
 - `new Date()` for Austin local times in scrapers
+- **Green used as a CTA color** (green = state only, use `--action-engage` or `--action-primary`)
+- **`shadow-sm` or `shadow-md` on EventCards** or content cards (de-SaaS violation)
+- **Colored pills for NEW/PRESALE/SOLD OUT** (should be monochrome typographic)
 
 **SUGGESTION (should fix, not blocking):**
 - Spacing that doesn't follow 4px system but is close
 - Missing hover state on a non-primary interactive element
 - Toast message that could be more concise
 - Inconsistent border color usage
+- Legacy alias used when new token exists (e.g., `--brand-border` instead of `--border-default`)
 
 **GOOD PRACTICE (call it out):**
 - Proper use of shared primitives (Button, Badge, Toast)

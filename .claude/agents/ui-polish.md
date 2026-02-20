@@ -16,12 +16,14 @@ Do this every session. No exceptions.
 
 The product is moving toward the "Lark" brand identity (see `references/lark-proposal-final.pdf`). The rename isn't happening yet, but the visual direction informs all design decisions NOW:
 
-- **High-contrast monochrome.** Dark canvas, white UI. Color only as signal (going=green, interested=amber, danger=red). Primary CTAs shift from green to dark/black.
-- **Texture of live events.** Sharpie strokes, printed setlist grain, raw and authentic. Not neon gradients, not warm-tone lifestyle, not geometric tech minimalism.
-- **"The house lights go down."** The brand starts where a night out starts. Edge, intention, nightlife.
-- **What we're NOT:** wellness app, productivity tool, festival poster, polished tech minimalism.
+- **High-contrast monochrome canvas.** White UI, dark text. Color only as signal or engagement warmth.
+- **Three-tier CTA hierarchy.** Dark `#171717` for structural CTAs (Buy, Done, Close). **Warm gold `#B45309`** for engagement CTAs (Start Plan, Invite, active chips). Green `#16A34A` for Going state **only** — never a CTA.
+- **De-SaaS aesthetic.** No card shadows. Whitespace + `border-b` on mobile. Hover borders on desktop. Shadows are SaaS; whitespace is editorial.
+- **Unified badges.** All status markers (NEW, PRESALE, SOLD OUT) use monochrome typographic treatment: `font-semibold uppercase tracking-wide text-[10px]`. No colored pills. Category badges keep subtle tint.
+- **Texture of live events.** Raw, authentic, nightlife. Not neon gradients, not warm-tone lifestyle, not geometric tech minimalism.
+- **"The house lights go down."** Edge, intention, nightlife. Not a wellness app, productivity tool, or SaaS dashboard.
 
-See the "Increment 0: Design Foundation" section of `notes/specs/ux-revamp-spec.md` for the full token architecture — monochrome surfaces + signal colors with legacy aliases for incremental migration.
+See `notes/specs/ux-revamp-audit.md` (Resolution section) for full design rationale and component migration map.
 
 ## Tool Access
 
@@ -35,20 +37,43 @@ Full access — read, write, edit, bash, glob, grep. You build and run code. If 
 
 ## Design Tokens (Source of Truth)
 
-All tokens live in `src/app/globals.css` under `@theme inline`. The current palette:
+All tokens live in `src/app/globals.css`. The Lark palette:
 
 ```
---brand-primary: #16A34A        (action green — CTAs, confirmations, active states)
---brand-primary-hover: #15803D  (green hover/press)
---brand-primary-light: #DCFCE7  (green tint backgrounds — highlights, selected states)
---brand-black: #171717          (text, headings, high-contrast elements)
---brand-gray: #FAFAFA           (page canvas)
---brand-gray-100: #F5F5F5       (card backgrounds, subtle surfaces)
---brand-border: #E5E5E5         (all standard borders)
---brand-danger: #DC2626         (destructive actions, errors)
---brand-danger-hover: #B91C1C   (danger hover/press)
---brand-warning: #F59E0B        (caution states)
---brand-info: #3B82F6           (informational, links, presale active)
+/* SURFACES */
+--surface-bg: #FAFAFA           (page background)
+--surface-card: #FFFFFF          (card / elevated)
+--surface-inset: #F5F5F5         (recessed areas, input backgrounds)
+
+/* TEXT */
+--text-primary: #171717          (headlines, body)
+--text-secondary: #525252        (supporting text)
+--text-muted: #A3A3A3           (hints, placeholders)
+
+/* BORDERS */
+--border-default: #E5E5E5        (card borders, dividers)
+--border-strong: #D4D4D4         (hover borders, emphasis)
+
+/* ACTION — structural (dark) */
+--action-primary: #171717        (Buy Tickets, Done, Close, Get Started)
+--action-primary-hover: #404040
+--action-primary-text: #FFFFFF
+
+/* ACTION — engagement (warm gold) */
+--action-engage: #B45309          (Start Plan, Invite, active chips)
+--action-engage-hover: #92400E
+--action-engage-text: #FFFFFF
+--action-engage-light: #FFFBEB    (warm glow for active chip backgrounds)
+
+/* SIGNALS — state only, NEVER CTAs */
+--signal-going: #16A34A          (Going badge)
+--signal-interested: #F59E0B     (Interested badge)
+--signal-danger: #DC2626         (errors, Leave Plan)
+--signal-info: #3B82F6           (links, informational)
+
+/* LEGACY (prefer new tokens; migration in progress) */
+--brand-primary → --signal-going
+--brand-border → --border-default
 ```
 
 ## Core Principles
@@ -57,9 +82,10 @@ All tokens live in `src/app/globals.css` under `@theme inline`. The current pale
 
 No raw hex values in components. No Tailwind color classes that bypass the design system.
 
-- `bg-emerald-500` is WRONG → use `bg-[var(--brand-primary)]`
-- `text-blue-600` is WRONG → use `text-[var(--brand-info)]`
-- `border-gray-200` is WRONG → use `border-[var(--brand-border)]`
+- `bg-emerald-500` is WRONG → use `bg-[var(--signal-going)]` for state, `bg-[var(--action-engage)]` for social CTA
+- `text-blue-600` is WRONG → use `text-[var(--signal-info)]`
+- `border-gray-200` is WRONG → use `border-[var(--border-default)]`
+- `bg-green-500` on a button is WRONG → green is never a CTA. Use `--action-engage` (warm gold) or `--action-primary` (dark)
 
 **Exceptions (documented, not ad-hoc):**
 - Category colors (violet, yellow, pink, red, green, orange for CONCERT/COMEDY/THEATER/MOVIE/SPORTS/FESTIVAL) — these are semantic category identifiers documented in `ui-reference.md` lines 322-330. They should live in `src/lib/constants/` as centralized maps, not inline in components.
@@ -122,17 +148,30 @@ All interactive elements use `transition-colors` with Tailwind defaults. No cust
 
 Standard: `hover:bg-gray-50 transition-colors` for list items and subtle hovers.
 
-## Known Debt (From Audit)
+## Known Debt (From Audit + Lark Visual Identity)
 
-These are confirmed issues waiting for fixes:
+These are confirmed issues waiting for fixes in Inc 3:
 
-1. **Category color maps duplicated** — `EventCard.tsx` and social sections both define category → color mappings inline. Extract to `src/lib/constants/categoryColors.ts`.
-2. **Status badge colors inline** — `StatusBadge.tsx` defines GOING/INTERESTED/etc. colors inline. Extract to `src/lib/constants/statusColors.ts`.
-3. **Spotify `#1DB954` hardcoded** — `EventCard.tsx:264`. Needs external brand constant.
-4. **Border colors inconsistent** — Mix of `border-gray-200`, `border-gray-100`, `border-gray-300` across components. Should all use `border-[var(--brand-border)]` or documented variants.
-5. **`text-blue-600` for presale active** — `EventCard.tsx:233` uses `text-blue-600` but `--brand-info` is `#3B82F6` (blue-500). Mismatch.
-6. **`border-green-200` in SocialSections** — Should derive from `--brand-primary` or `--brand-primary-light`, not raw Tailwind green.
-7. **Missing shared Input/Checkbox/Select** — Form fields are ad-hoc across components.
+### Warm Engagement Migration (Inc 3A)
+1. **ToggleChip active state uses green** — `Chip.tsx` primary color: `--brand-primary-light` + `border-green-300` + `hover:bg-green-50`. Should use `--action-engage-light` + warm borders.
+2. **StartPlanButton uses green** — All 3 variants reference `--brand-primary`. Should use `.btn-engage` warm gold.
+3. **SmartSquadButton uses green** — Same migration needed.
+4. **FilterStrip Filters button active** — Uses `--action-primary` border when active. Should use `--action-engage`.
+
+### De-SaaS Cards (Inc 3B)
+5. **EventCard has shadows** — `shadow-sm rounded-lg`. Remove shadow, use `border-b` (mobile) / hover border (desktop).
+6. **FriendsAndStatusCard shadows** — Same treatment.
+
+### Unified Badges (Inc 3C)
+7. **StatusBadge NEW = green pill** — Should be monochrome typographic.
+8. **StatusBadge PRESALE = blue pill** — Should be monochrome typographic.
+9. **Badge system fragmented** — Different treatments per marker type. Unify.
+
+### Legacy Constants
+10. **Category color maps duplicated** — Extract to `src/lib/constants/categoryColors.ts`.
+11. **Spotify `#1DB954` hardcoded** — `EventCard.tsx:264`. Needs external brand constant.
+12. **Border colors inconsistent** — Mix of `border-gray-*` variants. Use `border-[var(--border-default)]`.
+13. **Missing shared Input/Checkbox/Select** — Form fields are ad-hoc across components.
 
 ## Maintain Your Standards
 

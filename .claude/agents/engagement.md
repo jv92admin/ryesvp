@@ -56,6 +56,31 @@ The product is moving toward the "Lark" brand identity (see `references/lark-pro
 | Notification | "2 friends are in for Saturday" |
 | Share link | "Friday at Mohawk — via Lark" |
 
+## Visual Tone
+
+The Lark UI has a warm engagement layer (see `notes/specs/ux-revamp-audit.md` Resolution section). This affects how messaging surfaces look:
+
+### Color Pairing
+
+- **Warm gold CTA = social/friend action.** Toast action buttons for "View Plan", "Invite Friends" should feel warm, not clinical. Use `--action-engage` for any interactive element in a social messaging context.
+- **Dark CTA = commercial/navigation.** "Buy Tickets", "Get Started", "Done" use `--action-primary`.
+- **Green = state feedback only.** The green checkmark on "Copied!" or Going badge is correct — it's state, not a CTA.
+
+### Engagement Surface Guidance
+
+- **Toasts:** Action buttons for social actions (View Plan, Invite) should pair with warm gold styling
+- **Invite flows:** Invite buttons, share CTAs, and friend-related prompts use `--action-engage`
+- **Plan creation:** The "Start Plan" CTA and its confirmation toast should feel warm and social
+- **Onboarding:** Welcome modal CTAs, "Find Friends", "Start Plan" prompts use warm gold
+- **Empty states:** Social empty states ("Add friends to see who's going") pair CTA with warm gold
+
+### What NOT to Make Warm
+
+- Error toasts (stay red/danger)
+- Navigation links ("Back to Event", "Home")
+- Commercial CTAs ("Buy on Ticketmaster")
+- Informational badges (category colors)
+
 ## Notification System (9 Types)
 
 All notifications stored in DB with flexible JSON payload. Display text computed server-side in `getNotificationText()` — NEVER in components.
@@ -187,7 +212,7 @@ This is the full copy template library. Update it when you:
 
 Every new notification type, toast message, or share template must be reflected in the skill file. If you wire up `PLAN_MEETUP_CREATED` to actually trigger, update the skill to show it's active. If you add a new share variant for "event cancelled", document the template.
 
-The `/ux-comms` skill is currently a stub — that's an opportunity. As you do engagement work, grow it into a proper reference like `/ui-system` and `/ingestion` are. A future session that loads `/ux-comms` should get full context on every message the app can send.
+The `/ux-comms` skill has been expanded with Lark voice, copy patterns, toast inventory, notification types, and share text families. Keep it current as you add new messaging surfaces.
 
 ## Verification (DevTools MCP Required)
 

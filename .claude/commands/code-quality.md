@@ -16,6 +16,16 @@ You are working on testing, type safety, linting, or code health.
 - Auth checked in API routes via `requireAuthAPI()` + `handleAPIError()` (returns 401). Use `requireAuth()` only in page server components (redirects to login).
 - Batch queries with Map pattern to avoid N+1
 
-## Stub
+## Visual Verification
 
-This skill is a stub. Full content will be added when a testing strategy is established. Priority items from backlog: unit tests for data layer, integration tests for API routes, scraper reliability tests.
+After any UI change, verify design system compliance:
+
+- **CTA hierarchy:** Warm gold (`--action-engage`) for social actions, dark (`--action-primary`) for structural. Green (`--signal-going`) is **never** a CTA.
+- **No card shadows:** `shadow-sm` and `shadow-md` should not appear on content cards. Use `border-b` (mobile) or hover borders (desktop).
+- **Unified badges:** All status markers (NEW, PRESALE, SOLD OUT) use monochrome typographic treatment, not colored pills.
+- **Token usage:** Grep for legacy aliases (`--brand-primary`, `--brand-border`) — prefer new tokens.
+- **DevTools MCP:** When available, screenshot at 375px and 1024px+ to verify responsive layout.
+
+## Testing Strategy
+
+Priority items from backlog: unit tests for data layer, integration tests for API routes, scraper reliability tests. No unit or integration tests yet.
