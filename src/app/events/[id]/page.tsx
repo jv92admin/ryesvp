@@ -113,7 +113,7 @@ export default async function EventPage({ params }: EventPageProps) {
                 NEW
               </span>
             )}
-            <span className={`px-2 py-0.5 text-xs font-semibold uppercase tracking-wide rounded ${categoryColors[event.category] || 'bg-gray-100 text-gray-800'}`}>
+            <span className={`text-xs font-semibold uppercase tracking-wide ${categoryColors[event.category] || 'text-[var(--text-secondary)]'}`}>
               {event.category}
             </span>
             {event.status !== 'SCHEDULED' && eventStatusConfig[event.status as keyof typeof eventStatusConfig] && (

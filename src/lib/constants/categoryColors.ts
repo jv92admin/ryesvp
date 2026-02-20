@@ -4,17 +4,17 @@ import { EventCategory } from '@prisma/client';
  * Category → color class mapping.
  * Single source of truth — previously duplicated in EventCard.tsx and events/[id]/page.tsx.
  *
- * Uses Tailwind utility classes for background + text color.
- * These are semantic (category identification), not brand colors.
+ * Text-only micro labels (no background, no pill). Subtle category tint via text color.
+ * Inc 3.5: moved from colored pill backgrounds to editorial text-only treatment.
  */
 export const categoryColors: Record<EventCategory, string> = {
-  CONCERT: 'bg-purple-100 text-purple-800',
-  COMEDY: 'bg-yellow-100 text-yellow-800',
-  THEATER: 'bg-pink-100 text-pink-800',
-  MOVIE: 'bg-red-100 text-red-800',
-  SPORTS: 'bg-blue-100 text-blue-800',
-  FESTIVAL: 'bg-orange-100 text-orange-800',
-  OTHER: 'bg-gray-100 text-gray-800',
+  CONCERT: 'text-purple-700',
+  COMEDY: 'text-amber-700',
+  THEATER: 'text-pink-700',
+  MOVIE: 'text-red-700',
+  SPORTS: 'text-blue-700',
+  FESTIVAL: 'text-orange-700',
+  OTHER: 'text-[var(--text-secondary)]',
 };
 
 /**

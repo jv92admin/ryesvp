@@ -31,10 +31,12 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 | **UX** | **UX Revamp: Design Foundation (Inc 0)** | Tokens, constants, primitives, monochrome palette | ✅ Complete |
 | **UX** | **UX Revamp: Modal & People System (Inc 1)** | Dialog primitive, PeopleList, 4 modal migrations | ✅ Complete |
 | **UX** | **UX Revamp: Filter Cleanup (Inc 2)** | FilterDrawer, FilterStrip rewrite, search → 3 chips → overflow | ✅ Complete |
-| **UX** | **UX Revamp: Social-First Home (Inc 3)** | Kill ViewToggle, PlansStrip, inline social on EventCard | 🔲 |
-| **UX** | **UX Revamp: Event Page Hierarchy (Inc 4)** | Zone-based layout, promote Buy, separate social proof | 🔲 |
-| **UX** | **UX Revamp: Plan-on-Event-Page (Inc 5)** | Inline plan panel, kill navigate-away | 🔲 |
-| **UX** | **UX Revamp: Groups Surfacing (Inc 6)** | Group labels, group filter, group activity | 🔲 |
+| **UX** | **UX Revamp: Lark Visual Identity (Inc 3)** | Warm gold CTAs, de-SaaS cards, monochrome badges, chip migration | ✅ Complete |
+| **UX** | **UX Revamp: Editorial Polish (Inc 3.5)** | Typography density, text-only badges, breathing room, action button polish | 🔲 |
+| **UX** | **UX Revamp: Social-First Home (Inc 4)** | Kill ViewToggle, PlansStrip, inline social on EventCard | 🔲 |
+| **UX** | **UX Revamp: Event Page Hierarchy (Inc 5)** | Zone-based layout, promote Buy, separate social proof | 🔲 |
+| **UX** | **UX Revamp: Plan-on-Event-Page (Inc 6)** | Inline plan panel, kill navigate-away | 🔲 |
+| **UX** | **UX Revamp: Groups Surfacing (Inc 7)** | Group labels, group filter, group activity | 🔲 |
 | **C** | **User Testing** | Invite 20-30 users, collect feedback | 🔲 |
 | **D** | **Event Discovery 2.x** | Data enrichment (venue, event, performer) | 🔲 |
 | **D** | **Event Discovery 3.x** | Personalization + Spotify OAuth | 🔲 |
@@ -67,6 +69,7 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 | UX.0 | Design Foundation | Lark tokens, constants, monochrome palette shift | ✅ Complete |
 | UX.1 | Modal & People System | Dialog primitive (focus trap, sheet), PeopleList, 4 modals migrated | ✅ Complete |
 | UX.2 | Filter Cleanup | FilterDrawer (sheet), FilterStrip rewrite, deprecated old chips | ✅ Complete |
+| UX.3 | Lark Visual Identity | Warm gold CTAs, de-SaaS cards, monochrome badges, 15 files changed | ✅ Complete |
 
 ---
 
@@ -88,10 +91,12 @@ All phases (0–1.6) complete. 19 venue scrapers, 700+ events, 500+ performers, 
 | 0 | Design Foundation | ✅ | Lark token system (`--surface-*`, `--text-*`, `--action-*`, `--signal-*`), constants extraction (categoryColors, statusColors, externalBrands), Button/IconButton/Input primitives, legacy aliases for incremental migration |
 | 1 | Modal & People System | ✅ | Dialog primitive (focus trap, scroll lock, escape, fade+scale, 4 size variants incl. sheet), PeopleList component, 4 modals migrated (SquadCreation, SquadInvite, SquadPage, StartPlan) |
 | 2 | Filter Cleanup | ✅ | FilterDrawer (Dialog sheet, 4 sections: When/Category/Discovery/Venues), FilterStrip rewrite (search → 3 quick chips → Filters overflow), active filter tags with dismissal, venue name resolution, old chips deprecated |
-| 3 | Social-First Home | 🔲 | Kill ViewToggle, PlansStrip, social signals on EventCard, Friends Going filter |
-| 4 | Event Page Hierarchy | 🔲 | 5-zone layout, Buy above fold, SocialProofCard separated |
-| 5 | Plan-on-Event-Page | 🔲 | Inline plan panel on event page, kill navigate-away |
-| 6 | Groups Surfacing | 🔲 | Group labels on avatars, group filter, group activity in PlansStrip |
+| 3 | Lark Visual Identity | ✅ | Button `engage` variant, Chip `primary` → warm gold, de-SaaS cards (shadow removal, border-b mobile, hover border desktop), monochrome event badges, scoped legacy token cleanup (15 files) |
+| 3.5 | Editorial Polish | 🔲 | Text-only category badges, editorial date headers, card breathing room, ViewToggle softening, sign-in prompt warmth, action button visibility |
+| 4 | Social-First Home | 🔲 | Kill ViewToggle, PlansStrip, social signals on EventCard, Friends Going filter |
+| 5 | Event Page Hierarchy | 🔲 | 5-zone layout, Buy above fold, SocialProofCard separated |
+| 6 | Plan-on-Event-Page | 🔲 | Inline plan panel on event page, kill navigate-away |
+| 7 | Groups Surfacing | 🔲 | Group labels on avatars, group filter, group activity in PlansStrip |
 
 **Design audit & open questions:** See `specs/ux-revamp-audit.md`
 
@@ -265,5 +270,5 @@ Friend Links, Group Links, and Onboarding are complete. Remaining:
 
 ---
 
-**Last Updated:** February 19, 2026
+**Last Updated:** February 20, 2026
 **Active Specs:** `specs/event-discovery-spec.md` (Blocks A, D), `specs/ux-revamp-spec.md` (UX Revamp)

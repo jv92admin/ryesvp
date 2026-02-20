@@ -181,13 +181,13 @@ export function EventListWithPagination({
   return (
     <>
       {/* Event list grouped by date */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         {sortedDates.map((dateKey) => (
           <section key={dateKey}>
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2 sticky top-0 bg-gray-50 py-1 z-10">
+            <h2 className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider mb-3 sticky top-0 bg-[var(--surface-bg)] py-2 z-10 border-b border-[var(--border-default)]">
               {formatDateHeading(dateKey)}
             </h2>
-            <div className="space-y-2">
+            <div className="space-y-0">
               {groupedEvents.get(dateKey)!.map((event) => (
                 <EventCard key={event.id} event={event} />
               ))}

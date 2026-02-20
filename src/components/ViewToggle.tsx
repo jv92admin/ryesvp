@@ -29,23 +29,23 @@ export function ViewToggle({ defaultView = 'calendar', onViewChange }: ViewToggl
   };
 
   return (
-    <div className="flex bg-gray-100 rounded-lg p-1 mb-4">
+    <div className="flex border-b border-[var(--border-default)] mb-4">
       <button
         onClick={() => handleChange('calendar')}
-        className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
+        className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
           view === 'calendar'
-            ? 'bg-white text-gray-900 shadow-sm'
-            : 'text-gray-600 hover:text-gray-900'
+            ? 'text-[var(--text-primary)] border-b-2 border-[var(--text-primary)]'
+            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
         }`}
       >
         All Events
       </button>
       <button
         onClick={() => handleChange('social')}
-        className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${
+        className={`flex-1 px-4 py-2 text-sm font-medium transition-colors ${
           view === 'social'
-            ? 'bg-white text-gray-900 shadow-sm'
-            : 'text-gray-600 hover:text-gray-900'
+            ? 'text-[var(--text-primary)] border-b-2 border-[var(--text-primary)]'
+            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
         }`}
       >
         Your Events

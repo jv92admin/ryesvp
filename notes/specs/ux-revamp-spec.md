@@ -1,9 +1,9 @@
 # UX Revamp Spec
 
 > The complete UX architecture redesign.
-> Structured as 8 mutable increments (0-7), each shippable independently.
+> Structured as 9 mutable increments (0-7 + 3.5), each shippable independently.
 > Brand direction informed by `references/lark-proposal-final.pdf`.
-> Date: 2026-02-19 · Updated: 2026-02-20 (Lark Visual Identity + warm engagement)
+> Date: 2026-02-19 · Updated: 2026-02-20 (Inc 3 shipped, Inc 3.5 Editorial Polish added)
 
 ---
 
@@ -48,21 +48,23 @@
 ## Increment Overview
 
 ```
-INC 0  Design Foundation          ✅ tokens, constants, primitives, monochrome palette
+INC 0    Design Foundation          ✅ tokens, constants, primitives, monochrome palette
   ↓
-INC 1  Modal & People System      ✅ Dialog primitive, PeopleList, 4 modals migrated
+INC 1    Modal & People System      ✅ Dialog primitive, PeopleList, 4 modals migrated
   ↓
-INC 2  Filter Cleanup             ✅ FilterDrawer, FilterStrip rewrite, old chips deprecated
+INC 2    Filter Cleanup             ✅ FilterDrawer, FilterStrip rewrite, old chips deprecated
   ↓
-INC 3  Lark Visual Identity       ← warm tokens, de-SaaS cards, unified badges, chip migration
+INC 3    Lark Visual Identity       ✅ warm tokens, de-SaaS cards, unified badges, chip migration
   ↓
-INC 4  Social-First Home          ← kill tabs, inline social signals, plans strip
+INC 3.5  Editorial Polish           ← typography, density, badges → text, breathing room
   ↓
-INC 5  Event Page Zones           ← zone-based layout, promote Buy, separate social
+INC 4    Social-First Home          ← kill tabs, inline social signals, plans strip
   ↓
-INC 6  Plan-on-Event-Page         ← inline plan panel, kill navigate-away
+INC 5    Event Page Zones           ← zone-based layout, promote Buy, separate social
   ↓
-INC 7  Groups Surfacing           ← group labels, group filter, group activity
+INC 6    Plan-on-Event-Page         ← inline plan panel, kill navigate-away
+  ↓
+INC 7    Groups Surfacing           ← group labels, group filter, group activity
 ```
 
 Each increment is independently shippable. Later increments benefit from earlier ones but don't hard-block (except Inc 0, which everything depends on).
@@ -434,13 +436,15 @@ All existing filter logic stays — URL params, instant apply. We're just reorga
 
 ---
 
-## Increment 3: Lark Visual Identity
+## Increment 3: Lark Visual Identity ✅ COMPLETE
 
 **Goal:** Apply the warm engagement palette, de-SaaS card treatment, and unified badge system across the existing UI. This is a cosmetic skin change — no structural layout changes, no new features. Every component exits this increment looking like Lark, not a SaaS dashboard.
 
 **Agent:** `ui-polish` (primary), `qa-reviewer` (gate)
 
 **Depends on:** Inc 0 (tokens), Inc 2 (FilterStrip chips to migrate)
+
+**Shipped:** Feb 2026 · 15 files changed. Button `engage` variant, Chip `primary` → warm gold, de-SaaS cards (shadow removal, mobile border-b, desktop hover border reveal), monochrome event badges, scoped legacy token cleanup.
 
 ### 3A. Warm Engagement Token Migration
 
@@ -502,6 +506,107 @@ With warm tokens in place, remove legacy aliases that are no longer referenced:
 - [ ] Input focus rings use `--action-engage` (not green)
 - [ ] Legacy alias usage reduced (track count before/after)
 - [ ] Mobile (375px) and desktop (1024px+) verified via DevTools MCP
+- [x] `qa-reviewer` audit passes with zero BLOCKERs
+
+---
+
+## Increment 3.5: Editorial Polish
+
+**Goal:** The page should *feel* like a different app — not just have correct tokens. Inc 3 gave us the right colors underneath, but the layout density, typography rhythm, and information design still read as a generic SaaS dashboard. This increment is purely visual: spacing, type hierarchy, badge treatment, and breathing room. No new features, no data changes.
+
+**Agent:** `ui-polish` (primary), `qa-reviewer` (gate)
+
+**Depends on:** Inc 3 (tokens and card treatment in place)
+
+**Self-critique that motivated this:** After Inc 3 shipped, the home page looked ~95% the same. Token migration is invisible to users. The structural problems — identical card density, colored badge pills, tiny action targets, cramped spacing, SaaS-like ViewToggle, cookie-consent sign-in banner — require layout and typography changes, not color swaps.
+
+### 3.5A. Category Badges → Text-Only Micro Labels
+
+**Current:** Colored pill backgrounds (purple CONCERT, yellow COMEDY, blue SPORTS). Screams "dashboard."
+
+**Target:** Text-only micro labels — no background, no pill. Just typographic weight.
+
+```
+Current:  [CONCERT]  (purple bg, purple text, rounded pill)
+Target:   CONCERT    (text-[var(--text-secondary)], no background)
+```
+
+- Remove `bg-*` and `rounded` from category badge in EventCard and event detail page
+- Keep `text-[10px] font-semibold uppercase tracking-wide`
+- Color comes from text only: `text-[var(--text-secondary)]` default, or subtle category tint via a thin left-border or dot if hierarchy feels flat
+- `categoryColors.ts` updated: values become text-only classes
+
+### 3.5B. Date Section Headers → Editorial Weight
+
+**Current:** `text-sm font-semibold text-gray-500 uppercase tracking-wide` — small, gray, gets lost.
+
+**Target:** Section markers with editorial presence.
+
+```
+Current:  TODAY                          (small, gray, lost in the feed)
+Target:   Today                          (text-base font-semibold, sentence case, with subtle rule)
+          ─────────────────────────
+```
+
+- Size: `text-sm` → `text-base` (or `text-sm` with more weight)
+- Case: `uppercase` → sentence case ("Today", "Tomorrow", "Saturday, Feb 22")
+- Color: `text-gray-500` → `text-[var(--text-primary)]`
+- Add a subtle horizontal rule or extra bottom margin for section separation
+- Sticky behavior stays
+
+### 3.5C. Card Spacing & Breathing Room
+
+**Current:** `space-y-2` (8px) between cards. Dense spreadsheet feel.
+
+**Target:** More generous vertical rhythm.
+
+- Cards: `space-y-2` → `space-y-0` (let padding + border-b handle spacing naturally)
+- Card internal padding: evaluate `p-4` — may need `py-5` for more vertical air
+- Date section gap: `space-y-4` → `space-y-6` (more separation between day groups)
+- Meta row (badges + actions): evaluate if `mt-3 pt-3 border-t` divider is needed — removing it and integrating badges inline with venue/date could flatten the card and feel less chunky
+
+### 3.5D. ViewToggle Softening
+
+**Current:** Segmented control pill (`bg-gray-100 rounded-lg p-1`) with shadow on active tab. Very SaaS.
+
+**Options:**
+1. **Restyle as underline tabs** — Text links with active underline, not a segmented control. Less visual weight.
+2. **Pull forward the kill** — Remove entirely (Inc 4 deletes it). Accept that logged-in users temporarily lose social tab access until Inc 4 adds inline social signals.
+3. **Hide for logged-out users** — Only show when logged in (logged-out users see a unified feed anyway since "Your Events" requires auth).
+
+Recommended: Option 1 (restyle) — keeps functionality, removes the SaaS aesthetic.
+
+### 3.5E. Sign-In Prompt → Warm Invitation
+
+**Current:** Horizontal bar with "Sign in or sign up to track events..." — looks like a cookie consent banner.
+
+**Target:** Something that feels like an invitation, not a legal notice.
+
+Options:
+- Inline card with Lark voice: "See what your friends are up to this weekend. → Sign in"
+- Contextual prompt that appears near social features (on event cards, friend sections) rather than a persistent top banner
+- Subtle, dismissible, warm tone — not full-width alert bar
+
+### 3.5F. Action Buttons → More Inviting
+
+**Current:** 28px gray circles with tiny icons. Invisible, uninviting.
+
+**Target:** Slightly more prominent, with better affordance.
+
+- Size: `w-7 h-7` → `w-8 h-8` (32px) minimum
+- Inactive state: lighter background that still reads as "tappable"
+- Consider text labels on wider screens: `✓ Going` / `★ Interested` instead of icon-only
+- Active states already look good (green Going, amber Interested) — it's the *inactive* state that's invisible
+
+### 3.5G. Definition of Done
+
+- [ ] Category badges are text-only (no colored pill backgrounds) on EventCard and event detail page
+- [ ] Date headers feel like editorial section markers (heavier weight, sentence case, rule/divider)
+- [ ] Card spacing feels generous, not cramped
+- [ ] ViewToggle is either restyled or removed
+- [ ] Sign-in prompt feels warm, not GDPR
+- [ ] Going/Interested buttons are visible and inviting in inactive state
+- [ ] Mobile (375px) and desktop (1024px+) verified via DevTools MCP — should feel like a *different app*
 - [ ] `qa-reviewer` audit passes with zero BLOCKERs
 
 ---
