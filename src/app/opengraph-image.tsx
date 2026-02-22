@@ -39,6 +39,31 @@ export default async function Image() {
           }}
         />
 
+        {/* Bird mark */}
+        <svg
+          width="120"
+          height="100"
+          viewBox="0 0 100 100"
+          style={{ marginBottom: 24 }}
+        >
+          <path
+            d="M 15 65 Q 30 30, 50 45 Q 60 50, 70 35 Q 78 22, 88 18"
+            stroke="#E8E8E8"
+            strokeWidth="5"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M 15 65 Q 28 55, 45 58 Q 55 60, 68 52"
+            stroke="#E8E8E8"
+            strokeWidth="3.5"
+            fill="none"
+            strokeLinecap="round"
+            opacity="0.6"
+          />
+        </svg>
+
         {/* Lark wordmark */}
         <div
           style={{
