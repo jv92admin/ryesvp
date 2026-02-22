@@ -46,12 +46,14 @@ export function EventHero({
   shareProps,
 }: EventHeroProps) {
   const router = useRouter();
+  const [imgError, setImgError] = useState(false);
   const [status, setStatus] = useState<AttendanceStatus | null>(initialStatus);
   const [isLoading, setIsLoading] = useState(false);
   const { showToast, ToastComponent } = useEngagementToast();
 
   const isNew = isNewListing(new Date(event.createdAt));
   const statusConfig = eventStatusConfig[event.status as keyof typeof eventStatusConfig];
+  const hasImage = event.imageUrl && !imgError;
 
   const handleBack = () => {
     if (window.history.length > 1) {
@@ -93,12 +95,13 @@ export function EventHero({
     <>
       {/* Hero Image with Overlays */}
       <div className="relative w-full rounded-xl overflow-hidden mb-4">
-        {event.imageUrl ? (
+        {hasImage ? (
           <div className="aspect-[16/9] max-h-72">
             <img
-              src={event.imageUrl}
+              src={event.imageUrl!}
               alt={event.title}
               className="w-full h-full object-cover"
+              onError={() => setImgError(true)}
             />
           </div>
         ) : (
@@ -109,34 +112,36 @@ export function EventHero({
           </div>
         )}
 
-        {/* Back button — overlay */}
-        <button
-          onClick={handleBack}
-          className="absolute top-3 left-3 bg-black/30 backdrop-blur-sm rounded-full p-2 text-white hover:bg-black/50 transition-colors"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-
-        {/* Share button — overlay */}
-        <ShareButton
-          title={shareProps.title}
-          venueName={shareProps.venueName}
-          dateFormatted={shareProps.dateFormatted}
-          eventUrl={shareProps.eventUrl}
-          isLoggedIn={isLoggedIn}
-          iconOnly
-          className="absolute top-3 right-3 bg-black/30 backdrop-blur-sm rounded-full p-2 text-white hover:bg-black/50 transition-colors"
-        />
+        {/* Back + Share button overlays (only when image exists — invisible on dark fallback) */}
+        {hasImage && (
+          <>
+            <button
+              onClick={handleBack}
+              className="absolute top-3 left-3 bg-black/30 backdrop-blur-sm rounded-full p-2 text-white hover:bg-black/50 transition-colors"
+            >
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <ShareButton
+              title={shareProps.title}
+              venueName={shareProps.venueName}
+              dateFormatted={shareProps.dateFormatted}
+              eventUrl={shareProps.eventUrl}
+              isLoggedIn={isLoggedIn}
+              iconOnly
+              className="absolute top-3 right-3 bg-black/30 backdrop-blur-sm rounded-full p-2 text-white hover:bg-black/50 transition-colors"
+            />
+          </>
+        )}
 
         {/* Gradient fade at bottom of image */}
-        {event.imageUrl && (
+        {hasImage && (
           <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none" />
         )}
 
         {/* Title + badges overlaid on gradient (only when image exists) */}
-        {event.imageUrl && (
+        {hasImage && (
           <div className="absolute bottom-3 left-4 right-4">
             <div className="flex items-center gap-2 mb-1.5">
               {isNew && (
@@ -165,8 +170,31 @@ export function EventHero({
         )}
       </div>
 
+      {/* Back + Share row (only when NO image — overlay buttons are invisible on dark fallback) */}
+      {!hasImage && (
+        <div className="flex items-center justify-between mb-3">
+          <button
+            onClick={handleBack}
+            className="flex items-center gap-1.5 text-sm text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)] transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
+          <ShareButton
+            title={shareProps.title}
+            venueName={shareProps.venueName}
+            dateFormatted={shareProps.dateFormatted}
+            eventUrl={shareProps.eventUrl}
+            isLoggedIn={isLoggedIn}
+            className="flex items-center gap-1.5 text-sm text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)] transition-colors"
+          />
+        </div>
+      )}
+
       {/* Title + badges below image (only when NO image) */}
-      {!event.imageUrl && (
+      {!hasImage && (
         <div className="mb-3">
           <div className="flex items-center gap-2 mb-2">
             {isNew && (
@@ -195,7 +223,7 @@ export function EventHero({
       )}
 
       {/* Performer link (when image exists — the overlay only shows plain text) */}
-      {event.imageUrl && event.performer && (
+      {hasImage && event.performer && (
         <div className="text-sm text-[var(--lark-text-secondary)] mb-1">
           by <PerformerLink performerId={event.performer.id} performerName={event.performer.name} />
         </div>
