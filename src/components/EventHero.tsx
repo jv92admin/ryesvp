@@ -29,6 +29,8 @@ interface EventHeroProps {
   eventId: string;
   initialStatus: AttendanceStatus | null;
   isLoggedIn: boolean;
+  eventUrl?: string | null;
+  buyUrl?: string | null;
   shareProps: {
     title: string;
     venueName: string;
@@ -43,6 +45,8 @@ export function EventHero({
   eventId,
   initialStatus,
   isLoggedIn,
+  eventUrl,
+  buyUrl,
   shareProps,
 }: EventHeroProps) {
   const router = useRouter();
@@ -256,7 +260,7 @@ export function EventHero({
       </div>
 
       {/* Venue */}
-      <div className="flex items-center gap-2 text-sm text-[var(--lark-text-secondary)] mb-4">
+      <div className="flex items-center gap-2 text-sm text-[var(--lark-text-secondary)] mb-1.5">
         <svg className="w-4 h-4 text-[var(--lark-text-muted)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
@@ -266,6 +270,38 @@ export function EventHero({
           <span className="text-[var(--lark-text-muted)]">, {event.venue.city}, {event.venue.state}</span>
         )}
       </div>
+
+      {/* External links */}
+      {(eventUrl || buyUrl) && (
+        <div className="flex items-center gap-3 text-sm mb-4 ml-6">
+          {eventUrl && (
+            <a
+              href={eventUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--lark-text-muted)] hover:text-[var(--lark-text-secondary)] hover:underline transition-colors"
+            >
+              Event website
+            </a>
+          )}
+          {eventUrl && buyUrl && (
+            <span className="text-[var(--lark-text-muted)]">{'\u00B7'}</span>
+          )}
+          {buyUrl && (
+            <a
+              href={buyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--lark-text-muted)] hover:text-[var(--lark-text-secondary)] hover:underline transition-colors"
+            >
+              Tickets
+            </a>
+          )}
+        </div>
+      )}
+
+      {/* Spacer when no external links */}
+      {!eventUrl && !buyUrl && <div className="mb-2.5" />}
 
       {/* Inline attendance toggles */}
       {isLoggedIn && (

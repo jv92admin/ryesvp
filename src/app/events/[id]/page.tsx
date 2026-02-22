@@ -124,6 +124,8 @@ export default async function EventPage({ params }: EventPageProps) {
             eventId={id}
             initialStatus={userEvent?.status || null}
             isLoggedIn={!!user}
+            eventUrl={event.url}
+            buyUrl={tmUrl}
             shareProps={{ title: displayTitle, venueName: event.venue.name, dateFormatted, eventUrl }}
           />
 
@@ -155,8 +157,6 @@ export default async function EventPage({ params }: EventPageProps) {
           <AboutCard
             description={event.description}
             venue={event.venue}
-            eventUrl={event.url}
-            buyUrl={tmUrl}
           />
         </div>
       </main>
