@@ -27,6 +27,7 @@ export function FilterStrip() {
   const selectedCategories = categoriesParam ? categoriesParam.split(',').filter(Boolean) : [];
   const isConcertActive = selectedCategories.includes('CONCERT');
   const isFriendsActive = searchParams.get('friendsGoing') === 'true';
+  const isMyPlansActive = searchParams.get('myEvents') === 'true';
 
   // ─── Overflow filter state (for badge count + active tags) ───
   const startDate = searchParams.get('startDate') || '';
@@ -105,6 +106,13 @@ export function FilterStrip() {
     });
   };
 
+  const toggleMyPlans = () => {
+    updateParams((p) => {
+      if (isMyPlansActive) p.delete('myEvents');
+      else p.set('myEvents', 'true');
+    });
+  };
+
   // ─── Tag dismissal helpers ───
   const removeCategory = (id: string) => {
     updateParams((p) => {
@@ -165,17 +173,14 @@ export function FilterStrip() {
 
       {/* Row 2: Quick chips + Filters button */}
       <div className="flex items-center gap-2">
-        <ToggleChip active={currentWhen === 'thisWeek'} onClick={() => toggleDatePreset('thisWeek')}>
-          This Week
-        </ToggleChip>
         <ToggleChip active={currentWhen === 'weekend'} onClick={() => toggleDatePreset('weekend')}>
-          Weekend
-        </ToggleChip>
-        <ToggleChip active={isConcertActive} onClick={toggleConcert}>
-          Concerts
+          This Weekend
         </ToggleChip>
         <ToggleChip active={isFriendsActive} onClick={toggleFriends}>
           Friends
+        </ToggleChip>
+        <ToggleChip active={isMyPlansActive} onClick={toggleMyPlans}>
+          My Plans
         </ToggleChip>
 
         {/* Filters overflow button */}
@@ -184,8 +189,8 @@ export function FilterStrip() {
           onClick={() => setDrawerOpen(true)}
           className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full border transition-colors
             ${overflowCount > 0
-              ? 'bg-[var(--action-engage-light)] border-[var(--action-engage)] text-[var(--action-engage)]'
-              : 'bg-[var(--surface-card)] border-[var(--border-default)] text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:bg-[var(--surface-inset)]'
+              ? 'bg-[var(--bg-surface)] border-[var(--accent)] text-[var(--accent)]'
+              : 'bg-[var(--bg-elevated)] border-[var(--border-subtle)] text-[var(--lark-text-secondary)] hover:border-[var(--border-visible)] hover:bg-[var(--bg-hover)]'
             }`}
         >
           <FilterIcon />
@@ -224,7 +229,7 @@ export function FilterStrip() {
             <button
               type="button"
               onClick={clearAll}
-              className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors ml-1"
+              className="text-xs text-[var(--lark-text-muted)] hover:text-[var(--lark-text-primary)] transition-colors ml-1"
             >
               Clear all
             </button>

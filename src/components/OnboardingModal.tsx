@@ -78,36 +78,36 @@ export function OnboardingModal() {
       </div>
 
       <DialogBody className="pt-6 md:pt-8 pb-6 md:pb-8">
-        <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
+        <h2 className="text-2xl font-bold text-[var(--lark-text-primary)] mb-2">
           Discover. Connect. Plan. Go.
         </h2>
-        <p className="text-[var(--text-secondary)] mb-6">
+        <p className="text-[var(--lark-text-secondary)] mb-6">
           Find events with friends and keep each plan in one place.
         </p>
 
-        <ul className="space-y-4 mb-8 text-[var(--text-secondary)]">
+        <ul className="space-y-4 mb-8 text-[var(--lark-text-secondary)]">
           <li className="flex items-start gap-3">
-            <span className="text-[var(--text-primary)] mt-0.5 font-bold">·</span>
+            <span className="text-[var(--lark-text-primary)] mt-0.5 font-bold">·</span>
             <span>
-              <strong className="text-[var(--text-primary)]">Discover</strong> live music, comedy, sports, and more from 15+ venues around Austin.
+              <strong className="text-[var(--lark-text-primary)]">Discover</strong> live music, comedy, sports, and more from 15+ venues around Austin.
             </span>
           </li>
           <li className="flex items-start gap-3">
-            <span className="text-[var(--text-primary)] mt-0.5 font-bold">·</span>
+            <span className="text-[var(--lark-text-primary)] mt-0.5 font-bold">·</span>
             <span>
-              <strong className="text-[var(--text-primary)]">Connect</strong> by adding friends and seeing events they&apos;re into.
+              <strong className="text-[var(--lark-text-primary)]">Connect</strong> by adding friends and seeing events they&apos;re into.
             </span>
           </li>
           <li className="flex items-start gap-3">
-            <span className="text-[var(--text-primary)] mt-0.5 font-bold">·</span>
+            <span className="text-[var(--lark-text-primary)] mt-0.5 font-bold">·</span>
             <span>
-              <strong className="text-[var(--text-primary)]">Plan</strong> in one place so who&apos;s in, tickets, and meetup details aren&apos;t buried in endless group chats.
+              <strong className="text-[var(--lark-text-primary)]">Plan</strong> in one place so who&apos;s in, tickets, and meetup details aren&apos;t buried in endless group chats.
             </span>
           </li>
           <li className="flex items-start gap-3">
-            <span className="text-[var(--text-primary)] mt-0.5 font-bold">·</span>
+            <span className="text-[var(--lark-text-primary)] mt-0.5 font-bold">·</span>
             <span>
-              <strong className="text-[var(--text-primary)]">Go</strong> when the plan actually comes together.
+              <strong className="text-[var(--lark-text-primary)]">Go</strong> when the plan actually comes together.
             </span>
           </li>
         </ul>
@@ -115,13 +115,13 @@ export function OnboardingModal() {
         <div className="flex flex-col gap-3">
           <button
             onClick={handleExploreEvents}
-            className="w-full px-6 py-3 text-base font-medium rounded-lg transition-colors bg-[var(--action-primary)] text-[var(--action-primary-text)] hover:bg-[var(--action-primary-hover)]"
+            className="w-full px-6 py-3 text-base font-medium rounded-lg transition-colors bg-[var(--accent)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)]"
           >
             Explore Events
           </button>
           <button
             onClick={handleLearnMore}
-            className="w-full px-6 py-3 text-base font-medium rounded-lg transition-colors text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]"
+            className="w-full px-6 py-3 text-base font-medium rounded-lg transition-colors text-[var(--lark-text-secondary)] border border-[var(--border-subtle)] hover:border-[var(--border-visible)] hover:text-[var(--lark-text-primary)]"
           >
             Learn More
           </button>

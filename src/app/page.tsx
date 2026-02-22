@@ -77,8 +77,8 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 py-4">
+      <main className="min-h-screen bg-[var(--bg-primary)]">
+        <div className="max-w-6xl mx-auto px-[var(--screen-padding)] py-4">
           {/* Invite Banner for logged-out users with ?ref= */}
           <InviteBanner isLoggedIn={!!user} />
           

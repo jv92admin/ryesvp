@@ -3,20 +3,23 @@
 import { forwardRef, ButtonHTMLAttributes, ReactNode } from 'react';
 import { clsx } from 'clsx';
 
+/**
+ * Lark IconButton — monochrome variants.
+ */
 type IconButtonVariant = 'ghost' | 'outline' | 'solid';
 type IconButtonSize = 'sm' | 'md' | 'lg';
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon: ReactNode;
-  label: string;  // required aria-label — icon buttons MUST be accessible
+  label: string;
   variant?: IconButtonVariant;
   size?: IconButtonSize;
 }
 
 const variantStyles: Record<IconButtonVariant, string> = {
-  ghost: 'bg-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-inset)]',
-  outline: 'bg-[var(--surface-card)] text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]',
-  solid: 'bg-[var(--action-primary)] text-[var(--action-primary-text)] hover:bg-[var(--action-primary-hover)]',
+  ghost: 'bg-transparent text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)] hover:bg-[var(--bg-hover)]',
+  outline: 'bg-transparent text-[var(--lark-text-secondary)] border border-[var(--border-visible)] hover:border-[var(--lark-text-muted)] hover:text-[var(--lark-text-primary)]',
+  solid: 'bg-[var(--accent)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)]',
 };
 
 const sizeStyles: Record<IconButtonSize, string> = {
@@ -36,7 +39,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         className={clsx(
           'inline-flex items-center justify-center rounded-lg',
           'transition-colors duration-[var(--duration-fast)]',
-          'focus:outline-none focus:ring-2 focus:ring-[var(--border-strong)] focus:ring-offset-2',
+          'focus:outline-none focus:ring-2 focus:ring-[var(--border-visible)] focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)]',
           variantStyles[variant],
           sizeStyles[size],
           disabled && 'opacity-50 cursor-not-allowed',

@@ -101,8 +101,8 @@ export function VenueFilter() {
           px-2.5 py-1 text-xs font-medium rounded-full border
           flex items-center gap-1 transition-colors
           ${selectedVenueIds.length > 0
-            ? 'bg-[var(--brand-primary-light)] border-[var(--brand-primary)] text-[var(--brand-primary)]'
-            : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-gray-300'
+            ? 'bg-[var(--bg-surface)] border-[var(--accent)] text-[var(--accent)]'
+            : 'bg-[var(--bg-elevated)] border-[var(--border-subtle)] text-[var(--lark-text-secondary)] hover:bg-[var(--bg-hover)] hover:border-[var(--border-visible)]'
           }
         `}
       >
@@ -125,17 +125,17 @@ export function VenueFilter() {
 
       {/* Dropdown - fixed position on mobile to ensure it stays on screen */}
       {isOpen && (
-        <div className="fixed sm:absolute top-auto sm:top-full left-4 right-4 sm:left-0 sm:right-auto mt-2 sm:w-72 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div className="fixed sm:absolute top-auto sm:top-full left-4 right-4 sm:left-0 sm:right-auto mt-2 sm:w-72 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-lg z-50">
           {/* Search */}
-          <div className="p-2 border-b border-gray-100">
+          <div className="p-2 border-b border-[var(--border-subtle)]">
             <input
               type="text"
               placeholder="Search venues..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-3 py-1.5 text-sm border border-gray-200 rounded-md
-                       text-gray-900 placeholder:text-gray-400
-                       focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent"
+              className="w-full px-3 py-1.5 text-sm border border-[var(--border-subtle)] rounded-md
+                       text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)]
+                       focus:outline-none focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
               autoFocus
             />
           </div>
@@ -143,9 +143,9 @@ export function VenueFilter() {
           {/* Venue List */}
           <div className="max-h-64 overflow-y-auto p-2">
             {loading ? (
-              <p className="text-sm text-gray-500 text-center py-4">Loading venues...</p>
+              <p className="text-sm text-[var(--lark-text-secondary)] text-center py-4">Loading venues...</p>
             ) : filteredVenues.length === 0 ? (
-              <p className="text-sm text-gray-500 text-center py-4">No venues found</p>
+              <p className="text-sm text-[var(--lark-text-secondary)] text-center py-4">No venues found</p>
             ) : (
               <div className="space-y-1">
                 {filteredVenues.map((venue) => {
@@ -159,8 +159,8 @@ export function VenueFilter() {
                         w-full text-left px-3 py-2 text-sm rounded-md
                         flex items-center gap-2 transition-colors
                         ${isSelected
-                          ? 'bg-[var(--brand-primary-light)] text-[var(--brand-primary)]'
-                          : 'hover:bg-gray-50 text-gray-700'
+                          ? 'bg-[var(--bg-surface)] text-[var(--accent)]'
+                          : 'hover:bg-[var(--bg-hover)] text-[var(--lark-text-primary)]'
                         }
                       `}
                     >
@@ -168,8 +168,8 @@ export function VenueFilter() {
                         w-4 h-4 border rounded flex-shrink-0
                         flex items-center justify-center
                         ${isSelected
-                          ? 'bg-[var(--brand-primary)] border-[var(--brand-primary)]'
-                          : 'border-gray-300'
+                          ? 'bg-[var(--accent)] border-[var(--accent)]'
+                          : 'border-[var(--border-visible)]'
                         }
                       `}>
                         {isSelected && (
@@ -188,11 +188,11 @@ export function VenueFilter() {
 
           {/* Footer */}
           {selectedVenueIds.length > 0 && (
-            <div className="p-2 border-t border-gray-100">
+            <div className="p-2 border-t border-[var(--border-subtle)]">
               <button
                 type="button"
                 onClick={clearVenues}
-                className="w-full px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-md transition-colors"
+                className="w-full px-3 py-1.5 text-sm text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)] hover:bg-[var(--bg-hover)] rounded-md transition-colors"
               >
                 Clear selection
               </button>

@@ -85,8 +85,8 @@ ${shareUrl}`;
 
   const defaultStyle = `flex items-center justify-center gap-1.5 text-sm font-medium transition-colors ${
     copied
-      ? 'text-[var(--signal-going)]'
-      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+      ? 'text-[var(--lark-text-primary)]'
+      : 'text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)]'
   }`;
 
   return (

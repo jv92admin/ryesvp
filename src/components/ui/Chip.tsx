@@ -2,34 +2,24 @@
 
 import { forwardRef, ButtonHTMLAttributes, ReactNode } from 'react';
 import { clsx } from 'clsx';
+import { useHaptic } from '@/hooks/useHaptic';
 
 /**
- * Chip Variants:
- * - toggle: For selection states (guests, ticket options)
- * - tag: For category/filter tags with optional remove
- * - status: For status indicators (Going, Interested)
- * - info: Neutral informational chip
- * - coming-soon: Greyed out future feature
+ * Lark Chip — monochrome, two visual states:
+ * - default (outlined): `--border-visible` outline, `--lark-text-secondary`
+ * - selected (filled): `--accent` bg, `--text-inverse` text
+ * - alert: `--status-need-ticket` for Need Ticket state
+ *
+ * All color variants removed. Monochrome only.
  */
 type ChipVariant = 'toggle' | 'tag' | 'status' | 'info' | 'coming-soon';
 type ChipSize = 'xs' | 'sm' | 'md';
 
-/**
- * Semantic colors for chips:
- * - default: Gray (unselected/neutral)
- * - primary: Warm gold (engagement/social — active filter chips, selections)
- * - accent: Warm gold solid (highlighted engagement)
- * - category: Blue tint for category filters
- * - warning: Amber for "needs attention" states
- * - success: Green for going/confirmed signal states
- */
-type ChipColor = 'default' | 'primary' | 'accent' | 'category' | 'warning' | 'success';
-
 interface ChipProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'> {
   variant?: ChipVariant;
   size?: ChipSize;
-  color?: ChipColor;
   active?: boolean;
+  alert?: boolean;
   removable?: boolean;
   onRemove?: () => void;
   icon?: ReactNode;
@@ -42,50 +32,20 @@ const sizeStyles: Record<ChipSize, string> = {
   md: 'px-3 py-1.5 text-sm gap-2',
 };
 
-// Color styles for each chip color in both active and inactive states
-// Borders added for visual definition per UX feedback
-const colorStyles: Record<ChipColor, { active: string; inactive: string }> = {
-  default: {
-    active: 'bg-gray-200 text-[var(--text-primary)] border border-gray-300',
-    inactive: 'bg-white text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-gray-300 hover:bg-gray-50',
-  },
-  primary: {
-    active: 'bg-[var(--action-engage-light)] text-[var(--action-engage)] border border-amber-700/30',
-    inactive: 'bg-white text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-amber-700/30 hover:bg-[var(--action-engage-light)]',
-  },
-  accent: {
-    active: 'bg-[var(--action-engage)] text-white border border-[var(--action-engage)]',
-    inactive: 'bg-[var(--action-engage-light)] text-[var(--action-engage)] border border-amber-200 hover:bg-amber-100',
-  },
-  category: {
-    active: 'bg-blue-100 text-blue-800 border border-blue-300',
-    inactive: 'bg-white text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-blue-300 hover:bg-blue-50',
-  },
-  warning: {
-    active: 'bg-amber-100 text-amber-700 border border-amber-300',
-    inactive: 'bg-white text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-amber-300 hover:bg-amber-50',
-  },
-  success: {
-    active: 'bg-[var(--signal-going-light)] text-[var(--signal-going)] border border-green-300',
-    inactive: 'bg-white text-[var(--text-secondary)] border border-[var(--border-default)] hover:border-green-300 hover:bg-green-50',
-  },
-};
-
-// Variant-specific styling
 const variantStyles: Record<ChipVariant, string> = {
-  toggle: 'rounded-full font-medium cursor-pointer transition-colors',
+  toggle: 'rounded-full font-medium cursor-pointer',
   tag: 'rounded-full font-normal',
   status: 'rounded-md font-medium',
   info: 'rounded-full font-normal',
-  'coming-soon': 'rounded-full font-normal opacity-50 cursor-not-allowed',
+  'coming-soon': 'rounded-full font-normal opacity-40 cursor-not-allowed',
 };
 
 export const Chip = forwardRef<HTMLButtonElement, ChipProps>(
   ({
     variant = 'toggle',
     size = 'sm',
-    color = 'default',
     active = false,
+    alert = false,
     removable = false,
     onRemove,
     icon,
@@ -95,18 +55,24 @@ export const Chip = forwardRef<HTMLButtonElement, ChipProps>(
     onClick,
     ...props
   }, ref) => {
+    const { light: hapticLight } = useHaptic();
     const isClickable = variant !== 'coming-soon' && (onClick || removable);
     const isDisabled = disabled || variant === 'coming-soon';
 
-    const colorStyle = colorStyles[color][active ? 'active' : 'inactive'];
+    // State styling: alert > active > default
+    const stateStyle = alert
+      ? 'bg-[var(--status-need-ticket)] text-white border border-[var(--status-need-ticket)]'
+      : active
+        ? 'bg-[var(--accent)] text-[var(--text-inverse)] border border-[var(--accent)]'
+        : 'bg-transparent text-[var(--lark-text-secondary)] border border-[var(--border-visible)] hover:border-[var(--lark-text-muted)] hover:text-[var(--lark-text-primary)]';
 
-    // For coming-soon, override to always show muted style
-    const finalColorStyle = variant === 'coming-soon' 
-      ? 'bg-gray-100 text-gray-400'
-      : colorStyle;
+    const finalStyle = variant === 'coming-soon'
+      ? 'bg-[var(--bg-surface)] text-[var(--lark-text-muted)] border border-[var(--border-subtle)]'
+      : stateStyle;
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       if (isDisabled) return;
+      hapticLight();
       onClick?.(e);
     };
 
@@ -122,10 +88,11 @@ export const Chip = forwardRef<HTMLButtonElement, ChipProps>(
         disabled={isDisabled}
         onClick={handleClick}
         className={clsx(
-          'inline-flex items-center',
+          'inline-flex items-center transition-colors duration-[var(--duration-fast)]',
+          'active:scale-95 transition-transform',
           sizeStyles[size],
           variantStyles[variant],
-          finalColorStyle,
+          finalStyle,
           isDisabled && 'cursor-not-allowed',
           !isClickable && 'cursor-default',
           className
@@ -146,8 +113,8 @@ export const Chip = forwardRef<HTMLButtonElement, ChipProps>(
               }
             }}
             className={clsx(
-              'ml-0.5 flex-shrink-0 hover:text-red-500 transition-colors cursor-pointer',
-              active ? 'text-current opacity-60' : 'text-gray-400'
+              'ml-0.5 flex-shrink-0 transition-colors cursor-pointer',
+              active ? 'text-current opacity-60 hover:opacity-100' : 'text-[var(--lark-text-muted)] hover:text-[var(--status-need-ticket)]'
             )}
             aria-label="Remove"
           >
@@ -162,23 +129,21 @@ export const Chip = forwardRef<HTMLButtonElement, ChipProps>(
 Chip.displayName = 'Chip';
 
 /**
- * Convenience wrapper for toggle chips (like guest counts, ticket options)
+ * Convenience wrapper for toggle chips
  */
 interface ToggleChipProps {
   active: boolean;
   onClick: () => void;
   disabled?: boolean;
-  color?: ChipColor;
   size?: ChipSize;
   className?: string;
   children: ReactNode;
 }
 
-export function ToggleChip({ active, onClick, disabled, color = 'primary', size = 'sm', className, children }: ToggleChipProps) {
+export function ToggleChip({ active, onClick, disabled, size = 'sm', className, children }: ToggleChipProps) {
   return (
     <Chip
       variant="toggle"
-      color={color}
       active={active}
       onClick={onClick}
       disabled={disabled}
@@ -191,20 +156,18 @@ export function ToggleChip({ active, onClick, disabled, color = 'primary', size 
 }
 
 /**
- * Convenience wrapper for removable tag chips (like selected filters)
+ * Convenience wrapper for removable tag chips
  */
 interface TagChipProps {
   onRemove: () => void;
-  color?: ChipColor;
   size?: ChipSize;
   children: ReactNode;
 }
 
-export function TagChip({ onRemove, color = 'category', size = 'xs', children }: TagChipProps) {
+export function TagChip({ onRemove, size = 'xs', children }: TagChipProps) {
   return (
     <Chip
       variant="tag"
-      color={color}
       active={true}
       removable
       onRemove={onRemove}
@@ -214,4 +177,3 @@ export function TagChip({ onRemove, color = 'category', size = 'xs', children }:
     </Chip>
   );
 }
-

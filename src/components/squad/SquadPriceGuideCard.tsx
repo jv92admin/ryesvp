@@ -155,18 +155,18 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
 
   if (isLoading) {
     return (
-      <div className="animate-pulse bg-gray-100 rounded-lg h-20"></div>
+      <div className="animate-pulse bg-[var(--bg-surface)] rounded-lg h-20"></div>
     );
   }
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="font-medium text-gray-900">Ticket Price Guide</h4>
+        <h4 className="font-medium text-[var(--lark-text-primary)]">Ticket Price Guide</h4>
         {!isAdding && guides.length > 0 && (
           <button
             onClick={() => setIsAdding(true)}
-            className="text-sm text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)]"
+            className="text-sm text-[var(--accent)] hover:text-[var(--accent)]"
           >
             + Add
           </button>
@@ -174,14 +174,14 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
       </div>
 
       {guides.length === 0 && !isAdding ? (
-        <div className="text-sm text-gray-500 bg-gray-50 rounded-lg p-4">
+        <div className="text-sm text-[var(--lark-text-secondary)] bg-[var(--bg-surface)] rounded-lg p-4">
           <p className="mb-2">No one has shared price info yet.</p>
-          <p className="text-xs text-gray-400 mb-3">
+          <p className="text-xs text-[var(--lark-text-muted)] mb-3">
             If you've seen tickets, add a rough range to help everyone decide.
           </p>
           <button
             onClick={() => setIsAdding(true)}
-            className="text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)] text-sm font-medium"
+            className="text-[var(--accent)] hover:text-[var(--accent)] text-sm font-medium"
           >
             + Add price info
           </button>
@@ -191,17 +191,17 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
           {guides.map(guide => (
             <div
               key={guide.id}
-              className="bg-gray-50 rounded-lg p-3 text-sm"
+              className="bg-[var(--bg-surface)] rounded-lg p-3 text-sm"
             >
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-2">
                     {guide.label && (
-                      <span className="font-medium text-gray-900">{guide.label}:</span>
+                      <span className="font-medium text-[var(--lark-text-primary)]">{guide.label}:</span>
                     )}
-                    <span className="text-gray-900 font-medium">{formatPrice(guide)}</span>
+                    <span className="text-[var(--lark-text-primary)] font-medium">{formatPrice(guide)}</span>
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">
+                  <div className="text-xs text-[var(--lark-text-secondary)] mt-1">
                     Added by {getDisplayName(guide.addedBy.displayName, guide.addedBy.email)} · {formatTimeAgo(guide.updatedAt)}
                     {guide.source && <span> · {guide.source}</span>}
                   </div>
@@ -210,13 +210,13 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
                   <div className="flex gap-1">
                     <button
                       onClick={() => startEdit(guide)}
-                      className="text-xs text-gray-400 hover:text-gray-600 px-1"
+                      className="text-xs text-[var(--lark-text-muted)] hover:text-[var(--lark-text-secondary)] px-1"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(guide.id)}
-                      className="text-xs text-gray-400 hover:text-red-600 px-1"
+                      className="text-xs text-[var(--lark-text-muted)] hover:text-[var(--lark-text-primary)] px-1"
                     >
                       ×
                     </button>
@@ -230,39 +230,39 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
 
       {/* Add/Edit form */}
       {isAdding && (
-        <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
-          <div className="text-sm font-medium text-gray-700">
+        <form onSubmit={handleSubmit} className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-lg p-4 space-y-3">
+          <div className="text-sm font-medium text-[var(--lark-text-primary)]">
             {editingId ? 'Edit price info' : 'Add price info'}
           </div>
           
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Label (optional)</label>
+              <label className="block text-xs text-[var(--lark-text-secondary)] mb-1">Label (optional)</label>
               <input
                 type="text"
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 placeholder="e.g. GA, Balcony"
-                className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-3 py-2 text-sm text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] border border-[var(--border-subtle)] rounded-lg focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
               />
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Source (optional)</label>
+              <label className="block text-xs text-[var(--lark-text-secondary)] mb-1">Source (optional)</label>
               <input
                 type="text"
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
                 placeholder="e.g. Ticketmaster"
-                className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-3 py-2 text-sm text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] border border-[var(--border-subtle)] rounded-lg focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Min price *</label>
+              <label className="block text-xs text-[var(--lark-text-secondary)] mb-1">Min price *</label>
               <div className="relative">
-                <span className="absolute left-3 top-2 text-gray-400 text-sm">$</span>
+                <span className="absolute left-3 top-2 text-[var(--lark-text-muted)] text-sm">$</span>
                 <input
                   type="number"
                   value={priceMin}
@@ -270,27 +270,27 @@ export function SquadPriceGuideCard({ squadId, currentUserId }: SquadPriceGuideC
                   placeholder="50"
                   min="0"
                   required
-                  className="w-full pl-7 pr-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full pl-7 pr-3 py-2 text-sm text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] border border-[var(--border-subtle)] rounded-lg focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-xs text-gray-500 mb-1">Max price</label>
+              <label className="block text-xs text-[var(--lark-text-secondary)] mb-1">Max price</label>
               <div className="relative">
-                <span className="absolute left-3 top-2 text-gray-400 text-sm">$</span>
+                <span className="absolute left-3 top-2 text-[var(--lark-text-muted)] text-sm">$</span>
                 <input
                   type="number"
                   value={priceMax}
                   onChange={(e) => setPriceMax(e.target.value)}
                   placeholder="75"
                   min="0"
-                  className="w-full pl-7 pr-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full pl-7 pr-3 py-2 text-sm text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] border border-[var(--border-subtle)] rounded-lg focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
                 />
               </div>
             </div>
           </div>
 
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-[var(--lark-text-muted)]">
             Ballpark only — just to give people a sense of typical prices.
           </p>
 

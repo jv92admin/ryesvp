@@ -17,7 +17,7 @@ interface SearchInputProps {
  * - Syncs with URL on mount (for back/forward nav)
  */
 export function SearchInput({ 
-  placeholder = 'What kind of night are we having?',
+  placeholder = 'What kind of night are you planning?',
   className = ''
 }: SearchInputProps) {
   const router = useRouter();
@@ -72,8 +72,8 @@ export function SearchInput({
         onClick={submitSearch}
         className={`absolute left-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded transition-colors
           ${hasUnsearchedValue
-            ? 'text-[var(--action-primary)] hover:bg-[var(--surface-inset)]'
-            : 'text-[var(--text-muted)] cursor-default'
+            ? 'text-[var(--accent)] hover:bg-[var(--bg-hover)]'
+            : 'text-[var(--lark-text-muted)] cursor-default'
           }`}
         title={hasUnsearchedValue ? 'Search' : ''}
       >
@@ -98,10 +98,10 @@ export function SearchInput({
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="w-full pl-9 pr-8 py-2 text-sm border border-[var(--border-default)] rounded-lg
-                   bg-[var(--surface-card)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)]
-                   focus:outline-none focus:ring-2 focus:ring-[var(--border-strong)] focus:border-transparent
-                   transition-shadow"
+        style={{ fontFamily: 'var(--font-display)' }}
+        className="w-full pl-9 pr-8 h-12 text-sm border border-[var(--border-subtle)] rounded-[var(--card-radius)]
+                   bg-[var(--bg-surface)] text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)]
+                   focus:outline-none focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
       />
       
       {/* Clear button */}
@@ -109,7 +109,7 @@ export function SearchInput({
         <button
           type="button"
           onClick={handleClear}
-          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors"
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--lark-text-muted)] hover:text-[var(--lark-text-secondary)] transition-colors"
           aria-label="Clear search"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

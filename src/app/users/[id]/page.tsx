@@ -24,10 +24,9 @@ export default async function UserProfilePage({ params }: UserProfilePageProps) 
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-[var(--bg-primary)]">
         <UserProfileContent userId={id} />
       </main>
     </>
   );
 }
-

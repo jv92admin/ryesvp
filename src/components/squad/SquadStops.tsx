@@ -191,13 +191,13 @@ export function SquadStops({ squadId, stops, onRefresh }: SquadStopsProps) {
   };
 
   const renderForm = () => (
-    <div className="space-y-3 p-3 bg-gray-50 rounded-lg">
+    <div className="space-y-3 p-3 bg-[var(--bg-surface)] rounded-lg">
       <input
         type="text"
         value={formLabel}
         onChange={(e) => setFormLabel(e.target.value)}
         placeholder="Stop name (e.g., Pre-drinks, Concert, After-party)"
-        className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+        className="w-full px-3 py-2 text-sm text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] border border-[var(--border-visible)] rounded-lg focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
         autoFocus
       />
       <div className="grid grid-cols-2 gap-2">
@@ -205,14 +205,14 @@ export function SquadStops({ squadId, stops, onRefresh }: SquadStopsProps) {
           type="datetime-local"
           value={formTime}
           onChange={(e) => setFormTime(e.target.value)}
-          className="px-3 py-2 text-sm text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="px-3 py-2 text-sm text-[var(--lark-text-primary)] border border-[var(--border-visible)] rounded-lg focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
         />
         <input
           type="text"
           value={formLocation}
           onChange={(e) => setFormLocation(e.target.value)}
           placeholder="Location"
-          className="px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          className="px-3 py-2 text-sm text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] border border-[var(--border-visible)] rounded-lg focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
         />
       </div>
       <input
@@ -220,7 +220,7 @@ export function SquadStops({ squadId, stops, onRefresh }: SquadStopsProps) {
         value={formNotes}
         onChange={(e) => setFormNotes(e.target.value)}
         placeholder="Notes (optional)"
-        className="w-full px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+        className="w-full px-3 py-2 text-sm text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] border border-[var(--border-visible)] rounded-lg focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
       />
       <div className="flex gap-2">
         <Button
@@ -246,16 +246,16 @@ export function SquadStops({ squadId, stops, onRefresh }: SquadStopsProps) {
   );
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+    <div className="bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-4">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="font-medium text-gray-900">📍 Itinerary</h3>
+        <h3 className="font-medium text-[var(--lark-text-primary)]">Itinerary</h3>
         {!isAdding && !editingId && (
           <button
             onClick={() => {
               setIsAdding(true);
               resetForm();
             }}
-            className="text-xs text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)] font-medium"
+            className="text-xs text-[var(--accent)] hover:text-[var(--accent)] font-medium"
           >
             + Add stop
           </button>
@@ -264,8 +264,8 @@ export function SquadStops({ squadId, stops, onRefresh }: SquadStopsProps) {
 
       {stops.length === 0 && !isAdding ? (
         <div className="text-center py-4">
-          <p className="text-sm text-gray-500">No stops planned yet.</p>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-sm text-[var(--lark-text-secondary)]">No stops planned yet.</p>
+          <p className="text-xs text-[var(--lark-text-muted)] mt-1">
             Add pre-drinks, the main event, after-party, or where to meet up!
           </p>
         </div>
@@ -276,32 +276,32 @@ export function SquadStops({ squadId, stops, onRefresh }: SquadStopsProps) {
               {editingId === stop.id ? (
                 renderForm()
               ) : (
-                <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 group">
+                <div className="flex items-start gap-3 p-2 rounded-lg hover:bg-[var(--bg-hover)] group">
                   {/* Timeline dot */}
                   <div className="flex flex-col items-center pt-1">
-                    <div className="w-3 h-3 rounded-full bg-[var(--brand-primary)]" />
+                    <div className="w-3 h-3 rounded-full bg-[var(--accent)]" />
                     {index < stops.length - 1 && (
-                      <div className="w-0.5 h-8 bg-gray-200 mt-1" />
+                      <div className="w-0.5 h-8 bg-[var(--border-subtle)] mt-1" />
                     )}
                   </div>
                   
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-gray-900 text-sm">{stop.label}</span>
+                      <span className="font-medium text-[var(--lark-text-primary)] text-sm">{stop.label}</span>
                       {stop.time && (
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-[var(--lark-text-secondary)]">
                           {formatInTimeZone(new Date(stop.time), AUSTIN_TIMEZONE, 'h:mm a')}
                         </span>
                       )}
                     </div>
                     {stop.location && (
-                      <p className="text-xs text-gray-500 truncate">{stop.location}</p>
+                      <p className="text-xs text-[var(--lark-text-secondary)] truncate">{stop.location}</p>
                     )}
                     {stop.notes && (
-                      <p className="text-xs text-gray-400 mt-0.5">{stop.notes}</p>
+                      <p className="text-xs text-[var(--lark-text-muted)] mt-0.5">{stop.notes}</p>
                     )}
-                    <p className="text-xs text-gray-400 mt-0.5">
+                    <p className="text-xs text-[var(--lark-text-muted)] mt-0.5">
                       Added by {getDisplayName(stop.addedBy.displayName, stop.addedBy.email)}
                     </p>
                   </div>
@@ -312,7 +312,7 @@ export function SquadStops({ squadId, stops, onRefresh }: SquadStopsProps) {
                       <button
                         onClick={() => handleMoveUp(index)}
                         disabled={loading}
-                        className="p-1 text-gray-400 hover:text-gray-600"
+                        className="p-1 text-[var(--lark-text-muted)] hover:text-[var(--lark-text-secondary)]"
                         title="Move up"
                       >
                         ↑
@@ -322,7 +322,7 @@ export function SquadStops({ squadId, stops, onRefresh }: SquadStopsProps) {
                       <button
                         onClick={() => handleMoveDown(index)}
                         disabled={loading}
-                        className="p-1 text-gray-400 hover:text-gray-600"
+                        className="p-1 text-[var(--lark-text-muted)] hover:text-[var(--lark-text-secondary)]"
                         title="Move down"
                       >
                         ↓
@@ -331,15 +331,15 @@ export function SquadStops({ squadId, stops, onRefresh }: SquadStopsProps) {
                     <button
                       onClick={() => startEdit(stop)}
                       disabled={loading}
-                      className="p-1 text-gray-400 hover:text-gray-600"
+                      className="p-1 text-[var(--lark-text-muted)] hover:text-[var(--lark-text-secondary)]"
                       title="Edit"
                     >
-                      ✏️
+                      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                     </button>
                     <button
                       onClick={() => handleDelete(stop.id)}
                       disabled={loading}
-                      className="p-1 text-gray-400 hover:text-red-500"
+                      className="p-1 text-[var(--lark-text-muted)] hover:text-[var(--lark-text-primary)]"
                       title="Delete"
                     >
                       ×

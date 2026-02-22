@@ -3,7 +3,11 @@
 > The complete UX architecture redesign.
 > Structured as 9 mutable increments (0-7 + 3.5), each shippable independently.
 > Brand direction informed by `references/lark-proposal-final.pdf`.
-> Date: 2026-02-19 · Updated: 2026-02-20 (Inc 0–6 shipped, Inc 5+6 combined as integrated hero + plan-on-event-page)
+> Date: 2026-02-19 · Updated: 2026-02-22
+>
+> **Status:** Inc 0–6 shipped. Full Lark dark-mode visual redesign layered on top (Feb 22, 2026).
+> The visual system described in this spec (warm gold `#B45309`, white canvas, colored badges) was superseded by the Lark dark monochrome system (`#0A0A0A` canvas, `#E8E8E8` accent, Space Grotesk, zero shadows, monochrome badges). See `notes/design/ui-reference.md` for the **current** design system reference.
+> This spec is preserved as historical context for the UX architecture decisions (zone layout, component structure, incremental strategy). The token values and color references in Inc 0–3 are outdated.
 
 ---
 
@@ -69,18 +73,13 @@ INC 7    Groups Surfacing           ← group labels, group filter, group activi
 
 Each increment is independently shippable. Later increments benefit from earlier ones but don't hard-block (except Inc 0, which everything depends on).
 
-### Known Color Debt (post Inc 4)
+### Known Color Debt (post Inc 4) — RESOLVED
 
-The monochrome-first principle is working for layout/structure but several color sources still create visual noise:
-
-| Source | Issue | Fix approach |
-|--------|-------|-------------|
-| **User avatars** | Random bright colors (green, blue, etc.) from `getAvatarStyle()` | Shift to muted/neutral palette (grays, warm tones) |
-| **Category text labels** | Purple, amber, pink, etc. — subtle but adds color scatter | Consider all-gray or reduce to 2-3 muted tones |
-| **Spotify badge** | Bright green (#1DB954) circle on every card with a link | Dim to grayscale, colorize on hover? |
-| **External brand colors** | YouTube red, Instagram gradient in ExploreCard | Same approach — muted default, color on hover |
-
-These aren't blockers but they prevent the page from feeling truly monochrome-first. Candidate for a dedicated "Color Discipline" pass after Inc 5-7 ship, or folded into a future polish increment.
+> **Resolved Feb 22, 2026** as part of the Lark dark-mode visual redesign.
+> User avatars → flat `--bg-surface` + `--lark-text-secondary` initials (no bright colors).
+> Category labels → monochrome `--lark-text-secondary` (no colored pills).
+> External brand colors (Spotify, YouTube, TM) → kept as documented exceptions in `externalBrands.ts`.
+> See `notes/design/ui-reference.md` § Color Philosophy for the full monochrome rules.
 
 ---
 

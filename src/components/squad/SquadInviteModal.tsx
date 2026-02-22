@@ -152,25 +152,25 @@ export function SquadInviteModal({ squad, isOpen, onClose, onMemberAdded }: Squa
 
       <DialogBody className="space-y-4">
         {loading && (
-          <div className="text-center py-6 text-[var(--text-muted)]">
+          <div className="text-center py-6 text-[var(--lark-text-muted)]">
             <div className="animate-pulse">Loading friends...</div>
           </div>
         )}
 
         {error && (
-          <div className="p-3 bg-[var(--signal-danger)]/10 border border-[var(--signal-danger)]/20 rounded-lg text-[var(--signal-danger)] text-sm">
+          <div className="p-3 bg-[var(--status-need-ticket)]/10 border border-[var(--status-need-ticket)]/20 rounded-lg text-[var(--status-need-ticket)] text-sm">
             {error}
           </div>
         )}
 
         {!loading && !error && (
           <div>
-            <h4 className="font-medium text-[var(--text-primary)] mb-3">
+            <h4 className="font-medium text-[var(--lark-text-primary)] mb-3">
               Select friends to invite ({selectedFriends.size} selected)
             </h4>
 
             {friends.length === 0 ? (
-              <div className="text-center py-6 text-[var(--text-muted)]">
+              <div className="text-center py-6 text-[var(--lark-text-muted)]">
                 <p className="text-sm">No more friends to invite!</p>
                 <p className="text-xs mt-1">Everyone is already in the plan or not friends yet.</p>
               </div>
@@ -179,7 +179,7 @@ export function SquadInviteModal({ squad, isOpen, onClose, onMemberAdded }: Squa
                 {/* Interested Friends First */}
                 {interestedFriends.length > 0 && (
                   <div>
-                    <h5 className="text-sm font-medium text-[var(--signal-going)] mb-2">
+                    <h5 className="text-sm font-medium text-[var(--accent)] mb-2">
                       Already Interested
                     </h5>
                     <div className="space-y-2">
@@ -199,7 +199,7 @@ export function SquadInviteModal({ squad, isOpen, onClose, onMemberAdded }: Squa
                 {otherFriends.length > 0 && (
                   <div>
                     {interestedFriends.length > 0 && (
-                      <h5 className="text-sm font-medium text-[var(--text-secondary)] mb-2 mt-4">
+                      <h5 className="text-sm font-medium text-[var(--lark-text-secondary)] mb-2 mt-4">
                         Other Friends
                       </h5>
                     )}
@@ -258,10 +258,10 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
     if (!friend.status) return null;
 
     const statusConfig = {
-      INTERESTED: { label: '★', color: 'bg-[var(--signal-interested)]/10 text-[var(--signal-interested)]' },
-      GOING: { label: '✓', color: 'bg-[var(--signal-going)]/10 text-[var(--signal-going)]' },
-      NEED_TICKETS: { label: '?', color: 'bg-[var(--signal-interested)]/10 text-[var(--signal-interested)]' },
-      HAVE_TICKETS: { label: '✓', color: 'bg-[var(--signal-going)]/10 text-[var(--signal-going)]' },
+      INTERESTED: { label: '★', color: 'bg-[var(--lark-text-secondary)]/10 text-[var(--lark-text-secondary)]' },
+      GOING: { label: '✓', color: 'bg-[var(--accent)]/10 text-[var(--accent)]' },
+      NEED_TICKETS: { label: '?', color: 'bg-[var(--lark-text-secondary)]/10 text-[var(--lark-text-secondary)]' },
+      HAVE_TICKETS: { label: '✓', color: 'bg-[var(--accent)]/10 text-[var(--accent)]' },
     };
 
     const config = statusConfig[friend.status as keyof typeof statusConfig];
@@ -277,8 +277,8 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
   return (
     <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
       isSelected
-        ? 'bg-[var(--action-primary)]/10 border-[var(--action-primary)] ring-2 ring-[var(--action-primary)]/20'
-        : 'border-[var(--border-default)] hover:border-[var(--action-primary)]/30 hover:bg-[var(--surface-inset)]'
+        ? 'bg-[var(--accent)]/10 border-[var(--accent)] ring-2 ring-[var(--accent)]/20'
+        : 'border-[var(--border-subtle)] hover:border-[var(--accent)]/30 hover:bg-[var(--bg-hover)]'
     }`}>
       {/* Custom Checkbox */}
       <div className="relative flex-shrink-0">
@@ -290,8 +290,8 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
         />
         <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
           isSelected
-            ? 'bg-[var(--action-primary)] border-[var(--action-primary)]'
-            : 'bg-[var(--surface-card)] border-[var(--border-default)]'
+            ? 'bg-[var(--accent)] border-[var(--accent)]'
+            : 'bg-[var(--bg-elevated)] border-[var(--border-subtle)]'
         }`}>
           {isSelected && (
             <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -302,11 +302,11 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
       </div>
 
       <div className="flex items-center gap-2 flex-1 min-w-0">
-        <div className="w-8 h-8 rounded-full bg-[var(--surface-inset)] flex items-center justify-center text-xs font-medium text-[var(--text-muted)] flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-[var(--bg-surface)] flex items-center justify-center text-xs font-medium text-[var(--lark-text-muted)] flex-shrink-0">
           {friend.displayName.charAt(0).toUpperCase()}
         </div>
 
-        <span className="text-sm font-medium text-[var(--text-primary)] flex-1 truncate">
+        <span className="text-sm font-medium text-[var(--lark-text-primary)] flex-1 truncate">
           {friend.displayName}
         </span>
 

@@ -75,7 +75,7 @@ export default async function EventPage({ params }: EventPageProps) {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-[var(--surface-bg)]">
+      <main className="min-h-screen bg-[var(--bg-primary)]">
         <div className="max-w-3xl mx-auto px-4 py-6 pb-24">
           <InviteBanner isLoggedIn={!!user} />
           {user && <InviteRedemptionHandler />}

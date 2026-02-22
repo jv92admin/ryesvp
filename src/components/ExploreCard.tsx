@@ -44,7 +44,7 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
   if (hasImage && hasSpotify) {
     return (
       <div className="mb-6">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-4">Explore</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--lark-text-muted)] mb-4">Explore</h2>
         <div className="flex gap-4">
           {/* Image */}
           {imageUrl && (
@@ -61,14 +61,14 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
           <div className="flex-1 min-w-0">
             {/* Name */}
             {enrichment.kgName && (
-              <h3 className="font-semibold text-[var(--text-primary)] text-base sm:text-lg">
+              <h3 className="font-semibold text-[var(--lark-text-primary)] text-base sm:text-lg">
                 {enrichment.kgName}
               </h3>
             )}
 
             {/* Description */}
             {enrichment.kgDescription && (
-              <p className="text-sm text-[var(--text-secondary)] mt-1 line-clamp-2">
+              <p className="text-sm text-[var(--lark-text-secondary)] mt-1 line-clamp-2">
                 {enrichment.kgDescription}
               </p>
             )}
@@ -79,7 +79,7 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
                 {genres.slice(0, 3).map((genre) => (
                   <span
                     key={genre}
-                    className="px-2 py-0.5 bg-[var(--surface-inset)] text-[var(--text-secondary)] text-xs font-medium rounded-full"
+                    className="px-2 py-0.5 bg-[var(--bg-surface)] text-[var(--lark-text-secondary)] text-xs font-medium rounded-full"
                   >
                     {genre}
                   </span>
@@ -132,7 +132,7 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
                   href={tmLinks.homepage}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--surface-inset)] text-[var(--text-secondary)] text-sm font-medium rounded-full hover:bg-[var(--border-default)] transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--bg-surface)] text-[var(--lark-text-secondary)] text-sm font-medium rounded-full hover:bg-[var(--bg-hover)] transition-colors"
                 >
                   <WebIcon />
                   Website
@@ -149,7 +149,7 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
   if (hasSpotify || hasExternalLinks) {
     return (
       <div className="mb-6">
-        <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-4">Explore</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--lark-text-muted)] mb-4">Explore</h2>
         <div className="flex flex-wrap gap-2">
           {enrichment.spotifyUrl && (
             <a
@@ -191,7 +191,7 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
               href={tmLinks.homepage}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--surface-inset)] text-[var(--text-secondary)] font-medium rounded-lg hover:bg-[var(--border-default)] transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--bg-surface)] text-[var(--lark-text-secondary)] font-medium rounded-lg hover:bg-[var(--bg-hover)] transition-colors"
             >
               <WebIcon />
               Website

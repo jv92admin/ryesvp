@@ -257,27 +257,26 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
     <Dialog open={isOpen} onOpenChange={() => onClose()} size="lg">
       <DialogHeader onClose={onClose}>
         <DialogTitle>Start a Plan</DialogTitle>
-        <p className="text-sm text-[var(--text-secondary)] mt-1">
+        <p className="text-sm text-[var(--lark-text-secondary)] mt-1">
           Pick an event to plan with friends
         </p>
       </DialogHeader>
 
       {/* Search + Date Filters */}
-      <div className="px-6 py-3 border-b border-[var(--border-default)] bg-[var(--surface-inset)] space-y-3 flex-shrink-0">
+      <div className="px-6 py-3 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)] space-y-3 flex-shrink-0">
         {/* Search Input */}
         <input
           type="text"
           placeholder="Lady Gaga, indie rock, Moody Center..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-4 py-2.5 border border-[var(--border-default)] rounded-xl text-sm bg-[var(--surface-card)] text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--border-strong)] focus:border-transparent transition-all"
+          className="w-full px-4 py-2.5 border border-[var(--border-subtle)] rounded-xl text-sm bg-[var(--bg-elevated)] text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent transition-all"
         />
 
         {/* Date Chips */}
         <div className="flex items-center gap-2 flex-wrap">
           <Chip
             variant="toggle"
-            color="primary"
             size="sm"
             active={datePreset === 'thisWeek'}
             onClick={() => handleDatePresetClick('thisWeek')}
@@ -286,7 +285,6 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
           </Chip>
           <Chip
             variant="toggle"
-            color="primary"
             size="sm"
             active={datePreset === 'weekend'}
             onClick={() => handleDatePresetClick('weekend')}
@@ -298,7 +296,6 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
           <div className="relative" ref={datePickerRef}>
             <Chip
               variant="toggle"
-              color="primary"
               size="sm"
               active={!!hasCustomDates && !datePreset}
               onClick={() => setShowDatePicker(!showDatePicker)}
@@ -317,33 +314,33 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
             </Chip>
 
             {showDatePicker && (
-              <div className="absolute top-full left-0 mt-1 p-3 bg-[var(--surface-card)] border border-[var(--border-default)] rounded-lg shadow-lg z-20 min-w-[200px]">
+              <div className="absolute top-full left-0 mt-1 p-3 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-lg  z-20 min-w-[200px]">
                 <div className="space-y-2">
                   <div>
-                    <label className="block text-xs text-[var(--text-muted)] mb-1">From</label>
+                    <label className="block text-xs text-[var(--lark-text-muted)] mb-1">From</label>
                     <input
                       type="date"
                       value={customStartDate}
                       onChange={(e) => handleCustomDateChange(e.target.value, customEndDate)}
-                      className="w-full px-2 py-1.5 text-sm border border-[var(--border-default)] rounded-md
-                               focus:outline-none focus:ring-1 focus:ring-[var(--border-strong)] focus:border-[var(--border-strong)]"
+                      className="w-full px-2 py-1.5 text-sm border border-[var(--border-subtle)] rounded-md
+                               focus:outline-none focus:ring-1 focus:ring-[var(--border-visible)] focus:border-[var(--border-visible)]"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-[var(--text-muted)] mb-1">To</label>
+                    <label className="block text-xs text-[var(--lark-text-muted)] mb-1">To</label>
                     <input
                       type="date"
                       value={customEndDate}
                       onChange={(e) => handleCustomDateChange(customStartDate, e.target.value)}
-                      className="w-full px-2 py-1.5 text-sm border border-[var(--border-default)] rounded-md
-                               focus:outline-none focus:ring-1 focus:ring-[var(--border-strong)] focus:border-[var(--border-strong)]"
+                      className="w-full px-2 py-1.5 text-sm border border-[var(--border-subtle)] rounded-md
+                               focus:outline-none focus:ring-1 focus:ring-[var(--border-visible)] focus:border-[var(--border-visible)]"
                     />
                   </div>
                   {hasCustomDates && (
                     <button
                       type="button"
                       onClick={clearDates}
-                      className="w-full text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] mt-1"
+                      className="w-full text-xs text-[var(--lark-text-muted)] hover:text-[var(--lark-text-secondary)] mt-1"
                     >
                       Clear dates
                     </button>
@@ -357,7 +354,7 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
           {hasAnyDateFilter && (
             <button
               onClick={clearDates}
-              className="text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] ml-1"
+              className="text-xs text-[var(--lark-text-muted)] hover:text-[var(--lark-text-secondary)] ml-1"
             >
               Clear
             </button>
@@ -368,15 +365,15 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
       {/* Event List */}
       <DialogBody>
         {loading ? (
-          <div className="text-center py-8 text-[var(--text-muted)]">
-            <svg className="animate-spin h-5 w-5 mx-auto mb-2 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24">
+          <div className="text-center py-8 text-[var(--lark-text-muted)]">
+            <svg className="animate-spin h-5 w-5 mx-auto mb-2 text-[var(--lark-text-muted)]" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
             Searching events...
           </div>
         ) : events.length === 0 ? (
-          <div className="text-center py-8 text-[var(--text-muted)]">
+          <div className="text-center py-8 text-[var(--lark-text-muted)]">
             {debouncedQuery || hasAnyDateFilter
               ? 'No events match your search'
               : 'No upcoming events'}
@@ -392,15 +389,15 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
                   w-full flex items-center gap-3 p-3 rounded-xl border text-left
                   transition-all
                   ${selectedEventId === event.id
-                    ? 'border-[var(--action-primary)] bg-[var(--action-primary)]/10 ring-2 ring-[var(--action-primary)]/20'
-                    : 'border-[var(--border-default)] hover:border-[var(--action-primary)]/30 hover:bg-[var(--surface-inset)]'
+                    ? 'border-[var(--accent)] bg-[var(--accent)]/10 ring-2 ring-[var(--accent)]/20'
+                    : 'border-[var(--border-subtle)] hover:border-[var(--accent)]/30 hover:bg-[var(--bg-hover)]'
                   }
                   ${creating && selectedEventId !== event.id ? 'opacity-50' : ''}
                 `}
               >
                 {/* Event Image */}
                 {event.imageUrl ? (
-                  <div className="w-14 h-14 flex-shrink-0 rounded-xl overflow-hidden bg-[var(--surface-inset)] ring-1 ring-[var(--border-default)]">
+                  <div className="w-14 h-14 flex-shrink-0 rounded-xl overflow-hidden bg-[var(--bg-surface)] ring-1 ring-[var(--border-subtle)]">
                     <img
                       src={event.imageUrl}
                       alt=""
@@ -408,8 +405,8 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
                     />
                   </div>
                 ) : (
-                  <div className="w-14 h-14 flex-shrink-0 rounded-xl bg-[var(--surface-inset)] flex items-center justify-center">
-                    <svg className="w-6 h-6 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <div className="w-14 h-14 flex-shrink-0 rounded-xl bg-[var(--bg-surface)] flex items-center justify-center">
+                    <svg className="w-6 h-6 text-[var(--lark-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
                     </svg>
                   </div>
@@ -417,10 +414,10 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
 
                 {/* Event Info */}
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-[var(--text-primary)] truncate">
+                  <p className="font-medium text-[var(--lark-text-primary)] truncate">
                     {event.displayTitle}
                   </p>
-                  <p className="text-sm text-[var(--text-muted)] truncate">
+                  <p className="text-sm text-[var(--lark-text-muted)] truncate">
                     {event.venue.name} • {formatEventDate(new Date(event.startDateTime))}
                   </p>
                 </div>
@@ -428,7 +425,7 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
                 {/* Loading indicator */}
                 {creating && selectedEventId === event.id && (
                   <div className="flex-shrink-0">
-                    <svg className="animate-spin h-5 w-5 text-[var(--action-primary)]" fill="none" viewBox="0 0 24 24">
+                    <svg className="animate-spin h-5 w-5 text-[var(--accent)]" fill="none" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
@@ -442,7 +439,7 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
 
       {/* Footer hint */}
       <DialogFooter className="justify-center">
-        <p className="text-xs text-[var(--text-secondary)] text-center font-medium">
+        <p className="text-xs text-[var(--lark-text-secondary)] text-center font-medium">
           Select an event to start planning • You can invite friends after
         </p>
       </DialogFooter>

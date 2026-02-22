@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/contexts/ToastContext";
 
@@ -13,14 +13,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
+  subsets: ["latin"],
+  weight: ["600", "700"],
+});
+
 export const metadata: Metadata = {
   title: "Lark - Nights Start Here",
   description: "Discover Austin events, see what friends are into, and make plans that actually happen.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://ryesvp.me'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://lark.show'),
   openGraph: {
     title: "Lark - Nights Start Here",
     description: "Discover Austin events, see what friends are into, and make plans that actually happen.",
-    url: "https://ryesvp.me",
+    url: "https://lark.show",
     siteName: "Lark",
     locale: "en_US",
     type: "website",
@@ -46,7 +52,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} antialiased`}
       >
         <ToastProvider>
           {children}

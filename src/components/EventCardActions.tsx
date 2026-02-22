@@ -70,8 +70,8 @@ export function EventCardActions({
         className={`
           w-8 h-8 rounded-full flex items-center justify-center transition-colors
           ${status === 'GOING'
-            ? 'bg-[var(--signal-going)] text-white'
-            : 'bg-[var(--surface-inset)] text-[var(--text-muted)] hover:bg-gray-200 hover:text-[var(--text-secondary)]'
+            ? 'bg-[var(--accent)] text-[var(--text-inverse)]'
+            : 'bg-[var(--bg-surface)] text-[var(--lark-text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--lark-text-secondary)]'
           }
           disabled:opacity-50
         `}
@@ -93,8 +93,8 @@ export function EventCardActions({
         className={`
           w-8 h-8 rounded-full flex items-center justify-center transition-colors
           ${status === 'INTERESTED'
-            ? 'bg-amber-500 text-white'
-            : 'bg-[var(--surface-inset)] text-[var(--text-muted)] hover:bg-gray-200 hover:text-[var(--text-secondary)]'
+            ? 'bg-[var(--bg-surface)] text-[var(--lark-text-primary)]'
+            : 'bg-[var(--bg-surface)] text-[var(--lark-text-muted)] hover:bg-[var(--bg-hover)] hover:text-[var(--lark-text-secondary)]'
           }
           disabled:opacity-50
         `}

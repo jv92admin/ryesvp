@@ -32,7 +32,7 @@ export function CreateCommunityModal({ onClose, onCreate }: CreateCommunityModal
         <DialogBody>
           <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+              <label htmlFor="name" className="block text-sm font-medium text-[var(--lark-text-secondary)] mb-1">
                 Community Name
               </label>
               <input
@@ -41,13 +41,13 @@ export function CreateCommunityModal({ onClose, onCreate }: CreateCommunityModal
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g., EDM Lovers, Austin FC Fans"
-                className="w-full px-3 py-2 border border-[var(--border-default)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--border-strong)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-[var(--border-subtle)] rounded-lg text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
                 autoFocus
               />
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+              <label htmlFor="description" className="block text-sm font-medium text-[var(--lark-text-secondary)] mb-1">
                 Description (optional)
               </label>
               <textarea
@@ -56,11 +56,11 @@ export function CreateCommunityModal({ onClose, onCreate }: CreateCommunityModal
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What's this community about?"
                 rows={3}
-                className="w-full px-3 py-2 border border-[var(--border-default)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--border-strong)] focus:border-transparent resize-none"
+                className="w-full px-3 py-2 border border-[var(--border-subtle)] rounded-lg text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent resize-none"
               />
             </div>
 
-            <p className="text-sm text-[var(--text-muted)]">
+            <p className="text-sm text-[var(--lark-text-muted)]">
               You'll be able to invite friends after creating the community.
             </p>
           </div>
@@ -70,14 +70,14 @@ export function CreateCommunityModal({ onClose, onCreate }: CreateCommunityModal
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-inset)] rounded-lg transition-colors"
+            className="px-4 py-2 text-sm font-medium text-[var(--lark-text-secondary)] hover:bg-[var(--bg-hover)] rounded-lg transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={!name.trim() || loading}
-            className="px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-[var(--action-primary)] text-[var(--action-primary-text)] hover:bg-[var(--action-primary-hover)] disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-[var(--accent)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)] disabled:opacity-50"
           >
             {loading ? 'Creating...' : 'Create Community'}
           </button>

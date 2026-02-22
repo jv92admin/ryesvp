@@ -76,15 +76,15 @@ export function UserProfileContent({ userId }: UserProfileContentProps) {
 
   const handleFriendAction = async (action: 'send' | 'accept' | 'decline' | 'cancel') => {
     if (!data) return;
-    
+
     setActionLoading(true);
     try {
       const res = await fetch(`/api/users/${userId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           action,
-          friendshipId: data.profile.friendshipId 
+          friendshipId: data.profile.friendshipId
         }),
       });
 
@@ -101,9 +101,9 @@ export function UserProfileContent({ userId }: UserProfileContentProps) {
 
   const handleRemoveFriend = async () => {
     if (!data?.profile.friendshipId) return;
-    
+
     if (!confirm('Are you sure you want to remove this friend?')) return;
-    
+
     setActionLoading(true);
     try {
       const res = await fetch(
@@ -126,9 +126,9 @@ export function UserProfileContent({ userId }: UserProfileContentProps) {
       <div className="max-w-2xl mx-auto px-4 py-12">
         <div className="animate-pulse">
           <div className="flex flex-col items-center mb-8">
-            <div className="w-24 h-24 rounded-full bg-gray-200 mb-4" />
-            <div className="h-6 w-32 bg-gray-200 rounded mb-2" />
-            <div className="h-4 w-24 bg-gray-200 rounded" />
+            <div className="w-24 h-24 rounded-full bg-[var(--bg-surface)] mb-4" />
+            <div className="h-6 w-32 bg-[var(--bg-surface)] rounded mb-2" />
+            <div className="h-4 w-24 bg-[var(--bg-surface)] rounded" />
           </div>
         </div>
       </div>
@@ -138,10 +138,10 @@ export function UserProfileContent({ userId }: UserProfileContentProps) {
   if (error || !data) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-12 text-center">
-        <p className="text-gray-500">{error || 'Something went wrong'}</p>
-        <button 
+        <p className="text-[var(--lark-text-secondary)]">{error || 'Something went wrong'}</p>
+        <button
           onClick={() => router.back()}
-          className="mt-4 text-[var(--brand-primary)] hover:underline"
+          className="mt-4 text-[var(--accent)] hover:underline"
         >
           Go back
         </button>
@@ -157,7 +157,7 @@ export function UserProfileContent({ userId }: UserProfileContentProps) {
       {/* Back button */}
       <button
         onClick={() => router.back()}
-        className="flex items-center gap-1 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+        className="flex items-center gap-1 text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)] mb-6 transition-colors"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -169,20 +169,20 @@ export function UserProfileContent({ userId }: UserProfileContentProps) {
       <div className="text-center mb-8">
         {/* Avatar */}
         <div
-          className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-3xl font-semibold shadow-lg"
+          className="w-24 h-24 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-3xl font-semibold"
           style={getAvatarStyle(profile.id)}
         >
           {getInitials(profile.displayName, profile.email)}
         </div>
 
         {/* Name */}
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">
+        <h1 className="text-2xl font-bold text-[var(--lark-text-primary)] mb-1">
           {displayName}
         </h1>
 
         {/* Member since (friends only) */}
         {(profile.relation === 'friend' || profile.relation === 'self') && (
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-[var(--lark-text-secondary)] mb-4">
             Member since {format(new Date(profile.createdAt), 'MMMM yyyy')}
           </p>
         )}
@@ -207,7 +207,7 @@ export function UserProfileContent({ userId }: UserProfileContentProps) {
                 <Link
                   key={friend.id}
                   href={`/users/${friend.id}`}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-white shadow-sm hover:scale-110 transition-transform"
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium border-2 border-[var(--bg-primary)] hover:scale-110 transition-transform"
                   style={getAvatarStyle(friend.id)}
                   title={getDisplayName(friend.displayName, '')}
                 >
@@ -215,7 +215,7 @@ export function UserProfileContent({ userId }: UserProfileContentProps) {
                 </Link>
               ))}
             </div>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-[var(--lark-text-secondary)]">
               {profile.mutualFriendCount} mutual friend{profile.mutualFriendCount !== 1 ? 's' : ''}
             </span>
           </div>
@@ -261,9 +261,9 @@ function FriendshipActions({
   loading: boolean;
 }) {
   const buttonBase = "px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50";
-  const primaryBtn = `${buttonBase} bg-[var(--brand-primary)] text-white hover:bg-[var(--brand-primary-hover)]`;
-  const outlineBtn = `${buttonBase} border border-gray-300 text-gray-700 hover:bg-gray-50`;
-  const disabledBtn = `${buttonBase} bg-gray-100 text-gray-500 cursor-default`;
+  const primaryBtn = `${buttonBase} bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]`;
+  const outlineBtn = `${buttonBase} border border-[var(--border-visible)] text-[var(--lark-text-primary)] hover:bg-[var(--bg-hover)]`;
+  const disabledBtn = `${buttonBase} bg-[var(--bg-surface)] text-[var(--lark-text-secondary)] cursor-default`;
 
   switch (relation) {
     case 'stranger':
@@ -286,7 +286,7 @@ function FriendshipActions({
           <button
             onClick={() => onAction('cancel')}
             disabled={loading}
-            className="text-sm text-gray-500 hover:text-gray-700"
+            className="text-sm text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)]"
           >
             Cancel Request
           </button>
@@ -317,7 +317,7 @@ function FriendshipActions({
       return (
         <div className="flex flex-col items-center gap-2">
           {friendsSince && (
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-[var(--lark-text-secondary)]">
               ✓ Friends since {format(new Date(friendsSince), 'MMM yyyy')}
             </span>
           )}
@@ -354,10 +354,10 @@ function FriendContent({
   return (
     <div className="space-y-8">
       {/* Start Plan CTA */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <div className="bg-[var(--bg-elevated)] rounded-xl border border-[var(--border-subtle)] p-4">
         <button
           onClick={onStartPlan}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[var(--brand-primary)] text-white rounded-lg font-medium hover:bg-[var(--brand-primary-hover)] transition-colors"
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[var(--accent)] text-white rounded-lg font-medium hover:bg-[var(--accent-hover)] transition-colors"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -369,8 +369,8 @@ function FriendContent({
       {/* Mutual Events (highlighted) */}
       {mutualEvents.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-            <span className="text-[var(--brand-primary)]">✨</span>
+          <h2 className="text-lg font-semibold text-[var(--lark-text-primary)] mb-3 flex items-center gap-2">
+            <span className="text-[var(--accent)]">—</span>
             You're Both Interested In
           </h2>
           <div className="space-y-3">
@@ -384,7 +384,7 @@ function FriendContent({
       {/* Their Plans */}
       {events.going.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">
+          <h2 className="text-lg font-semibold text-[var(--lark-text-primary)] mb-3">
             {firstName}'s Plans ({events.going.length})
           </h2>
           <div className="space-y-3">
@@ -398,7 +398,7 @@ function FriendContent({
       {/* Their Interests */}
       {events.interested.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">
+          <h2 className="text-lg font-semibold text-[var(--lark-text-primary)] mb-3">
             Interested In ({events.interested.length})
           </h2>
           <div className="space-y-3">
@@ -411,7 +411,7 @@ function FriendContent({
 
       {/* Empty state */}
       {events.going.length === 0 && events.interested.length === 0 && mutualEvents.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-[var(--lark-text-secondary)]">
           <p>{firstName} hasn't marked any upcoming events yet.</p>
         </div>
       )}
@@ -426,40 +426,40 @@ function EventListItem({ event, highlighted }: { event: UserEvent; highlighted?:
       href={`/events/${event.id}`}
       className={`
         flex items-center gap-3 p-3 rounded-lg border transition-colors
-        ${highlighted 
-          ? 'bg-[var(--brand-primary-light)] border-[var(--brand-primary)]/20 hover:border-[var(--brand-primary)]/40' 
-          : 'bg-white border-gray-200 hover:border-gray-300'
+        ${highlighted
+          ? 'bg-[var(--bg-surface)] border-[var(--accent)]/20 hover:border-[var(--accent)]/40'
+          : 'bg-[var(--bg-elevated)] border-[var(--border-subtle)] hover:border-[var(--border-visible)]'
         }
       `}
     >
       {/* Event Image */}
       {event.imageUrl ? (
-        <div className="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-          <img 
-            src={event.imageUrl} 
+        <div className="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden bg-[var(--bg-surface)]">
+          <img
+            src={event.imageUrl}
             alt=""
             className="w-full h-full object-cover"
           />
         </div>
       ) : (
-        <div className="w-12 h-12 flex-shrink-0 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-          <span className="text-xl">📅</span>
+        <div className="w-12 h-12 flex-shrink-0 rounded-lg bg-[var(--bg-surface)] flex items-center justify-center">
+          <svg className="w-5 h-5 text-[var(--lark-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
         </div>
       )}
 
       {/* Event Info */}
       <div className="flex-1 min-w-0">
-        <p className="font-medium text-gray-900 truncate">
+        <p className="font-medium text-[var(--lark-text-primary)] truncate">
           {event.displayTitle}
         </p>
-        <p className="text-sm text-gray-500 truncate">
+        <p className="text-sm text-[var(--lark-text-secondary)] truncate">
           {event.venue.name} • {formatEventDate(new Date(event.startDateTime))}
         </p>
       </div>
 
       {/* Mutual badge */}
       {highlighted && (
-        <span className="flex-shrink-0 px-2 py-1 bg-[var(--brand-primary)] text-white text-xs font-medium rounded-full">
+        <span className="flex-shrink-0 px-2 py-1 bg-[var(--accent)] text-white text-xs font-medium rounded-full">
           Mutual
         </span>
       )}
@@ -470,16 +470,15 @@ function EventListItem({ event, highlighted }: { event: UserEvent; highlighted?:
 // Content for strangers (not friends)
 function StrangerContent({ displayName }: { displayName: string }) {
   return (
-    <div className="bg-gray-100 rounded-xl p-8 text-center">
-      <div className="w-12 h-12 mx-auto mb-4 bg-gray-200 rounded-full flex items-center justify-center">
-        <svg className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className="bg-[var(--bg-surface)] rounded-xl p-8 text-center">
+      <div className="w-12 h-12 mx-auto mb-4 bg-[var(--bg-surface)] rounded-full flex items-center justify-center">
+        <svg className="w-6 h-6 text-[var(--lark-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
         </svg>
       </div>
-      <p className="text-gray-600">
+      <p className="text-[var(--lark-text-secondary)]">
         Add <span className="font-medium">{displayName}</span> as a friend to see their upcoming events and plans.
       </p>
     </div>
   );
 }
-

@@ -49,10 +49,10 @@ export function EventActionBar({
     }
   };
 
-  const barWrapper = "fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-t border-[var(--border-default)]";
+  const barWrapper = "fixed bottom-0 left-0 right-0 z-40 bg-[var(--bg-elevated)]/95 backdrop-blur-sm border-t border-[var(--border-subtle)]";
   const barInner = "max-w-3xl mx-auto px-4 py-3 flex items-center gap-3";
   const barPadding = { paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' };
-  const primaryBtn = "flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-[var(--action-engage)] text-[var(--action-engage-text)] hover:bg-[var(--action-engage-hover)] transition-colors";
+  const primaryBtn = "flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-[var(--accent)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)] transition-colors";
   // State A: has plan — Invite Friends + Share Plan
   if (isStateA) {
     return (

@@ -114,13 +114,13 @@ export function CommunitiesContent() {
   return (
     <>
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-lg">
+      <div className="flex gap-1 mb-6 bg-[var(--bg-surface)] p-1 rounded-lg">
         <button
           onClick={() => setActiveTab('communities')}
           className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
             activeTab === 'communities'
-              ? 'bg-white text-gray-900 shadow-sm'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'bg-[var(--bg-elevated)] text-[var(--lark-text-primary)]'
+              : 'text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)]'
           }`}
         >
           My Communities {data && data.communities.length > 0 && `(${data.communities.length})`}
@@ -129,8 +129,8 @@ export function CommunitiesContent() {
           onClick={() => setActiveTab('invitations')}
           className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors relative ${
             activeTab === 'invitations'
-              ? 'bg-white text-gray-900 shadow-sm'
-              : 'text-gray-600 hover:text-gray-900'
+              ? 'bg-[var(--bg-elevated)] text-[var(--lark-text-primary)]'
+              : 'text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)]'
           }`}
         >
           Invitations
@@ -144,13 +144,13 @@ export function CommunitiesContent() {
 
       {loading && (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--brand-primary)] mx-auto"></div>
-          <p className="text-gray-500 mt-4">Loading...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent)] mx-auto"></div>
+          <p className="text-[var(--lark-text-secondary)] mt-4">Loading...</p>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 text-red-700 p-4 rounded-lg">
+        <div className="bg-red-500/10 text-red-400 p-4 rounded-lg">
           {error}
         </div>
       )}
@@ -162,16 +162,16 @@ export function CommunitiesContent() {
             <div className="space-y-4">
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="w-full px-4 py-3 text-sm font-medium text-[var(--text-secondary)] bg-[var(--surface-inset)] border-2 border-dashed border-[var(--border-default)] rounded-lg hover:bg-[var(--border-default)] transition-colors"
+                className="w-full px-4 py-3 text-sm font-medium text-[var(--lark-text-secondary)] bg-[var(--bg-surface)] border-2 border-dashed border-[var(--border-subtle)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors"
               >
                 + Create New Community
               </button>
 
               {data.communities.length === 0 ? (
-                <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
-                  <p className="text-gray-500 mb-2">No communities yet</p>
-                  <p className="text-sm text-gray-400">
-                    Create a community or get invited by a friend
+                <div className="text-center py-8 bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)]">
+                  <p className="text-[var(--lark-text-secondary)] mb-2">No communities yet.</p>
+                  <p className="text-sm text-[var(--lark-text-muted)]">
+                    Start one or get invited by a friend.
                   </p>
                 </div>
               ) : (
@@ -190,8 +190,8 @@ export function CommunitiesContent() {
           {activeTab === 'invitations' && (
             <div className="space-y-3">
               {data.pendingInvitations.length === 0 ? (
-                <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
-                  <p className="text-gray-500">No pending invitations</p>
+                <div className="text-center py-8 bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)]">
+                  <p className="text-[var(--lark-text-secondary)]">No pending invitations</p>
                 </div>
               ) : (
                 data.pendingInvitations.map((invitation) => (
@@ -218,4 +218,3 @@ export function CommunitiesContent() {
     </>
   );
 }
-

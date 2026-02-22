@@ -3,6 +3,9 @@
 import { forwardRef, InputHTMLAttributes } from 'react';
 import { clsx } from 'clsx';
 
+/**
+ * Lark Input — dark surface, subtle border, visible on focus.
+ */
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
@@ -17,7 +20,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-xs font-medium text-[var(--text-secondary)] mb-1"
+            className="block text-xs font-medium text-[var(--lark-text-secondary)] mb-1"
           >
             {label}
           </label>
@@ -27,19 +30,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           id={inputId}
           className={clsx(
             'w-full px-3 py-2 text-sm rounded-lg',
-            'bg-[var(--surface-card)] text-[var(--text-primary)]',
-            'border placeholder:text-[var(--text-muted)]',
-            'transition-shadow duration-[var(--duration-fast)]',
+            'bg-[var(--bg-surface)] text-[var(--lark-text-primary)]',
+            'border placeholder:text-[var(--lark-text-muted)]',
+            'transition-colors duration-[var(--duration-fast)]',
             'focus:outline-none focus:ring-2 focus:border-transparent',
             error
-              ? 'border-[var(--signal-danger)] focus:ring-[var(--signal-danger)]'
-              : 'border-[var(--border-default)] focus:ring-[var(--action-primary)]',
+              ? 'border-[var(--status-need-ticket)] focus:ring-[var(--status-need-ticket)]'
+              : 'border-[var(--border-subtle)] focus:ring-[var(--border-visible)] focus:border-[var(--border-visible)]',
             className
           )}
           {...props}
         />
         {error && (
-          <p className="mt-1 text-xs text-[var(--signal-danger)]">{error}</p>
+          <p className="mt-1 text-xs text-[var(--status-need-ticket)]">{error}</p>
         )}
       </div>
     );

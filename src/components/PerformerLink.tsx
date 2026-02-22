@@ -15,7 +15,7 @@ export function PerformerLink({ performerId, performerName }: PerformerLinkProps
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)] hover:underline font-medium transition-colors"
+        className="text-[var(--accent)] hover:text-[var(--accent-hover)] hover:underline font-medium transition-colors"
       >
         {performerName}
       </button>

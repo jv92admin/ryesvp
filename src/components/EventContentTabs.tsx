@@ -46,8 +46,8 @@ export function EventContentTabs({
   const [activeTab, setActiveTab] = useState<Tab>(initialTab);
 
   const tabBase = 'px-4 py-2 text-sm font-medium transition-colors relative';
-  const tabActive = 'text-[var(--text-primary)]';
-  const tabInactive = 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]';
+  const tabActive = 'text-[var(--lark-text-primary)]';
+  const tabInactive = 'text-[var(--lark-text-muted)] hover:text-[var(--lark-text-secondary)]';
 
   // Construct squad object for DayOfModeView
   const squadForDayOf = {
@@ -76,7 +76,7 @@ export function EventContentTabs({
   return (
     <div>
       {/* Tab bar */}
-      <div className="flex gap-1 border-b border-[var(--border-default)] mb-6">
+      <div className="flex gap-1 border-b border-[var(--border-subtle)] mb-6">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -85,32 +85,34 @@ export function EventContentTabs({
           >
             {tab.label}
             {activeTab === tab.key && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--action-engage)]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--accent)]" />
             )}
           </button>
         ))}
       </div>
 
-      {/* Tab content */}
-      {activeTab === 'plan' && (
-        <EventPlanPanel squadId={squadId} eventId={eventId} />
-      )}
+      {/* Tab content — crossfade on switch */}
+      <div key={activeTab} className="animate-fade-in">
+        {activeTab === 'plan' && (
+          <EventPlanPanel squadId={squadId} eventId={eventId} />
+        )}
 
-      {activeTab === 'dayof' && (
-        <DayOfModeView
-          squad={squadForDayOf}
-          currentUserId=""
-          onSquadRefresh={async () => {}}
-          enrichment={enrichment}
-        />
-      )}
+        {activeTab === 'dayof' && (
+          <DayOfModeView
+            squad={squadForDayOf}
+            currentUserId=""
+            onSquadRefresh={async () => {}}
+            enrichment={enrichment}
+          />
+        )}
 
-      {activeTab === 'explore' && (
-        <div className="space-y-6">
-          <ExploreCard enrichment={enrichment} />
-          <AboutCard description={description} venue={venue} eventUrl={eventUrl} buyUrl={buyUrl} />
-        </div>
-      )}
+        {activeTab === 'explore' && (
+          <div className="space-y-6">
+            <ExploreCard enrichment={enrichment} />
+            <AboutCard description={description} venue={venue} eventUrl={eventUrl} buyUrl={buyUrl} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

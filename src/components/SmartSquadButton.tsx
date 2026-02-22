@@ -74,8 +74,8 @@ export function SmartSquadButton({
     ? 'min-w-[5.5rem] px-2.5 py-1.5 text-xs font-semibold rounded-md'
     : 'px-4 py-2 text-sm font-medium rounded-lg';
   const colorStyles = isCompact
-    ? 'text-[var(--action-engage-text)] bg-[var(--action-engage)] border-[var(--action-engage)] hover:bg-[var(--action-engage-hover)]'
-    : 'text-[var(--action-engage)] bg-transparent border-[var(--action-engage)] hover:bg-[var(--action-engage-light)]';
+    ? 'text-[var(--text-inverse)] bg-[var(--accent)] border-[var(--accent)] hover:bg-[var(--accent-hover)]'
+    : 'text-[var(--lark-text-primary)] bg-transparent border-[var(--border-visible)] hover:bg-[var(--bg-hover)]';
 
   return (
     <>

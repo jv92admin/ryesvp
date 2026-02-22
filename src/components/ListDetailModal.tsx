@@ -107,14 +107,14 @@ export function ListDetailModal({ listId, onClose }: ListDetailModalProps) {
       <DialogHeader onClose={onClose}>
         <DialogTitle>{list?.name || 'Loading...'}</DialogTitle>
         {list?.description && (
-          <p className="text-sm text-[var(--text-muted)] mt-1">{list.description}</p>
+          <p className="text-sm text-[var(--lark-text-muted)] mt-1">{list.description}</p>
         )}
       </DialogHeader>
 
       <DialogBody>
         {loading ? (
           <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--action-primary)] mx-auto"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent)] mx-auto"></div>
           </div>
         ) : (
           <>
@@ -122,7 +122,7 @@ export function ListDetailModal({ listId, onClose }: ListDetailModalProps) {
             <div className="mb-6">
               <button
                 onClick={() => setShowAddFriend(!showAddFriend)}
-                className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                className="text-sm font-medium text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)]"
               >
                 {showAddFriend ? '− Hide' : '+ Add Friends'}
               </button>
@@ -130,26 +130,26 @@ export function ListDetailModal({ listId, onClose }: ListDetailModalProps) {
               {showAddFriend && (
                 <div className="mt-3 space-y-2">
                   {availableFriends.length === 0 ? (
-                    <p className="text-sm text-[var(--text-muted)]">
+                    <p className="text-sm text-[var(--lark-text-muted)]">
                       All your friends are already in this list, or you have no friends yet.
                     </p>
                   ) : (
                     availableFriends.map((friend) => (
                       <div
                         key={friend.id}
-                        className="flex items-center justify-between p-2 bg-[var(--surface-inset)] rounded-lg"
+                        className="flex items-center justify-between p-2 bg-[var(--bg-surface)] rounded-lg"
                       >
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-[var(--surface-inset)] border border-[var(--border-default)] flex items-center justify-center text-[var(--text-secondary)] text-xs font-medium">
+                          <div className="w-8 h-8 rounded-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--lark-text-secondary)] text-xs font-medium">
                             {getInitials(friend)}
                           </div>
-                          <span className="text-sm text-[var(--text-primary)]">
+                          <span className="text-sm text-[var(--lark-text-primary)]">
                             {friend.displayName || friend.email.split('@')[0]}
                           </span>
                         </div>
                         <button
                           onClick={() => handleAddMember(friend.id)}
-                          className="text-xs font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                          className="text-xs font-medium text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)]"
                         >
                           Add
                         </button>
@@ -162,33 +162,33 @@ export function ListDetailModal({ listId, onClose }: ListDetailModalProps) {
 
             {/* Members List */}
             <div>
-              <h3 className="text-sm font-semibold text-[var(--text-muted)] uppercase tracking-wide mb-3">
+              <h3 className="text-sm font-semibold text-[var(--lark-text-muted)] uppercase tracking-wide mb-3">
                 Members ({list?.members.length || 0})
               </h3>
 
               {list?.members.length === 0 ? (
-                <p className="text-sm text-[var(--text-muted)]">No members yet. Add some friends!</p>
+                <p className="text-sm text-[var(--lark-text-muted)]">No members yet. Add some friends!</p>
               ) : (
                 <div className="space-y-2">
                   {list?.members.map((member) => (
                     <div
                       key={member.id}
-                      className="flex items-center justify-between p-3 bg-[var(--surface-card)] border border-[var(--border-default)] rounded-lg"
+                      className="flex items-center justify-between p-3 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-lg"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[var(--surface-inset)] border border-[var(--border-default)] flex items-center justify-center text-[var(--text-secondary)] text-xs font-medium">
+                        <div className="w-8 h-8 rounded-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--lark-text-secondary)] text-xs font-medium">
                           {getInitials(member.user)}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-[var(--text-primary)]">
+                          <p className="text-sm font-medium text-[var(--lark-text-primary)]">
                             {member.user.displayName || member.user.email.split('@')[0]}
                           </p>
-                          <p className="text-xs text-[var(--text-muted)]">{member.user.email}</p>
+                          <p className="text-xs text-[var(--lark-text-muted)]">{member.user.email}</p>
                         </div>
                       </div>
                       <button
                         onClick={() => handleRemoveMember(member.userId)}
-                        className="text-xs text-[var(--text-muted)] hover:text-[var(--signal-danger)]"
+                        className="text-xs text-[var(--lark-text-muted)] hover:text-[var(--status-need-ticket)]"
                       >
                         Remove
                       </button>

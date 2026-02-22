@@ -30,7 +30,7 @@ export function UserMenu({ userId, displayName, email }: UserMenuProps) {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-2 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+        className="flex items-center gap-2 px-2 py-1.5 text-sm text-[var(--lark-text-primary)] hover:bg-[var(--bg-hover)] rounded-lg transition-colors"
       >
         <span 
           className="w-8 h-8 rounded-full flex items-center justify-center font-medium text-white text-sm"
@@ -38,10 +38,10 @@ export function UserMenu({ userId, displayName, email }: UserMenuProps) {
         >
           {initials}
         </span>
-        <span className="hidden sm:inline font-medium text-gray-900 max-w-[120px] truncate">
+        <span className="hidden sm:inline font-medium text-[var(--lark-text-primary)] max-w-[120px] truncate">
           {name}
         </span>
-        <svg className="w-4 h-4 text-gray-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 text-[var(--lark-text-muted)] hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
@@ -52,33 +52,33 @@ export function UserMenu({ userId, displayName, email }: UserMenuProps) {
             className="fixed inset-0 z-10"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-20">
+          <div className="absolute right-0 mt-2 w-48 bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] py-1 z-20">
             <Link
               href="/profile"
               onClick={() => setIsOpen(false)}
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              className="block px-4 py-2 text-sm text-[var(--lark-text-primary)] hover:bg-[var(--bg-hover)]"
             >
               My Profile
             </Link>
             <Link
               href="/friends"
               onClick={() => setIsOpen(false)}
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              className="block px-4 py-2 text-sm text-[var(--lark-text-primary)] hover:bg-[var(--bg-hover)]"
             >
               Friends
             </Link>
             <Link
               href="/about"
               onClick={() => setIsOpen(false)}
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              className="block px-4 py-2 text-sm text-[var(--lark-text-primary)] hover:bg-[var(--bg-hover)]"
             >
               About
             </Link>
-            <hr className="my-1 border-gray-200" />
+            <hr className="my-1 border-[var(--border-subtle)]" />
             <button
               onClick={handleLogout}
               disabled={isLoggingOut}
-              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-50"
+              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-[var(--bg-hover)] disabled:opacity-50"
             >
               {isLoggingOut ? 'Signing out...' : 'Sign out'}
             </button>

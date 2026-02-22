@@ -40,7 +40,7 @@ export function SquadLogistics({ squad, onLogisticsUpdate }: SquadLogisticsProps
 
   const handleSave = async () => {
     setSaving(true);
-    
+
     try {
       // Construct meet time as date on same day as event
       let meetTimeDate = null;
@@ -55,7 +55,7 @@ export function SquadLogistics({ squad, onLogisticsUpdate }: SquadLogisticsProps
         meetTime: meetTimeDate ? meetTimeDate.toISOString() : null,
         meetSpot: meetSpot.trim() || null,
       });
-      
+
       setEditing(false);
     } catch (error) {
       console.error('Failed to save logistics:', error);
@@ -79,11 +79,11 @@ export function SquadLogistics({ squad, onLogisticsUpdate }: SquadLogisticsProps
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h4 className="font-medium text-gray-900">Logistics</h4>
+        <h4 className="font-medium text-[var(--lark-text-primary)]">Logistics</h4>
         {!editing && (
           <button
             onClick={() => setEditing(true)}
-            className="text-sm text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)]"
+            className="text-sm text-[var(--accent)] hover:opacity-80"
           >
             Edit
           </button>
@@ -94,34 +94,34 @@ export function SquadLogistics({ squad, onLogisticsUpdate }: SquadLogisticsProps
         <div className="space-y-4">
           {/* Meet Time Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[var(--lark-text-primary)] mb-1">
               Meet Time
             </label>
             <input
               type="time"
               value={meetTime}
               onChange={(e) => setMeetTime(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              className="w-full px-3 py-2 border border-[var(--border-visible)] rounded-lg text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)] bg-[var(--bg-primary)]"
               placeholder="e.g. 19:30"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-[var(--lark-text-secondary)] mt-1">
               When to meet before the show
             </p>
           </div>
 
           {/* Meet Spot Input */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[var(--lark-text-primary)] mb-1">
               Meet Spot
             </label>
             <input
               type="text"
               value={meetSpot}
               onChange={(e) => setMeetSpot(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              className="w-full px-3 py-2 border border-[var(--border-visible)] rounded-lg text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] focus:ring-2 focus:ring-[var(--accent)] focus:border-[var(--accent)] bg-[var(--bg-primary)]"
               placeholder="e.g. Lazarus Brewing, East 6th"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-[var(--lark-text-secondary)] mt-1">
               Where to meet up
             </p>
           </div>
@@ -156,21 +156,21 @@ export function SquadLogistics({ squad, onLogisticsUpdate }: SquadLogisticsProps
             <div className="space-y-1">
               {squad.meetTime && (
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-gray-500">⏰ Meet:</span>
-                  <span className="text-gray-900">
+                  <span className="text-[var(--lark-text-secondary)]">Meet:</span>
+                  <span className="text-[var(--lark-text-primary)]">
                     {formatInTimeZone(new Date(squad.meetTime), AUSTIN_TIMEZONE, 'h:mm a')}
                   </span>
                 </div>
               )}
               {squad.meetSpot && (
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-gray-500">📍 Where:</span>
-                  <span className="text-gray-900">{squad.meetSpot}</span>
+                  <span className="text-[var(--lark-text-secondary)]">Where:</span>
+                  <span className="text-[var(--lark-text-primary)]">{squad.meetSpot}</span>
                 </div>
               )}
             </div>
           ) : (
-            <div className="text-sm text-gray-500 italic">
+            <div className="text-sm text-[var(--lark-text-secondary)] italic">
               No logistics set yet
             </div>
           )}

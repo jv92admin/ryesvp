@@ -81,33 +81,33 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
       <Dialog open={true} onOpenChange={() => onClose()} size="sm">
         <DialogBody>
           <div className="text-center">
-            <div className="w-12 h-12 bg-[var(--signal-going-light)] rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-6 h-6 text-[var(--signal-going)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="w-12 h-12 bg-[var(--bg-surface)] rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-6 h-6 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
 
-            <h2 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
+            <h2 className="text-lg font-semibold text-[var(--lark-text-primary)] mb-2">
               Group Created!
             </h2>
-            <p className="text-sm text-[var(--text-secondary)] mb-4">
+            <p className="text-sm text-[var(--lark-text-secondary)] mb-4">
               Share this link with your friends. Everyone who joins becomes friends with each other so future plans are easier.
             </p>
           </div>
 
-          <div className="bg-[var(--surface-inset)] rounded-lg p-3 flex items-center gap-2 mb-4">
+          <div className="bg-[var(--bg-surface)] rounded-lg p-3 flex items-center gap-2 mb-4">
             <input
               type="text"
               value={inviteUrl}
               readOnly
-              className="flex-1 bg-transparent text-sm text-[var(--text-secondary)] outline-none"
+              className="flex-1 bg-transparent text-sm text-[var(--lark-text-secondary)] outline-none"
             />
             <button
               onClick={handleCopy}
               className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                 copied
-                  ? 'bg-[var(--signal-going-light)] text-[var(--signal-going)]'
-                  : 'bg-[var(--action-primary)] text-[var(--action-primary-text)] hover:bg-[var(--action-primary-hover)]'
+                  ? 'bg-[var(--bg-surface)] text-[var(--accent)]'
+                  : 'bg-[var(--accent)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)]'
               }`}
             >
               {copied ? 'Copied!' : 'Copy'}
@@ -116,7 +116,7 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
 
           <button
             onClick={onCreated}
-            className="w-full py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            className="w-full py-2 text-sm text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)] transition-colors"
           >
             Done
           </button>
@@ -132,7 +132,7 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
       </DialogHeader>
 
       <DialogBody>
-        <label className="block text-sm font-medium text-[var(--text-secondary)] mb-1.5">
+        <label className="block text-sm font-medium text-[var(--lark-text-secondary)] mb-1.5">
           Group Name
         </label>
         <input
@@ -141,27 +141,27 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder={defaultName || "My Group"}
-          className="w-full px-3 py-2 border border-[var(--border-default)] rounded-lg text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:ring-2 focus:ring-[var(--border-strong)] focus:border-transparent outline-none"
+          className="w-full px-3 py-2 border border-[var(--border-subtle)] rounded-lg text-[var(--lark-text-primary)] placeholder-[var(--lark-text-muted)] focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent outline-none"
         />
-        <p className="text-xs text-[var(--text-muted)] mt-1.5">
+        <p className="text-xs text-[var(--lark-text-muted)] mt-1.5">
           This helps you remember what this link is for. Only you can see it.
         </p>
 
         {error && (
-          <div className="mt-4 bg-red-50 text-red-700 text-sm p-3 rounded-lg">
+          <div className="mt-4 bg-red-500/10 text-red-400 text-sm p-3 rounded-lg">
             {error}
           </div>
         )}
 
-        <div className="mt-6 bg-[var(--surface-inset)] rounded-lg p-4">
+        <div className="mt-6 bg-[var(--bg-surface)] rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-[var(--signal-going-light)] rounded-full flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-[var(--signal-going)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="w-8 h-8 bg-[var(--bg-surface)] rounded-full flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             </div>
-            <div className="text-sm text-[var(--text-secondary)]">
-              <p className="font-medium text-[var(--text-primary)] mb-1">How it works</p>
+            <div className="text-sm text-[var(--lark-text-secondary)]">
+              <p className="font-medium text-[var(--lark-text-primary)] mb-1">How it works</p>
               <p>Anyone with this link will become friends with everyone else in the group.</p>
             </div>
           </div>
@@ -171,14 +171,14 @@ export function CreateGroupModal({ onClose, onCreated }: CreateGroupModalProps) 
       <DialogFooter className="justify-end">
         <button
           onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+          className="px-4 py-2 text-sm font-medium text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)] transition-colors"
         >
           Cancel
         </button>
         <button
           onClick={handleCreate}
           disabled={creating}
-          className="px-4 py-2 text-sm font-medium text-[var(--action-primary-text)] bg-[var(--action-primary)] rounded-lg hover:bg-[var(--action-primary-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 text-sm font-medium text-[var(--text-inverse)] bg-[var(--accent)] rounded-lg hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {creating ? 'Creating...' : 'Create & Copy Link'}
         </button>

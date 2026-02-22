@@ -7,7 +7,7 @@ interface EventEnrichmentProps {
 export function EventEnrichment({ enrichment }: EventEnrichmentProps) {
   const hasKG = enrichment.kgName || enrichment.kgDescription;
   const hasSpotify = enrichment.spotifyUrl;
-  
+
   if (!hasKG && !hasSpotify) {
     return null;
   }
@@ -17,7 +17,7 @@ export function EventEnrichment({ enrichment }: EventEnrichmentProps) {
   const genres = enrichment.spotifyGenres || [];
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-5 mb-6 border border-gray-200">
+    <div className="bg-[var(--bg-surface)] rounded-xl p-5 mb-6 border border-[var(--border-subtle)]">
       <div className="flex gap-5">
         {/* Image */}
         {imageUrl && (
@@ -25,41 +25,41 @@ export function EventEnrichment({ enrichment }: EventEnrichmentProps) {
             <img
               src={imageUrl}
               alt={enrichment.kgName || 'Artist'}
-              className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg object-cover shadow-sm"
+              className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg object-cover"
             />
           </div>
         )}
-        
+
         {/* Info */}
         <div className="flex-1 min-w-0">
           {/* Name */}
           {enrichment.kgName && (
-            <h3 className="font-semibold text-gray-900 text-lg">
+            <h3 className="font-semibold text-[var(--lark-text-primary)] text-lg">
               {enrichment.kgName}
             </h3>
           )}
-          
+
           {/* Description */}
           {enrichment.kgDescription && (
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-[var(--lark-text-secondary)] mt-1">
               {enrichment.kgDescription}
             </p>
           )}
-          
+
           {/* Genres */}
           {genres.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mt-3">
               {genres.slice(0, 4).map((genre) => (
                 <span
                   key={genre}
-                  className="px-2.5 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full"
+                  className="px-2.5 py-1 bg-[var(--bg-surface)] text-[var(--lark-text-secondary)] text-xs font-medium rounded-full border border-[var(--border-subtle)]"
                 >
                   {genre}
                 </span>
               ))}
             </div>
           )}
-          
+
           {/* Links */}
           <div className="flex flex-wrap gap-3 mt-4">
             {enrichment.spotifyUrl && (
@@ -78,7 +78,7 @@ export function EventEnrichment({ enrichment }: EventEnrichmentProps) {
                 href={enrichment.kgWikiUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-200 text-gray-700 text-sm font-medium rounded-full hover:bg-gray-300 transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--bg-surface)] text-[var(--lark-text-primary)] text-sm font-medium rounded-full hover:bg-[var(--bg-hover)] transition-colors border border-[var(--border-subtle)]"
               >
                 <WikiIcon />
                 Wikipedia
@@ -87,14 +87,14 @@ export function EventEnrichment({ enrichment }: EventEnrichmentProps) {
           </div>
         </div>
       </div>
-      
+
       {/* Bio (collapsible if long) */}
       {enrichment.kgBio && enrichment.kgBio.length > 200 && (
-        <details className="mt-4 pt-4 border-t border-gray-200">
-          <summary className="text-sm text-gray-600 cursor-pointer hover:text-gray-900">
+        <details className="mt-4 pt-4 border-t border-[var(--border-subtle)]">
+          <summary className="text-sm text-[var(--lark-text-secondary)] cursor-pointer hover:text-[var(--lark-text-primary)]">
             Read more about {enrichment.kgName || 'this artist'}
           </summary>
-          <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+          <p className="text-sm text-[var(--lark-text-secondary)] mt-2 leading-relaxed">
             {enrichment.kgBio.slice(0, 500)}
             {enrichment.kgBio.length > 500 && '...'}
           </p>
@@ -121,4 +121,3 @@ function WikiIcon() {
     </svg>
   );
 }
-

@@ -23,18 +23,18 @@ interface CommunityInviteCardProps {
 
 export function CommunityInviteCard({ invitation, onAccept, onDecline }: CommunityInviteCardProps) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4">
+    <div className="bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-4">
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white font-bold text-lg">
+        <div className="w-12 h-12 rounded-xl bg-[var(--bg-surface)] flex items-center justify-center text-[var(--lark-text-primary)] font-bold text-lg">
           {invitation.list.name[0].toUpperCase()}
         </div>
         <div className="flex-1">
-          <p className="font-semibold text-gray-900">{invitation.list.name}</p>
-          <p className="text-sm text-gray-500">
+          <p className="font-semibold text-[var(--lark-text-primary)]">{invitation.list.name}</p>
+          <p className="text-sm text-[var(--lark-text-secondary)]">
             Invited by {invitation.list.owner.displayName || invitation.list.owner.email.split('@')[0]}
           </p>
           {invitation.list.description && (
-            <p className="text-sm text-gray-600 mt-1">{invitation.list.description}</p>
+            <p className="text-sm text-[var(--lark-text-secondary)] mt-1">{invitation.list.description}</p>
           )}
         </div>
       </div>
@@ -47,7 +47,7 @@ export function CommunityInviteCard({ invitation, onAccept, onDecline }: Communi
         </button>
         <button
           onClick={onDecline}
-          className="flex-1 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+          className="flex-1 px-4 py-2 text-sm font-medium text-[var(--lark-text-secondary)] bg-[var(--bg-surface)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors"
         >
           Decline
         </button>
@@ -55,4 +55,3 @@ export function CommunityInviteCard({ invitation, onAccept, onDecline }: Communi
     </div>
   );
 }
-

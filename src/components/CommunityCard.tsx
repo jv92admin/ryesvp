@@ -20,32 +20,31 @@ interface CommunityCardProps {
 
 export function CommunityCard({ community }: CommunityCardProps) {
   const stats = community.eventStats;
-  
+
   return (
-    <div className="bg-white rounded-lg border border-[var(--border-default)] p-4 hover:border-[var(--border-strong)] transition-colors cursor-pointer">
+    <div className="bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-4 hover:border-[var(--border-visible)] transition-colors cursor-pointer">
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+        <div className="w-12 h-12 rounded-xl bg-[var(--bg-surface)] flex items-center justify-center text-[var(--lark-text-primary)] font-bold text-lg">
           {community.name[0].toUpperCase()}
         </div>
         <div className="flex-1">
-          <p className="font-semibold text-gray-900">{community.name}</p>
-          <p className="text-sm text-gray-500">
+          <p className="font-semibold text-[var(--lark-text-primary)]">{community.name}</p>
+          <p className="text-sm text-[var(--lark-text-secondary)]">
             {community._count.members} {community._count.members === 1 ? 'member' : 'members'}
             {stats && stats.upcomingEvents > 0 && (
-              <span className="text-green-600 ml-2">
+              <span className="text-[var(--lark-text-primary)] ml-2">
                 · {stats.upcomingEvents} {stats.upcomingEvents === 1 ? 'event' : 'events'} coming up
               </span>
             )}
           </p>
           {community.description && (
-            <p className="text-sm text-gray-600 mt-1 line-clamp-1">{community.description}</p>
+            <p className="text-sm text-[var(--lark-text-secondary)] mt-1 line-clamp-1">{community.description}</p>
           )}
         </div>
-        <div className="text-gray-400">
+        <div className="text-[var(--lark-text-muted)]">
           →
         </div>
       </div>
     </div>
   );
 }
-

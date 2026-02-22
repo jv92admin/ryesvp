@@ -194,11 +194,11 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
 
       <DialogBody className="space-y-4">
         {/* Event Info */}
-        <div className="text-center border-b border-[var(--border-default)] pb-4">
-          <h3 className="font-medium text-[var(--text-primary)] mb-1">
+        <div className="text-center border-b border-[var(--border-subtle)] pb-4">
+          <h3 className="font-medium text-[var(--lark-text-primary)] mb-1">
             {event.title}
           </h3>
-          <p className="text-sm text-[var(--text-secondary)]">
+          <p className="text-sm text-[var(--lark-text-secondary)]">
             {formatInTimeZone(new Date(event.startDateTime), AUSTIN_TIMEZONE, 'EEE, MMM d • h:mm a')}
             {' • '}
             {event.venue.name}
@@ -206,13 +206,13 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
         </div>
 
         {loading && (
-          <div className="py-4 text-center text-[var(--text-muted)]">
+          <div className="py-4 text-center text-[var(--lark-text-muted)]">
             Loading friends...
           </div>
         )}
 
         {error && (
-          <div className="p-3 bg-[var(--signal-danger)]/10 border border-[var(--signal-danger)]/20 rounded-lg text-[var(--signal-danger)] text-sm">
+          <div className="p-3 bg-[var(--status-need-ticket)]/10 border border-[var(--status-need-ticket)]/20 rounded-lg text-[var(--status-need-ticket)] text-sm">
             {error}
           </div>
         )}
@@ -220,12 +220,12 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
         {!loading && !error && (
           <>
             <div>
-              <h4 className="font-medium text-[var(--text-primary)] mb-3">
+              <h4 className="font-medium text-[var(--lark-text-primary)] mb-3">
                 Who do you want to invite? ({selectedFriends.size} selected)
               </h4>
 
               {friends.length === 0 ? (
-                <div className="text-center py-6 text-[var(--text-muted)]">
+                <div className="text-center py-6 text-[var(--lark-text-muted)]">
                   <p className="text-sm">No friends to invite yet.</p>
                   <p className="text-xs mt-1">Add friends to coordinate with them!</p>
                 </div>
@@ -234,7 +234,7 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
                   {/* Interested Friends First */}
                   {interestedFriends.length > 0 && (
                     <div>
-                      <h5 className="text-sm font-medium text-[var(--signal-going)] mb-2">
+                      <h5 className="text-sm font-medium text-[var(--lark-text-primary)] mb-2">
                         Already Interested
                       </h5>
                       <div className="space-y-2">
@@ -263,7 +263,7 @@ export function SquadCreationModal({ event, isOpen, onClose, onSquadCreated }: S
                   {otherFriends.length > 0 && (
                     <div>
                       {interestedFriends.length > 0 && (
-                        <h5 className="text-sm font-medium text-[var(--text-secondary)] mb-2 mt-4">
+                        <h5 className="text-sm font-medium text-[var(--lark-text-secondary)] mb-2 mt-4">
                           Other Friends
                         </h5>
                       )}
@@ -341,10 +341,10 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
     if (!friend.status) return null;
 
     const statusConfig = {
-      INTERESTED: { label: '★', color: 'bg-[var(--signal-interested)]/10 text-[var(--signal-interested)]' },
-      GOING: { label: '✓', color: 'bg-[var(--signal-going)]/10 text-[var(--signal-going)]' },
-      NEED_TICKETS: { label: '?', color: 'bg-[var(--signal-interested)]/10 text-[var(--signal-interested)]' },
-      HAVE_TICKETS: { label: '✓', color: 'bg-[var(--signal-going)]/10 text-[var(--signal-going)]' },
+      INTERESTED: { label: '★', color: 'bg-[var(--bg-surface)] text-[var(--lark-text-secondary)]' },
+      GOING: { label: '✓', color: 'bg-[var(--bg-surface)] text-[var(--lark-text-primary)]' },
+      NEED_TICKETS: { label: '?', color: 'bg-[var(--bg-surface)] text-[var(--lark-text-secondary)]' },
+      HAVE_TICKETS: { label: '✓', color: 'bg-[var(--bg-surface)] text-[var(--lark-text-primary)]' },
     };
 
     const config = statusConfig[friend.status as keyof typeof statusConfig];
@@ -360,8 +360,8 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
   return (
     <label className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
       isSelected
-        ? 'bg-[var(--action-primary)]/10 border-[var(--action-primary)] ring-2 ring-[var(--action-primary)]/20'
-        : 'border-[var(--border-default)] hover:border-[var(--action-primary)]/30 hover:bg-[var(--surface-inset)]'
+        ? 'bg-[var(--accent)]/10 border-[var(--accent)] ring-2 ring-[var(--accent)]/20'
+        : 'border-[var(--border-subtle)] hover:border-[var(--accent)]/30 hover:bg-[var(--bg-surface)]'
     }`}>
       {/* Custom Checkbox */}
       <div className="relative flex-shrink-0">
@@ -373,8 +373,8 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
         />
         <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
           isSelected
-            ? 'bg-[var(--action-primary)] border-[var(--action-primary)]'
-            : 'bg-[var(--surface-card)] border-[var(--border-default)]'
+            ? 'bg-[var(--accent)] border-[var(--accent)]'
+            : 'bg-[var(--bg-elevated)] border-[var(--border-subtle)]'
         }`}>
           {isSelected && (
             <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -385,11 +385,11 @@ function FriendCheckbox({ friend, isSelected, onToggle }: FriendCheckboxProps) {
       </div>
 
       <div className="flex items-center gap-2 flex-1 min-w-0">
-        <div className="w-8 h-8 rounded-full bg-[var(--surface-inset)] flex items-center justify-center text-xs font-medium text-[var(--text-muted)] flex-shrink-0">
+        <div className="w-8 h-8 rounded-full bg-[var(--bg-surface)] flex items-center justify-center text-xs font-medium text-[var(--lark-text-muted)] flex-shrink-0">
           {friend.displayName.charAt(0).toUpperCase()}
         </div>
 
-        <span className="text-sm font-medium text-[var(--text-primary)] flex-1 truncate">
+        <span className="text-sm font-medium text-[var(--lark-text-primary)] flex-1 truncate">
           {friend.displayName}
         </span>
 
@@ -404,10 +404,10 @@ function FriendSquadCard({ friend, onJoinSquad, isJoining }: FriendSquadCardProp
     if (!friend.status) return null;
 
     const statusConfig = {
-      INTERESTED: { label: '★', color: 'bg-[var(--signal-interested)]/10 text-[var(--signal-interested)]' },
-      GOING: { label: '✓', color: 'bg-[var(--signal-going)]/10 text-[var(--signal-going)]' },
-      NEED_TICKETS: { label: '?', color: 'bg-[var(--signal-interested)]/10 text-[var(--signal-interested)]' },
-      HAVE_TICKETS: { label: '✓', color: 'bg-[var(--signal-going)]/10 text-[var(--signal-going)]' },
+      INTERESTED: { label: '★', color: 'bg-[var(--bg-surface)] text-[var(--lark-text-secondary)]' },
+      GOING: { label: '✓', color: 'bg-[var(--bg-surface)] text-[var(--lark-text-primary)]' },
+      NEED_TICKETS: { label: '?', color: 'bg-[var(--bg-surface)] text-[var(--lark-text-secondary)]' },
+      HAVE_TICKETS: { label: '✓', color: 'bg-[var(--bg-surface)] text-[var(--lark-text-primary)]' },
     };
 
     const config = statusConfig[friend.status as keyof typeof statusConfig];
@@ -421,20 +421,20 @@ function FriendSquadCard({ friend, onJoinSquad, isJoining }: FriendSquadCardProp
   };
 
   return (
-    <div className="flex items-center gap-3 p-2 rounded-lg bg-[var(--signal-going)]/10 border border-[var(--signal-going)]/20">
+    <div className="flex items-center gap-3 p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
       <div className="flex items-center gap-2 flex-1">
-        <div className="w-6 h-6 rounded-full bg-[var(--surface-inset)] flex items-center justify-center text-xs font-medium text-[var(--text-muted)]">
+        <div className="w-6 h-6 rounded-full bg-[var(--bg-surface)] flex items-center justify-center text-xs font-medium text-[var(--lark-text-muted)]">
           {friend.displayName.charAt(0).toUpperCase()}
         </div>
 
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-[var(--text-primary)]">
+            <span className="text-sm text-[var(--lark-text-primary)]">
               {friend.displayName}
             </span>
             {getStatusBadge()}
           </div>
-          <div className="text-xs text-[var(--text-muted)] mt-0.5">
+          <div className="text-xs text-[var(--lark-text-muted)] mt-0.5">
             In a plan with {friend.squadMemberNames}
           </div>
         </div>

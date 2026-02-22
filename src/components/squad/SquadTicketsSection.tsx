@@ -144,9 +144,9 @@ export function SquadTicketsSection({ squadId, members, currentUserId, onUpdate 
   // If covered by someone else
   if (isCovered && coveredByMember) {
     return (
-      <div className="bg-[var(--brand-primary-light)] border border-green-200 rounded-lg p-3">
-        <span className="text-[var(--brand-primary)]">✓</span>
-        <span className="text-green-900 ml-2 text-sm">
+      <div className="bg-[var(--bg-surface)] border border-[var(--border-subtle)] rounded-lg p-3">
+        <span className="text-[var(--accent)]">✓</span>
+        <span className="text-[var(--lark-text-primary)] ml-2 text-sm">
           <strong>{getDisplayName(coveredByMember.user.displayName, coveredByMember.user.email)}</strong> is getting your ticket
         </span>
       </div>
@@ -157,13 +157,12 @@ export function SquadTicketsSection({ squadId, members, currentUserId, onUpdate 
     <div className="space-y-3">
       {/* My ticket status - Have/Getting vs Need */}
       <div className="flex items-center gap-3">
-        <span className="text-sm text-gray-600 flex-shrink-0">Ticket?</span>
+        <span className="text-sm text-[var(--lark-text-secondary)] flex-shrink-0">Ticket?</span>
         <div className="flex gap-1 flex-1">
           <ToggleChip
             active={hasTicket}
             onClick={() => updateMyTicketStatus('YES')}
             disabled={isUpdating}
-            color="success"
             className="flex-1 justify-center"
           >
             Have / Getting
@@ -172,7 +171,6 @@ export function SquadTicketsSection({ squadId, members, currentUserId, onUpdate 
             active={currentMember.ticketStatus === 'MAYBE'}
             onClick={() => updateMyTicketStatus('MAYBE')}
             disabled={isUpdating}
-            color="warning"
             className="flex-1 justify-center"
           >
             Need
@@ -183,14 +181,13 @@ export function SquadTicketsSection({ squadId, members, currentUserId, onUpdate 
       {/* Cover others - show if I have a ticket and there are people to cover or already covering */}
       {hasTicket && (membersNeedingTickets.length > 0 || membersCovering.length > 0) && (
         <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-600 flex-shrink-0">Cover others?</span>
+          <span className="text-sm text-[var(--lark-text-secondary)] flex-shrink-0">Cover others?</span>
           <div className="flex gap-1 flex-1 flex-wrap items-center">
             {/* People I'm covering - inline pills with × */}
             {membersCovering.map(m => (
               <Chip
                 key={m.userId}
                 variant="tag"
-                color="primary"
                 active
                 removable
                 onRemove={() => handleUncover(m.userId)}
@@ -205,7 +202,6 @@ export function SquadTicketsSection({ squadId, members, currentUserId, onUpdate 
               <ToggleChip
                 active={showPicker}
                 onClick={() => setShowPicker(!showPicker)}
-                color="accent"
               >
                 + Add
               </ToggleChip>
@@ -216,19 +212,19 @@ export function SquadTicketsSection({ squadId, members, currentUserId, onUpdate 
 
       {/* Member picker - shows when + Add is clicked */}
       {hasTicket && showPicker && membersNeedingTickets.length > 0 && (
-        <div className="p-2 bg-gray-50 rounded-lg space-y-1">
+        <div className="p-2 bg-[var(--bg-surface)] rounded-lg space-y-1">
           {membersNeedingTickets.map(member => (
             <label
               key={member.userId}
-              className="flex items-center gap-2 p-1.5 rounded hover:bg-gray-100 cursor-pointer text-sm"
+              className="flex items-center gap-2 p-1.5 rounded hover:bg-[var(--bg-hover)] cursor-pointer text-sm"
             >
               <input
                 type="checkbox"
                 checked={selectedMembers.includes(member.userId)}
                 onChange={() => toggleMemberSelection(member.userId)}
-                className="w-3.5 h-3.5 text-[var(--brand-primary)] rounded border-gray-300"
+                className="w-3.5 h-3.5 text-[var(--accent)] rounded border-[var(--border-visible)]"
               />
-              <span className="text-gray-900">
+              <span className="text-[var(--lark-text-primary)]">
                 {getDisplayName(member.user.displayName, member.user.email)}
               </span>
             </label>

@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Build the invite URL
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://ryesvp.me';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lark.show';
     const inviteUrl = `${baseUrl}/g/${group.inviteCode}`;
 
     return NextResponse.json({ 

@@ -11,10 +11,9 @@ export default async function CommunityPage({ params }: CommunityPageProps) {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-[var(--bg-primary)]">
         <CommunityDetailContent communityId={id} />
       </main>
     </>
   );
 }
-

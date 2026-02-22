@@ -5,68 +5,71 @@
   --foreground: #171717;
 
   /* ==========================================
-     LARK DESIGN TOKENS
-     Monochrome-first. Color is signal, not decoration.
+     LARK DARK-MODE TOKENS (new system)
+     Monochrome UI. Event imagery is the only color.
      ========================================== */
 
-  /* SURFACES — the canvas */
-  --surface-bg: #FAFAFA;              /* page background */
-  --surface-card: #FFFFFF;            /* card / elevated */
-  --surface-inset: #F5F5F5;           /* recessed areas, input backgrounds */
+  /* Surfaces — dark canvas */
+  --bg-primary: #0A0A0A;
+  --bg-elevated: #141414;
+  --bg-surface: #1E1E1E;
+  --bg-hover: #2A2A2A;
 
-  /* TEXT — high contrast */
-  --text-primary: #171717;            /* headlines, body */
-  --text-secondary: #525252;          /* supporting text */
-  --text-muted: #A3A3A3;             /* hints, placeholders */
+  /* Borders — barely there */
+  --border-subtle: #2A2A2A;
+  --border-visible: #3A3A3A;
 
-  /* BORDERS */
-  --border-default: #E5E5E5;          /* card borders, dividers */
-  --border-strong: #D4D4D4;           /* hover borders, emphasis */
+  /* Text — light on dark (prefixed during migration to avoid collision) */
+  --lark-text-primary: #F5F5F5;
+  --lark-text-secondary: #A0A0A0;
+  --lark-text-muted: #666666;
+  --text-inverse: #0A0A0A;
 
-  /* ACTION — monochrome primary */
-  --action-primary: #171717;          /* primary CTA buttons (dark) */
-  --action-primary-hover: #404040;    /* hover state */
-  --action-primary-text: #FFFFFF;     /* text on primary buttons */
-  --action-secondary: #FFFFFF;        /* secondary buttons (white) */
-  --action-secondary-border: #D4D4D4; /* secondary button border */
-  --action-secondary-hover: #F5F5F5;  /* secondary button hover bg */
+  /* Accent — near-white, surgical */
+  --accent: #E8E8E8;
+  --accent-hover: #FFFFFF;
+  --accent-muted: #3A3A3A;
 
-  /* ENGAGEMENT — warm gold for social/friend actions */
-  --action-engage: #B45309;            /* engagement CTAs (Start Plan, Invite, active chips) */
-  --action-engage-hover: #92400E;      /* engagement hover/press */
-  --action-engage-text: #FFFFFF;       /* text on engagement buttons */
-  --action-engage-light: #FFFBEB;      /* warm glow for active chips, backgrounds */
+  /* Semantic — minimal */
+  --status-going: #E8E8E8;
+  --status-interested: transparent;
+  --status-need-ticket: #FF4444;
+  --status-have-ticket: #E8E8E8;
 
-  /* SIGNAL COLORS — color only as state indicator */
-  --signal-going: #16A34A;            /* going, confirmed, active */
-  --signal-going-hover: #15803D;      /* going hover/press */
-  --signal-going-light: #DCFCE7;      /* going background tint */
-  --signal-interested: #F59E0B;       /* interested, warm intent */
-  --signal-interested-light: #FEF3C7; /* interested background tint */
-  --signal-danger: #DC2626;           /* error, destructive */
-  --signal-danger-hover: #B91C1C;     /* danger hover/press */
-  --signal-info: #3B82F6;             /* links, informational */
+  /* Layout constants */
+  --card-radius: 12px;
+  --chip-radius: 20px;
+  --image-radius: 8px;
+  --screen-padding: 20px;
+  --card-padding: 16px;
+  --chip-height: 36px;
+  --thumb-size: 72px;
+  --avatar-sm: 28px;
+  --avatar-md: 36px;
 
-  /* ANIMATION — motion tokens */
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);   /* snappy deceleration — toasts, slides, reveals */
-  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);  /* slight overshoot — chip toggles, popovers, scale pops */
-  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);       /* material-style — general purpose, fades, color shifts */
-  --duration-fast: 150ms;    /* hover states, color changes, micro-interactions */
-  --duration-normal: 250ms;  /* toasts, reveals, content transitions */
-  --duration-slow: 400ms;    /* page transitions, large layout shifts */
+  /* Typography */
+  --font-display: var(--font-space-grotesk), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
-  /* LEGACY ALIASES — keep during migration, remove when done */
-  --brand-primary: var(--signal-going);
-  --brand-primary-hover: var(--signal-going-hover);
-  --brand-primary-light: var(--signal-going-light);
-  --brand-black: var(--text-primary);
-  --brand-gray: var(--surface-bg);
-  --brand-gray-100: var(--surface-inset);
-  --brand-border: var(--border-default);
-  --brand-danger: var(--signal-danger);
-  --brand-danger-hover: var(--signal-danger-hover);
-  --brand-warning: var(--signal-interested);
-  --brand-info: var(--signal-info);
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+
+  /* Motion — new easing */
+  --ease-snap: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Motion — old easing curves (kept for compatibility) */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
 }
 
 @theme inline {
@@ -75,35 +78,30 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
-  /* Expose tokens to Tailwind */
-  --color-surface-bg: var(--surface-bg);
-  --color-surface-card: var(--surface-card);
-  --color-surface-inset: var(--surface-inset);
-  --color-action-primary: var(--action-primary);
-  --color-action-primary-hover: var(--action-primary-hover);
-  --color-action-engage: var(--action-engage);
-  --color-action-engage-hover: var(--action-engage-hover);
-  --color-action-engage-light: var(--action-engage-light);
-  --color-signal-going: var(--signal-going);
-  --color-signal-going-light: var(--signal-going-light);
-  --color-signal-interested: var(--signal-interested);
-  --color-signal-danger: var(--signal-danger);
-  --color-signal-info: var(--signal-info);
+  /* Lark tokens — expose to Tailwind */
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-hover: var(--bg-hover);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-visible: var(--border-visible);
+  --color-lark-text-primary: var(--lark-text-primary);
+  --color-lark-text-secondary: var(--lark-text-secondary);
+  --color-lark-text-muted: var(--lark-text-muted);
+  --color-text-inverse: var(--text-inverse);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-muted: var(--accent-muted);
+  --color-status-going: var(--status-going);
+  --color-status-interested: var(--status-interested);
+  --color-status-need-ticket: var(--status-need-ticket);
+  --color-status-have-ticket: var(--status-have-ticket);
 
   /* Motion — expose to Tailwind */
   --ease-out-expo: var(--ease-out-expo);
   --ease-spring: var(--ease-spring);
   --ease-smooth: var(--ease-smooth);
-
-  /* Legacy Tailwind aliases (remove after full migration) */
-  --color-brand-primary: var(--brand-primary);
-  --color-brand-primary-hover: var(--brand-primary-hover);
-  --color-brand-primary-light: var(--brand-primary-light);
-  --color-brand-black: var(--brand-black);
-  --color-brand-gray: var(--brand-gray);
-  --color-brand-border: var(--brand-border);
-  --color-brand-danger: var(--brand-danger);
-  --color-brand-danger-hover: var(--brand-danger-hover);
+  --ease-snap: var(--ease-snap);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -114,49 +112,55 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg-primary);
+  color: var(--lark-text-primary);
+  font-family: var(--font-body);
+}
+
+/* Film grain noise texture — transforms flat black into tactile surface */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* Scroll-linked header border — appears on scroll */
+.header-scrolled {
+  border-bottom-color: var(--border-subtle) !important;
+}
+
+/* Dark skeleton pulse — overrides default pulse colors */
+@keyframes lark-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }
 
 /* ========================================
-   UTILITY CLASSES
+   LARK UTILITY CLASSES
    ======================================== */
 
-/* Primary button — dark monochrome CTA */
+/* Primary button — near-white accent CTA */
 .btn-primary {
-  background-color: var(--action-primary);
-  color: var(--action-primary-text);
+  background-color: var(--accent);
+  color: var(--text-inverse);
 }
 .btn-primary:hover {
-  background-color: var(--action-primary-hover);
-}
-
-/* Signal button — green "going" state */
-.btn-going {
-  background-color: var(--signal-going);
-  color: white;
-}
-.btn-going:hover {
-  background-color: var(--signal-going-hover);
+  background-color: var(--accent-hover);
 }
 
 /* Danger button — red destructive action */
 .btn-danger {
-  background-color: var(--signal-danger);
+  background-color: var(--status-need-ticket);
   color: white;
 }
 .btn-danger:hover {
-  background-color: var(--signal-danger-hover);
-}
-
-/* Engagement button — warm gold for social/friend actions */
-.btn-engage {
-  background-color: var(--action-engage);
-  color: var(--action-engage-text);
-}
-.btn-engage:hover {
-  background-color: var(--action-engage-hover);
+  filter: brightness(1.1);
 }
 
 /* Date input styling - smaller calendar icon */
@@ -195,4 +199,50 @@ body {
 
 .animate-slide-up {
   animation: slide-up var(--duration-normal) var(--ease-out-expo);
+}
+
+/* ========================================
+   LARK KEYFRAMES (new motion system)
+   ======================================== */
+
+/* Reveal — content entering from below with fade */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade in — simple opacity entrance */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Slide down — toast/notification exit */
+@keyframes slide-down {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.animate-reveal {
+  animation: reveal var(--duration-normal) var(--ease-snap);
+}
+
+.animate-fade-in {
+  animation: fade-in var(--duration-fast) var(--ease-snap);
+}
+
+.animate-slide-down {
+  animation: slide-down var(--duration-normal) var(--ease-snap);
 }

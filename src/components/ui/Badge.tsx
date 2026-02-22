@@ -4,24 +4,11 @@ import { ReactNode } from 'react';
 import { clsx } from 'clsx';
 
 /**
- * Badge Variants:
- * - count: Notification count badges (circular)
- * - status: Status indicators (NEW, PRESALE, SOLD OUT)
- * - label: Simple text labels
+ * Lark Badge — monochrome. All badges are `--bg-surface` + `--lark-text-secondary`.
+ * No colored variants. The only exception: danger uses `--status-need-ticket`.
  */
 type BadgeVariant = 'count' | 'status' | 'label';
-
-/**
- * Badge Colors:
- * - default: Gray neutral
- * - primary: Brand green
- * - danger: Red (alerts, errors)
- * - warning: Amber
- * - info: Blue (legacy, will migrate)
- * - success: Green
- */
-type BadgeColor = 'default' | 'primary' | 'danger' | 'warning' | 'info' | 'success';
-
+type BadgeColor = 'default' | 'danger';
 type BadgeSize = 'xs' | 'sm' | 'md';
 
 interface BadgeProps {
@@ -33,12 +20,8 @@ interface BadgeProps {
 }
 
 const colorStyles: Record<BadgeColor, string> = {
-  default: 'bg-gray-100 text-gray-700',
-  primary: 'bg-[var(--brand-primary-light)] text-[var(--brand-primary)]',
-  danger: 'bg-red-100 text-red-700',
-  warning: 'bg-amber-100 text-amber-700',
-  info: 'bg-blue-100 text-blue-700',
-  success: 'bg-green-100 text-green-700',
+  default: 'bg-[var(--bg-surface)] text-[var(--lark-text-secondary)]',
+  danger: 'bg-[var(--status-need-ticket)] text-white',
 };
 
 const sizeStyles: Record<BadgeVariant, Record<BadgeSize, string>> = {
@@ -65,12 +48,12 @@ const variantStyles: Record<BadgeVariant, string> = {
   label: 'rounded font-medium',
 };
 
-export function Badge({ 
-  variant = 'label', 
-  color = 'default', 
-  size = 'sm', 
-  children, 
-  className 
+export function Badge({
+  variant = 'label',
+  color = 'default',
+  size = 'sm',
+  children,
+  className,
 }: BadgeProps) {
   return (
     <span
@@ -99,9 +82,9 @@ interface CountBadgeProps {
 
 export function CountBadge({ count, max = 99, color = 'danger', size = 'xs', className }: CountBadgeProps) {
   if (count <= 0) return null;
-  
+
   const displayCount = count > max ? `${max}+` : count.toString();
-  
+
   return (
     <Badge variant="count" color={color} size={size} className={className}>
       {displayCount}
@@ -111,24 +94,25 @@ export function CountBadge({ count, max = 99, color = 'danger', size = 'xs', cla
 
 /**
  * Status Badge - for event status (NEW, PRESALE, SOLD OUT)
+ * All monochrome except SOLD OUT which uses danger.
  */
-interface StatusBadgeProps {
+interface StatusBadgeInlineProps {
   status: 'new' | 'presale' | 'sold-out' | 'limited' | 'featured';
   size?: BadgeSize;
   className?: string;
 }
 
-const statusConfig: Record<StatusBadgeProps['status'], { label: string; color: BadgeColor }> = {
-  'new': { label: 'NEW', color: 'primary' },
-  'presale': { label: 'PRESALE', color: 'info' },
+const statusConfig: Record<StatusBadgeInlineProps['status'], { label: string; color: BadgeColor }> = {
+  'new': { label: 'NEW', color: 'default' },
+  'presale': { label: 'PRESALE', color: 'default' },
   'sold-out': { label: 'SOLD OUT', color: 'danger' },
-  'limited': { label: 'LIMITED', color: 'warning' },
-  'featured': { label: 'FEATURED', color: 'primary' },
+  'limited': { label: 'LIMITED', color: 'default' },
+  'featured': { label: 'FEATURED', color: 'default' },
 };
 
-export function StatusBadge({ status, size = 'xs', className }: StatusBadgeProps) {
+export function StatusBadge({ status, size = 'xs', className }: StatusBadgeInlineProps) {
   const config = statusConfig[status];
-  
+
   return (
     <Badge variant="status" color={config.color} size={size} className={className}>
       {config.label}
@@ -137,7 +121,7 @@ export function StatusBadge({ status, size = 'xs', className }: StatusBadgeProps
 }
 
 /**
- * Category Badge - for event categories
+ * Category Badge - monochrome
  */
 interface CategoryBadgeProps {
   category: string;
@@ -152,4 +136,3 @@ export function CategoryBadge({ category, size = 'xs', className }: CategoryBadg
     </Badge>
   );
 }
-

@@ -108,7 +108,7 @@ export function NotificationBell() {
             handleMarkAllAsRead();
           }
         }}
-        className="relative p-1.5 text-gray-500 hover:text-[var(--brand-primary)] transition-colors"
+        className="relative p-1.5 text-[var(--lark-text-secondary)] hover:text-[var(--accent)] transition-colors"
         title="Notifications"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -120,7 +120,7 @@ export function NotificationBell() {
           />
         </svg>
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold text-white bg-[var(--brand-primary)] rounded-full px-1">
+          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-bold text-white bg-[var(--accent)] rounded-full px-1">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
@@ -142,15 +142,15 @@ export function NotificationBell() {
           />
 
           {/* Dropdown Panel */}
-          <div className="fixed sm:absolute top-14 sm:top-auto right-2 sm:right-0 left-2 sm:left-auto mt-0 sm:mt-2 sm:w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-20 overflow-hidden">
+          <div className="fixed sm:absolute top-14 sm:top-auto right-2 sm:right-0 left-2 sm:left-auto mt-0 sm:mt-2 sm:w-96 bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] z-20 overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200">
-              <h3 className="font-semibold text-gray-900">Notifications</h3>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border-subtle)]">
+              <h3 className="font-semibold text-[var(--lark-text-primary)]">Notifications</h3>
               {unreadCount > 0 && (
                 <button
                   onClick={handleMarkAllAsRead}
                   disabled={isLoading}
-                  className="text-xs text-[var(--brand-primary)] hover:underline disabled:opacity-50"
+                  className="text-xs text-[var(--accent)] hover:underline disabled:opacity-50"
                 >
                   Mark all as read
                 </button>
@@ -160,7 +160,7 @@ export function NotificationBell() {
             {/* Notification List */}
             <div className="max-h-80 overflow-y-auto">
               {notifications.length === 0 ? (
-                <div className="px-4 py-8 text-center text-gray-500 text-sm">
+                <div className="px-4 py-8 text-center text-[var(--lark-text-secondary)] text-sm">
                   No notifications yet
                 </div>
               ) : (
@@ -168,15 +168,15 @@ export function NotificationBell() {
                   <button
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
-                    className={`w-full text-left px-4 py-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors ${
-                      !notification.readAt ? 'bg-blue-50/50' : ''
+                    className={`w-full text-left px-4 py-3 border-b border-[var(--border-subtle)] last:border-b-0 hover:bg-[var(--bg-hover)] transition-colors ${
+                      !notification.readAt ? 'bg-[var(--bg-surface)]' : ''
                     }`}
                   >
                     <div className="flex items-start gap-3">
                       {/* Unread indicator */}
                       <div className="mt-1.5 flex-shrink-0">
                         {!notification.readAt ? (
-                          <span className="w-2 h-2 bg-[var(--brand-primary)] rounded-full block" />
+                          <span className="w-2 h-2 bg-[var(--accent)] rounded-full block" />
                         ) : (
                           <span className="w-2 h-2 block" />
                         )}
@@ -184,10 +184,10 @@ export function NotificationBell() {
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-900 leading-snug">
+                        <p className="text-sm text-[var(--lark-text-primary)] leading-snug">
                           {notification.displayText}
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-[var(--lark-text-secondary)] mt-1">
                           {formatDistanceToNow(new Date(notification.createdAt), { addSuffix: true })}
                         </p>
                       </div>
@@ -195,7 +195,7 @@ export function NotificationBell() {
                       {/* Link indicator */}
                       {notification.linkUrl && (
                         <svg
-                          className="w-4 h-4 text-gray-400 flex-shrink-0 mt-1"
+                          className="w-4 h-4 text-[var(--lark-text-muted)] flex-shrink-0 mt-1"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"

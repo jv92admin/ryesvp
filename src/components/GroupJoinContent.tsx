@@ -71,18 +71,18 @@ export function GroupJoinContent({ code }: GroupJoinContentProps) {
         method: 'POST',
       });
       const json = await res.json();
-      
+
       if (!res.ok) {
         setError(json.error || 'Failed to join group');
         return;
       }
-      
+
       setJoinResult({
         success: true,
         message: json.message,
         newFriendships: json.newFriendships,
       });
-      
+
       // Redirect to friends page after a short delay
       setTimeout(() => {
         router.push('/friends');
@@ -96,10 +96,10 @@ export function GroupJoinContent({ code }: GroupJoinContentProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--brand-primary)] mx-auto"></div>
-          <p className="text-gray-500 mt-4">Loading...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent)] mx-auto"></div>
+          <p className="text-[var(--lark-text-secondary)] mt-4">Loading...</p>
         </div>
       </div>
     );
@@ -107,18 +107,18 @@ export function GroupJoinContent({ code }: GroupJoinContentProps) {
 
   if (error && !data) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-[var(--bg-elevated)] rounded-xl border border-[var(--border-subtle)] p-8 text-center">
+          <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">Invalid Group Link</h1>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <h1 className="text-xl font-semibold text-[var(--lark-text-primary)] mb-2">Invalid Group Link</h1>
+          <p className="text-[var(--lark-text-secondary)] mb-6">{error}</p>
           <Link
             href="/"
-            className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-[var(--brand-primary)] rounded-lg hover:bg-[var(--brand-primary-hover)] transition-colors"
+            className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-[var(--accent)] rounded-lg hover:opacity-90 transition-colors"
           >
             Go to Home
           </Link>
@@ -132,20 +132,20 @@ export function GroupJoinContent({ code }: GroupJoinContentProps) {
   // Already a member state
   if (data.isMember) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-[var(--bg-elevated)] rounded-xl border border-[var(--border-subtle)] p-8 text-center">
+          <div className="w-16 h-16 bg-[var(--bg-surface)] rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">You&apos;re already a member!</h1>
-          <p className="text-gray-600 mb-6">
+          <h1 className="text-xl font-semibold text-[var(--lark-text-primary)] mb-2">You&apos;re already a member!</h1>
+          <p className="text-[var(--lark-text-secondary)] mb-6">
             You&apos;re already part of <span className="font-medium">{data.group.name}</span>
           </p>
           <Link
             href="/friends"
-            className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-[var(--brand-primary)] rounded-lg hover:bg-[var(--brand-primary-hover)] transition-colors"
+            className="inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-[var(--accent)] rounded-lg hover:opacity-90 transition-colors"
           >
             View Your Friends
           </Link>
@@ -157,21 +157,21 @@ export function GroupJoinContent({ code }: GroupJoinContentProps) {
   // Success state after joining
   if (joinResult?.success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-[var(--bg-elevated)] rounded-xl border border-[var(--border-subtle)] p-8 text-center">
+          <div className="w-16 h-16 bg-[var(--bg-surface)] rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">Welcome to the group!</h1>
-          <p className="text-gray-600 mb-2">{joinResult.message}</p>
+          <h1 className="text-xl font-semibold text-[var(--lark-text-primary)] mb-2">Welcome to the group!</h1>
+          <p className="text-[var(--lark-text-secondary)] mb-2">{joinResult.message}</p>
           {joinResult.newFriendships > 0 && (
-            <p className="text-sm text-green-600 font-medium mb-6">
-              🎉 {joinResult.newFriendships} new friend{joinResult.newFriendships > 1 ? 's' : ''} added!
+            <p className="text-sm text-[var(--accent)] font-medium mb-6">
+              {joinResult.newFriendships} new friend{joinResult.newFriendships > 1 ? 's' : ''} added!
             </p>
           )}
-          <p className="text-sm text-gray-500">Redirecting to your friends...</p>
+          <p className="text-sm text-[var(--lark-text-secondary)]">Redirecting to your friends...</p>
         </div>
       </div>
     );
@@ -179,10 +179,10 @@ export function GroupJoinContent({ code }: GroupJoinContentProps) {
 
   // Main join UI
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-[var(--bg-elevated)] rounded-xl border border-[var(--border-subtle)] overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-[var(--brand-primary)] to-emerald-500 p-6 text-center text-white">
+        <div className="bg-[var(--accent)] p-6 text-center text-white">
           <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
             <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -194,16 +194,16 @@ export function GroupJoinContent({ code }: GroupJoinContentProps) {
 
         {/* Members */}
         <div className="p-6">
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-[var(--lark-text-secondary)] mb-4">
             You&apos;ll become friends with everyone in this group:
           </p>
-          
+
           <div className="flex flex-wrap gap-3 mb-6">
             {data.members.slice(0, 8).map((member) => {
               const avatarStyle = getAvatarStyle(member.id);
               const initials = getInitials(member.displayName, member.email);
               const name = getDisplayName(member.displayName, member.email);
-              
+
               return (
                 <div key={member.id} className="flex items-center gap-2">
                   <div
@@ -213,13 +213,13 @@ export function GroupJoinContent({ code }: GroupJoinContentProps) {
                   >
                     {initials}
                   </div>
-                  <span className="text-sm text-gray-700">{name}</span>
+                  <span className="text-sm text-[var(--lark-text-primary)]">{name}</span>
                 </div>
               );
             })}
             {data.members.length > 8 && (
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-xs font-medium">
+                <div className="w-8 h-8 rounded-full bg-[var(--bg-surface)] flex items-center justify-center text-[var(--lark-text-secondary)] text-xs font-medium">
                   +{data.members.length - 8}
                 </div>
               </div>
@@ -227,7 +227,7 @@ export function GroupJoinContent({ code }: GroupJoinContentProps) {
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-700 text-sm p-3 rounded-lg mb-4">
+            <div className="bg-red-500/10 text-red-400 text-sm p-3 rounded-lg mb-4">
               {error}
             </div>
           )}
@@ -237,7 +237,7 @@ export function GroupJoinContent({ code }: GroupJoinContentProps) {
             <button
               onClick={handleJoin}
               disabled={joining}
-              className="w-full px-6 py-3 text-sm font-medium text-white bg-[var(--brand-primary)] rounded-lg hover:bg-[var(--brand-primary-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-6 py-3 text-sm font-medium text-white bg-[var(--accent)] rounded-lg hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {joining ? 'Joining...' : 'Join Group'}
             </button>
@@ -246,11 +246,11 @@ export function GroupJoinContent({ code }: GroupJoinContentProps) {
               <Link
                 href={`/login?next=/g/${code}`}
                 onClick={() => storeGroupInvite(code)}
-                className="block w-full px-6 py-3 text-sm font-medium text-center text-white bg-[var(--brand-primary)] rounded-lg hover:bg-[var(--brand-primary-hover)] transition-colors"
+                className="block w-full px-6 py-3 text-sm font-medium text-center text-white bg-[var(--accent)] rounded-lg hover:opacity-90 transition-colors"
               >
                 Sign In to Join
               </Link>
-              <p className="text-xs text-gray-500 text-center">
+              <p className="text-xs text-[var(--lark-text-secondary)] text-center">
                 Don&apos;t have an account? You&apos;ll create one when you sign in.
               </p>
             </div>
@@ -260,4 +260,3 @@ export function GroupJoinContent({ code }: GroupJoinContentProps) {
     </div>
   );
 }
-

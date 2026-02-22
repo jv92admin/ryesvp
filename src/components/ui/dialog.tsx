@@ -25,7 +25,6 @@ function useFocusTrap(containerRef: React.RefObject<HTMLDivElement | null>, acti
     const container = containerRef.current;
     const previouslyFocused = document.activeElement as HTMLElement | null;
 
-    // Focus the first focusable element (or the container itself)
     const focusable = container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
     if (focusable.length > 0) {
       focusable[0].focus();
@@ -99,6 +98,10 @@ interface DialogProps {
   size?: DialogSize;
 }
 
+/**
+ * Lark Dialog — `--bg-elevated` content, `--border-subtle`, no shadows.
+ * `bg-black/60` backdrop.
+ */
 export function Dialog({ open, onOpenChange, children, size = 'md' }: DialogProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -108,7 +111,6 @@ export function Dialog({ open, onOpenChange, children, size = 'md' }: DialogProp
   useFocusTrap(contentRef, open && visible);
   useScrollLock(open);
 
-  // Handle escape key
   const handleEscape = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -126,7 +128,6 @@ export function Dialog({ open, onOpenChange, children, size = 'md' }: DialogProp
     }
   }, [open, handleEscape]);
 
-  // Mount/unmount with transition
   useEffect(() => {
     if (open) {
       setMounted(true);
@@ -150,7 +151,7 @@ export function Dialog({ open, onOpenChange, children, size = 'md' }: DialogProp
       className={clsx(
         'fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4',
         'transition-colors duration-200',
-        visible ? 'bg-black/50' : 'bg-black/0'
+        visible ? 'bg-black/60' : 'bg-black/0'
       )}
       onClick={(e) => {
         if (e.target === overlayRef.current) {
@@ -164,7 +165,7 @@ export function Dialog({ open, onOpenChange, children, size = 'md' }: DialogProp
         aria-modal="true"
         tabIndex={-1}
         className={clsx(
-          'relative bg-[var(--surface-card)] w-full shadow-xl border border-[var(--border-default)]',
+          'relative bg-[var(--bg-elevated)] w-full border border-[var(--border-subtle)]',
           'max-h-[90vh] flex flex-col',
           'outline-none',
           'transition-all duration-200',
@@ -193,7 +194,7 @@ export function DialogHeader({ children, onClose, className }: DialogHeaderProps
   return (
     <div
       className={clsx(
-        'flex items-center justify-between px-6 py-4 border-b border-[var(--border-default)] flex-shrink-0',
+        'flex items-center justify-between px-8 py-5 border-b border-[var(--border-subtle)] flex-shrink-0',
         className
       )}
     >
@@ -224,7 +225,7 @@ interface DialogTitleProps {
 
 export function DialogTitle({ children, className = '' }: DialogTitleProps) {
   return (
-    <h3 className={clsx('text-lg font-semibold text-[var(--text-primary)]', className)}>
+    <h3 className={clsx('text-lg font-semibold text-[var(--lark-text-primary)]', className)} style={{ fontFamily: 'var(--font-display)' }}>
       {children}
     </h3>
   );
@@ -238,7 +239,7 @@ interface DialogBodyProps {
 
 export function DialogBody({ children, className }: DialogBodyProps) {
   return (
-    <div className={clsx('flex-1 overflow-y-auto px-6 py-4', className)}>
+    <div className={clsx('flex-1 overflow-y-auto px-8 py-5', className)}>
       {children}
     </div>
   );
@@ -254,7 +255,7 @@ export function DialogFooter({ children, className }: DialogFooterProps) {
   return (
     <div
       className={clsx(
-        'flex items-center gap-2 px-6 py-4 border-t border-[var(--border-default)] bg-[var(--surface-inset)] flex-shrink-0',
+        'flex items-center gap-2 px-8 py-5 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] flex-shrink-0',
         className
       )}
     >

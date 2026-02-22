@@ -99,13 +99,13 @@ export function ListsContent() {
 
       {loading && (
         <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--brand-primary)] mx-auto"></div>
-          <p className="text-gray-500 mt-4">Loading...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent)] mx-auto"></div>
+          <p className="text-[var(--lark-text-secondary)] mt-4">Loading...</p>
         </div>
       )}
 
       {error && (
-        <div className="bg-red-50 text-red-700 p-4 rounded-lg">
+        <div className="bg-red-500/10 text-red-400 p-4 rounded-lg">
           {error}
         </div>
       )}
@@ -113,10 +113,10 @@ export function ListsContent() {
       {!loading && !error && (
         <div className="space-y-3">
           {lists.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-              <p className="text-gray-500 mb-4">You haven't created any lists yet.</p>
-              <p className="text-sm text-gray-400 mb-4">
-                Lists help you organize friends into groups like "Work Friends" or "Concert Crew"
+            <div className="text-center py-12 bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)]">
+              <p className="text-[var(--lark-text-secondary)] mb-4">No lists yet.</p>
+              <p className="text-sm text-[var(--lark-text-muted)] mb-4">
+                Organize your crew into groups like "Work Friends" or "Concert Crew."
               </p>
               <button
                 onClick={() => setShowCreateModal(true)}
@@ -159,4 +159,3 @@ export function ListsContent() {
     </>
   );
 }
-

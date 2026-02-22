@@ -101,12 +101,12 @@ export function PlanModeView({
       {/* Compact Event Header */}
       <Link
         href={`/events/${squad.eventId}`}
-        className="block bg-white rounded-lg shadow-sm border border-gray-200 p-3 hover:bg-gray-50 transition-colors"
+        className="block bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-3 hover:bg-[var(--bg-hover)] transition-colors"
       >
-        <h1 className="font-semibold text-gray-900 text-sm line-clamp-1">
+        <h1 className="font-semibold text-[var(--lark-text-primary)] text-sm line-clamp-1">
           {squad.event.displayTitle}
         </h1>
-        <div className="text-xs text-gray-500 mt-0.5">
+        <div className="text-xs text-[var(--lark-text-secondary)] mt-0.5">
           {dateFormatted} • {timeFormatted} • {squad.event.venue.name}{venueLocation}
         </div>
       </Link>
@@ -117,11 +117,11 @@ export function PlanModeView({
           onClick={onSharePlan}
           disabled={copying === 'plan'}
           className={`flex items-center gap-1.5 text-sm font-medium transition-colors disabled:opacity-50 ${
-            copying === 'plan' 
-              ? 'text-green-600' 
-              : squad.members.length === 1 
-                ? 'text-green-600 hover:text-green-700' 
-                : 'text-gray-600 hover:text-green-600'
+            copying === 'plan'
+              ? 'text-[var(--accent)]'
+              : squad.members.length === 1
+                ? 'text-[var(--accent)] hover:text-[var(--accent)]'
+                : 'text-[var(--lark-text-secondary)] hover:text-[var(--accent)]'
           }`}
         >
           {copying === 'plan' ? (
@@ -142,7 +142,7 @@ export function PlanModeView({
       </div>
 
       {/* Your Status + Guests + Tickets (combined card) */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 space-y-3">
+      <div className="bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-3 space-y-3">
         {/* Going? */}
         <SquadStatusControls
           squad={squad}
@@ -171,7 +171,7 @@ export function PlanModeView({
       </div>
 
       {/* Price Guide */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+      <div className="bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-3">
         <SquadPriceGuideCard
           squadId={squad.id}
           currentUserId={currentUserId}
@@ -179,7 +179,7 @@ export function PlanModeView({
       </div>
 
       {/* Squad Member List */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+      <div className="bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-3">
         <SquadMemberList
           squad={squad}
           currentUserId={currentUserId}
@@ -190,14 +190,14 @@ export function PlanModeView({
       </div>
 
       {/* Share Options */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+      <div className="bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-3">
         <div className="flex gap-2">
           <Button
             variant="primary"
             size="sm"
             onClick={onSharePlan}
             disabled={copying === 'plan'}
-            className={`flex-1 ${squad.members.length === 1 ? 'ring-2 ring-green-300 ring-offset-1' : ''}`}
+            className={`flex-1 ${squad.members.length === 1 ? 'ring-2 ring-[var(--accent)]/40 ring-offset-1' : ''}`}
           >
             {copying === 'plan' ? '✓ Copied!' : 'Share Plan'}
           </Button>
@@ -215,7 +215,7 @@ export function PlanModeView({
       </div>
 
       {/* Leave Plan */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3">
+      <div className="bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-3">
         <Button
           variant="danger"
           size="sm"

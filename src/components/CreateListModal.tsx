@@ -80,7 +80,7 @@ export function CreateListModal({ onClose, onCreate }: CreateListModalProps) {
         <DialogBody>
           <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+              <label htmlFor="name" className="block text-sm font-medium text-[var(--lark-text-secondary)] mb-1">
                 List Name
               </label>
               <input
@@ -89,13 +89,13 @@ export function CreateListModal({ onClose, onCreate }: CreateListModalProps) {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g., Concert Crew, Work Friends"
-                className="w-full px-3 py-2 border border-[var(--border-default)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--border-strong)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-[var(--border-subtle)] rounded-lg text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
                 autoFocus
               />
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-[var(--text-secondary)] mb-1">
+              <label htmlFor="description" className="block text-sm font-medium text-[var(--lark-text-secondary)] mb-1">
                 Description (optional)
               </label>
               <input
@@ -104,40 +104,40 @@ export function CreateListModal({ onClose, onCreate }: CreateListModalProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="What's this list for?"
-                className="w-full px-3 py-2 border border-[var(--border-default)] rounded-lg text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--border-strong)] focus:border-transparent"
+                className="w-full px-3 py-2 border border-[var(--border-subtle)] rounded-lg text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+              <label className="block text-sm font-medium text-[var(--lark-text-secondary)] mb-2">
                 Add Friends ({selectedIds.size} selected)
               </label>
 
               {loadingFriends ? (
-                <div className="text-sm text-[var(--text-muted)]">Loading friends...</div>
+                <div className="text-sm text-[var(--lark-text-muted)]">Loading friends...</div>
               ) : friends.length === 0 ? (
-                <div className="text-sm text-[var(--text-muted)] bg-[var(--surface-inset)] p-3 rounded-lg">
+                <div className="text-sm text-[var(--lark-text-muted)] bg-[var(--bg-surface)] p-3 rounded-lg">
                   No friends yet. You can add friends after creating the list.
                 </div>
               ) : (
-                <div className="space-y-2 max-h-48 overflow-auto border border-[var(--border-default)] rounded-lg p-2">
+                <div className="space-y-2 max-h-48 overflow-auto border border-[var(--border-subtle)] rounded-lg p-2">
                   {friends.map((f) => (
                     <label
                       key={f.friend.id}
                       className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${
-                        selectedIds.has(f.friend.id) ? 'bg-[var(--surface-inset)] border border-[var(--border-strong)]' : 'hover:bg-[var(--surface-inset)]'
+                        selectedIds.has(f.friend.id) ? 'bg-[var(--bg-surface)] border border-[var(--border-visible)]' : 'hover:bg-[var(--bg-hover)]'
                       }`}
                     >
                       <input
                         type="checkbox"
                         checked={selectedIds.has(f.friend.id)}
                         onChange={() => toggleFriend(f.friend.id)}
-                        className="w-4 h-4 text-[var(--action-primary)] border-[var(--border-default)] rounded focus:ring-[var(--border-strong)]"
+                        className="w-4 h-4 text-[var(--accent)] border-[var(--border-subtle)] rounded focus:ring-[var(--border-visible)]"
                       />
-                      <div className="w-8 h-8 rounded-full bg-[var(--surface-inset)] flex items-center justify-center text-[var(--text-secondary)] text-xs font-medium">
+                      <div className="w-8 h-8 rounded-full bg-[var(--bg-surface)] flex items-center justify-center text-[var(--lark-text-secondary)] text-xs font-medium">
                         {getInitials(f.friend)}
                       </div>
-                      <span className="text-sm text-[var(--text-primary)]">
+                      <span className="text-sm text-[var(--lark-text-primary)]">
                         {f.friend.displayName || f.friend.email.split('@')[0]}
                       </span>
                     </label>
@@ -152,14 +152,14 @@ export function CreateListModal({ onClose, onCreate }: CreateListModalProps) {
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-inset)] rounded-lg transition-colors"
+            className="px-4 py-2 text-sm font-medium text-[var(--lark-text-secondary)] hover:bg-[var(--bg-hover)] rounded-lg transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={!name.trim() || loading}
-            className="px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-[var(--action-primary)] text-[var(--action-primary-text)] hover:bg-[var(--action-primary-hover)] disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-[var(--accent)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)] disabled:opacity-50"
           >
             {loading ? 'Creating...' : 'Create List'}
           </button>

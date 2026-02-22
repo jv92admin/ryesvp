@@ -12,14 +12,14 @@ function AuthSuccessContent() {
 
   useEffect(() => {
     const supabase = createClient();
-    
+
     // Poll for session to be ready
     let attempts = 0;
     const maxAttempts = 20; // 2 seconds max
-    
+
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       if (session) {
         // Session is ready, redirect
         router.replace(next);
@@ -32,12 +32,12 @@ function AuthSuccessContent() {
         router.replace('/login');
       }
     };
-    
+
     checkSession();
   }, [next, router]);
 
   return (
-    <p className="text-gray-600">
+    <p className="text-[var(--lark-text-secondary)]">
       {checking ? 'Signing you in...' : 'Redirecting...'}
     </p>
   );
@@ -49,14 +49,13 @@ function AuthSuccessContent() {
  */
 export default function AuthSuccessPage() {
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <main className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
       <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-        <Suspense fallback={<p className="text-gray-600">Loading...</p>}>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--lark-text-primary)] mx-auto mb-4"></div>
+        <Suspense fallback={<p className="text-[var(--lark-text-secondary)]">Loading...</p>}>
           <AuthSuccessContent />
         </Suspense>
       </div>
     </main>
   );
 }
-

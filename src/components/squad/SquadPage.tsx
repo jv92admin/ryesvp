@@ -130,7 +130,7 @@ export function SquadPage({ squad: initialSquad, currentUserId, enrichment, cale
     try {
       const shareText = generateSharePlanText(squad, currentUserId);
       const shareUrl = `${window.location.origin}/squads/${squad.id}`;
-      
+
       // Try native share first (mobile)
       if (navigator.share) {
         try {
@@ -149,7 +149,7 @@ export function SquadPage({ squad: initialSquad, currentUserId, enrichment, cale
           }
         }
       }
-      
+
       // Fall back to clipboard
       await navigator.clipboard.writeText(shareText);
       setTimeout(() => setCopying(null), 1000);
@@ -163,7 +163,7 @@ export function SquadPage({ squad: initialSquad, currentUserId, enrichment, cale
     setCopying('dayof');
     try {
       const shareText = generateDayOfText(squad);
-      
+
       // Try native share first (mobile)
       if (navigator.share) {
         try {
@@ -181,7 +181,7 @@ export function SquadPage({ squad: initialSquad, currentUserId, enrichment, cale
           }
         }
       }
-      
+
       // Fall back to clipboard
       await navigator.clipboard.writeText(shareText);
       setTimeout(() => setCopying(null), 1000);
@@ -198,14 +198,14 @@ export function SquadPage({ squad: initialSquad, currentUserId, enrichment, cale
   const isOrganizer = squad.members.find(m => m.userId === currentUserId)?.isOrganizer || false;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
       <div className="max-w-lg mx-auto px-4 py-6">
         {/* Navigation Header */}
         <div className="flex items-center justify-between mb-4">
           {/* Back Button */}
           <button
             onClick={() => router.push(`/events/${squad.eventId}`)}
-            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors group"
+            className="flex items-center gap-2 text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)] transition-colors group"
           >
             <svg className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -216,21 +216,21 @@ export function SquadPage({ squad: initialSquad, currentUserId, enrichment, cale
           {/* Home Link */}
           <button
             onClick={() => router.push('/')}
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
+            className="text-sm font-medium text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)] transition-colors"
           >
             Home
           </button>
         </div>
 
         {/* Mode Toggle - Apple-style full-width */}
-        <div className="mb-4 bg-gray-100 rounded-full p-0.5">
+        <div className="mb-4 bg-[var(--bg-surface)] rounded-full p-0.5">
           <div className="relative flex">
             <button
               onClick={() => setMode('plan')}
               className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full transition-all relative z-10 ${
                 mode === 'plan'
-                  ? 'text-gray-900'
-                  : 'text-gray-500'
+                  ? 'text-[var(--lark-text-primary)]'
+                  : 'text-[var(--lark-text-secondary)]'
               }`}
             >
               Plan
@@ -239,15 +239,15 @@ export function SquadPage({ squad: initialSquad, currentUserId, enrichment, cale
               onClick={() => setMode('dayof')}
               className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full transition-all relative z-10 ${
                 mode === 'dayof'
-                  ? 'text-gray-900'
-                  : 'text-gray-500'
+                  ? 'text-[var(--lark-text-primary)]'
+                  : 'text-[var(--lark-text-secondary)]'
               }`}
             >
               Day-of
             </button>
             {/* Sliding background */}
             <div
-              className={`absolute top-0.5 bottom-0.5 w-1/2 bg-white rounded-full shadow-sm transition-transform duration-200 ${
+              className={`absolute top-0.5 bottom-0.5 w-1/2 bg-[var(--bg-elevated)] rounded-full transition-transform duration-200 ${
                 mode === 'dayof' ? 'translate-x-full' : 'translate-x-0'
               }`}
               style={{ left: '2px', right: '2px', width: 'calc(50% - 2px)' }}

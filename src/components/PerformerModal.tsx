@@ -47,11 +47,11 @@ const TYPE_LABELS: Record<PerformerType, string> = {
 };
 
 const TYPE_COLORS: Record<PerformerType, string> = {
-  ARTIST: 'bg-purple-100 text-purple-800',
-  TEAM: 'bg-blue-100 text-blue-800',
-  COMEDIAN: 'bg-amber-100 text-amber-800',
-  COMPANY: 'bg-gray-100 text-gray-800',
-  OTHER: 'bg-gray-100 text-gray-800',
+  ARTIST: 'bg-[var(--bg-surface)] text-[var(--lark-text-secondary)]',
+  TEAM: 'bg-[var(--bg-surface)] text-[var(--lark-text-secondary)]',
+  COMEDIAN: 'bg-[var(--bg-surface)] text-[var(--lark-text-secondary)]',
+  COMPANY: 'bg-[var(--bg-surface)] text-[var(--lark-text-secondary)]',
+  OTHER: 'bg-[var(--bg-surface)] text-[var(--lark-text-secondary)]',
 };
 
 function getInitials(name: string): string {
@@ -112,13 +112,13 @@ export function PerformerModal({ performerId, onClose }: PerformerModalProps) {
   return (
     <Dialog open={true} onOpenChange={() => onClose()} size="md">
       {loading ? (
-        <div className="p-8 text-center text-[var(--text-muted)]">Loading...</div>
+        <div className="p-8 text-center text-[var(--lark-text-muted)]">Loading...</div>
       ) : error ? (
         <div className="p-8 text-center">
-          <p className="text-[var(--signal-danger)] mb-4">{error}</p>
+          <p className="text-[var(--status-need-ticket)] mb-4">{error}</p>
           <button
             onClick={onClose}
-            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            className="text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)]"
           >
             Close
           </button>
@@ -126,7 +126,7 @@ export function PerformerModal({ performerId, onClose }: PerformerModalProps) {
       ) : performer ? (
         <>
           {/* Header with image or placeholder */}
-          <div className="relative bg-[var(--surface-inset)] px-6 pt-6 pb-4 flex-shrink-0">
+          <div className="relative bg-[var(--bg-surface)] px-6 pt-6 pb-4 flex-shrink-0">
             <div className="absolute top-3 right-3">
               <IconButton
                 icon={
@@ -146,18 +146,18 @@ export function PerformerModal({ performerId, onClose }: PerformerModalProps) {
                 <img
                   src={performer.imageUrl}
                   alt={performer.name}
-                  className="w-20 h-20 rounded-full object-cover shadow-md"
+                  className="w-20 h-20 rounded-full object-cover"
                 />
               ) : (
                 <div
-                  className={`w-20 h-20 rounded-full ${getAvatarColor(performer.name)} flex items-center justify-center text-white text-2xl font-bold shadow-md`}
+                  className={`w-20 h-20 rounded-full ${getAvatarColor(performer.name)} flex items-center justify-center text-white text-2xl font-bold`}
                 >
                   {getInitials(performer.name)}
                 </div>
               )}
 
               <div className="flex-1 min-w-0 pt-1">
-                <h2 className="text-xl font-bold text-[var(--text-primary)] truncate">
+                <h2 className="text-xl font-bold text-[var(--lark-text-primary)] truncate">
                   {performer.name}
                 </h2>
                 <span
@@ -172,7 +172,7 @@ export function PerformerModal({ performerId, onClose }: PerformerModalProps) {
           <DialogBody>
             <div className="space-y-4">
               {performer.bio && (
-                <p className="text-[var(--text-secondary)] text-sm leading-relaxed line-clamp-3">
+                <p className="text-[var(--lark-text-secondary)] text-sm leading-relaxed line-clamp-3">
                   {performer.bio}
                 </p>
               )}
@@ -182,7 +182,7 @@ export function PerformerModal({ performerId, onClose }: PerformerModalProps) {
                   {performer.tags.slice(0, 5).map(tag => (
                     <span
                       key={tag}
-                      className="px-2 py-0.5 bg-[var(--surface-inset)] text-[var(--text-secondary)] text-xs rounded-full"
+                      className="px-2 py-0.5 bg-[var(--bg-surface)] text-[var(--lark-text-secondary)] text-xs rounded-full"
                     >
                       {tag}
                     </span>
@@ -206,21 +206,21 @@ export function PerformerModal({ performerId, onClose }: PerformerModalProps) {
               )}
 
               {(pastEvent || upcomingEvent) && (
-                <div className="border-t border-[var(--border-default)] pt-4 space-y-3">
+                <div className="border-t border-[var(--border-subtle)] pt-4 space-y-3">
                   {pastEvent && (
                     <div>
-                      <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1">
+                      <p className="text-xs font-semibold text-[var(--lark-text-muted)] uppercase tracking-wider mb-1">
                         Last Show
                       </p>
                       <Link
                         href={`/events/${pastEvent.id}`}
                         onClick={onClose}
-                        className="block hover:bg-[var(--surface-inset)] -mx-2 px-2 py-1 rounded transition-colors"
+                        className="block hover:bg-[var(--bg-surface)] -mx-2 px-2 py-1 rounded transition-colors"
                       >
-                        <p className="text-sm font-medium text-[var(--text-primary)] truncate">
+                        <p className="text-sm font-medium text-[var(--lark-text-primary)] truncate">
                           {pastEvent.displayTitle}
                         </p>
-                        <p className="text-xs text-[var(--text-muted)]">
+                        <p className="text-xs text-[var(--lark-text-muted)]">
                           {pastEvent.venue.name} •{' '}
                           {formatInTimeZone(new Date(pastEvent.startDateTime), AUSTIN_TIMEZONE, 'MMM d, yyyy')}
                         </p>
@@ -230,18 +230,18 @@ export function PerformerModal({ performerId, onClose }: PerformerModalProps) {
 
                   {upcomingEvent && (
                     <div>
-                      <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1">
+                      <p className="text-xs font-semibold text-[var(--lark-text-muted)] uppercase tracking-wider mb-1">
                         Next Show
                       </p>
                       <Link
                         href={`/events/${upcomingEvent.id}`}
                         onClick={onClose}
-                        className="block hover:bg-[var(--surface-inset)] -mx-2 px-2 py-1 rounded transition-colors"
+                        className="block hover:bg-[var(--bg-surface)] -mx-2 px-2 py-1 rounded transition-colors"
                       >
-                        <p className="text-sm font-medium text-[var(--text-primary)] truncate">
+                        <p className="text-sm font-medium text-[var(--lark-text-primary)] truncate">
                           {upcomingEvent.displayTitle}
                         </p>
-                        <p className="text-xs text-[var(--text-muted)]">
+                        <p className="text-xs text-[var(--lark-text-muted)]">
                           {upcomingEvent.venue.name} •{' '}
                           {formatInTimeZone(new Date(upcomingEvent.startDateTime), AUSTIN_TIMEZONE, 'MMM d, yyyy')}
                         </p>
@@ -252,8 +252,8 @@ export function PerformerModal({ performerId, onClose }: PerformerModalProps) {
               )}
 
               {!pastEvent && !upcomingEvent && (
-                <div className="border-t border-[var(--border-default)] pt-4">
-                  <p className="text-sm text-[var(--text-muted)] text-center">
+                <div className="border-t border-[var(--border-subtle)] pt-4">
+                  <p className="text-sm text-[var(--lark-text-muted)] text-center">
                     First time in Austin!
                   </p>
                 </div>

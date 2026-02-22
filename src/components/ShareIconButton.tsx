@@ -18,7 +18,7 @@ export function ShareIconButton({ title, venueName, dateFormatted, eventUrl, isL
   useEffect(() => {
     async function fetchInviteCode() {
       if (!isLoggedIn) return;
-      
+
       try {
         const response = await fetch('/api/invites/me');
         if (response.ok) {
@@ -29,30 +29,30 @@ export function ShareIconButton({ title, venueName, dateFormatted, eventUrl, isL
         console.error('Failed to fetch invite code:', error);
       }
     }
-    
+
     fetchInviteCode();
   }, [isLoggedIn]);
 
   // Build share URL with invite code if available
-  const shareUrl = inviteCode 
+  const shareUrl = inviteCode
     ? `${eventUrl}?ref=${inviteCode}`
     : eventUrl;
 
   const shareText = inviteCode
     ? `Hey! Check out this event:
 
-🎵 ${title}
-📍 ${venueName}
-📅 ${dateFormatted}
+${title}
+${venueName}
+${dateFormatted}
 
 ${shareUrl}
 
-👋 Join me on Lark so we can see who's in and make a plan.`
+Join me on Lark so we can see who's in and make a plan.`
     : `Hey! Check out this event:
 
-🎵 ${title}
-📍 ${venueName}
-📅 ${dateFormatted}
+${title}
+${venueName}
+${dateFormatted}
 
 ${shareUrl}`;
 
@@ -85,9 +85,9 @@ ${shareUrl}`;
     <button
       onClick={handleShare}
       className={`p-1.5 rounded-lg transition-colors ${
-        copied 
-          ? 'text-green-600' 
-          : 'text-gray-500 hover:text-green-600 hover:bg-green-50'
+        copied
+          ? 'text-[var(--accent)]'
+          : 'text-[var(--lark-text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--bg-hover)]'
       }`}
       title="Share event"
     >
@@ -103,4 +103,3 @@ ${shareUrl}`;
     </button>
   );
 }
-

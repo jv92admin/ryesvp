@@ -42,13 +42,12 @@ export function SquadGuestsSection({ squadId, currentGuestCount, onUpdate }: Squ
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm text-gray-600 flex-shrink-0">Guests?</span>
+      <span className="text-sm text-[var(--lark-text-secondary)] flex-shrink-0">Guests?</span>
       <div className="flex gap-1 flex-1">
         <ToggleChip
           active={currentGuestCount === 1}
           onClick={() => updateGuestCount(currentGuestCount === 1 ? 0 : 1)}
           disabled={isUpdating}
-          color="primary"
         >
           +1
         </ToggleChip>
@@ -56,7 +55,6 @@ export function SquadGuestsSection({ squadId, currentGuestCount, onUpdate }: Squ
           active={currentGuestCount === 2}
           onClick={() => updateGuestCount(currentGuestCount === 2 ? 0 : 2)}
           disabled={isUpdating}
-          color="primary"
         >
           +2
         </ToggleChip>
@@ -69,7 +67,7 @@ export function SquadGuestsSection({ squadId, currentGuestCount, onUpdate }: Squ
               max="99"
               value={customCount}
               onChange={(e) => setCustomCount(e.target.value)}
-              className="w-12 px-2 py-1 text-xs border border-gray-300 rounded-lg focus:ring-1 focus:ring-green-500 text-gray-900 placeholder:text-gray-400"
+              className="w-12 px-2 py-1 text-xs border border-[var(--border-visible)] rounded-lg focus:ring-1 focus:ring-[var(--border-visible)] text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)]"
               placeholder="3+"
             />
             <Button
@@ -92,7 +90,6 @@ export function SquadGuestsSection({ squadId, currentGuestCount, onUpdate }: Squ
           <ToggleChip
             active={currentGuestCount > 2}
             onClick={() => setShowCustom(true)}
-            color="primary"
           >
             {currentGuestCount > 2 ? `+${currentGuestCount}` : '3+'}
           </ToggleChip>

@@ -17,7 +17,7 @@ export function ProfileContent() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  
+
   // Delete account state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
@@ -76,7 +76,7 @@ export function ProfileContent() {
 
   const handleDeleteAccount = async () => {
     if (deleteConfirmText !== 'DELETE') return;
-    
+
     setDeleting(true);
     setDeleteError(null);
 
@@ -99,15 +99,15 @@ export function ProfileContent() {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--brand-primary)] mx-auto"></div>
-        <p className="text-gray-500 mt-4">Loading...</p>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--accent)] mx-auto"></div>
+        <p className="text-[var(--lark-text-secondary)] mt-4">Loading...</p>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="bg-red-50 text-red-700 p-4 rounded-lg">
+      <div className="bg-red-500/10 text-red-400 p-4 rounded-lg">
         Failed to load profile
       </div>
     );
@@ -119,15 +119,15 @@ export function ProfileContent() {
   return (
     <div className="space-y-6">
       {/* Quick Actions */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
+      <div className="bg-[var(--bg-elevated)] rounded-xl border border-[var(--border-subtle)] p-6">
+        <h2 className="text-sm font-semibold text-[var(--lark-text-secondary)] uppercase tracking-wide mb-4">
           Quick Actions
         </h2>
         <div className="flex flex-col sm:flex-row gap-3">
           <StartPlanButton variant="profile" />
-          <a 
-            href="/friends" 
-            className="px-4 py-2 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+          <a
+            href="/friends"
+            className="px-4 py-2 text-sm font-medium rounded-lg border border-[var(--border-visible)] text-[var(--lark-text-primary)] hover:bg-[var(--bg-hover)] transition-colors flex items-center justify-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
@@ -139,25 +139,25 @@ export function ProfileContent() {
 
       {/* Add Friend Link */}
       <AddFriendCard />
-      
+
       {/* Avatar Preview */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
+      <div className="bg-[var(--bg-elevated)] rounded-xl border border-[var(--border-subtle)] p-6">
+        <h2 className="text-sm font-semibold text-[var(--lark-text-secondary)] uppercase tracking-wide mb-4">
           Your Avatar
         </h2>
         <div className="flex items-center gap-4">
-          <div 
+          <div
             className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-2xl"
             style={avatarStyle}
           >
             {initials}
           </div>
           <div>
-            <p className="font-medium text-gray-900">
+            <p className="font-medium text-[var(--lark-text-primary)]">
               {user.displayName || user.email.split('@')[0]}
             </p>
-            <p className="text-sm text-gray-500">{user.email}</p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-sm text-[var(--lark-text-secondary)]">{user.email}</p>
+            <p className="text-xs text-[var(--lark-text-muted)] mt-1">
               Your avatar color is based on your account ID
             </p>
           </div>
@@ -165,13 +165,13 @@ export function ProfileContent() {
       </div>
 
       {/* Edit Form */}
-      <form onSubmit={handleSave} className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
+      <form onSubmit={handleSave} className="bg-[var(--bg-elevated)] rounded-xl border border-[var(--border-subtle)] p-6">
+        <h2 className="text-sm font-semibold text-[var(--lark-text-secondary)] uppercase tracking-wide mb-4">
           Display Name
         </h2>
-        
+
         <div className="mb-4">
-          <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="displayName" className="block text-sm font-medium text-[var(--lark-text-primary)] mb-1">
             Name
           </label>
           <input
@@ -180,18 +180,18 @@ export function ProfileContent() {
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             placeholder="Your name"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            className="w-full px-3 py-2 border border-[var(--border-visible)] rounded-lg text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-[var(--bg-primary)]"
           />
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-[var(--lark-text-secondary)] mt-1">
             This is how your name appears to friends and in communities
           </p>
         </div>
 
         {message && (
           <div className={`mb-4 p-3 rounded-lg text-sm ${
-            message.type === 'success' 
-              ? 'bg-green-50 text-green-700' 
-              : 'bg-red-50 text-red-700'
+            message.type === 'success'
+              ? 'bg-[var(--bg-surface)] text-[var(--accent)]'
+              : 'bg-red-500/10 text-red-400'
           }`}>
             {message.text}
           </div>
@@ -207,27 +207,27 @@ export function ProfileContent() {
       </form>
 
       {/* Email (read-only) */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
+      <div className="bg-[var(--bg-elevated)] rounded-xl border border-[var(--border-subtle)] p-6">
+        <h2 className="text-sm font-semibold text-[var(--lark-text-secondary)] uppercase tracking-wide mb-4">
           Email Address
         </h2>
-        <p className="text-gray-900">{user.email}</p>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-[var(--lark-text-primary)]">{user.email}</p>
+        <p className="text-xs text-[var(--lark-text-secondary)] mt-1">
           Email cannot be changed
         </p>
       </div>
 
       {/* Danger Zone */}
-      <div className="bg-white rounded-xl border-2 border-red-200 p-6">
-        <h2 className="text-sm font-semibold text-red-600 uppercase tracking-wide mb-4">
+      <div className="bg-[var(--bg-elevated)] rounded-xl border-2 border-red-500/30 p-6">
+        <h2 className="text-sm font-semibold text-red-400 uppercase tracking-wide mb-4">
           Danger Zone
         </h2>
-        <p className="text-gray-700 mb-4">
+        <p className="text-[var(--lark-text-primary)] mb-4">
           Permanently delete your account and all associated data. This action cannot be undone.
         </p>
         <button
           onClick={() => setShowDeleteModal(true)}
-          className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors"
+          className="px-4 py-2 text-sm font-medium text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg hover:bg-red-500/20 transition-colors"
         >
           Delete Account
         </button>
@@ -236,50 +236,50 @@ export function ProfileContent() {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-xl">
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+          <div className="bg-[var(--bg-elevated)] rounded-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-[var(--lark-text-primary)] mb-2">
               Delete Your Account?
             </h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-[var(--lark-text-secondary)] mb-4">
               This will permanently delete:
             </p>
-            <ul className="text-sm text-gray-600 mb-4 space-y-1">
+            <ul className="text-sm text-[var(--lark-text-secondary)] mb-4 space-y-1">
               <li className="flex items-center gap-2">
-                <span className="text-red-500">•</span>
+                <span className="text-red-400">•</span>
                 Your profile and display name
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-red-500">•</span>
+                <span className="text-red-400">•</span>
                 All event RSVPs (going/interested)
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-red-500">•</span>
+                <span className="text-red-400">•</span>
                 All friendships and friend requests
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-red-500">•</span>
+                <span className="text-red-400">•</span>
                 Lists and communities you own
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-red-500">•</span>
+                <span className="text-red-400">•</span>
                 All community memberships
               </li>
             </ul>
-            
-            <p className="text-sm text-gray-700 mb-2">
-              Type <span className="font-mono font-bold text-red-600">DELETE</span> to confirm:
+
+            <p className="text-sm text-[var(--lark-text-primary)] mb-2">
+              Type <span className="font-mono font-bold text-red-400">DELETE</span> to confirm:
             </p>
             <input
               type="text"
               value={deleteConfirmText}
               onChange={(e) => setDeleteConfirmText(e.target.value)}
               placeholder="Type DELETE"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4 font-mono"
+              className="w-full px-3 py-2 border border-[var(--border-visible)] rounded-lg text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent mb-4 font-mono bg-[var(--bg-primary)]"
               autoFocus
             />
 
             {deleteError && (
-              <div className="mb-4 p-3 rounded-lg text-sm bg-red-50 text-red-700">
+              <div className="mb-4 p-3 rounded-lg text-sm bg-red-500/10 text-red-400">
                 {deleteError}
               </div>
             )}
@@ -292,7 +292,7 @@ export function ProfileContent() {
                   setDeleteError(null);
                 }}
                 disabled={deleting}
-                className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2 text-sm font-medium text-[var(--lark-text-primary)] bg-[var(--bg-surface)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -310,4 +310,3 @@ export function ProfileContent() {
     </div>
   );
 }
-

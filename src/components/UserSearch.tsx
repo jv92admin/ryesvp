@@ -24,10 +24,10 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
 
   const handleSearch = async () => {
     if (query.length < 3) return;
-    
+
     setLoading(true);
     setSearched(true);
-    
+
     try {
       const res = await fetch(`/api/users/search?email=${encodeURIComponent(query)}`);
       if (!res.ok) throw new Error('Search failed');
@@ -62,7 +62,7 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={compact ? "Search by email..." : "Enter exact email address..."}
-          className={`flex-1 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent ${compact ? 'px-3 py-1.5 text-sm' : 'px-4 py-2'}`}
+          className={`flex-1 border border-[var(--border-visible)] rounded-lg text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:border-transparent bg-[var(--bg-primary)] ${compact ? 'px-3 py-1.5 text-sm' : 'px-4 py-2'}`}
         />
         <button
           onClick={handleSearch}
@@ -74,10 +74,10 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
       </div>
 
       {searched && results.length === 0 && !loading && (
-        <div className={`text-center bg-white rounded-lg border border-gray-200 ${compact ? 'py-4' : 'py-8'}`}>
-          <p className="text-gray-500 text-sm">No user found with &quot;{query}&quot;</p>
+        <div className={`text-center bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] ${compact ? 'py-4' : 'py-8'}`}>
+          <p className="text-[var(--lark-text-secondary)] text-sm">No user found with &quot;{query}&quot;</p>
           {!compact && (
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-sm text-[var(--lark-text-muted)] mt-1">
               Enter the exact email address of the person you want to add
             </p>
           )}
@@ -94,10 +94,10 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
             return (
               <div
                 key={user.id}
-                className="bg-white rounded-lg border border-gray-200 p-4 flex items-center justify-between"
+                className="bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-4 flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <div 
+                  <div
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white font-medium text-sm"
                     style={avatarStyle}
                     title={getDisplayName(user.displayName, user.email)}
@@ -105,18 +105,18 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
                     {initials}
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-[var(--lark-text-primary)]">
                       {getDisplayName(user.displayName, user.email)}
                     </p>
-                    <p className="text-sm text-gray-500">{user.email}</p>
+                    <p className="text-sm text-[var(--lark-text-secondary)]">{user.email}</p>
                   </div>
                 </div>
 
                 {state === 'friend' && (
-                  <span className="text-sm text-green-600 font-medium">✓ Friends</span>
+                  <span className="text-sm text-[var(--accent)] font-medium">Friends</span>
                 )}
                 {state === 'pending' && (
-                  <span className="text-sm text-gray-500 italic">Pending</span>
+                  <span className="text-sm text-[var(--lark-text-secondary)] italic">Pending</span>
                 )}
                 {state === 'add' && (
                   <button
@@ -133,9 +133,9 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
       )}
 
       {!searched && !compact && (
-        <div className="text-center py-8 bg-white rounded-lg border border-gray-200">
-          <p className="text-gray-500">Enter a friend&apos;s email address</p>
-          <p className="text-sm text-gray-400 mt-1">
+        <div className="text-center py-8 bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)]">
+          <p className="text-[var(--lark-text-secondary)]">Enter a friend&apos;s email address</p>
+          <p className="text-sm text-[var(--lark-text-muted)] mt-1">
             You&apos;ll need their exact email to find them
           </p>
         </div>
@@ -143,4 +143,3 @@ export function UserSearch({ onSendRequest, existingFriendIds, pendingRequestIds
     </div>
   );
 }
-

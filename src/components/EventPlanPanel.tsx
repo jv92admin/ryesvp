@@ -239,10 +239,10 @@ export function EventPlanPanel({ squadId, eventId }: EventPlanPanelProps) {
   if (loading) {
     return (
       <div className="space-y-3 animate-pulse">
-        <div className="h-4 w-32 bg-[var(--surface-inset)] rounded" />
-        <div className="h-10 bg-[var(--surface-inset)] rounded-lg" />
-        <div className="h-10 bg-[var(--surface-inset)] rounded-lg" />
-        <div className="h-24 bg-[var(--surface-inset)] rounded-lg" />
+        <div className="h-4 w-32 bg-[var(--bg-surface)] rounded" />
+        <div className="h-10 bg-[var(--bg-surface)] rounded-lg" />
+        <div className="h-10 bg-[var(--bg-surface)] rounded-lg" />
+        <div className="h-24 bg-[var(--bg-surface)] rounded-lg" />
       </div>
     );
   }
@@ -257,21 +257,21 @@ export function EventPlanPanel({ squadId, eventId }: EventPlanPanelProps) {
     <>
       <div className="space-y-0">
         {/* Section header */}
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-4">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--lark-text-muted)] mb-4">
           Your Plan
         </h3>
 
         {/* ── Status controls ── */}
         <div className="flex items-center gap-3 pb-3">
-          <span className="text-sm text-[var(--text-secondary)] flex-shrink-0 w-14">Going?</span>
+          <span className="text-sm text-[var(--lark-text-secondary)] flex-shrink-0 w-14">Going?</span>
           <div className="flex gap-1.5 flex-1">
             {STATUS_OPTIONS.map((opt) => {
               const isActive = currentMember.status === opt.value;
               let activeClasses = '';
               if (isActive) {
-                if (opt.value === 'IN') activeClasses = 'bg-[var(--signal-going-light)] text-[var(--signal-going)] border-[var(--signal-going)]';
-                else if (opt.value === 'THINKING') activeClasses = 'bg-[var(--signal-interested-light)] text-[var(--signal-interested)] border-[var(--signal-interested)]';
-                else activeClasses = 'bg-red-50 text-red-600 border-red-300';
+                if (opt.value === 'IN') activeClasses = 'bg-[var(--bg-surface)] text-[var(--lark-text-primary)] border-[var(--border-visible)]';
+                else if (opt.value === 'THINKING') activeClasses = 'bg-[var(--bg-surface)] text-[var(--lark-text-secondary)] border-[var(--border-visible)]';
+                else activeClasses = 'bg-[var(--bg-surface)] text-[var(--lark-text-secondary)] border-[var(--border-visible)]';
               }
               return (
                 <button
@@ -281,7 +281,7 @@ export function EventPlanPanel({ squadId, eventId }: EventPlanPanelProps) {
                   className={`flex-1 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                     isActive
                       ? activeClasses
-                      : 'border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-[var(--surface-inset)]'
+                      : 'border-[var(--border-subtle)] text-[var(--lark-text-secondary)] hover:bg-[var(--bg-hover)]'
                   } disabled:opacity-50`}
                 >
                   {opt.label}
@@ -294,7 +294,7 @@ export function EventPlanPanel({ squadId, eventId }: EventPlanPanelProps) {
         {/* ── Ticket status (only if not OUT) ── */}
         {currentMember.status !== 'OUT' && (
           <div className="flex items-center gap-3 pb-4">
-            <span className="text-sm text-[var(--text-secondary)] flex-shrink-0 w-14">Ticket?</span>
+            <span className="text-sm text-[var(--lark-text-secondary)] flex-shrink-0 w-14">Ticket?</span>
             <div className="flex gap-1.5 flex-1">
               {TICKET_OPTIONS.map((opt) => {
                 const isActive = currentMember.ticketStatus === opt.value
@@ -306,8 +306,8 @@ export function EventPlanPanel({ squadId, eventId }: EventPlanPanelProps) {
                     disabled={updatingTicket || currentMember.ticketStatus === 'COVERED'}
                     className={`flex-1 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
                       isActive
-                        ? 'bg-[var(--surface-inset)] text-[var(--text-primary)] border-[var(--border-strong)]'
-                        : 'border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-[var(--surface-inset)]'
+                        ? 'bg-[var(--bg-surface)] text-[var(--lark-text-primary)] border-[var(--border-visible)]'
+                        : 'border-[var(--border-subtle)] text-[var(--lark-text-secondary)] hover:bg-[var(--bg-hover)]'
                     } disabled:opacity-50`}
                   >
                     {opt.label}
@@ -319,10 +319,10 @@ export function EventPlanPanel({ squadId, eventId }: EventPlanPanelProps) {
         )}
 
         {/* ── Divider ── */}
-        <div className="border-t border-[var(--border-default)] pt-4">
+        <div className="border-t border-[var(--border-subtle)] pt-4">
           {/* ── Members list ── */}
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--lark-text-muted)]">
               Members ({squad.members.length})
             </span>
           </div>
@@ -347,10 +347,10 @@ export function EventPlanPanel({ squadId, eventId }: EventPlanPanelProps) {
 
                   {/* Name + organizer badge */}
                   <Link href={`/users/${member.userId}`} className="flex-1 min-w-0">
-                    <span className="text-sm text-[var(--text-primary)] truncate block">
+                    <span className="text-sm text-[var(--lark-text-primary)] truncate block">
                       {isMe ? 'You' : name}
                       {member.isOrganizer && (
-                        <span className="text-[10px] text-[var(--text-muted)] ml-1">org</span>
+                        <span className="text-[10px] text-[var(--lark-text-muted)] ml-1">org</span>
                       )}
                     </span>
                   </Link>
@@ -358,24 +358,24 @@ export function EventPlanPanel({ squadId, eventId }: EventPlanPanelProps) {
                   {/* Status icon */}
                   <span className="flex-shrink-0 text-xs w-12 text-right">
                     {member.status === 'IN' && (
-                      <span className="text-[var(--signal-going)]">In</span>
+                      <span className="text-[var(--lark-text-primary)]">In</span>
                     )}
                     {member.status === 'THINKING' && (
-                      <span className="text-[var(--signal-interested)]">Maybe</span>
+                      <span className="text-[var(--lark-text-secondary)]">Maybe</span>
                     )}
                     {member.status === 'OUT' && (
-                      <span className="text-[var(--text-muted)]">Out</span>
+                      <span className="text-[var(--lark-text-muted)]">Out</span>
                     )}
                   </span>
 
                   {/* Ticket icon */}
                   <span className="flex-shrink-0 w-5 text-center text-xs">
                     {(member.ticketStatus === 'YES' || member.ticketStatus === 'COVERED') ? (
-                      <svg className="w-4 h-4 text-[var(--text-secondary)] inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <svg className="w-4 h-4 text-[var(--lark-text-secondary)] inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z" />
                       </svg>
                     ) : (
-                      <span className="text-[var(--text-muted)]">—</span>
+                      <span className="text-[var(--lark-text-muted)]">—</span>
                     )}
                   </span>
 
@@ -384,7 +384,7 @@ export function EventPlanPanel({ squadId, eventId }: EventPlanPanelProps) {
                     <button
                       onClick={() => handleRemoveMember(member.userId, name)}
                       disabled={removingMemberId === member.userId}
-                      className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--signal-danger)] transition-colors disabled:opacity-50"
+                      className="flex-shrink-0 w-5 h-5 flex items-center justify-center text-[var(--lark-text-muted)] hover:text-[var(--status-need-ticket)] transition-colors disabled:opacity-50"
                       aria-label={`Remove ${name}`}
                     >
                       <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -402,23 +402,23 @@ export function EventPlanPanel({ squadId, eventId }: EventPlanPanelProps) {
           {/* Invite inline link */}
           <button
             onClick={() => setShowInvite(true)}
-            className="mt-3 text-sm text-[var(--action-engage)] hover:underline transition-colors"
+            className="mt-3 text-sm text-[var(--lark-text-primary)] hover:underline transition-colors"
           >
             + Invite Friends
           </button>
         </div>
 
         {/* ── Divider ── */}
-        <div className="border-t border-[var(--border-default)] pt-4 mt-4">
+        <div className="border-t border-[var(--border-subtle)] pt-4 mt-4">
           {/* ── Meetup section ── */}
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--lark-text-muted)]">
               Meetup
             </span>
             {!editingMeetup && (
               <button
                 onClick={handleMeetupEdit}
-                className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                className="text-xs text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)] transition-colors"
               >
                 Edit
               </button>
@@ -428,36 +428,36 @@ export function EventPlanPanel({ squadId, eventId }: EventPlanPanelProps) {
           {editingMeetup ? (
             <div className="space-y-3">
               <div>
-                <label className="text-xs text-[var(--text-muted)] mb-1 block">Where</label>
+                <label className="text-xs text-[var(--lark-text-muted)] mb-1 block">Where</label>
                 <input
                   type="text"
                   value={meetSpotDraft}
                   onChange={(e) => setMeetSpotDraft(e.target.value)}
                   placeholder="e.g. Front entrance"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-[var(--border-default)] bg-white text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--border-strong)]"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-elevated)] text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] focus:outline-none focus:border-[var(--border-visible)]"
                 />
               </div>
               <div>
-                <label className="text-xs text-[var(--text-muted)] mb-1 block">When</label>
+                <label className="text-xs text-[var(--lark-text-muted)] mb-1 block">When</label>
                 <input
                   type="text"
                   value={meetTimeDraft}
                   onChange={(e) => setMeetTimeDraft(e.target.value)}
                   placeholder="e.g. 6:30 PM"
-                  className="w-full px-3 py-2 text-sm rounded-lg border border-[var(--border-default)] bg-white text-[var(--text-primary)] placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--border-strong)]"
+                  className="w-full px-3 py-2 text-sm rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-elevated)] text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)] focus:outline-none focus:border-[var(--border-visible)]"
                 />
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={handleMeetupSave}
                   disabled={savingMeetup}
-                  className="px-4 py-1.5 text-sm font-medium rounded-lg bg-[var(--action-primary)] text-[var(--action-primary-text)] hover:bg-[var(--action-primary-hover)] transition-colors disabled:opacity-50"
+                  className="px-4 py-1.5 text-sm font-medium rounded-lg bg-[var(--accent)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50"
                 >
                   {savingMeetup ? 'Saving...' : 'Save'}
                 </button>
                 <button
                   onClick={() => setEditingMeetup(false)}
-                  className="px-4 py-1.5 text-sm font-medium rounded-lg text-[var(--text-secondary)] border border-[var(--border-default)] hover:bg-[var(--surface-inset)] transition-colors"
+                  className="px-4 py-1.5 text-sm font-medium rounded-lg text-[var(--lark-text-secondary)] border border-[var(--border-subtle)] hover:bg-[var(--bg-hover)] transition-colors"
                 >
                   Cancel
                 </button>
@@ -466,8 +466,8 @@ export function EventPlanPanel({ squadId, eventId }: EventPlanPanelProps) {
           ) : (
             <div className="space-y-1.5">
               {squad.meetSpot && (
-                <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-                  <svg className="w-4 h-4 text-[var(--text-muted)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <div className="flex items-center gap-2 text-sm text-[var(--lark-text-secondary)]">
+                  <svg className="w-4 h-4 text-[var(--lark-text-muted)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                   </svg>
@@ -475,33 +475,33 @@ export function EventPlanPanel({ squadId, eventId }: EventPlanPanelProps) {
                 </div>
               )}
               {squad.meetTime && (
-                <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
-                  <svg className="w-4 h-4 text-[var(--text-muted)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <div className="flex items-center gap-2 text-sm text-[var(--lark-text-secondary)]">
+                  <svg className="w-4 h-4 text-[var(--lark-text-muted)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <span>{squad.meetTime}</span>
                 </div>
               )}
               {!squad.meetSpot && !squad.meetTime && (
-                <p className="text-sm text-[var(--text-muted)]">No meetup details yet</p>
+                <p className="text-sm text-[var(--lark-text-muted)]">No meetup details yet</p>
               )}
             </div>
           )}
         </div>
 
         {/* ── Divider ── */}
-        <div className="border-t border-[var(--border-default)] pt-4 mt-4">
+        <div className="border-t border-[var(--border-subtle)] pt-4 mt-4">
           {/* ── Action buttons ── */}
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowInvite(true)}
-              className="px-4 py-2 text-sm font-medium rounded-lg text-[var(--action-engage)] border border-[var(--action-engage)] hover:bg-[var(--action-engage-light)] transition-colors"
+              className="px-4 py-2 text-sm font-medium rounded-lg text-[var(--lark-text-primary)] border border-[var(--border-visible)] hover:bg-[var(--bg-surface)] transition-colors"
             >
               Invite Friends
             </button>
             <button
               onClick={handleShare}
-              className="px-4 py-2 text-sm font-medium rounded-lg text-[var(--text-secondary)] border border-[var(--border-default)] hover:bg-[var(--surface-inset)] transition-colors"
+              className="px-4 py-2 text-sm font-medium rounded-lg text-[var(--lark-text-secondary)] border border-[var(--border-subtle)] hover:bg-[var(--bg-hover)] transition-colors"
             >
               {copying ? 'Copied!' : 'Share Plan'}
             </button>
@@ -512,7 +512,7 @@ export function EventPlanPanel({ squadId, eventId }: EventPlanPanelProps) {
         <div className="pt-6">
           <button
             onClick={handleLeave}
-            className="text-sm text-[var(--signal-danger)] hover:underline transition-colors"
+            className="text-sm text-[var(--status-need-ticket)] hover:underline transition-colors"
           >
             Leave plan
           </button>

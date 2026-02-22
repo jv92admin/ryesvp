@@ -39,17 +39,17 @@ interface SquadMemberListProps {
 
 // Status icon mapping
 const STATUS_DISPLAY: Record<string, { icon: string; color: string }> = {
-  IN: { icon: '✓', color: 'text-green-600' },
-  THINKING: { icon: '?', color: 'text-amber-500' },
-  OUT: { icon: '✗', color: 'text-red-400' },
+  IN: { icon: '✓', color: 'text-[var(--lark-text-primary)]' },
+  THINKING: { icon: '?', color: 'text-[var(--lark-text-secondary)]' },
+  OUT: { icon: '✗', color: 'text-[var(--lark-text-muted)]' },
 };
 
 // Ticket icon mapping
 const TICKET_DISPLAY: Record<TicketStatus, { icon: string; color: string }> = {
-  YES: { icon: '🎫', color: '' },
-  MAYBE: { icon: '—', color: 'text-gray-400' },
-  NO: { icon: '—', color: 'text-gray-400' },
-  COVERED: { icon: '✓', color: 'text-[var(--brand-primary)]' },
+  YES: { icon: '✓', color: 'text-[var(--accent)]' },
+  MAYBE: { icon: '—', color: 'text-[var(--lark-text-muted)]' },
+  NO: { icon: '—', color: 'text-[var(--lark-text-muted)]' },
+  COVERED: { icon: '✓', color: 'text-[var(--accent)]' },
 };
 
 export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite, onRefresh }: SquadMemberListProps) {
@@ -89,14 +89,14 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite, o
     <div className="space-y-2">
       {/* Empty State - Only you in the plan */}
       {isAlone && onInvite && (
-        <div className="bg-[var(--brand-primary-light)] border-2 border-dashed border-[var(--brand-primary)]/40 rounded-xl p-6 text-center mb-3">
-          <h3 className="font-bold text-gray-900 mb-1">Add your first friend</h3>
-          <p className="text-sm text-gray-600 mb-4">
-            Plans are better with friends! Invite someone to join you.
+        <div className="bg-[var(--bg-surface)] border-2 border-dashed border-[var(--accent)]/40 rounded-xl p-6 text-center mb-3">
+          <h3 className="font-bold text-[var(--lark-text-primary)] mb-1">Nights are better together.</h3>
+          <p className="text-sm text-[var(--lark-text-secondary)] mb-4">
+            Invite someone to join your plan.
           </p>
           <button
             onClick={onInvite}
-            className="w-full px-4 py-2.5 bg-[var(--brand-primary)] text-white rounded-xl font-semibold hover:bg-[var(--brand-primary-hover)] transition-colors"
+            className="w-full px-4 py-2.5 bg-[var(--accent)] text-white rounded-xl font-semibold hover:bg-[var(--accent)] transition-colors"
           >
             Invite Friends
           </button>
@@ -104,7 +104,7 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite, o
       )}
 
       {/* Column Headers */}
-      <div className="flex items-center text-[10px] text-gray-400 uppercase tracking-wider px-1">
+      <div className="flex items-center text-[10px] text-[var(--lark-text-muted)] uppercase tracking-wider px-1">
         <div className="flex-1">Member</div>
         <div className="w-10 text-center">Going</div>
         <div className="w-10 text-center">Ticket</div>
@@ -112,7 +112,7 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite, o
       </div>
 
       {/* Member List */}
-      <div className="divide-y divide-gray-100">
+      <div className="divide-y divide-[var(--border-subtle)]">
         {members.map((member) => {
           const displayName = getDisplayName(member.user.displayName, member.user.email);
           const statusInfo = STATUS_DISPLAY[member.status];
@@ -130,7 +130,7 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite, o
               {/* Avatar - clickable link to profile */}
               <Link
                 href={`/users/${member.userId}`}
-                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-medium flex-shrink-0 hover:ring-2 hover:ring-[var(--brand-primary)] hover:ring-offset-1 transition-shadow"
+                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-medium flex-shrink-0 hover:ring-2 hover:ring-[var(--accent)] hover:ring-offset-1 transition-shadow"
                 style={getAvatarStyle(member.userId)}
                 title={`View ${displayName}'s profile`}
               >
@@ -141,12 +141,12 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite, o
               <div className="flex-1 min-w-0 flex items-center gap-1.5">
                 <Link 
                   href={`/users/${member.userId}`}
-                  className="text-sm text-gray-900 truncate hover:text-[var(--brand-primary)] transition-colors"
+                  className="text-sm text-[var(--lark-text-primary)] truncate hover:text-[var(--accent)] transition-colors"
                 >
                   {displayName}
                 </Link>
                 {member.isOrganizer && (
-                  <span className="text-[9px] px-1 py-0.5 bg-[var(--brand-primary-light)] text-[var(--brand-primary)] rounded flex-shrink-0">
+                  <span className="text-[9px] px-1 py-0.5 bg-[var(--bg-surface)] text-[var(--accent)] rounded flex-shrink-0">
                     Org
                   </span>
                 )}
@@ -161,13 +161,13 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite, o
               <div className={`w-10 text-center text-sm ${ticketInfo.color}`}>
                 {isCovered && coveredByMember ? (
                   <span 
-                    className="text-[var(--brand-primary)] text-[10px] font-medium"
+                    className="text-[var(--accent)] text-[10px] font-medium"
                     title={`Covered by ${getDisplayName(coveredByMember.user.displayName, coveredByMember.user.email)}`}
                   >
                     ({getDisplayName(coveredByMember.user.displayName, coveredByMember.user.email).charAt(0)})
                   </span>
                 ) : member.status === 'OUT' ? (
-                  <span className="text-gray-300">—</span>
+                  <span className="text-[var(--lark-text-muted)]">—</span>
                 ) : (
                   ticketInfo.icon
                 )}
@@ -178,7 +178,7 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite, o
                 <button
                   onClick={() => handleRemoveMember(member.userId)}
                   disabled={removingUserId === member.userId}
-                  className="w-6 text-center text-gray-300 hover:text-red-500 transition-colors disabled:opacity-50"
+                  className="w-6 text-center text-[var(--lark-text-muted)] hover:text-[var(--lark-text-primary)] transition-colors disabled:opacity-50"
                   title={`Remove ${displayName} from plan`}
                 >
                   {removingUserId === member.userId ? '...' : '×'}
@@ -196,7 +196,7 @@ export function SquadMemberList({ squad, currentUserId, isOrganizer, onInvite, o
           size="sm"
           onClick={onInvite}
           fullWidth
-          className="mt-2 text-[var(--brand-primary)] border-green-200 hover:bg-[var(--brand-primary-light)]"
+          className="mt-2 text-[var(--accent)] border-[var(--border-subtle)] hover:bg-[var(--bg-surface)]"
         >
           + Invite more friends
         </Button>

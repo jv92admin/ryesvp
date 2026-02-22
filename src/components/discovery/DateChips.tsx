@@ -121,19 +121,17 @@ export function DateChips() {
           key={chip.id}
           active={currentWhen === chip.id}
           onClick={() => handleChipClick(chip.id)}
-          color="primary"
           size="sm"
         >
           {chip.label}
         </ToggleChip>
       ))}
-      
+
       {/* Date Picker Dropdown */}
       <div className="relative" ref={dropdownRef}>
         <ToggleChip
           active={isCustomActive}
           onClick={() => setShowDatePicker(!showDatePicker)}
-          color="primary"
           size="sm"
         >
           <span className="flex items-center gap-1">
@@ -150,12 +148,12 @@ export function DateChips() {
         </ToggleChip>
         
         {showDatePicker && (
-          <div className="fixed sm:absolute top-32 sm:top-full left-4 right-4 sm:left-0 sm:right-auto mt-2 p-3 bg-white border border-gray-200 rounded-lg shadow-lg z-50 sm:min-w-[280px]">
+          <div className="fixed sm:absolute top-32 sm:top-full left-4 right-4 sm:left-0 sm:right-auto mt-2 p-3 bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-lg z-50 sm:min-w-[280px]">
             <div className="space-y-3">
               {/* Combined date range display */}
               <div className="flex items-center gap-2">
                 <div className="flex-1">
-                  <label className="block text-xs text-gray-500 mb-1">From</label>
+                  <label className="block text-xs text-[var(--lark-text-secondary)] mb-1">From</label>
                   <input
                     type="date"
                     value={localStart}
@@ -164,14 +162,14 @@ export function DateChips() {
                       setLocalStart(e.target.value);
                       handleDateChange(e.target.value, localEnd);
                     }}
-                    className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md 
-                             text-gray-900 placeholder:text-gray-400
-                             focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent"
+                    className="w-full px-2 py-1.5 text-sm border border-[var(--border-subtle)] rounded-md
+                             text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)]
+                             focus:outline-none focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
                   />
                 </div>
-                <span className="text-gray-400 mt-5">→</span>
+                <span className="text-[var(--lark-text-muted)] mt-5">→</span>
                 <div className="flex-1">
-                  <label className="block text-xs text-gray-500 mb-1">To</label>
+                  <label className="block text-xs text-[var(--lark-text-secondary)] mb-1">To</label>
                   <input
                     type="date"
                     value={localEnd}
@@ -180,20 +178,20 @@ export function DateChips() {
                       setLocalEnd(e.target.value);
                       handleDateChange(localStart, e.target.value);
                     }}
-                    className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded-md
-                             text-gray-900 placeholder:text-gray-400
-                             focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)] focus:border-transparent"
+                    className="w-full px-2 py-1.5 text-sm border border-[var(--border-subtle)] rounded-md
+                             text-[var(--lark-text-primary)] placeholder:text-[var(--lark-text-muted)]
+                             focus:outline-none focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
                   />
                 </div>
               </div>
               
               {/* Footer */}
-              <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+              <div className="flex items-center justify-between pt-2 border-t border-[var(--border-subtle)]">
                 {hasCustomDates ? (
                   <button
                     type="button"
                     onClick={clearDates}
-                    className="text-xs text-gray-500 hover:text-gray-700"
+                    className="text-xs text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)]"
                   >
                     Clear
                   </button>
@@ -203,7 +201,7 @@ export function DateChips() {
                 <button
                   type="button"
                   onClick={() => setShowDatePicker(false)}
-                  className="px-3 py-1 text-xs font-medium text-white bg-[var(--brand-primary)] rounded-md hover:bg-[var(--brand-primary-hover)]"
+                  className="px-3 py-1 text-xs font-medium text-white bg-[var(--accent)] rounded-md hover:bg-[var(--accent-hover)]"
                 >
                   Done
                 </button>

@@ -15,13 +15,13 @@ export default function LoginPage() {
     const params = new URLSearchParams(window.location.search);
     const next = params.get('next');
     const storedReturn = getStoredReturnUrl();
-    
+
     // Priority: query param > stored return URL > default
     setReturnUrl(next || storedReturn || '/');
 
     // Check for ?ref= param in URL and store it
     const refParam = params.get('ref');
-    
+
     if (refParam) {
       storeInviteRef(refParam);
     }
@@ -51,7 +51,7 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     const supabase = createClient();
     const callbackUrl = `${window.location.origin}/auth/callback?next=${encodeURIComponent(returnUrl)}`;
-    
+
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -61,33 +61,33 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <main className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center px-[var(--screen-padding)]">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <Link href="/" className="text-2xl font-bold text-gray-900">
+          <Link href="/" className="text-2xl font-bold text-[var(--lark-text-primary)]">
             Lark
           </Link>
-          <p className="text-gray-600 mt-2">
+          <p className="text-[var(--lark-text-secondary)] mt-2">
             Discover Austin events and go with friends
           </p>
         </div>
 
         {/* Invite Banner */}
         {!loadingInvite && inviterName && (
-          <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg p-4 mb-4 text-center shadow-lg">
+          <div className="bg-[var(--bg-surface)] text-[var(--lark-text-primary)] rounded-lg p-4 mb-4 text-center border border-[var(--border-subtle)]">
             <p className="text-lg font-semibold">
-              🎉 {inviterName} invited you!
+              {inviterName} invited you!
             </p>
-            <p className="text-sm text-white/80 mt-1">
+            <p className="text-sm text-[var(--lark-text-secondary)] mt-1">
               Sign up to connect and discover events together
             </p>
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-6">
           <button
             onClick={handleGoogleLogin}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-[var(--border-visible)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -95,11 +95,11 @@ export default function LoginPage() {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
             </svg>
-            <span className="font-medium text-gray-700">Continue with Google</span>
+            <span className="font-medium text-[var(--lark-text-primary)]">Continue with Google</span>
           </button>
 
-          <p className="text-xs text-gray-500 text-center mt-4">
-            {inviterName 
+          <p className="text-xs text-[var(--lark-text-secondary)] text-center mt-4">
+            {inviterName
               ? `Sign up to connect with ${inviterName}`
               : 'Can\'t find your invite code? Ask a friend on Lark to add you from their Friends page.'
             }
@@ -107,9 +107,9 @@ export default function LoginPage() {
         </div>
 
         <div className="text-center mt-4">
-          <Link 
-            href="/" 
-            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[var(--lark-text-primary)] bg-[var(--bg-elevated)] border border-[var(--border-visible)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -121,4 +121,3 @@ export default function LoginPage() {
     </main>
   );
 }
-

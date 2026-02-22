@@ -38,11 +38,11 @@ export function SetNameBanner() {
   if (!show || dismissed) return null;
 
   return (
-    <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 mb-4 flex items-center justify-between gap-3">
-      <p className="text-sm text-gray-700">
+    <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-[var(--card-radius)] px-4 py-3 mb-4 flex items-center justify-between gap-3">
+      <p className="text-sm text-[var(--lark-text-primary)]">
         <Link 
           href="/profile" 
-          className="font-medium text-[var(--brand-primary)] hover:underline"
+          className="font-medium text-[var(--accent)] hover:underline"
         >
           Add your name
         </Link>
@@ -50,7 +50,7 @@ export function SetNameBanner() {
       </p>
       <button
         onClick={handleDismiss}
-        className="flex-shrink-0 text-gray-400 hover:text-gray-600 p-1"
+        className="flex-shrink-0 text-[var(--lark-text-muted)] hover:text-[var(--lark-text-secondary)] p-1"
         aria-label="Dismiss"
       >
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

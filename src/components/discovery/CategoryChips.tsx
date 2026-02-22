@@ -61,7 +61,6 @@ export function CategoryChips() {
           key={chip.id}
           active={selectedCategories.includes(chip.id)}
           onClick={() => handleChipClick(chip.id)}
-          color="primary"
           size="sm"
         >
           {chip.label}

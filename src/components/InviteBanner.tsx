@@ -49,22 +49,22 @@ export function InviteBanner({ isLoggedIn }: InviteBannerProps) {
   if (loading || !inviterName) return null;
 
   return (
-    <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg p-4 mb-6 shadow-lg">
+    <div className="bg-[var(--bg-elevated)] text-[var(--lark-text-primary)] rounded-lg p-4 mb-6 border border-[var(--border-subtle)]">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">👋</span>
+          <span className="text-lg font-bold text-[var(--lark-text-muted)]" style={{ fontFamily: 'var(--font-display)' }}>L</span>
           <div>
             <p className="font-semibold">
               {inviterName} invited you to Lark!
             </p>
-            <p className="text-sm text-white/80">
+            <p className="text-sm text-[var(--lark-text-secondary)]">
               Sign up to connect and track events together
             </p>
           </div>
         </div>
         <Link
           href={`/login?next=${encodeURIComponent(window.location.pathname)}`}
-          className="px-4 py-2 bg-white text-purple-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap"
+          className="px-4 py-2 bg-[var(--accent)] text-[var(--text-inverse)] font-semibold rounded-lg hover:bg-[var(--accent-hover)] transition-colors whitespace-nowrap"
         >
           Sign Up
         </Link>

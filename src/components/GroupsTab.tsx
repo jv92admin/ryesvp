@@ -61,7 +61,7 @@ export function GroupsTab() {
   const handleShareLink = async (group: GroupLink) => {
     const baseUrl = window.location.origin;
     const inviteUrl = `${baseUrl}/g/${group.inviteCode}`;
-    
+
     const shareText = `Join ${group.name} on Lark! Everyone who joins becomes friends with each other so future plans are easier.
 
 ${inviteUrl}`;
@@ -93,7 +93,7 @@ ${inviteUrl}`;
     if (!confirm('Delete this group? Friends you made will stay friends, but the group link will stop working.')) {
       return;
     }
-    
+
     setDeletingId(groupId);
     try {
       const res = await fetch(`/api/groups/${groupId}`, { method: 'DELETE' });
@@ -117,10 +117,10 @@ ${inviteUrl}`;
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-6">
         <div className="animate-pulse">
-          <div className="h-5 bg-gray-200 rounded w-1/3 mb-4"></div>
-          <div className="h-16 bg-gray-100 rounded"></div>
+          <div className="h-5 bg-[var(--bg-surface)] rounded w-1/3 mb-4"></div>
+          <div className="h-16 bg-[var(--bg-surface)] rounded"></div>
         </div>
       </div>
     );
@@ -129,19 +129,19 @@ ${inviteUrl}`;
   if (!hasGroups) {
     return (
       <>
-        <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-            <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="text-center py-12 bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)]">
+          <div className="w-16 h-16 mx-auto mb-4 bg-[var(--bg-surface)] rounded-full flex items-center justify-center">
+            <svg className="w-8 h-8 text-[var(--lark-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
           </div>
-          <h3 className="font-semibold text-gray-900 mb-1">No friend groups yet</h3>
-          <p className="text-gray-500 text-sm mb-4 max-w-xs mx-auto">
-            Create a group link to add multiple friends at once. Everyone who joins becomes friends with each other — perfect for your crew.
+          <h3 className="font-semibold text-[var(--lark-text-primary)] mb-1">Better together.</h3>
+          <p className="text-[var(--lark-text-secondary)] text-sm mb-4 max-w-xs mx-auto">
+            Create a group link to add your whole crew at once.
           </p>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[var(--brand-primary)] rounded-lg hover:bg-[var(--brand-primary-hover)] transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[var(--accent)] rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -166,7 +166,7 @@ ${inviteUrl}`;
         {/* Create New Button */}
         <button
           onClick={() => setShowCreateModal(true)}
-          className="w-full px-4 py-3 text-sm font-medium text-[var(--text-secondary)] bg-[var(--surface-inset)] border-2 border-dashed border-[var(--border-default)] rounded-lg hover:bg-[var(--border-default)] transition-colors flex items-center justify-center gap-2"
+          className="w-full px-4 py-3 text-sm font-medium text-[var(--lark-text-secondary)] bg-[var(--bg-surface)] border-2 border-dashed border-[var(--border-subtle)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors flex items-center justify-center gap-2"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -239,23 +239,23 @@ function GroupCard({
     ...group.members.map((m) => m.user).filter((u) => u.id !== group.owner.id),
   ];
   const memberCount = allMembers.length;
-  
+
   const isCopied = copiedId === group.id;
   const isDeleting = deletingId === group.id;
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4">
+    <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-lg p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <h4 className="font-medium text-gray-900 truncate">{group.name}</h4>
+            <h4 className="font-medium text-[var(--lark-text-primary)] truncate">{group.name}</h4>
             {isOwner && (
-              <span className="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded">
+              <span className="text-xs text-[var(--lark-text-secondary)] bg-[var(--bg-surface)] px-1.5 py-0.5 rounded">
                 Created by you
               </span>
             )}
           </div>
-          
+
           {/* Member avatars - clickable to expand */}
           <button
             onClick={onToggleExpand}
@@ -268,7 +268,7 @@ function GroupCard({
                 return (
                   <div
                     key={member.id}
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-medium border-2 border-white"
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-medium border-2 border-[var(--bg-elevated)]"
                     style={avatarStyle}
                     title={getDisplayName(member.displayName, member.email)}
                   >
@@ -277,17 +277,17 @@ function GroupCard({
                 );
               })}
               {memberCount > 5 && (
-                <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 text-[10px] font-medium border-2 border-white">
+                <div className="w-7 h-7 rounded-full bg-[var(--bg-surface)] flex items-center justify-center text-[var(--lark-text-secondary)] text-[10px] font-medium border-2 border-[var(--bg-elevated)]">
                   +{memberCount - 5}
                 </div>
               )}
             </div>
-            <span className="text-sm text-gray-500 flex items-center gap-1">
+            <span className="text-sm text-[var(--lark-text-secondary)] flex items-center gap-1">
               {memberCount} member{memberCount !== 1 ? 's' : ''}
-              <svg 
-                className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} 
-                fill="none" 
-                viewBox="0 0 24 24" 
+              <svg
+                className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                fill="none"
+                viewBox="0 0 24 24"
                 stroke="currentColor"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -301,9 +301,9 @@ function GroupCard({
           <button
             onClick={onShare}
             className={`p-2 rounded-lg transition-colors ${
-              isCopied 
-                ? 'text-green-600 bg-green-50' 
-                : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+              isCopied
+                ? 'text-[var(--lark-text-primary)] bg-[var(--bg-surface)]'
+                : 'text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)] hover:bg-[var(--bg-hover)]'
             }`}
             title={isCopied ? 'Copied!' : 'Share invite link'}
           >
@@ -317,12 +317,12 @@ function GroupCard({
               </svg>
             )}
           </button>
-          
+
           {isOwner && (
             <button
               onClick={onDelete}
               disabled={isDeleting}
-              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+              className="p-2 text-[var(--lark-text-muted)] hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50"
               title="Delete group"
             >
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -335,19 +335,19 @@ function GroupCard({
 
       {/* Expanded member list */}
       {isExpanded && (
-        <div className="mt-4 pt-4 border-t border-gray-100">
+        <div className="mt-4 pt-4 border-t border-[var(--border-subtle)]">
           <div className="space-y-2">
             {allMembers.map((member) => {
               const avatarStyle = getAvatarStyle(member.id);
               const initials = getInitials(member.displayName, member.email);
               const displayName = getDisplayName(member.displayName, member.email);
               const isGroupOwner = member.id === group.owner.id;
-              
+
               return (
                 <Link
                   key={member.id}
                   href={`/users/${member.id}`}
-                  className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-[var(--bg-hover)] transition-colors"
                 >
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-medium"
@@ -355,15 +355,15 @@ function GroupCard({
                   >
                     {initials}
                   </div>
-                  <span className="flex-1 text-sm font-medium text-gray-900">
+                  <span className="flex-1 text-sm font-medium text-[var(--lark-text-primary)]">
                     {displayName}
                   </span>
                   {isGroupOwner && (
-                    <span className="text-xs text-gray-400">
+                    <span className="text-xs text-[var(--lark-text-muted)]">
                       Creator
                     </span>
                   )}
-                  <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 text-[var(--lark-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </Link>
@@ -375,4 +375,3 @@ function GroupCard({
     </div>
   );
 }
-

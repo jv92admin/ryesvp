@@ -101,17 +101,17 @@ export function OnboardingTips() {
     <div className="space-y-2 mb-4">
       {/* Tip 1: Mark events as Interested/Going */}
       {showTip1 && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 flex items-center justify-between gap-3">
-          <p className="text-sm text-gray-700">
+        <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-[var(--card-radius)] px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-[var(--lark-text-primary)]">
             Mark events as{' '}
-            <span className="font-medium text-[var(--brand-primary)]">Going</span>
+            <span className="font-medium text-[var(--accent)]">Going</span>
             {' '}or{' '}
-            <span className="font-medium text-amber-600">Interested</span>
+            <span className="font-medium text-[var(--lark-text-secondary)]">Interested</span>
             {' '}to start building your plans.
           </p>
           <button
             onClick={handleDismissTip1}
-            className="flex-shrink-0 text-gray-400 hover:text-gray-600 p-1"
+            className="flex-shrink-0 text-[var(--lark-text-muted)] hover:text-[var(--lark-text-secondary)] p-1"
             aria-label="Dismiss tip"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -123,11 +123,11 @@ export function OnboardingTips() {
 
       {/* Tip 2: Add friends */}
       {showTip2 && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 flex items-center justify-between gap-3">
-          <p className="text-sm text-gray-700">
+        <div className="bg-[var(--bg-elevated)] border border-[var(--border-subtle)] rounded-[var(--card-radius)] px-4 py-3 flex items-center justify-between gap-3">
+          <p className="text-sm text-[var(--lark-text-primary)]">
             <button
               onClick={handleAddFriendsClick}
-              className="font-medium text-[var(--brand-primary)] hover:text-[var(--brand-primary-hover)] hover:underline"
+              className="font-medium text-[var(--accent)] hover:text-[var(--accent)] hover:underline"
             >
               {copied ? 'Link copied!' : 'Add friends'}
             </button>
@@ -135,7 +135,7 @@ export function OnboardingTips() {
           </p>
           <button
             onClick={handleDismissTip2}
-            className="flex-shrink-0 text-gray-400 hover:text-gray-600 p-1"
+            className="flex-shrink-0 text-[var(--lark-text-muted)] hover:text-[var(--lark-text-secondary)] p-1"
             aria-label="Dismiss tip"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

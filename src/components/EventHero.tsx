@@ -87,7 +87,7 @@ export function EventHero({
 
   // Attendance toggle styles
   const pill = 'px-3 py-1.5 rounded-full text-xs font-medium border transition-colors disabled:opacity-50';
-  const pillOff = 'border-[var(--border-default)] text-[var(--text-secondary)] bg-white hover:bg-[var(--surface-inset)]';
+  const pillOff = 'border-[var(--border-subtle)] text-[var(--lark-text-secondary)] bg-[var(--bg-elevated)] hover:bg-[var(--bg-hover)]';
 
   return (
     <>
@@ -102,8 +102,8 @@ export function EventHero({
             />
           </div>
         ) : (
-          <div className="aspect-[16/9] max-h-48 bg-gradient-to-br from-[var(--surface-inset)] to-[var(--border-default)] flex items-center justify-center">
-            <span className="text-lg font-medium text-[var(--text-muted)] uppercase tracking-wider">
+          <div className="aspect-[16/9] max-h-48 bg-gradient-to-br from-[var(--bg-surface)] to-[var(--border-subtle)] flex items-center justify-center">
+            <span className="text-lg font-medium text-[var(--lark-text-muted)] uppercase tracking-wider">
               {event.category}
             </span>
           </div>
@@ -140,7 +140,7 @@ export function EventHero({
           <div className="absolute bottom-3 left-4 right-4">
             <div className="flex items-center gap-2 mb-1.5">
               {isNew && (
-                <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-white text-[var(--text-primary)] rounded">
+                <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-[var(--bg-elevated)] text-[var(--lark-text-primary)] rounded">
                   NEW
                 </span>
               )}
@@ -153,7 +153,7 @@ export function EventHero({
                 </span>
               )}
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-white leading-snug line-clamp-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-white leading-snug line-clamp-2" style={{ fontFamily: 'var(--font-display)' }}>
               {event.displayTitle}
             </h1>
             {event.performer && (
@@ -170,11 +170,11 @@ export function EventHero({
         <div className="mb-3">
           <div className="flex items-center gap-2 mb-2">
             {isNew && (
-              <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-[var(--action-primary)] text-[var(--action-primary-text)] rounded">
+              <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-[var(--accent)] text-[var(--text-inverse)] rounded">
                 NEW
               </span>
             )}
-            <span className={`text-[10px] font-semibold uppercase tracking-wide ${categoryColors[event.category as EventCategory] || 'text-[var(--text-secondary)]'}`}>
+            <span className={`text-[10px] font-semibold uppercase tracking-wide ${categoryColors[event.category as EventCategory] || 'text-[var(--lark-text-secondary)]'}`}>
               {event.category}
             </span>
             {event.status !== 'SCHEDULED' && statusConfig && (
@@ -183,11 +183,11 @@ export function EventHero({
               </span>
             )}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] leading-snug">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--lark-text-primary)] leading-snug">
             {event.displayTitle}
           </h1>
           {event.performer && (
-            <div className="text-sm text-[var(--text-secondary)] mt-1">
+            <div className="text-sm text-[var(--lark-text-secondary)] mt-1">
               by <PerformerLink performerId={event.performer.id} performerName={event.performer.name} />
             </div>
           )}
@@ -196,20 +196,20 @@ export function EventHero({
 
       {/* Performer link (when image exists — the overlay only shows plain text) */}
       {event.imageUrl && event.performer && (
-        <div className="text-sm text-[var(--text-secondary)] mb-1">
+        <div className="text-sm text-[var(--lark-text-secondary)] mb-1">
           by <PerformerLink performerId={event.performer.id} performerName={event.performer.name} />
         </div>
       )}
 
       {/* Supporting acts */}
       {supportingActs && supportingActs.length > 0 && (
-        <p className="text-sm text-[var(--text-muted)] mb-2">
+        <p className="text-sm text-[var(--lark-text-muted)] mb-2">
           With: {supportingActs.join(', ')}
         </p>
       )}
 
       {/* Date + Time */}
-      <div className="text-sm text-[var(--text-secondary)] mb-1.5">
+      <div className="text-sm text-[var(--lark-text-secondary)] mb-1.5">
         <span className="font-medium">
           {formatInTimeZone(new Date(event.startDateTime), AUSTIN_TIMEZONE, 'EEE, MMM d')}
           {' \u00B7 '}
@@ -219,14 +219,14 @@ export function EventHero({
       </div>
 
       {/* Venue */}
-      <div className="flex items-center gap-2 text-sm text-[var(--text-secondary)] mb-4">
-        <svg className="w-4 h-4 text-[var(--text-muted)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <div className="flex items-center gap-2 text-sm text-[var(--lark-text-secondary)] mb-4">
+        <svg className="w-4 h-4 text-[var(--lark-text-muted)] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
           <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
         </svg>
         <span className="font-medium">{event.venue.name}</span>
         {event.venue.city && event.venue.state && (
-          <span className="text-[var(--text-muted)]">, {event.venue.city}, {event.venue.state}</span>
+          <span className="text-[var(--lark-text-muted)]">, {event.venue.city}, {event.venue.state}</span>
         )}
       </div>
 
@@ -237,7 +237,7 @@ export function EventHero({
             onClick={() => handleAttendance('INTERESTED')}
             disabled={isLoading}
             className={`${pill} ${status === 'INTERESTED'
-              ? 'bg-[var(--signal-interested-light)] text-[var(--signal-interested)] border-[var(--signal-interested)]'
+              ? 'bg-[var(--bg-surface)] text-[var(--lark-text-secondary)] border-[var(--border-visible)]'
               : pillOff
             }`}
           >
@@ -247,7 +247,7 @@ export function EventHero({
             onClick={() => handleAttendance('GOING')}
             disabled={isLoading}
             className={`${pill} ${status === 'GOING'
-              ? 'bg-[var(--signal-going-light)] text-[var(--signal-going)] border-[var(--signal-going)]'
+              ? 'bg-[var(--bg-surface)] text-[var(--lark-text-primary)] border-[var(--border-visible)]'
               : pillOff
             }`}
           >

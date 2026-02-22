@@ -252,14 +252,14 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
       {loading && (
         <DialogBody>
           <div className="py-12 text-center">
-            <div className="animate-pulse text-[var(--text-muted)]">Loading...</div>
+            <div className="animate-pulse text-[var(--lark-text-muted)]">Loading...</div>
           </div>
         </DialogBody>
       )}
 
       {error && (
         <DialogBody>
-          <div className="p-4 bg-[var(--signal-danger)]/10 border border-[var(--signal-danger)]/20 rounded-lg text-[var(--signal-danger)] text-sm">
+          <div className="p-4 bg-[var(--status-need-ticket)]/10 border border-[var(--status-need-ticket)]/20 rounded-lg text-[var(--status-need-ticket)] text-sm">
             {error}
           </div>
         </DialogBody>
@@ -268,14 +268,14 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
       {squad && currentUserId && (
         <DialogBody>
           {/* Mode Toggle - Apple-style full-width */}
-          <div className="mb-4 bg-[var(--surface-inset)] rounded-full p-0.5">
+          <div className="mb-4 bg-[var(--bg-surface)] rounded-full p-0.5">
             <div className="relative flex">
               <button
                 onClick={() => setMode('plan')}
                 className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full transition-all relative z-10 ${
                   mode === 'plan'
-                    ? 'text-[var(--text-primary)]'
-                    : 'text-[var(--text-muted)]'
+                    ? 'text-[var(--lark-text-primary)]'
+                    : 'text-[var(--lark-text-muted)]'
                 }`}
               >
                 Plan
@@ -284,15 +284,15 @@ export function SquadPageModal({ squadId, isOpen, onClose }: SquadPageModalProps
                 onClick={() => setMode('dayof')}
                 className={`flex-1 px-4 py-1.5 text-sm font-medium rounded-full transition-all relative z-10 ${
                   mode === 'dayof'
-                    ? 'text-[var(--text-primary)]'
-                    : 'text-[var(--text-muted)]'
+                    ? 'text-[var(--lark-text-primary)]'
+                    : 'text-[var(--lark-text-muted)]'
                 }`}
               >
                 Day-of
               </button>
               {/* Sliding background */}
               <div
-                className={`absolute top-0.5 bottom-0.5 w-1/2 bg-[var(--surface-card)] rounded-full shadow-sm transition-transform duration-200 ${
+                className={`absolute top-0.5 bottom-0.5 w-1/2 bg-[var(--bg-elevated)] rounded-full transition-transform duration-200 ${
                   mode === 'dayof' ? 'translate-x-full' : 'translate-x-0'
                 }`}
                 style={{ left: '2px', right: '2px', width: 'calc(50% - 2px)' }}

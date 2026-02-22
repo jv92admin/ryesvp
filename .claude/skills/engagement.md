@@ -192,8 +192,8 @@ The codebase uses "Squad" internally (database, API routes, types). Users NEVER 
 
 Your domain knowledge lives in two places. When you make changes, update both:
 
-### Skill: `.claude/commands/ux-comms.md`
-This is the quick-reference that any agent or session loads via `/ux-comms`. It's currently a stub — flesh it out as you work. Update it when you:
+### Skill: `.claude/skills/ux-comms.md`
+This is the quick-reference that any agent or session loads via `/ux-comms`. Update it when you:
 - **Add a new notification type or change copy** → document the type, template, and trigger point
 - **Add or change toast messages** → document the scenario and message
 - **Add or change share text templates** → document the template family and variants

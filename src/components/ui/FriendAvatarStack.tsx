@@ -19,12 +19,8 @@ interface FriendAvatarStackProps {
 }
 
 /**
- * Compact avatar stack for showing friends going/interested
- * - 1-3 friends: Shows individual avatars
- * - 4+ friends: Shows maxVisible avatars + "+N" overflow
- * - Click opens modal (via onClick prop) or links to profiles
- * 
- * Used in: EventCard, SocialProofCard
+ * Lark avatar stack — flat monochrome initials on `--bg-surface`.
+ * `border-[var(--bg-elevated)]` for ring separation. No shadows.
  */
 export function FriendAvatarStack({
   friends,
@@ -50,11 +46,11 @@ export function FriendAvatarStack({
   const renderAvatar = (friend: FriendForStack, index: number) => {
     const avatarStyle = getAvatarStyle(friend.id);
     const initials = getInitials(friend.displayName, friend.email);
-    
+
     const avatar = (
       <div
         key={friend.id}
-        className={`${avatarSize} rounded-full flex items-center justify-center text-white font-medium border-2 border-white shadow-sm`}
+        className={`${avatarSize} rounded-full flex items-center justify-center font-medium border-2 border-[var(--bg-elevated)]`}
         style={{ ...avatarStyle, marginLeft: index > 0 ? '-0.375rem' : 0 }}
         title={friend.displayName || friend.email || 'Friend'}
       >
@@ -89,7 +85,7 @@ export function FriendAvatarStack({
         {visibleFriends.map((friend, index) => renderAvatar(friend, index))}
         {overflowCount > 0 && (
           <div
-            className={`${overflowSize} rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-medium border-2 border-white shadow-sm`}
+            className={`${overflowSize} rounded-full bg-[var(--bg-surface)] flex items-center justify-center text-[var(--lark-text-secondary)] font-medium border-2 border-[var(--bg-elevated)]`}
             style={{ marginLeft: '-0.375rem' }}
           >
             +{overflowCount}
@@ -113,4 +109,3 @@ export function FriendAvatarStack({
 
   return content;
 }
-

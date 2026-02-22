@@ -14,7 +14,7 @@ export interface Person {
 
 export interface PeopleGroup {
   label: string;
-  /** CSS custom property value, e.g. 'var(--signal-going)' */
+  /** CSS custom property value, e.g. 'var(--accent)' */
   color?: string;
   /** Override displayed count (defaults to people.length) */
   count?: number;
@@ -26,7 +26,6 @@ interface PeopleListProps {
   avatarSize?: 'sm' | 'md';
   linkToProfile?: boolean;
   showEmail?: boolean;
-  /** Render a custom action element for each person (button, badge, etc.) */
   renderAction?: (person: Person) => ReactNode;
   emptyMessage?: string;
   emptyDetail?: string;
@@ -48,7 +47,7 @@ export function PeopleList({
 
   if (totalPeople === 0) {
     return (
-      <div className="text-center py-8 text-[var(--text-muted)]">
+      <div className="text-center py-8 text-[var(--lark-text-muted)]">
         <p>{emptyMessage}</p>
         {emptyDetail && <p className="text-sm mt-1">{emptyDetail}</p>}
       </div>
@@ -73,7 +72,7 @@ export function PeopleList({
             {showHeaders && (
               <h4
                 className="text-sm font-semibold mb-2 flex items-center gap-2"
-                style={group.color ? { color: group.color } : undefined}
+                style={group.color ? { color: group.color } : { color: 'var(--lark-text-secondary)' }}
               >
                 {group.color && (
                   <span
@@ -121,7 +120,7 @@ function PersonRow({
 }) {
   const avatar = (
     <div
-      className={clsx(avatarCls, 'rounded-full flex items-center justify-center text-white font-medium flex-shrink-0')}
+      className={clsx(avatarCls, 'rounded-full flex items-center justify-center font-medium flex-shrink-0')}
       style={getAvatarStyle(person.id)}
       title={getDisplayName(person.displayName, person.email)}
     >
@@ -131,11 +130,11 @@ function PersonRow({
 
   const nameBlock = (
     <div className="flex-1 min-w-0">
-      <span className="text-sm text-[var(--text-primary)]">
+      <span className="text-sm text-[var(--lark-text-primary)]">
         {getDisplayName(person.displayName, person.email)}
       </span>
       {showEmail && (
-        <p className="text-xs text-[var(--text-muted)] truncate">{person.email}</p>
+        <p className="text-xs text-[var(--lark-text-muted)] truncate">{person.email}</p>
       )}
     </div>
   );
@@ -143,7 +142,7 @@ function PersonRow({
   const content = linkToProfile ? (
     <Link
       href={`/users/${person.id}`}
-      className="flex items-center gap-3 py-1 hover:bg-[var(--surface-inset)] rounded-lg -ml-2 px-2 transition-colors flex-1 min-w-0"
+      className="flex items-center gap-3 py-1 hover:bg-[var(--bg-hover)] rounded-lg -ml-2 px-2 transition-colors flex-1 min-w-0"
     >
       {avatar}
       {nameBlock}

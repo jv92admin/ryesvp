@@ -80,9 +80,9 @@ export function SocialProofCard({
             className="flex items-center gap-2 hover:opacity-80 transition-opacity mb-4"
           >
             <FriendAvatarStack friends={friendsForAvatars} maxVisible={3} size="sm" />
-            <span className="text-sm text-[var(--text-primary)]">
+            <span className="text-sm text-[var(--lark-text-primary)]">
               {friendsGoing > 0 && <><strong>{friendsGoing}</strong> going</>}
-              {friendsGoing > 0 && friendsInterested > 0 && <span className="text-[var(--text-muted)]"> &middot; </span>}
+              {friendsGoing > 0 && friendsInterested > 0 && <span className="text-[var(--lark-text-muted)]"> &middot; </span>}
               {friendsInterested > 0 && <><strong>{friendsInterested}</strong> interested</>}
             </span>
           </button>
@@ -93,12 +93,12 @@ export function SocialProofCard({
           <div>
             <button
               onClick={() => setShowCreation(true)}
-              className="w-full px-4 py-3 text-sm font-medium rounded-lg bg-[var(--action-engage)] text-[var(--action-engage-text)] hover:bg-[var(--action-engage-hover)] transition-colors"
+              className="w-full px-4 py-3 text-sm font-medium rounded-lg bg-[var(--accent)] text-[var(--text-inverse)] hover:bg-[var(--accent-hover)] transition-colors"
             >
               Start Plan
             </button>
             {friendSubtitle && (
-              <p className="text-xs text-[var(--text-muted)] text-center mt-1.5">
+              <p className="text-xs text-[var(--lark-text-muted)] text-center mt-1.5">
                 {friendSubtitle}
               </p>
             )}

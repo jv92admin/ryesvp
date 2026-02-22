@@ -6,100 +6,37 @@ interface RyesVPLogoProps {
 }
 
 /**
- * RyesVP Square Logo
- * 
- * The "Tucked Y" design: The Y becomes a checkmark (✓), visually teaching users
- * "When you see RyesVP, you check the box. You say yes."
- * 
- * - R, V, P in brand-black (#171717)
- * - Y as checkmark in brand-primary green (#16A34A)
+ * Lark Logo — the wordmark IS the logo.
+ * Space Grotesk 700, near-white on dark.
+ * Retained as component for backward-compat with imports.
  */
 export function RyesVPLogo({ size = 48, className = '' }: RyesVPLogoProps) {
+  const fontSize = size * 0.55;
   return (
-    <svg 
-      viewBox="0 0 100 100" 
-      width={size} 
-      height={size}
-      className={className}
+    <span
+      className={`inline-flex items-center justify-center font-bold text-[var(--lark-text-primary)] ${className}`}
+      style={{
+        fontFamily: 'var(--font-display)',
+        fontSize: `${fontSize}px`,
+        lineHeight: 1,
+        width: size,
+        height: size,
+      }}
       aria-label="Lark Logo"
     >
-      {/* White background with rounded corners */}
-      <rect 
-        width="100" 
-        height="100" 
-        rx="18" 
-        fill="#FFFFFF"
-        stroke="var(--brand-border, #E5E5E5)"
-        strokeWidth="1"
-      />
-      
-      {/* R - Top left */}
-      <text 
-        x="16" 
-        y="52" 
-        fontFamily="var(--font-geist-sans), system-ui, sans-serif" 
-        fontWeight="700" 
-        fontSize="38" 
-        fill="var(--brand-black, #171717)"
-      >
-        R
-      </text>
-      
-      {/* Y as Checkmark - Top right */}
-      {/* The checkmark stroke + stem that forms a stylized Y */}
-      <path 
-        d="M52 28 L62 40 L80 16" 
-        stroke="var(--brand-primary, #16A34A)" 
-        strokeWidth="7" 
-        strokeLinecap="round" 
-        strokeLinejoin="round"
-        fill="none"
-      />
-      {/* Stem of the Y extending down */}
-      <path 
-        d="M62 40 L62 52" 
-        stroke="var(--brand-primary, #16A34A)" 
-        strokeWidth="7" 
-        strokeLinecap="round"
-        fill="none"
-      />
-      
-      {/* V - Bottom left */}
-      <text 
-        x="16" 
-        y="88" 
-        fontFamily="var(--font-geist-sans), system-ui, sans-serif" 
-        fontWeight="700" 
-        fontSize="38" 
-        fill="var(--brand-black, #171717)"
-      >
-        V
-      </text>
-      
-      {/* P - Bottom right */}
-      <text 
-        x="54" 
-        y="88" 
-        fontFamily="var(--font-geist-sans), system-ui, sans-serif" 
-        fontWeight="700" 
-        fontSize="38" 
-        fill="var(--brand-black, #171717)"
-      >
-        P
-      </text>
-    </svg>
+      L
+    </span>
   );
 }
 
 /**
- * RyesVP Wordmark - The text "RyesVP" with styled Y
- * For use alongside the logo or standalone
+ * Lark Wordmark — "Lark" in Space Grotesk 700
  */
 export function RyesVPWordmark({ className = '' }: { className?: string }) {
   return (
     <span
-      className={`font-bold tracking-tight ${className}`}
-      style={{ color: 'var(--text-primary, #171717)' }}
+      className={`font-bold tracking-tight text-[var(--lark-text-primary)] ${className}`}
+      style={{ fontFamily: 'var(--font-display)' }}
     >
       Lark
     </span>
@@ -109,10 +46,10 @@ export function RyesVPWordmark({ className = '' }: { className?: string }) {
 /**
  * Combined Logo + Wordmark for header use
  */
-export function RyesVPBrand({ 
-  logoSize = 40, 
-  className = '' 
-}: { 
+export function RyesVPBrand({
+  logoSize = 40,
+  className = '',
+}: {
   logoSize?: number;
   className?: string;
 }) {
@@ -123,4 +60,3 @@ export function RyesVPBrand({
     </div>
   );
 }
-

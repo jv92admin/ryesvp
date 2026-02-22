@@ -4,15 +4,13 @@ import { forwardRef, ButtonHTMLAttributes, ReactNode } from 'react';
 import { clsx } from 'clsx';
 
 /**
- * Button Variants:
- * - primary: Dark/black CTA — "Buy Tickets", "Create Plan", main actions
- * - secondary: White with border — "Share", "Cancel", supporting actions
+ * Lark Button Variants (monochrome):
+ * - primary: Near-white accent CTA — "Get Started", "Save", main actions
+ * - secondary: Outlined with visible border — "Share", "Cancel", supporting actions
  * - ghost: Text-only, minimal visual weight — inline actions
- * - danger: Red destructive — "Delete", "Leave"
- * - signal: Green for status confirmations — "Going", "RSVP" (green = signal, not brand)
- * - engage: Warm gold for social CTAs — "Start Plan", "Invite", "Add Friend"
+ * - danger: Red destructive — "Delete", "Leave" (the only chromatic color)
  */
-type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'signal' | 'engage';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -25,40 +23,28 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary: [
-    'bg-[var(--action-primary)] text-[var(--action-primary-text)]',
-    'hover:bg-[var(--action-primary-hover)]',
-    'focus:ring-2 focus:ring-[var(--border-strong)] focus:ring-offset-2',
-    'disabled:bg-[var(--border-default)] disabled:text-[var(--text-muted)]',
+    'bg-[var(--accent)] text-[var(--text-inverse)]',
+    'hover:bg-[var(--accent-hover)]',
+    'focus:ring-2 focus:ring-[var(--border-visible)] focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)]',
+    'disabled:bg-[var(--accent-muted)] disabled:text-[var(--lark-text-muted)]',
   ].join(' '),
   secondary: [
-    'bg-[var(--action-secondary)] text-[var(--text-primary)] border border-[var(--action-secondary-border)]',
-    'hover:bg-[var(--action-secondary-hover)] hover:border-[var(--border-strong)]',
-    'focus:ring-2 focus:ring-[var(--border-strong)] focus:ring-offset-2',
-    'disabled:bg-[var(--surface-inset)] disabled:text-[var(--text-muted)] disabled:border-[var(--border-default)]',
+    'bg-transparent text-[var(--lark-text-primary)] border border-[var(--border-visible)]',
+    'hover:bg-[var(--bg-hover)] hover:border-[var(--lark-text-muted)]',
+    'focus:ring-2 focus:ring-[var(--border-visible)] focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)]',
+    'disabled:bg-transparent disabled:text-[var(--lark-text-muted)] disabled:border-[var(--border-subtle)]',
   ].join(' '),
   ghost: [
-    'bg-transparent text-[var(--text-secondary)]',
-    'hover:text-[var(--text-primary)] hover:bg-[var(--surface-inset)]',
-    'focus:ring-2 focus:ring-[var(--border-strong)]',
-    'disabled:text-[var(--text-muted)] disabled:bg-transparent',
+    'bg-transparent text-[var(--lark-text-secondary)]',
+    'hover:text-[var(--lark-text-primary)] hover:bg-[var(--bg-hover)]',
+    'focus:ring-2 focus:ring-[var(--border-visible)]',
+    'disabled:text-[var(--lark-text-muted)] disabled:bg-transparent',
   ].join(' '),
   danger: [
-    'bg-[var(--signal-danger)] text-white',
-    'hover:bg-[var(--signal-danger-hover)]',
-    'focus:ring-2 focus:ring-[var(--signal-danger)] focus:ring-offset-2',
-    'disabled:bg-[var(--border-default)] disabled:text-[var(--text-muted)]',
-  ].join(' '),
-  signal: [
-    'bg-[var(--signal-going)] text-white',
-    'hover:bg-[var(--signal-going-hover)]',
-    'focus:ring-2 focus:ring-[var(--signal-going)] focus:ring-offset-2',
-    'disabled:bg-[var(--border-default)] disabled:text-[var(--text-muted)]',
-  ].join(' '),
-  engage: [
-    'bg-[var(--action-engage)] text-[var(--action-engage-text)]',
-    'hover:bg-[var(--action-engage-hover)]',
-    'focus:ring-2 focus:ring-[var(--action-engage)] focus:ring-offset-2',
-    'disabled:bg-[var(--border-default)] disabled:text-[var(--text-muted)]',
+    'bg-[var(--status-need-ticket)] text-white',
+    'hover:brightness-110',
+    'focus:ring-2 focus:ring-[var(--status-need-ticket)] focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)]',
+    'disabled:bg-[var(--accent-muted)] disabled:text-[var(--lark-text-muted)]',
   ].join(' '),
 };
 
@@ -70,15 +56,15 @@ const sizeStyles: Record<ButtonSize, string> = {
 };
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ 
-    variant = 'primary', 
-    size = 'md', 
-    fullWidth = false, 
-    children, 
+  ({
+    variant = 'primary',
+    size = 'md',
+    fullWidth = false,
+    children,
     loading = false,
     disabled,
     className,
-    ...props 
+    ...props
   }, ref) => {
     return (
       <button
@@ -96,23 +82,23 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {loading && (
-          <svg 
-            className="animate-spin h-4 w-4" 
-            xmlns="http://www.w3.org/2000/svg" 
-            fill="none" 
+          <svg
+            className="animate-spin h-4 w-4"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
             viewBox="0 0 24 24"
           >
-            <circle 
-              className="opacity-25" 
-              cx="12" 
-              cy="12" 
-              r="10" 
-              stroke="currentColor" 
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
               strokeWidth="4"
             />
-            <path 
-              className="opacity-75" 
-              fill="currentColor" 
+            <path
+              className="opacity-75"
+              fill="currentColor"
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
             />
           </svg>
@@ -124,4 +110,3 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 Button.displayName = 'Button';
-

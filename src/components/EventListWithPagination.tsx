@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { EventCard } from '@/components/EventCard';
+import { FeaturedEventCard } from '@/components/FeaturedEventCard';
 import { formatDateHeading, groupEventsByDateClient } from '@/lib/utils';
 import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import type { EventDisplay } from '@/db/events';
@@ -158,7 +159,7 @@ export function EventListWithPagination({
   if (isRestoring) {
     return (
       <div className="text-center py-12">
-        <div className="inline-flex items-center gap-2 text-gray-500">
+        <div className="inline-flex items-center gap-2 text-[var(--lark-text-secondary)]">
           <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
@@ -172,24 +173,37 @@ export function EventListWithPagination({
   // Empty state
   if (sortedDates.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">No events found matching your filters.</p>
+      <div className="text-center py-16">
+        <div className="w-12 h-12 mx-auto mb-4 bg-[var(--bg-surface)] rounded-full flex items-center justify-center">
+          <span className="text-lg font-bold text-[var(--lark-text-muted)]" style={{ fontFamily: 'var(--font-display)' }}>L</span>
+        </div>
+        <p className="text-[var(--lark-text-secondary)] font-medium">Nothing here yet.</p>
+        <p className="text-sm text-[var(--lark-text-muted)] mt-1">Try adjusting your filters or check back soon.</p>
       </div>
     );
   }
 
   return (
     <>
-      {/* Event list grouped by date */}
-      <div className="space-y-6">
+      {/* Event list grouped by date — 48px between sections, 12px between cards */}
+      <div className="flex flex-col" style={{ gap: 'var(--space-3xl)' }}>
         {sortedDates.map((dateKey) => (
           <section key={dateKey}>
-            <h2 className="text-xs font-medium text-[var(--text-secondary)] uppercase tracking-wider mb-3 sticky top-0 bg-[var(--surface-bg)] py-2 z-10 border-b border-[var(--border-default)]">
+            <h2 className="text-xs font-semibold text-[var(--lark-text-secondary)] uppercase tracking-wider mb-3 sticky top-0 bg-[var(--bg-primary)] py-2 z-10" style={{ fontFamily: 'var(--font-display)' }}>
               {formatDateHeading(dateKey)}
             </h2>
-            <div className="space-y-0">
-              {groupedEvents.get(dateKey)!.map((event) => (
-                <EventCard key={event.id} event={event} />
+            <div className="flex flex-col" style={{ gap: 'var(--space-md)' }}>
+              {groupedEvents.get(dateKey)!.map((event, index) => (
+                <div
+                  key={event.id}
+                  className="animate-reveal"
+                  style={index < 5 ? { animationDelay: `${index * 60}ms`, animationFillMode: 'backwards' } : undefined}
+                >
+                  {index === 0 && event.imageUrl
+                    ? <FeaturedEventCard event={event} />
+                    : <EventCard event={event} />
+                  }
+                </div>
               ))}
             </div>
           </section>
@@ -202,12 +216,12 @@ export function EventListWithPagination({
           <button
             onClick={loadMore}
             disabled={loading}
-            className="px-6 py-2.5 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-6 py-2.5 bg-[var(--bg-elevated)] text-[var(--lark-text-primary)] font-medium rounded-lg hover:bg-[var(--bg-hover)] border border-[var(--border-subtle)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {loading ? 'Loading...' : 'Load More Events'}
           </button>
         ) : (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[var(--lark-text-secondary)]">
             Showing all {events.length} events
           </p>
         )}

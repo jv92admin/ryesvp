@@ -73,7 +73,6 @@ export function DiscoveryChips() {
       {/* New Listings Chip */}
       <Chip
         variant="toggle"
-        color="primary"
         size="sm"
         active={isNewActive}
         onClick={() => handleChipClick('new')}
@@ -85,7 +84,6 @@ export function DiscoveryChips() {
       {/* Presales Chip */}
       <Chip
         variant="toggle"
-        color="primary"
         size="sm"
         active={isPresalesActive}
         onClick={() => handleChipClick('presales')}

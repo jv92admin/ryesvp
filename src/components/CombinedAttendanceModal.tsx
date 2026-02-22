@@ -57,7 +57,7 @@ export function CombinedAttendanceModal({ eventId, goingCount, interestedCount, 
     ...(goingCount > 0
       ? [{
           label: 'going',
-          color: 'var(--signal-going)',
+          color: 'var(--lark-text-primary)',
           count: goingCount,
           people: goingAttendees.map((a) => ({ id: a.userId, displayName: a.displayName, email: a.email })),
         }]
@@ -65,7 +65,7 @@ export function CombinedAttendanceModal({ eventId, goingCount, interestedCount, 
     ...(interestedCount > 0
       ? [{
           label: 'interested',
-          color: 'var(--signal-interested)',
+          color: 'var(--lark-text-secondary)',
           count: interestedCount,
           people: interestedAttendees.map((a) => ({ id: a.userId, displayName: a.displayName, email: a.email })),
         }]
@@ -82,9 +82,9 @@ export function CombinedAttendanceModal({ eventId, goingCount, interestedCount, 
 
       <DialogBody>
         {loading ? (
-          <div className="text-center py-4 text-[var(--text-muted)]">Loading...</div>
+          <div className="text-center py-4 text-[var(--lark-text-muted)]">Loading...</div>
         ) : error ? (
-          <div className="text-center py-4 text-[var(--signal-danger)]">{error}</div>
+          <div className="text-center py-4 text-[var(--status-need-ticket)]">{error}</div>
         ) : (
           <PeopleList groups={groups} linkToProfile />
         )}

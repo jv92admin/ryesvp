@@ -190,7 +190,7 @@ export function FilterDrawer({ open, onClose }: FilterDrawerProps) {
         <div className="space-y-6">
           {/* ─── When ─── */}
           <section>
-            <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-3">When</h4>
+            <h4 className="text-sm font-semibold text-[var(--lark-text-primary)] mb-3">When</h4>
             <div className="flex flex-wrap gap-2 mb-3">
               <ToggleChip active={currentWhen === 'thisWeek'} onClick={() => toggleDatePreset('thisWeek')}>
                 This Week
@@ -201,7 +201,7 @@ export function FilterDrawer({ open, onClose }: FilterDrawerProps) {
             </div>
             <div className="flex items-center gap-2">
               <div className="flex-1">
-                <label className="block text-xs text-[var(--text-muted)] mb-1">From</label>
+                <label className="block text-xs text-[var(--lark-text-muted)] mb-1">From</label>
                 <input
                   type="date"
                   value={localStart}
@@ -210,14 +210,14 @@ export function FilterDrawer({ open, onClose }: FilterDrawerProps) {
                     setLocalStart(e.target.value);
                     handleDateChange(e.target.value, localEnd);
                   }}
-                  className="w-full px-2 py-1.5 text-sm border border-[var(--border-default)] rounded-md
-                           text-[var(--text-primary)] bg-[var(--surface-card)]
-                           focus:outline-none focus:ring-2 focus:ring-[var(--border-strong)] focus:border-transparent"
+                  className="w-full px-2 py-1.5 text-sm border border-[var(--border-subtle)] rounded-md
+                           text-[var(--lark-text-primary)] bg-[var(--bg-elevated)]
+                           focus:outline-none focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
                 />
               </div>
-              <span className="text-[var(--text-muted)] mt-5">&rarr;</span>
+              <span className="text-[var(--lark-text-muted)] mt-5">&rarr;</span>
               <div className="flex-1">
-                <label className="block text-xs text-[var(--text-muted)] mb-1">To</label>
+                <label className="block text-xs text-[var(--lark-text-muted)] mb-1">To</label>
                 <input
                   type="date"
                   value={localEnd}
@@ -226,9 +226,9 @@ export function FilterDrawer({ open, onClose }: FilterDrawerProps) {
                     setLocalEnd(e.target.value);
                     handleDateChange(localStart, e.target.value);
                   }}
-                  className="w-full px-2 py-1.5 text-sm border border-[var(--border-default)] rounded-md
-                           text-[var(--text-primary)] bg-[var(--surface-card)]
-                           focus:outline-none focus:ring-2 focus:ring-[var(--border-strong)] focus:border-transparent"
+                  className="w-full px-2 py-1.5 text-sm border border-[var(--border-subtle)] rounded-md
+                           text-[var(--lark-text-primary)] bg-[var(--bg-elevated)]
+                           focus:outline-none focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
                 />
               </div>
             </div>
@@ -236,7 +236,7 @@ export function FilterDrawer({ open, onClose }: FilterDrawerProps) {
 
           {/* ─── Category ─── */}
           <section>
-            <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-3">Category</h4>
+            <h4 className="text-sm font-semibold text-[var(--lark-text-primary)] mb-3">Category</h4>
             <div className="flex flex-wrap gap-2">
               {categoryOptions.map((cat) => (
                 <ToggleChip
@@ -252,7 +252,7 @@ export function FilterDrawer({ open, onClose }: FilterDrawerProps) {
 
           {/* ─── Discovery ─── */}
           <section>
-            <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-3">Discovery</h4>
+            <h4 className="text-sm font-semibold text-[var(--lark-text-primary)] mb-3">Discovery</h4>
             <div className="flex flex-wrap gap-2">
               <ToggleChip
                 active={isNewActive}
@@ -273,21 +273,21 @@ export function FilterDrawer({ open, onClose }: FilterDrawerProps) {
 
           {/* ─── Venues ─── */}
           <section>
-            <h4 className="text-sm font-semibold text-[var(--text-primary)] mb-3">Venues</h4>
+            <h4 className="text-sm font-semibold text-[var(--lark-text-primary)] mb-3">Venues</h4>
             <input
               type="text"
               placeholder="Search venues..."
               value={venueSearch}
               onChange={(e) => setVenueSearch(e.target.value)}
-              className="w-full px-3 py-1.5 text-sm border border-[var(--border-default)] rounded-md mb-2
-                       text-[var(--text-primary)] bg-[var(--surface-card)] placeholder:text-[var(--text-muted)]
-                       focus:outline-none focus:ring-2 focus:ring-[var(--border-strong)] focus:border-transparent"
+              className="w-full px-3 py-1.5 text-sm border border-[var(--border-subtle)] rounded-md mb-2
+                       text-[var(--lark-text-primary)] bg-[var(--bg-elevated)] placeholder:text-[var(--lark-text-muted)]
+                       focus:outline-none focus:ring-2 focus:ring-[var(--border-visible)] focus:border-transparent"
             />
             <div className="max-h-48 overflow-y-auto space-y-1">
               {venuesLoading ? (
-                <p className="text-sm text-[var(--text-muted)] text-center py-4">Loading venues...</p>
+                <p className="text-sm text-[var(--lark-text-muted)] text-center py-4">Loading venues...</p>
               ) : filteredVenues.length === 0 ? (
-                <p className="text-sm text-[var(--text-muted)] text-center py-4">No venues found</p>
+                <p className="text-sm text-[var(--lark-text-muted)] text-center py-4">No venues found</p>
               ) : (
                 filteredVenues.map((venue) => {
                   const isSelected = selectedVenueIds.includes(venue.id);
@@ -298,15 +298,15 @@ export function FilterDrawer({ open, onClose }: FilterDrawerProps) {
                       onClick={() => toggleVenue(venue.id)}
                       className={`w-full text-left px-3 py-2 text-sm rounded-md flex items-center gap-2 transition-colors
                         ${isSelected
-                          ? 'bg-[var(--action-primary)]/10 text-[var(--text-primary)]'
-                          : 'hover:bg-[var(--surface-inset)] text-[var(--text-secondary)]'
+                          ? 'bg-[var(--accent)]/10 text-[var(--lark-text-primary)]'
+                          : 'hover:bg-[var(--bg-hover)] text-[var(--lark-text-secondary)]'
                         }`}
                     >
                       <span
                         className={`w-4 h-4 border rounded flex-shrink-0 flex items-center justify-center
                           ${isSelected
-                            ? 'bg-[var(--action-primary)] border-[var(--action-primary)]'
-                            : 'border-[var(--border-default)]'
+                            ? 'bg-[var(--accent)] border-[var(--accent)]'
+                            : 'border-[var(--border-subtle)]'
                           }`}
                       >
                         {isSelected && (
@@ -330,7 +330,7 @@ export function FilterDrawer({ open, onClose }: FilterDrawerProps) {
           <button
             type="button"
             onClick={clearAll}
-            className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            className="text-sm text-[var(--lark-text-secondary)] hover:text-[var(--lark-text-primary)] transition-colors"
           >
             Clear All
           </button>
@@ -340,7 +340,7 @@ export function FilterDrawer({ open, onClose }: FilterDrawerProps) {
         <button
           type="button"
           onClick={onClose}
-          className="px-4 py-2 text-sm font-medium text-white bg-[var(--action-primary)] rounded-lg hover:bg-[var(--action-primary-hover)] transition-colors"
+          className="px-4 py-2 text-sm font-medium text-white bg-[var(--accent)] rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
         >
           Done
         </button>

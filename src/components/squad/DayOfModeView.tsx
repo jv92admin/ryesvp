@@ -131,23 +131,23 @@ export function DayOfModeView({ squad, enrichment }: DayOfModeViewProps) {
   return (
     <div className="space-y-4">
       {/* Event Quick Info */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <h3 className="font-medium text-gray-900 text-sm line-clamp-1">
+      <div className="bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-4">
+        <h3 className="font-medium text-[var(--lark-text-primary)] text-sm line-clamp-1">
           {squad.event.displayTitle}
         </h3>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-[var(--lark-text-secondary)] mt-1">
           {formattedEventDate} • {formattedEventTime}
         </p>
-        <p className="text-sm text-gray-500">
-          📍 {squad.event.venue.name}
+        <p className="text-sm text-[var(--lark-text-secondary)]">
+          {squad.event.venue.name}
           {squad.event.venue.city && `, ${squad.event.venue.city}`}
         </p>
       </div>
 
       {/* Itinerary / Stops */}
       {loadingStops ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-          <div className="animate-pulse text-gray-400">Loading itinerary...</div>
+        <div className="bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-8 text-center">
+          <div className="animate-pulse text-[var(--lark-text-muted)]">Loading itinerary...</div>
         </div>
       ) : (
         <SquadStops
@@ -158,13 +158,13 @@ export function DayOfModeView({ squad, enrichment }: DayOfModeViewProps) {
       )}
 
       {/* Weather */}
-      <div className="bg-gradient-to-r from-sky-50 to-sky-100 rounded-lg border border-sky-200 p-4">
+      <div className="bg-[var(--bg-surface)] rounded-lg border border-[var(--border-subtle)] p-4">
         {weatherLoading ? (
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-sky-200 rounded-full animate-pulse" />
+            <div className="w-10 h-10 bg-[var(--bg-surface)] rounded-full animate-pulse" />
             <div className="flex-1">
-              <div className="h-4 bg-sky-200 rounded w-24 animate-pulse mb-2" />
-              <div className="h-3 bg-sky-200 rounded w-32 animate-pulse" />
+              <div className="h-4 bg-[var(--bg-surface)] rounded w-24 animate-pulse mb-2" />
+              <div className="h-3 bg-[var(--bg-surface)] rounded w-32 animate-pulse" />
             </div>
           </div>
         ) : weather ? (
@@ -178,42 +178,42 @@ export function DayOfModeView({ squad, enrichment }: DayOfModeViewProps) {
                   className="w-12 h-12"
                 />
                 <div>
-                  <div className="text-2xl font-semibold text-gray-900">
+                  <div className="text-2xl font-semibold text-[var(--lark-text-primary)]">
                     {weather.tempHigh}°F
                   </div>
-                  <div className="text-sm text-gray-600">{weather.condition}</div>
+                  <div className="text-sm text-[var(--lark-text-secondary)]">{weather.condition}</div>
                 </div>
               </div>
-              <div className="text-right text-sm text-gray-600">
+              <div className="text-right text-sm text-[var(--lark-text-secondary)]">
                 <div>Low: {weather.tempLow}°F</div>
                 <div>Feels like: {weather.feelsLikeHigh}°F</div>
               </div>
             </div>
             <div className="grid grid-cols-4 gap-2 text-center text-xs">
-              <div className="bg-white/50 rounded p-2">
-                <div className="text-gray-500">Rain</div>
-                <div className="font-medium text-gray-900">{weather.precipChance}%</div>
+              <div className="bg-[var(--bg-elevated)]/50 rounded p-2">
+                <div className="text-[var(--lark-text-secondary)]">Rain</div>
+                <div className="font-medium text-[var(--lark-text-primary)]">{weather.precipChance}%</div>
               </div>
-              <div className="bg-white/50 rounded p-2">
-                <div className="text-gray-500">Humidity</div>
-                <div className="font-medium text-gray-900">{weather.humidity}%</div>
+              <div className="bg-[var(--bg-elevated)]/50 rounded p-2">
+                <div className="text-[var(--lark-text-secondary)]">Humidity</div>
+                <div className="font-medium text-[var(--lark-text-primary)]">{weather.humidity}%</div>
               </div>
-              <div className="bg-white/50 rounded p-2">
-                <div className="text-gray-500">UV</div>
-                <div className="font-medium text-gray-900">{weather.uvIndex}</div>
+              <div className="bg-[var(--bg-elevated)]/50 rounded p-2">
+                <div className="text-[var(--lark-text-secondary)]">UV</div>
+                <div className="font-medium text-[var(--lark-text-primary)]">{weather.uvIndex}</div>
               </div>
-              <div className="bg-white/50 rounded p-2">
-                <div className="text-gray-500">Wind</div>
-                <div className="font-medium text-gray-900">{weather.windSpeed} mph</div>
+              <div className="bg-[var(--bg-elevated)]/50 rounded p-2">
+                <div className="text-[var(--lark-text-secondary)]">Wind</div>
+                <div className="font-medium text-[var(--lark-text-primary)]">{weather.windSpeed} mph</div>
               </div>
             </div>
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            <span className="text-3xl">🌤️</span>
+            <svg className="w-8 h-8 text-[var(--lark-text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /></svg>
             <div>
-              <h3 className="font-medium text-gray-900">Weather</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-medium text-[var(--lark-text-primary)]">Weather</h3>
+              <p className="text-sm text-[var(--lark-text-secondary)]">
                 {weatherError || 'Forecast not available yet'}
               </p>
             </div>
@@ -223,32 +223,32 @@ export function DayOfModeView({ squad, enrichment }: DayOfModeViewProps) {
 
       {/* Know Before You Go */}
       {(enrichment?.tmInfo || enrichment?.tmPleaseNote || enrichment?.tmTicketLimit || (enrichment?.tmSupportingActs && enrichment.tmSupportingActs.length > 0)) ? (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <h3 className="font-medium text-gray-900 mb-3">📋 Know before you go</h3>
+        <div className="bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-4">
+          <h3 className="font-medium text-[var(--lark-text-primary)] mb-3">Know before you go</h3>
           <div className="space-y-3 text-sm">
             {enrichment?.tmSupportingActs && enrichment.tmSupportingActs.length > 0 && (
               <div>
-                <div className="text-gray-500 text-xs mb-1">Supporting Acts</div>
-                <p className="text-gray-700">
+                <div className="text-[var(--lark-text-secondary)] text-xs mb-1">Supporting Acts</div>
+                <p className="text-[var(--lark-text-primary)]">
                   {enrichment.tmSupportingActs.join(', ')}
                 </p>
               </div>
             )}
             {enrichment?.tmInfo && (
               <div>
-                <div className="text-gray-500 text-xs mb-1">Event Info</div>
-                <p className="text-gray-700 whitespace-pre-wrap">{enrichment.tmInfo}</p>
+                <div className="text-[var(--lark-text-secondary)] text-xs mb-1">Event Info</div>
+                <p className="text-[var(--lark-text-primary)] whitespace-pre-wrap">{enrichment.tmInfo}</p>
               </div>
             )}
             {enrichment?.tmPleaseNote && (
               <div>
-                <div className="text-gray-500 text-xs mb-1">Please Note</div>
-                <p className="text-gray-700 whitespace-pre-wrap">{enrichment.tmPleaseNote}</p>
+                <div className="text-[var(--lark-text-secondary)] text-xs mb-1">Please Note</div>
+                <p className="text-[var(--lark-text-primary)] whitespace-pre-wrap">{enrichment.tmPleaseNote}</p>
               </div>
             )}
             {enrichment?.tmTicketLimit && (
-              <div className="flex items-center gap-2 text-gray-600">
-                <span>🎟️</span>
+              <div className="flex items-center gap-2 text-[var(--lark-text-secondary)]">
+                <span className="text-xs font-semibold text-[var(--lark-text-muted)]">TIX</span>
                 <span>Max {enrichment.tmTicketLimit} tickets per order</span>
               </div>
             )}
@@ -257,8 +257,8 @@ export function DayOfModeView({ squad, enrichment }: DayOfModeViewProps) {
       ) : null}
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-        <h3 className="font-medium text-gray-900 mb-3">⚡ Quick actions</h3>
+      <div className="bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-subtle)] p-4">
+        <h3 className="font-medium text-[var(--lark-text-primary)] mb-3">Quick actions</h3>
         <div className="grid grid-cols-2 gap-2">
           <a
             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -266,9 +266,9 @@ export function DayOfModeView({ squad, enrichment }: DayOfModeViewProps) {
             )}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--lark-text-primary)] bg-[var(--bg-surface)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors"
           >
-            🗺️ Maps
+            Maps
           </a>
           <a
             href={`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[formatted_address]=${encodeURIComponent(
@@ -276,12 +276,12 @@ export function DayOfModeView({ squad, enrichment }: DayOfModeViewProps) {
             )}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-[var(--lark-text-primary)] bg-[var(--bg-surface)] rounded-lg hover:bg-[var(--bg-hover)] transition-colors"
           >
-            🚗 Uber
+            Uber
           </a>
         </div>
-        <p className="text-xs text-gray-400 text-center mt-2">
+        <p className="text-xs text-[var(--lark-text-muted)] text-center mt-2">
           Ticket links coming soon
         </p>
       </div>

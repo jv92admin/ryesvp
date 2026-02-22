@@ -28,12 +28,12 @@ interface HomePageContentProps {
 
 export function HomePageContent({ initialEvents, initialHasMore, isLoggedIn, filters }: HomePageContentProps) {
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col" style={{ gap: 'var(--space-3xl)' }}>
       {/* Plans Strip - logged-in users only */}
       {isLoggedIn && <PlansStrip />}
 
       {/* Two-column layout with sidebar on desktop */}
-      <div className="flex flex-col lg:flex-row gap-6">
+      <div className="flex flex-col lg:flex-row" style={{ gap: 'var(--space-xl)' }}>
         {/* Calendar Sidebar - Desktop only (hidden on mobile per UX charter) */}
         <aside className="hidden lg:block lg:order-last lg:w-80 flex-shrink-0">
           <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:scrollbar-thin">

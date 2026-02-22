@@ -150,7 +150,7 @@ When auditing scraper health, check:
 
 Your domain knowledge lives in two places. When you make changes, update both:
 
-### Skill: `.claude/commands/ingestion.md`
+### Skill: `.claude/skills/ingestion.md`
 This is the quick-reference that any agent or session loads via `/ingestion`. Update it when you:
 - **Add a new scraper** → add to the strategy examples and update the scraper count
 - **Add a new scraping strategy or pattern** → document in Common Patterns or create a new Strategy section
