@@ -145,22 +145,19 @@ export default async function EventPage({ params }: EventPageProps) {
               displayTitle={displayTitle}
               startDateTime={typeof event.startDateTime === 'string' ? event.startDateTime : event.startDateTime.toISOString()}
               enrichment={fullEnrichment}
-              description={event.description}
               venue={event.venue}
-              eventUrl={event.url}
-              buyUrl={tmUrl}
             />
           ) : (
-            <>
-              <ExploreCard enrichment={fullEnrichment} />
-              <AboutCard
-                description={event.description}
-                venue={event.venue}
-                eventUrl={event.url}
-                buyUrl={tmUrl}
-              />
-            </>
+            <ExploreCard enrichment={fullEnrichment} />
           )}
+
+          {/* About + external links — always visible regardless of plan state */}
+          <AboutCard
+            description={event.description}
+            venue={event.venue}
+            eventUrl={event.url}
+            buyUrl={tmUrl}
+          />
         </div>
       </main>
 

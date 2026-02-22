@@ -6,7 +6,6 @@ import { Enrichment } from '@prisma/client';
 import { EventPlanPanel } from './EventPlanPanel';
 import { DayOfModeView } from './squad/DayOfModeView';
 import { ExploreCard } from './ExploreCard';
-import { AboutCard } from './AboutCard';
 
 interface EventContentTabsProps {
   squadId: string;
@@ -14,18 +13,13 @@ interface EventContentTabsProps {
   displayTitle: string;
   startDateTime: string;
   enrichment: Enrichment | null;
-  description: string | null;
   venue: {
     name: string;
-    address?: string | null;
     city?: string | null;
     state?: string | null;
-    url?: string | null;
     lat?: number | null;
     lng?: number | null;
   };
-  eventUrl: string | null;
-  buyUrl?: string | null;
 }
 
 type Tab = 'plan' | 'dayof' | 'explore';
@@ -36,10 +30,7 @@ export function EventContentTabs({
   displayTitle,
   startDateTime,
   enrichment,
-  description,
   venue,
-  eventUrl,
-  buyUrl,
 }: EventContentTabsProps) {
   const searchParams = useSearchParams();
   const initialTab = (searchParams.get('tab') as Tab) || 'plan';
@@ -107,10 +98,7 @@ export function EventContentTabs({
         )}
 
         {activeTab === 'explore' && (
-          <div className="space-y-6">
-            <ExploreCard enrichment={enrichment} />
-            <AboutCard description={description} venue={venue} eventUrl={eventUrl} buyUrl={buyUrl} />
-          </div>
+          <ExploreCard enrichment={enrichment} />
         )}
       </div>
     </div>
