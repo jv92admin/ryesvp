@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { SquadInviteModal } from './squad/SquadInviteModal';
 import { getDisplayName, getAvatarStyle, getInitials } from '@/lib/avatar';
 import { useToast } from '@/contexts/ToastContext';
+import { generateSharePlanText } from '@/lib/squadShareText';
 import Link from 'next/link';
 
 // ---------------------------------------------------------------------------
@@ -15,6 +16,8 @@ interface SquadMember {
   userId: string;
   status: 'THINKING' | 'IN' | 'OUT';
   ticketStatus: 'YES' | 'MAYBE' | 'NO' | 'COVERED';
+  coveredById: string | null;
+  buyingForIds: string[];
   guestCount: number;
   isOrganizer: boolean;
   user: {
@@ -27,8 +30,20 @@ interface SquadMember {
 interface Squad {
   id: string;
   eventId: string;
+  createdById: string;
   meetTime: string | null;
   meetSpot: string | null;
+  deadline: string | null;
+  playlistUrl: string | null;
+  event: {
+    id: string;
+    title: string;
+    displayTitle: string;
+    startDateTime: string;
+    venue: {
+      name: string;
+    };
+  };
   members: SquadMember[];
 }
 
@@ -208,23 +223,18 @@ export function EventPlanPanel({ squadId, eventId }: EventPlanPanelProps) {
   };
 
   const handleShare = async () => {
-    if (!squad) return;
-    const memberNames = squad.members
-      .filter(m => m.status !== 'OUT')
-      .map(m => getDisplayName(m.user.displayName, m.user.email))
-      .join(', ');
-    const shareUrl = `${window.location.origin}/squads/${squadId}`;
-    const text = `Plan for this event:\n${memberNames}\n\n${shareUrl}`;
+    if (!squad || !currentUserId) return;
+    const shareText = generateSharePlanText(squad, currentUserId);
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'Plan', text });
+        await navigator.share({ title: squad.event.displayTitle, text: shareText });
         return;
       } catch { /* cancelled */ }
     }
 
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(shareText);
       setCopying(true);
       setTimeout(() => setCopying(false), 2000);
     } catch (e) {
