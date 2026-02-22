@@ -111,7 +111,7 @@ export function generateDayOfText(squad: Squad): string {
   } else if (squad.meetSpot) {
     text += `\n\n📍 Meeting at ${squad.meetSpot} (time TBD).`;
   } else {
-    text += `\n\n📍 Meetup details TBD - check the squad!`;
+    text += `\n\n📍 Meetup details TBD - check the plan!`;
   }
   
   if (inMembers.length > 0) {
