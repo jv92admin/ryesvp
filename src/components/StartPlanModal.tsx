@@ -176,7 +176,7 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
               type: 'success',
             });
           }
-          router.push(`/squads/${data.squad.id}`);
+          router.push(`/events/${eventId}?tab=plan`);
           onClose();
           return;
         }
@@ -215,7 +215,7 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
           });
         }
 
-        router.push(`/squads/${data.squad.id}`);
+        router.push(`/events/${eventId}?tab=plan`);
         onClose();
       } else if (createRes.status === 409) {
         // User already has a squad - add friend to it and navigate
@@ -236,7 +236,7 @@ export function StartPlanModal({ isOpen, onClose, preSelectedFriendId }: StartPl
                 duration: 4000,
               });
             }
-            router.push(`/squads/${existingData.squad.id}`);
+            router.push(`/events/${eventId}?tab=plan`);
             onClose();
             return;
           }

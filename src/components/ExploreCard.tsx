@@ -43,8 +43,8 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
   // If we have image + Spotify, use the picture + listen layout
   if (hasImage && hasSpotify) {
     return (
-      <div className="bg-white rounded-lg border border-[var(--border-default)] p-4 sm:p-6 h-full flex flex-col">
-        <h2 className="font-semibold text-gray-900 text-base sm:text-lg mb-4">Explore</h2>
+      <div className="mb-6">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-4">Explore</h2>
         <div className="flex gap-4">
           {/* Image */}
           {imageUrl && (
@@ -52,27 +52,27 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
               <img
                 src={imageUrl}
                 alt={enrichment.kgName || 'Artist'}
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-cover shadow-sm"
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg object-cover"
               />
             </div>
           )}
-          
+
           {/* Info */}
           <div className="flex-1 min-w-0">
             {/* Name */}
             {enrichment.kgName && (
-              <h3 className="font-semibold text-gray-900 text-base sm:text-lg">
+              <h3 className="font-semibold text-[var(--text-primary)] text-base sm:text-lg">
                 {enrichment.kgName}
               </h3>
             )}
-            
+
             {/* Description */}
             {enrichment.kgDescription && (
-              <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+              <p className="text-sm text-[var(--text-secondary)] mt-1 line-clamp-2">
                 {enrichment.kgDescription}
               </p>
             )}
-            
+
             {/* Genres */}
             {genres.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">
@@ -86,7 +86,7 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
                 ))}
               </div>
             )}
-            
+
             {/* Links Row */}
             <div className="flex flex-wrap items-center gap-2 mt-3">
               {/* Spotify Link */}
@@ -132,7 +132,7 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
                   href={tmLinks.homepage}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-700 text-white text-sm font-medium rounded-full hover:bg-gray-800 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--surface-inset)] text-[var(--text-secondary)] text-sm font-medium rounded-full hover:bg-[var(--border-default)] transition-colors"
                 >
                   <WebIcon />
                   Website
@@ -148,8 +148,8 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
   // Fallback: Links without full artist info
   if (hasSpotify || hasExternalLinks) {
     return (
-      <div className="bg-white rounded-lg border border-[var(--border-default)] p-4 sm:p-6 h-full flex flex-col">
-        <h2 className="font-semibold text-gray-900 text-base sm:text-lg mb-4">Explore</h2>
+      <div className="mb-6">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)] mb-4">Explore</h2>
         <div className="flex flex-wrap gap-2">
           {enrichment.spotifyUrl && (
             <a
@@ -191,7 +191,7 @@ export function ExploreCard({ enrichment }: ExploreCardProps) {
               href={tmLinks.homepage}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-700 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--surface-inset)] text-[var(--text-secondary)] font-medium rounded-lg hover:bg-[var(--border-default)] transition-colors"
             >
               <WebIcon />
               Website

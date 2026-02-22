@@ -9,7 +9,7 @@ export async function Header() {
   const user = await getCurrentUser();
 
   return (
-    <header className="bg-white border-b sticky top-0 z-50" style={{ borderColor: 'var(--brand-border)' }}>
+    <header className="bg-white sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo + Wordmark + Tagline */}
         <div className="flex items-center gap-4">

@@ -1,16 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui';
-import { SquadPageModal } from './squad/SquadPageModal';
 import { SquadCreationModal } from './squad/SquadCreationModal';
 
 interface SmartSquadButtonProps {
   eventId: string;
-  userSquadId?: string | null; // Pre-fetched squad ID
-  friendsGoing?: number; // Number of friends going
-  friendsInterested?: number; // Number of friends interested  
+  userSquadId?: string | null;
+  friendsGoing?: number;
+  friendsInterested?: number;
   event?: {
     id: string;
     title: string;
@@ -21,80 +19,49 @@ interface SmartSquadButtonProps {
   };
   className?: string;
   variant?: 'default' | 'compact';
-  alwaysShow?: boolean; // Always show button regardless of friends (for Social tab)
+  alwaysShow?: boolean;
 }
 
-// Hook to detect mobile (< 768px)
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
-  return isMobile;
-}
-
-export function SmartSquadButton({ 
-  eventId, 
+export function SmartSquadButton({
+  eventId,
   userSquadId = null,
   friendsGoing = 0,
   friendsInterested = 0,
   event,
-  className = "", 
+  className = "",
   variant = 'default',
   alwaysShow = false
 }: SmartSquadButtonProps) {
   const router = useRouter();
-  const isMobile = useIsMobile();
-  const [showSquadModal, setShowSquadModal] = useState(false);
   const [showCreationModal, setShowCreationModal] = useState(false);
   const [currentSquadId, setCurrentSquadId] = useState(userSquadId);
 
   const hasSquad = !!currentSquadId;
   const totalFriends = friendsGoing + friendsInterested;
-  
-  // Show button if: alwaysShow is true, OR friends interested/going, OR user already has a squad
+
   const shouldShow = alwaysShow || hasSquad || totalFriends > 0;
-  
+
   if (!shouldShow) {
-    return null; // Don't render anything
+    return null;
   }
 
   const handleClick = () => {
     if (currentSquadId) {
-      // User has existing squad
-      if (isMobile) {
-        // Mobile: Navigate directly to squad page
-        router.push(`/squads/${currentSquadId}`);
-      } else {
-        // Desktop: Show modal (with link to full page)
-        setShowSquadModal(true);
-      }
+      // Navigate to event page with Plan tab open
+      router.push(`/events/${eventId}?tab=plan`);
     } else {
-      // No existing squad - show creation modal (same on both)
       setShowCreationModal(true);
     }
   };
 
   const handleSquadCreated = (squadId: string) => {
     setCurrentSquadId(squadId);
-    if (isMobile) {
-      // Mobile: Navigate directly to new squad
-      router.push(`/squads/${squadId}`);
-    } else {
-      // Desktop: Show modal
-      setShowSquadModal(true);
-    }
+    // Navigate to event page with Plan tab open
+    router.push(`/events/${eventId}?tab=plan`);
   };
 
-  // Title Case for CTAs - human language, no jargon
   const buttonText = hasSquad ? 'View Plan' : 'Start Plan';
 
-  // Default event object if not provided (for compatibility)
   const eventData = event || {
     id: eventId,
     title: 'Event',
@@ -123,16 +90,6 @@ export function SmartSquadButton({
         {buttonText}
       </button>
 
-      {/* Squad Modal - Desktop only, full squad experience */}
-      {showSquadModal && currentSquadId && !isMobile && (
-        <SquadPageModal
-          squadId={currentSquadId}
-          isOpen={showSquadModal}
-          onClose={() => setShowSquadModal(false)}
-        />
-      )}
-
-      {/* Squad Creation Modal - Both platforms */}
       {showCreationModal && (
         <SquadCreationModal
           event={eventData}

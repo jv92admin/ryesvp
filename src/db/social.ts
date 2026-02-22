@@ -159,8 +159,11 @@ export async function getYourPlans(userId: string, filters?: SocialFilters): Pro
     };
   });
 
-  // Sort by priority (time bucket first, then status priority)
-  const sortedEvents = processedEvents.sort((a, b) => a._priority - b._priority);
+  // Sort by priority (time bucket first, then status priority, then soonest first)
+  const sortedEvents = processedEvents.sort((a, b) => {
+    if (a._priority !== b._priority) return a._priority - b._priority;
+    return new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime();
+  });
 
   // Remove metadata and return top 20
   return sortedEvents.slice(0, 20).map(({ _priority, _hasSquad, ...event }) => event);

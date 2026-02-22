@@ -1,104 +1,148 @@
 'use client';
 
 import { useState } from 'react';
-import { AttendanceStatus } from '@prisma/client';
-import { useEngagementToast } from './EngagementToast';
 import Link from 'next/link';
+import { SquadCreationModal } from './squad/SquadCreationModal';
+import { SquadInviteModal } from './squad/SquadInviteModal';
 
 interface EventActionBarProps {
-  eventId: string;
-  initialStatus: AttendanceStatus | null;
   isLoggedIn: boolean;
-  buyUrl?: string | null;
+  hasSquad: boolean;
+  squadId?: string | null;
+  hasFriendsGoing: boolean;
+  event: {
+    id: string;
+    title: string;
+    startDateTime: string;
+    venue: { name: string };
+  };
 }
 
-export function EventActionBar({ eventId, initialStatus, isLoggedIn, buyUrl }: EventActionBarProps) {
-  const [status, setStatus] = useState<AttendanceStatus | null>(initialStatus);
-  const [isLoading, setIsLoading] = useState(false);
-  const { showToast, ToastComponent } = useEngagementToast();
+export function EventActionBar({
+  isLoggedIn,
+  hasSquad,
+  squadId,
+  hasFriendsGoing,
+  event,
+}: EventActionBarProps) {
+  const [showCreation, setShowCreation] = useState(false);
+  const [showInvite, setShowInvite] = useState(false);
+  const [squadData, setSquadData] = useState<{
+    id: string;
+    eventId: string;
+    members: { id: string; userId: string; user: { displayName: string | null; email: string } }[];
+  } | null>(null);
 
-  const handleChange = async (newStatus: 'INTERESTED' | 'GOING') => {
-    const previous = status;
-    setIsLoading(true);
-    setStatus(status === newStatus ? null : newStatus);
+  const isStateA = isLoggedIn && hasSquad;
+  const isStateB = isLoggedIn && !hasSquad && hasFriendsGoing;
+  const isStateC = isLoggedIn && !hasSquad && !hasFriendsGoing;
 
+  const handleInvite = async () => {
+    if (!squadId) return;
     try {
-      if (previous === newStatus) {
-        await fetch(`/api/events/${eventId}/attendance`, { method: 'DELETE' });
-      } else {
-        const res = await fetch(`/api/events/${eventId}/attendance`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: newStatus }),
-        });
-        if (!res.ok) setStatus(previous);
-        else if (previous === null) showToast();
-      }
-    } catch {
-      setStatus(previous);
-    } finally {
-      setIsLoading(false);
+      const res = await fetch(`/api/squads/${squadId}`);
+      const data = await res.json();
+      setSquadData(data.squad);
+      setShowInvite(true);
+    } catch (e) {
+      console.error('Failed to fetch squad:', e);
     }
   };
 
-  // Nothing to show if logged out with no buy link
-  if (!isLoggedIn && !buyUrl) return null;
+  const barWrapper = "fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-t border-[var(--border-default)]";
+  const barInner = "max-w-3xl mx-auto px-4 py-3 flex items-center gap-3";
+  const barPadding = { paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' };
+  const primaryBtn = "flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-[var(--action-engage)] text-[var(--action-engage-text)] hover:bg-[var(--action-engage-hover)] transition-colors";
+  // State A: has plan — Invite Friends + Share Plan
+  if (isStateA) {
+    return (
+      <>
+        <div className={barWrapper}>
+          <div className={barInner} style={barPadding}>
+            <button onClick={handleInvite} className={primaryBtn}>
+              Invite Friends
+            </button>
+          </div>
+        </div>
+        {showInvite && squadData && (
+          <SquadInviteModal
+            squad={squadData}
+            isOpen={showInvite}
+            onClose={() => setShowInvite(false)}
+            onMemberAdded={() => {
+              setShowInvite(false);
+              window.location.reload();
+            }}
+          />
+        )}
+      </>
+    );
+  }
 
-  const toggle = 'px-3 py-2 rounded-lg text-xs font-medium border transition-colors disabled:opacity-50';
-  const toggleOff = 'border-[var(--border-default)] text-[var(--text-secondary)] bg-white hover:bg-[var(--surface-inset)]';
+  // State B: friends going, no plan — Start Plan is the hero
+  if (isStateB) {
+    return (
+      <>
+        <div className={barWrapper}>
+          <div className={barInner} style={barPadding}>
+            <button onClick={() => setShowCreation(true)} className={primaryBtn}>
+              Start Plan
+            </button>
+          </div>
+        </div>
+        {showCreation && (
+          <SquadCreationModal
+            event={event}
+            isOpen={showCreation}
+            onClose={() => setShowCreation(false)}
+            onSquadCreated={() => {
+              setShowCreation(false);
+              window.location.reload();
+            }}
+          />
+        )}
+      </>
+    );
+  }
 
-  return (
-    <>
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-sm border-t border-[var(--border-default)]">
-        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center gap-2" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
-          {isLoggedIn && (
-            <>
-              <button
-                onClick={() => handleChange('INTERESTED')}
-                disabled={isLoading}
-                className={`${toggle} ${status === 'INTERESTED'
-                  ? 'bg-[var(--signal-interested-light)] text-[var(--signal-interested)] border-[var(--signal-interested)]'
-                  : toggleOff
-                }`}
-              >
-                Interested
-              </button>
-              <button
-                onClick={() => handleChange('GOING')}
-                disabled={isLoading}
-                className={`${toggle} ${status === 'GOING'
-                  ? 'bg-[var(--signal-going-light)] text-[var(--signal-going)] border-[var(--signal-going)]'
-                  : toggleOff
-                }`}
-              >
-                Going
-              </button>
-            </>
-          )}
-          {!isLoggedIn && (
-            <Link
-              href="/login"
-              className="px-3 py-2 rounded-lg text-xs font-medium text-[var(--action-engage)] border border-[var(--action-engage)] hover:bg-[var(--action-engage-light)] transition-colors"
-            >
-              Sign In
-            </Link>
-          )}
-          {buyUrl && (
-            <a
-              href={buyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-[var(--action-primary)] text-[var(--action-primary-text)] hover:bg-[var(--action-primary-hover)] transition-colors"
-            >
-              Buy Tickets
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-              </svg>
-            </a>
-          )}
+  // State C: discovery — Start Plan is the hero
+  if (isStateC) {
+    return (
+      <>
+        <div className={barWrapper}>
+          <div className={barInner} style={barPadding}>
+            <button onClick={() => setShowCreation(true)} className={primaryBtn}>
+              Start Plan
+            </button>
+          </div>
+        </div>
+        {showCreation && (
+          <SquadCreationModal
+            event={event}
+            isOpen={showCreation}
+            onClose={() => setShowCreation(false)}
+            onSquadCreated={() => {
+              setShowCreation(false);
+              window.location.reload();
+            }}
+          />
+        )}
+      </>
+    );
+  }
+
+  // Logged out — Sign In is the hero
+  if (!isLoggedIn) {
+    return (
+      <div className={barWrapper}>
+        <div className={barInner} style={barPadding}>
+          <Link href="/login" className={primaryBtn}>
+            Sign In to Plan
+          </Link>
         </div>
       </div>
-      {ToastComponent}
-    </>
-  );
+    );
+  }
+
+  return null;
 }

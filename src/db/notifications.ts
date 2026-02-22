@@ -81,7 +81,11 @@ function getNotificationLink(type: NotificationType, payload: NotificationPayloa
     case 'PLAN_MEMBER_LEFT':
     case 'TICKET_COVERED_FOR_YOU':
     case 'PLAN_MEETUP_CREATED':
-      return payload.squadId ? `/squads/${payload.squadId}` : null;
+      return payload.eventId
+        ? `/events/${payload.eventId}?tab=plan`
+        : payload.squadId
+          ? `/squads/${payload.squadId}`
+          : null;
     case 'PLAN_CANCELLED':
       // Plan is gone, link to event instead
       return payload.eventId ? `/events/${payload.eventId}` : null;

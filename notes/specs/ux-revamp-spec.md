@@ -3,7 +3,7 @@
 > The complete UX architecture redesign.
 > Structured as 9 mutable increments (0-7 + 3.5), each shippable independently.
 > Brand direction informed by `references/lark-proposal-final.pdf`.
-> Date: 2026-02-19 · Updated: 2026-02-20 (Inc 3–4 shipped, Inc 3.5 Editorial Polish added)
+> Date: 2026-02-19 · Updated: 2026-02-20 (Inc 0–6 shipped, Inc 5+6 combined as integrated hero + plan-on-event-page)
 
 ---
 
@@ -60,9 +60,9 @@ INC 3.5  Editorial Polish           ✅ text-only badges, editorial headers, bre
   ↓
 INC 4    Social-First Home          ✅ kill ViewToggle, PlansStrip, Friends chip, 7 components deleted
   ↓
-INC 5    Event Page Zones           ✅ 5-zone layout, Buy above fold, AttendanceButtons + SocialProofCard
+INC 5    Event Page Hierarchy       ✅ integrated hero, 3-state architecture, inline attendance, state-dependent bar
   ↓
-INC 6    Plan-on-Event-Page         ← inline plan panel, kill navigate-away
+INC 6    Plan-on-Event-Page         ✅ interactive panel, /squads/ redirect, legacy deprecated
   ↓
 INC 7    Groups Surfacing           ← group labels, group filter, group activity
 ```
@@ -719,11 +719,11 @@ If performance is a concern (social signals on every card), the data layer alrea
 
 ---
 
-## Increment 5: Event Page Zones
+## Increment 5: Event Page Hierarchy ✅ COMPLETE
 
-**Goal:** Zone-based layout that puts the highest-intent actions above the fold and separates attendance, commerce, and social into clear zones.
+**Goal:** Integrated hero with overlay navigation, 3-state event page architecture (plan/friends/discovery), inline attendance toggles, and state-dependent sticky bar.
 
-**Agent:** `ui-polish` (primary), `engagement` (CTA copy, social proof messaging), `qa-reviewer` (gate)
+**Shipped:** Feb 2026 · Combined with Inc 6 into unified hero redesign + plan-on-event-page. 3 new components created (EventHero, EventPlanPanel, EventContentTabs), 5 components rewritten (EventActionBar, SocialProofCard, ExploreCard, AboutCard, ShareButton).
 
 **Depends on:** Inc 0 (tokens, IconButton for Share/Website), Inc 1 (Dialog + PeopleList for friend modal), Inc 3 (warm CTAs, de-SaaS card treatment already applied)
 
@@ -818,11 +818,11 @@ ZONE 5: ABOUT
 
 ---
 
-## Increment 6: Plan-on-Event-Page
+## Increment 6: Plan-on-Event-Page ✅ COMPLETE
 
-**Goal:** When a user has a plan for an event, the plan experience lives on the event page itself — not a separate `/squads/[id]` route. The squad page becomes a deep-link fallback.
+**Goal:** When a user has a plan for an event, the plan experience lives on the event page itself — not a separate `/squads/[id]` route. Inline plan panel, Plan/Explore tabs, full-width Start Plan CTA.
 
-**Agent:** `ui-polish` (layout, panel UI), `engagement` (plan messaging, share texts), `data-model` (plan data on event page), `qa-reviewer` (gate)
+**Shipped:** Feb 2026 · EventPlanPanel rewritten as fully interactive (status controls, ticket toggle, full member list with organizer remove, meetup inline edit, leave plan). `/squads/[id]` redirects to `/events/[eventId]?tab=plan`. SmartSquadButton, StartPlanModal, and notifications all route to event page. Legacy plan page (SquadPage, SquadPageModal, PlanModeView) deprecated.
 
 **Depends on:** Inc 5 (event page zones — plan panel extends Zone 3)
 

@@ -34,8 +34,8 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 | **UX** | **UX Revamp: Lark Visual Identity (Inc 3)** | Warm gold CTAs, de-SaaS cards, monochrome badges, chip migration | ✅ Complete |
 | **UX** | **UX Revamp: Editorial Polish (Inc 3.5)** | Typography density, text-only badges, breathing room, action button polish | ✅ Complete |
 | **UX** | **UX Revamp: Social-First Home (Inc 4)** | Kill ViewToggle, PlansStrip, inline social on EventCard, Friends chip | ✅ Complete |
-| **UX** | **UX Revamp: Event Page Hierarchy (Inc 5)** | 5-zone layout, Buy above fold, split FriendsAndStatusCard | ✅ Complete |
-| **UX** | **UX Revamp: Plan-on-Event-Page (Inc 6)** | Inline plan panel, kill navigate-away | 🔲 |
+| **UX** | **UX Revamp: Event Page Hierarchy (Inc 5)** | Integrated hero, 3-state architecture, inline attendance | ✅ Complete |
+| **UX** | **UX Revamp: Plan-on-Event-Page (Inc 6)** | Interactive plan panel, /squads/ redirect, legacy page deprecated | ✅ Complete |
 | **UX** | **UX Revamp: Groups Surfacing (Inc 7)** | Group labels, group filter, group activity | 🔲 |
 | **C** | **User Testing** | Invite 20-30 users, collect feedback | 🔲 |
 | **D** | **Event Discovery 2.x** | Data enrichment (venue, event, performer) | 🔲 |
@@ -72,7 +72,8 @@ Master tracker for all workstreams. Individual specs contain implementation deta
 | UX.3 | Lark Visual Identity | Warm gold CTAs, de-SaaS cards, monochrome badges, 15 files changed | ✅ Complete |
 | UX.3.5 | Editorial Polish | Text-only badges, editorial date headers, card breathing room, underline tabs | ✅ Complete |
 | UX.4 | Social-First Home | Kill ViewToggle, PlansStrip, Friends chip, delete 7 social components | ✅ Complete |
-| UX.5 | Event Page Zones | 5-zone layout, Buy above fold, AttendanceButtons + SocialProofCard | ✅ Complete |
+| UX.5 | Event Page Zones | Integrated hero (overlay nav, gradient title, inline attendance), 3-state architecture (plan/friends/discovery), state-dependent sticky bar | ✅ Complete |
+| UX.6 | Plan-on-Event-Page | Interactive EventPlanPanel (status/tickets/members/meetup/leave), `/squads/[id]` redirects to event page, SmartSquadButton+StartPlanModal+notifications updated, legacy plan page deprecated | ✅ Complete |
 
 ---
 
@@ -95,10 +96,10 @@ All phases (0–1.6) complete. 19 venue scrapers, 700+ events, 500+ performers, 
 | 1 | Modal & People System | ✅ | Dialog primitive (focus trap, scroll lock, escape, fade+scale, 4 size variants incl. sheet), PeopleList component, 4 modals migrated (SquadCreation, SquadInvite, SquadPage, StartPlan) |
 | 2 | Filter Cleanup | ✅ | FilterDrawer (Dialog sheet, 4 sections: When/Category/Discovery/Venues), FilterStrip rewrite (search → 3 quick chips → Filters overflow), active filter tags with dismissal, venue name resolution, old chips deprecated |
 | 3 | Lark Visual Identity | ✅ | Button `engage` variant, Chip `primary` → warm gold, de-SaaS cards (shadow removal, border-b mobile, hover border desktop), monochrome event badges, scoped legacy token cleanup (15 files) |
-| 3.5 | Editorial Polish | 🔲 | Text-only category badges, editorial date headers, card breathing room, ViewToggle softening, sign-in prompt warmth, action button visibility |
-| 4 | Social-First Home | 🔲 | Kill ViewToggle, PlansStrip, social signals on EventCard, Friends Going filter |
-| 5 | Event Page Hierarchy | 🔲 | 5-zone layout, Buy above fold, SocialProofCard separated |
-| 6 | Plan-on-Event-Page | 🔲 | Inline plan panel on event page, kill navigate-away |
+| 3.5 | Editorial Polish | ✅ | Text-only category badges, editorial date headers, card breathing room, underline tabs |
+| 4 | Social-First Home | ✅ | Kill ViewToggle, PlansStrip, inline social on EventCard, Friends chip |
+| 5 | Event Page Hierarchy | ✅ | Integrated hero (overlay nav, gradient title), 3-state architecture, inline attendance, state-dependent sticky bar |
+| 6 | Plan-on-Event-Page | ✅ | EventPlanPanel (inline squad), EventContentTabs (Plan/Explore tabs), SocialProofCard Start Plan CTA, de-SaaS ExploreCard+AboutCard |
 | 7 | Groups Surfacing | 🔲 | Group labels on avatars, group filter, group activity in PlansStrip |
 
 **Design audit & open questions:** See `specs/ux-revamp-audit.md`
