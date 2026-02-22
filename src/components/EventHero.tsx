@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AttendanceStatus, EventCategory } from '@prisma/client';
 import { PerformerLink } from '@/components/PerformerLink';
@@ -46,10 +46,18 @@ export function EventHero({
   shareProps,
 }: EventHeroProps) {
   const router = useRouter();
+  const imgRef = useRef<HTMLImageElement>(null);
   const [imgError, setImgError] = useState(false);
   const [status, setStatus] = useState<AttendanceStatus | null>(initialStatus);
   const [isLoading, setIsLoading] = useState(false);
   const { showToast, ToastComponent } = useEngagementToast();
+
+  // Catch images that 404'd before React hydration (onError fires before mount)
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current.naturalWidth === 0) {
+      setImgError(true);
+    }
+  }, []);
 
   const isNew = isNewListing(new Date(event.createdAt));
   const statusConfig = eventStatusConfig[event.status as keyof typeof eventStatusConfig];
@@ -98,6 +106,7 @@ export function EventHero({
         {hasImage ? (
           <div className="aspect-[16/9] max-h-72">
             <img
+              ref={imgRef}
               src={event.imageUrl!}
               alt={event.title}
               className="w-full h-full object-cover"

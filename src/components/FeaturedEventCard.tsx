@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useState, useRef, useEffect, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { EventDisplay, EnrichmentDisplay } from '@/db/events';
@@ -96,8 +96,17 @@ interface FeaturedEventCardProps {
  * Used for the first event in each day section to create visual hierarchy.
  */
 export function FeaturedEventCard({ event }: FeaturedEventCardProps) {
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [imgError, setImgError] = useState(false);
   const [showFriendsModal, setShowFriendsModal] = useState(false);
   const { saveScrollPosition } = useScrollRestoration();
+
+  // Catch images that 404'd before React hydration
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current.naturalWidth === 0) {
+      setImgError(true);
+    }
+  }, []);
 
   const handleNavigate = () => {
     saveScrollPosition();
@@ -127,12 +136,14 @@ export function FeaturedEventCard({ event }: FeaturedEventCardProps) {
     >
       {/* Hero Image — full width */}
       <Link href={`/events/${event.id}`} className="block" onClick={handleNavigate}>
-        {event.imageUrl ? (
+        {event.imageUrl && !imgError ? (
           <div className="relative aspect-[2/1] w-full bg-[var(--bg-surface)]">
             <img
+              ref={imgRef}
               src={event.imageUrl}
               alt={event.title}
               className="w-full h-full object-cover"
+              onError={() => setImgError(true)}
             />
             {/* Gradient fade at bottom */}
             <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-[var(--bg-elevated)] to-transparent pointer-events-none" />

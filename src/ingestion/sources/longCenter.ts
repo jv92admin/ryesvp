@@ -10,7 +10,8 @@ import { EventSource } from '@prisma/client';
 import { NormalizedEvent } from '../types';
 
 const LONG_CENTER_URL = 'https://thelongcenter.org/events/';
-const LONG_CENTER_DEFAULT_IMAGE = 'https://thelongcenter.org/wp-content/uploads/2020/09/Long-Center-OG-Image.jpg';
+// Previous default image URL was retired by Long Center (returns 404).
+// Events without their own image now get null, triggering component fallback UIs.
 
 interface JsonLdEvent {
   '@type': string;
@@ -139,7 +140,7 @@ export async function fetchEventsFromLongCenter(): Promise<NormalizedEvent[]> {
           title: jsonData.name,
           startDateTime: startDate,
           url: jsonData.url,
-          imageUrl: jsonData.image || LONG_CENTER_DEFAULT_IMAGE,
+          imageUrl: jsonData.image || null,
           description: hallName !== 'Long Center' 
             ? `[${hallName}] ${baseDescription || ''}`.trim()
             : baseDescription,

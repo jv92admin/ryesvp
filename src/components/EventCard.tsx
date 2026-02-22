@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useState, useRef, useEffect, type ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { EventDisplay, EnrichmentDisplay } from '@/db/events';
@@ -146,8 +146,17 @@ interface EventCardProps {
 }
 
 export function EventCard({ event }: EventCardProps) {
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [imgError, setImgError] = useState(false);
   const [showFriendsModal, setShowFriendsModal] = useState(false);
   const { saveScrollPosition, savePaginationState } = useScrollRestoration();
+
+  // Catch images that 404'd before React hydration
+  useEffect(() => {
+    if (imgRef.current?.complete && imgRef.current.naturalWidth === 0) {
+      setImgError(true);
+    }
+  }, []);
   
   // Combined save function for both scroll and pagination
   const handleNavigate = () => {
@@ -187,12 +196,14 @@ export function EventCard({ event }: EventCardProps) {
       <Link href={`/events/${event.id}`} className="block" onClick={handleNavigate}>
         <div className="flex gap-3">
           {/* Event Image */}
-          {event.imageUrl ? (
+          {event.imageUrl && !imgError ? (
             <div className="w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-[var(--bg-surface)]">
-              <img 
-                src={event.imageUrl} 
+              <img
+                ref={imgRef}
+                src={event.imageUrl}
                 alt={event.title}
                 className="w-full h-full object-cover"
+                onError={() => setImgError(true)}
               />
             </div>
           ) : (
