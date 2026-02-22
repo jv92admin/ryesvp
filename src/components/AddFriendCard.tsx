@@ -43,14 +43,12 @@ export function AddFriendCard({ variant = 'default', className = '', onGroupCrea
   const handleShare = async () => {
     if (!addFriendLink) return;
 
-    const shareText = `Add me as a friend on Lark so we can spot Austin events and actually make plans to go.
-
-${addFriendLink}`;
+    const shareText = `I've been using this app Lark for finding stuff to do in Austin. Way easier than scrolling Instagram stories.\n\n${addFriendLink}`;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Add me on Lark',
+          title: 'Lark',
           text: shareText,
         });
         return;

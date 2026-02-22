@@ -14,7 +14,7 @@ export async function Header() {
       <div className="max-w-6xl mx-auto px-[var(--screen-padding)] py-3 flex items-center justify-between">
         {/* Bird Mark + Lark Wordmark */}
         <Link href="/" className="flex items-center gap-2 group">
-          <svg width="24" height="20" viewBox="0 0 100 100" aria-hidden="true" className="text-[var(--lark-text-primary)]">
+          <svg width="32" height="26" viewBox="0 0 100 100" aria-hidden="true" className="text-[var(--lark-text-primary)]">
             <path d="M 15 65 Q 30 30, 50 45 Q 60 50, 70 35 Q 78 22, 88 18"
                   stroke="currentColor" strokeWidth="6" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M 15 65 Q 28 55, 45 58 Q 55 60, 68 52"

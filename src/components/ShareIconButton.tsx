@@ -38,23 +38,7 @@ export function ShareIconButton({ title, venueName, dateFormatted, eventUrl, isL
     ? `${eventUrl}?ref=${inviteCode}`
     : eventUrl;
 
-  const shareText = inviteCode
-    ? `Hey! Check out this event:
-
-${title}
-${venueName}
-${dateFormatted}
-
-${shareUrl}
-
-Join me on Lark so we can see who's in and make a plan.`
-    : `Hey! Check out this event:
-
-${title}
-${venueName}
-${dateFormatted}
-
-${shareUrl}`;
+  const shareText = `${title}\n${venueName} · ${dateFormatted}\n\n${shareUrl}`;
 
   const handleShare = async () => {
     // Try native share first (mobile)

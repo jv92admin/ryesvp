@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lark Logo Concepts</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0A0A0A;
+    color: #F5F5F5;
+    font-family: 'Space Grotesk', sans-serif;
+    padding: 40px 24px;
+  }
+  h1 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #666;
+    margin-bottom: 48px;
+    text-align: center;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .concept {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  .concept-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #666;
+  }
+  .logo-frame {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #1E1E1E;
+    border-radius: 12px;
+    background: #0A0A0A;
+  }
+  .app-icon-frame {
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 28px;
+    background: #0A0A0A;
+    border: 1px solid #2A2A2A;
+  }
+  .nav-frame {
+    width: 100%;
+    max-width: 375px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    background: #0A0A0A;
+    border-bottom: 1px solid #1E1E1E;
+    border-radius: 12px 12px 0 0;
+    gap: 8px;
+  }
+  .nav-frame .tagline {
+    font-size: 13px;
+    color: #666;
+    font-weight: 400;
+    margin-left: 2px;
+  }
+  .nav-frame .spacer { flex: 1; }
+  .nav-frame .nav-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid #3A3A3A;
+  }
+  .section { margin-bottom: 80px; }
+  .section-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #666;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+  .sizes {
+    display: flex;
+    align-items: flex-end;
+    gap: 32px;
+    justify-content: center;
+    margin-top: 32px;
+  }
+  .size-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .size-label {
+    font-size: 10px;
+    color: #666;
+    font-weight: 500;
+  }
+  .divider {
+    width: 80px;
+    height: 1px;
+    background: #1E1E1E;
+    margin: 0 auto 80px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Lark — Logo Concepts</h1>
+
+<!-- ==================== CONCEPT A: PURE WORDMARK ==================== -->
+<div class="section">
+  <div class="section-title">A — Pure Wordmark</div>
+  <p style="text-align:center; color:#666; font-size:13px; margin-bottom:32px; max-width:500px; margin-left:auto; margin-right:auto;">
+    Just the name. Space Grotesk 700. The angular "k" does all the work. Confident restraint — like Linear's logo.
+  </p>
+  <div class="row">
+    <div class="concept">
+      <div class="logo-frame">
+        <svg width="140" height="44" viewBox="0 0 140 44">
+          <text x="0" y="36" font-family="Space Grotesk" font-weight="700" font-size="42" fill="#F5F5F5">Lark</text>
+        </svg>
+      </div>
+      <span class="concept-label">Title Case</span>
+    </div>
+    <div class="concept">
+      <div class="logo-frame">
+        <svg width="120" height="44" viewBox="0 0 120 44">
+          <text x="0" y="36" font-family="Space Grotesk" font-weight="700" font-size="42" fill="#F5F5F5">lark</text>
+        </svg>
+      </div>
+      <span class="concept-label">Lowercase</span>
+    </div>
+  </div>
+  <div class="sizes">
+    <div class="size-item">
+      <svg width="80" height="28" viewBox="0 0 80 28"><text x="0" y="22" font-family="Space Grotesk" font-weight="700" font-size="26" fill="#F5F5F5">Lark</text></svg>
+      <span class="size-label">Nav bar</span>
+    </div>
+    <div class="size-item">
+      <svg width="50" height="18" viewBox="0 0 50 18"><text x="0" y="14" font-family="Space Grotesk" font-weight="700" font-size="16" fill="#F5F5F5">Lark</text></svg>
+      <span class="size-label">Small</span>
+    </div>
+    <div class="size-item">
+      <svg width="36" height="14" viewBox="0 0 36 14"><text x="0" y="11" font-family="Space Grotesk" font-weight="700" font-size="12" fill="#F5F5F5">Lark</text></svg>
+      <span class="size-label">Micro</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ==================== CONCEPT B: L WITH BIRD STROKE ==================== -->
+<div class="section">
+  <div class="section-title">B — Bird Stroke Mark</div>
+  <p style="text-align:center; color:#666; font-size:13px; margin-bottom:32px; max-width:500px; margin-left:auto; margin-right:auto;">
+    A single swift stroke — abstract bird in flight. Hand-drawn energy, reads as movement and spontaneity. Works alone as app icon or paired with wordmark.
+  </p>
+  <div class="row">
+    <div class="concept">
+      <div class="logo-frame">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <!-- Abstract bird: single continuous swooping stroke -->
+          <path d="M 15 65 Q 30 30, 50 45 Q 60 50, 70 35 Q 78 22, 88 18" 
+                stroke="#F5F5F5" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Second wing stroke, slightly offset -->
+          <path d="M 15 65 Q 28 55, 45 58 Q 55 60, 68 52" 
+                stroke="#F5F5F5" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+        </svg>
+      </div>
+      <span class="concept-label">Mark Only</span>
+    </div>
+    <div class="concept">
+      <div class="app-icon-frame">
+        <svg width="60" height="60" viewBox="0 0 100 100">
+          <path d="M 15 65 Q 30 30, 50 45 Q 60 50, 70 35 Q 78 22, 88 18" 
+                stroke="#F5F5F5" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M 15 65 Q 28 55, 45 58 Q 55 60, 68 52" 
+                stroke="#F5F5F5" stroke-width="2.8" fill="none" stroke-linecap="round" opacity="0.6"/>
+        </svg>
+      </div>
+      <span class="concept-label">App Icon</span>
+    </div>
+    <div class="concept">
+      <div class="logo-frame">
+        <svg width="180" height="50" viewBox="0 0 180 50">
+          <!-- Small bird mark -->
+          <g transform="translate(0, 5) scale(0.4)">
+            <path d="M 15 65 Q 30 30, 50 45 Q 60 50, 70 35 Q 78 22, 88 18" 
+                  stroke="#F5F5F5" stroke-width="5" fill="none" stroke-linecap="round"/>
+            <path d="M 15 65 Q 28 55, 45 58 Q 55 60, 68 52" 
+                  stroke="#F5F5F5" stroke-width="3.5" fill="none" stroke-linecap="round" opacity="0.6"/>
+          </g>
+          <!-- Wordmark -->
+          <text x="48" y="38" font-family="Space Grotesk" font-weight="700" font-size="36" fill="#F5F5F5">Lark</text>
+        </svg>
+      </div>
+      <span class="concept-label">Mark + Wordmark</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ==================== CONCEPT C: STYLIZED L ==================== -->
+<div class="section">
+  <div class="section-title">C — Stylized L</div>
+  <p style="text-align:center; color:#666; font-size:13px; margin-bottom:32px; max-width:500px; margin-left:auto; margin-right:auto;">
+    The letter L with an upward kick on the base — like a bird taking off from the ground. Minimal, geometric, works at any size.
+  </p>
+  <div class="row">
+    <div class="concept">
+      <div class="logo-frame">
+        <svg width="80" height="100" viewBox="0 0 80 100">
+          <!-- L with upward flick at the end -->
+          <path d="M 15 10 L 15 80 L 55 80 Q 65 80, 68 70 L 70 62" 
+                stroke="#F5F5F5" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="concept-label">L — Upward Kick</span>
+    </div>
+    <div class="concept">
+      <div class="app-icon-frame">
+        <svg width="50" height="60" viewBox="0 0 80 100">
+          <path d="M 15 10 L 15 80 L 55 80 Q 65 80, 68 70 L 70 62" 
+                stroke="#F5F5F5" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="concept-label">App Icon</span>
+    </div>
+    <div class="concept">
+      <div class="logo-frame">
+        <svg width="180" height="50" viewBox="0 0 180 50">
+          <!-- Small L mark -->
+          <g transform="translate(2, 2) scale(0.45)">
+            <path d="M 15 10 L 15 80 L 55 80 Q 65 80, 68 70 L 70 62" 
+                  stroke="#F5F5F5" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <!-- Wordmark -->
+          <text x="46" y="38" font-family="Space Grotesk" font-weight="700" font-size="36" fill="#F5F5F5">Lark</text>
+        </svg>
+      </div>
+      <span class="concept-label">Mark + Wordmark</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ==================== CONCEPT D: L WITH DOT ==================== -->
+<div class="section">
+  <div class="section-title">D — L + Dot</div>
+  <p style="text-align:center; color:#666; font-size:13px; margin-bottom:32px; max-width:500px; margin-left:auto; margin-right:auto;">
+    Clean geometric L with a dot accent — the dot implies "something's happening." Like a notification, a moment of discovery, a point on a map.
+  </p>
+  <div class="row">
+    <div class="concept">
+      <div class="logo-frame">
+        <svg width="80" height="100" viewBox="0 0 80 100">
+          <!-- Clean L -->
+          <path d="M 18 12 L 18 78 L 62 78" 
+                stroke="#F5F5F5" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Dot -->
+          <circle cx="62" cy="62" r="5" fill="#F5F5F5"/>
+        </svg>
+      </div>
+      <span class="concept-label">Dot at Corner</span>
+    </div>
+    <div class="concept">
+      <div class="logo-frame">
+        <svg width="80" height="100" viewBox="0 0 80 100">
+          <!-- Clean L -->
+          <path d="M 18 12 L 18 78 L 62 78" 
+                stroke="#F5F5F5" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <!-- Dot floating above -->
+          <circle cx="52" cy="22" r="5" fill="#F5F5F5"/>
+        </svg>
+      </div>
+      <span class="concept-label">Dot Floating</span>
+    </div>
+    <div class="concept">
+      <div class="app-icon-frame">
+        <svg width="50" height="60" viewBox="0 0 80 100">
+          <path d="M 18 12 L 18 78 L 62 78" 
+                stroke="#F5F5F5" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="62" cy="62" r="5.5" fill="#F5F5F5"/>
+        </svg>
+      </div>
+      <span class="concept-label">App Icon</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ==================== CONCEPT E: MUSICAL NOTE L ==================== -->
+<div class="section">
+  <div class="section-title">E — Lark Note</div>
+  <p style="text-align:center; color:#666; font-size:13px; margin-bottom:32px; max-width:500px; margin-left:auto; margin-right:auto;">
+    The L's vertical stroke doubles as a musical note stem. Subtle reference to the songbird meaning without being literal. The filled note head sits where the L's base meets the ground.
+  </p>
+  <div class="row">
+    <div class="concept">
+      <div class="logo-frame">
+        <svg width="80" height="100" viewBox="0 0 80 100">
+          <!-- Stem (L vertical) -->
+          <line x1="22" y1="12" x2="22" y2="72" stroke="#F5F5F5" stroke-width="4.5" stroke-linecap="round"/>
+          <!-- Note head (tilted ellipse at base) -->
+          <ellipse cx="32" cy="76" rx="14" ry="10" transform="rotate(-20, 32, 76)" fill="#F5F5F5"/>
+          <!-- L horizontal extends from note -->
+          <path d="M 44 80 L 62 80" stroke="#F5F5F5" stroke-width="4.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="concept-label">Note Mark</span>
+    </div>
+    <div class="concept">
+      <div class="app-icon-frame">
+        <svg width="50" height="60" viewBox="0 0 80 100">
+          <line x1="22" y1="12" x2="22" y2="72" stroke="#F5F5F5" stroke-width="5.5" stroke-linecap="round"/>
+          <ellipse cx="32" cy="76" rx="14" ry="10" transform="rotate(-20, 32, 76)" fill="#F5F5F5"/>
+          <path d="M 44 80 L 62 80" stroke="#F5F5F5" stroke-width="5.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <span class="concept-label">App Icon</span>
+    </div>
+    <div class="concept">
+      <div class="logo-frame">
+        <svg width="180" height="50" viewBox="0 0 180 50">
+          <g transform="translate(0, 2) scale(0.45)">
+            <line x1="22" y1="12" x2="22" y2="72" stroke="#F5F5F5" stroke-width="6" stroke-linecap="round"/>
+            <ellipse cx="32" cy="76" rx="14" ry="10" transform="rotate(-20, 32, 76)" fill="#F5F5F5"/>
+            <path d="M 44 80 L 62 80" stroke="#F5F5F5" stroke-width="6" stroke-linecap="round"/>
+          </g>
+          <text x="42" y="38" font-family="Space Grotesk" font-weight="700" font-size="36" fill="#F5F5F5">Lark</text>
+        </svg>
+      </div>
+      <span class="concept-label">Mark + Wordmark</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ==================== CONCEPT F: ABSTRACT SWOOSH K ==================== -->
+<div class="section">
+  <div class="section-title">F — The K Tail</div>
+  <p style="text-align:center; color:#666; font-size:13px; margin-bottom:32px; max-width:500px; margin-left:auto; margin-right:auto;">
+    No separate mark — just the wordmark with the "k" tail extended into an upward swoosh. The logotype IS the logo. The k's leg kicks up like a bird lifting off.
+  </p>
+  <div class="row">
+    <div class="concept">
+      <div class="logo-frame">
+        <svg width="160" height="55" viewBox="0 0 160 55">
+          <!-- "Lar" in Space Grotesk -->
+          <text x="0" y="42" font-family="Space Grotesk" font-weight="700" font-size="44" fill="#F5F5F5">Lar</text>
+          <!-- Custom k with extended upward tail -->
+          <g transform="translate(98, 0)">
+            <!-- k stem -->
+            <line x1="6" y1="6" x2="6" y2="44" stroke="#F5F5F5" stroke-width="5" stroke-linecap="round"/>
+            <!-- k upper arm -->
+            <path d="M 6 30 L 28 10" stroke="#F5F5F5" stroke-width="4.5" stroke-linecap="round"/>
+            <!-- k lower leg with upward flick -->
+            <path d="M 6 30 L 22 44 Q 30 50, 38 40 L 44 28" 
+                  stroke="#F5F5F5" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </div>
+      <span class="concept-label">Extended K Tail</span>
+    </div>
+    <div class="concept">
+      <div class="logo-frame">
+        <svg width="160" height="55" viewBox="0 0 160 55">
+          <text x="0" y="42" font-family="Space Grotesk" font-weight="700" font-size="44" fill="#F5F5F5">Lar</text>
+          <g transform="translate(98, 0)">
+            <line x1="6" y1="6" x2="6" y2="44" stroke="#F5F5F5" stroke-width="5" stroke-linecap="round"/>
+            <path d="M 6 30 L 28 10" stroke="#F5F5F5" stroke-width="4.5" stroke-linecap="round"/>
+            <!-- Simpler flick — just a slight upturn -->
+            <path d="M 6 30 L 26 46 Q 32 50, 38 44" 
+                  stroke="#F5F5F5" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </div>
+      <span class="concept-label">Subtle K Flick</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ==================== NAV BAR CONTEXT ==================== -->
+<div class="section">
+  <div class="section-title">In Context — Nav Bar</div>
+  <p style="text-align:center; color:#666; font-size:13px; margin-bottom:32px; max-width:500px; margin-left:auto; margin-right:auto;">
+    How each concept looks at nav bar scale (20px height).
+  </p>
+  
+  <div style="display:flex; flex-direction:column; gap:16px; align-items:center;">
+    <!-- Nav A: Pure wordmark -->
+    <div class="nav-frame">
+      <svg width="60" height="22" viewBox="0 0 60 22"><text x="0" y="18" font-family="Space Grotesk" font-weight="700" font-size="20" fill="#F5F5F5">Lark</text></svg>
+      <span class="tagline">Nights start here.</span>
+      <span class="spacer"></span>
+      <svg width="20" height="20" viewBox="0 0 20 20"><line x1="10" y1="4" x2="10" y2="4.1" stroke="#A0A0A0" stroke-width="3" stroke-linecap="round"/><line x1="4" y1="10" x2="16" y2="10" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="4" x2="10" y2="16" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A0A0A0" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="nav-icon" style="background:#2A2A2A; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#A0A0A0;">V</div>
+    </div>
+
+    <!-- Nav B: Bird mark + wordmark -->
+    <div class="nav-frame">
+      <svg width="24" height="20" viewBox="0 0 100 100">
+        <path d="M 15 65 Q 30 30, 50 45 Q 60 50, 70 35 Q 78 22, 88 18" stroke="#F5F5F5" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <path d="M 15 65 Q 28 55, 45 58 Q 55 60, 68 52" stroke="#F5F5F5" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+      </svg>
+      <svg width="52" height="18" viewBox="0 0 52 18"><text x="0" y="15" font-family="Space Grotesk" font-weight="700" font-size="17" fill="#F5F5F5">Lark</text></svg>
+      <span class="spacer"></span>
+      <svg width="20" height="20" viewBox="0 0 20 20"><line x1="10" y1="4" x2="10" y2="4.1" stroke="#A0A0A0" stroke-width="3" stroke-linecap="round"/><line x1="4" y1="10" x2="16" y2="10" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="4" x2="10" y2="16" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A0A0A0" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="nav-icon" style="background:#2A2A2A; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#A0A0A0;">V</div>
+    </div>
+
+    <!-- Nav D: L + Dot + wordmark -->
+    <div class="nav-frame">
+      <svg width="20" height="22" viewBox="0 0 80 100">
+        <path d="M 18 12 L 18 78 L 62 78" stroke="#F5F5F5" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="62" cy="62" r="6" fill="#F5F5F5"/>
+      </svg>
+      <svg width="52" height="18" viewBox="0 0 52 18"><text x="0" y="15" font-family="Space Grotesk" font-weight="700" font-size="17" fill="#F5F5F5">Lark</text></svg>
+      <span class="spacer"></span>
+      <svg width="20" height="20" viewBox="0 0 20 20"><line x1="10" y1="4" x2="10" y2="4.1" stroke="#A0A0A0" stroke-width="3" stroke-linecap="round"/><line x1="4" y1="10" x2="16" y2="10" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="4" x2="10" y2="16" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A0A0A0" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="nav-icon" style="background:#2A2A2A; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#A0A0A0;">V</div>
+    </div>
+
+    <!-- Nav E: Note + wordmark -->
+    <div class="nav-frame">
+      <svg width="20" height="22" viewBox="0 0 80 100">
+        <line x1="22" y1="12" x2="22" y2="72" stroke="#F5F5F5" stroke-width="6" stroke-linecap="round"/>
+        <ellipse cx="32" cy="76" rx="14" ry="10" transform="rotate(-20, 32, 76)" fill="#F5F5F5"/>
+        <path d="M 44 80 L 62 80" stroke="#F5F5F5" stroke-width="6" stroke-linecap="round"/>
+      </svg>
+      <svg width="52" height="18" viewBox="0 0 52 18"><text x="0" y="15" font-family="Space Grotesk" font-weight="700" font-size="17" fill="#F5F5F5">Lark</text></svg>
+      <span class="spacer"></span>
+      <svg width="20" height="20" viewBox="0 0 20 20"><line x1="10" y1="4" x2="10" y2="4.1" stroke="#A0A0A0" stroke-width="3" stroke-linecap="round"/><line x1="4" y1="10" x2="16" y2="10" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="4" x2="10" y2="16" stroke="#A0A0A0" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A0A0A0" stroke-width="1.5"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="nav-icon" style="background:#2A2A2A; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; color:#A0A0A0;">V</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ==================== STICKER / MERCH CONTEXT ==================== -->
+<div class="section">
+  <div class="section-title">Sticker / Merch Test</div>
+  <p style="text-align:center; color:#666; font-size:13px; margin-bottom:32px; max-width:500px; margin-left:auto; margin-right:auto;">
+    Would you pick this sticker up at a venue? Would it look right on a laptop?
+  </p>
+  <div class="row">
+    <div class="concept">
+      <div style="width:160px; height:160px; background:#0A0A0A; border-radius:80px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; border:1px solid #2A2A2A;">
+        <svg width="60" height="22" viewBox="0 0 60 22"><text x="4" y="18" font-family="Space Grotesk" font-weight="700" font-size="20" fill="#F5F5F5">Lark</text></svg>
+        <span style="font-size:9px; color:#666; letter-spacing:0.08em;">lark.show</span>
+      </div>
+      <span class="concept-label">Circle Sticker — Wordmark</span>
+    </div>
+    <div class="concept">
+      <div style="width:160px; height:160px; background:#0A0A0A; border-radius:80px; display:flex; align-items:center; justify-content:center; border:1px solid #2A2A2A;">
+        <svg width="60" height="60" viewBox="0 0 100 100">
+          <path d="M 15 65 Q 30 30, 50 45 Q 60 50, 70 35 Q 78 22, 88 18" stroke="#F5F5F5" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          <path d="M 15 65 Q 28 55, 45 58 Q 55 60, 68 52" stroke="#F5F5F5" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6"/>
+        </svg>
+      </div>
+      <span class="concept-label">Circle Sticker — Bird Mark</span>
+    </div>
+    <div class="concept">
+      <div style="width:160px; height:160px; background:#0A0A0A; border-radius:80px; display:flex; align-items:center; justify-content:center; border:1px solid #2A2A2A;">
+        <svg width="50" height="60" viewBox="0 0 80 100">
+          <path d="M 18 12 L 18 78 L 62 78" stroke="#F5F5F5" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="62" cy="62" r="5.5" fill="#F5F5F5"/>
+        </svg>
+      </div>
+      <span class="concept-label">Circle Sticker — L + Dot</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

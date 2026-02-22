@@ -62,15 +62,13 @@ export function GroupsTab() {
     const baseUrl = window.location.origin;
     const inviteUrl = `${baseUrl}/g/${group.inviteCode}`;
 
-    const shareText = `Join ${group.name} on Lark! Everyone who joins becomes friends with each other so future plans are easier.
-
-${inviteUrl}`;
+    const shareText = `${inviteUrl}`;
 
     // Try native share first
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Join ${group.name} on Lark`,
+          title: group.name,
           text: shareText,
         });
         return;

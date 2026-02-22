@@ -65,13 +65,13 @@ export function SocialEngagementPanel({ isLoggedIn }: SocialEngagementPanelProps
     if (!stats?.inviteCode) return;
 
     const inviteUrl = `${window.location.origin}?ref=${stats.inviteCode}`;
-    const shareText = `Add me as a friend on Lark so we can spot Austin events and actually make plans to go. ${inviteUrl}`;
+    const shareText = `I've been using this app Lark for finding stuff to do in Austin. Way easier than scrolling Instagram stories. ${inviteUrl}`;
 
     // Try native share first (mobile)
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'Join me on Lark',
+          title: 'Lark',
           text: shareText,
         });
         return;

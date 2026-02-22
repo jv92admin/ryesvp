@@ -39,8 +39,16 @@ interface Squad {
   members: SquadMember[];
 }
 
+function getPlanLink(squadId: string): string {
+  const origin = typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL || '';
+  return `${origin}/squads/${squadId}`;
+}
+
 /**
- * Generate share plan text based on user's ticket status and squad state
+ * Generate share plan text based on user's ticket status and squad state.
+ *
+ * Templates follow the share-curator spec:
+ *   hook -> details -> link. No product language, no feature explanations.
  */
 export function generateSharePlanText(
   squad: Squad,
@@ -53,85 +61,60 @@ export function generateSharePlanText(
 
   const eventName = squad.event.displayTitle;
   const eventDate = formatInTimeZone(new Date(squad.event.startDateTime), AUSTIN_TIMEZONE, 'EEE, MMM d');
-  const eventTime = formatInTimeZone(new Date(squad.event.startDateTime), AUSTIN_TIMEZONE, 'h:mm a');
   const venueName = squad.event.venue.name;
-  const eventLink = `${typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL || ''}/events/${squad.event.id}`;
-  
-  // Get deadline text if set
-  const deadlineText = squad.deadline 
-    ? ` by ${formatInTimeZone(new Date(squad.deadline), AUSTIN_TIMEZONE, 'EEE h:mm a')}`
-    : '';
+  const planLink = getPlanLink(squad.id);
 
-  // Count squad status
-  const inCount = squad.members.filter(m => m.status === 'IN').length;
-  const thinkingCount = squad.members.filter(m => m.status === 'THINKING').length;
-  
-  const squadSummary = inCount > 0 || thinkingCount > 0 
-    ? ` (${inCount} in, ${thinkingCount} maybe)`
-    : '';
-
-  // Check if user is buying for others
+  // Check if user is buying for others (organizer buying tickets)
   const buyingForCount = userMember.buyingForIds?.length || 0;
 
   if (buyingForCount > 0) {
-    const deadlinePart = squad.deadline 
-      ? ` by ${formatInTimeZone(new Date(squad.deadline), AUSTIN_TIMEZONE, 'EEE h:mm a')}`
-      : '';
-    return `I'm organizing ${eventName} on ${eventDate} at ${eventTime} (${venueName}). I'm getting tickets for people who say they're in${deadlinePart}. Mark your status in the plan so I can sort tickets and logistics: ${eventLink}`;
+    return `${eventName} — ${eventDate}\n${venueName}\n\nI'm grabbing tickets — are you in?\n${planLink}`;
   }
-  
+
   if (userMember.ticketStatus === 'YES') {
-    return `I'm going to ${eventName} on ${eventDate} at ${eventTime}. If you're in, mark it in the plan and grab your ticket here so we can coordinate: ${eventLink}`;
+    return `${eventName} — ${eventDate}\n${venueName}\n\nI've got my ticket — you coming?\n${planLink}`;
   }
-  
-  return `Thinking about ${eventName} on ${eventDate} at ${eventTime} (${venueName}). Mark if you're in and your ticket situation in the plan so we can see if this one comes together: ${eventLink}`;
+
+  return `${eventName} — ${eventDate}\n${venueName}\n\nAre you in? ${planLink}`;
 }
 
 /**
- * Generate day-of logistics text with meetup details
+ * Generate day-of share text with meetup details.
+ *
+ * No emoji. Day-of texts are practical — people are checking these
+ * while getting ready. Just clean info.
  */
 export function generateDayOfText(squad: Squad): string {
   const eventName = squad.event.displayTitle;
   const eventTime = formatInTimeZone(new Date(squad.event.startDateTime), AUSTIN_TIMEZONE, 'h:mm a');
-  const eventLink = `${typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL || ''}/events/${squad.event.id}`;
-  
-  const inMembers = squad.members.filter(m => m.status === 'IN');
-  const memberNames = inMembers
-    .map(m => m.user.displayName || m.user.email.split('@')[0])
-    .join(', ');
+  const venueName = squad.event.venue.name;
+  const planLink = getPlanLink(squad.id);
 
-  let text = `Tonight: ${eventName} at ${eventTime}! 🎵`;
-  
+  let text = `Tonight — ${eventName}\n${venueName} · Doors at ${eventTime}`;
+
   if (squad.meetTime && squad.meetSpot) {
     const meetTime = formatInTimeZone(new Date(squad.meetTime), AUSTIN_TIMEZONE, 'h:mm a');
-    text += `\n\n📍 Meeting at ${meetTime} at ${squad.meetSpot}, then heading to the show.`;
+    text += `\n\nMeeting at ${squad.meetSpot} at ${meetTime}`;
   } else if (squad.meetTime) {
     const meetTime = formatInTimeZone(new Date(squad.meetTime), AUSTIN_TIMEZONE, 'h:mm a');
-    text += `\n\n⏰ Meeting at ${meetTime} (location TBD).`;
+    text += `\n\nMeeting at ${meetTime}`;
   } else if (squad.meetSpot) {
-    text += `\n\n📍 Meeting at ${squad.meetSpot} (time TBD).`;
-  } else {
-    text += `\n\n📍 Meetup details TBD - check the plan!`;
+    text += `\n\nMeeting at ${squad.meetSpot}`;
   }
-  
-  if (inMembers.length > 0) {
-    text += `\n\n👥 Going: ${memberNames}`;
-  }
-  
-  text += `\n\nOpen the plan for all the details: ${eventLink}`;
-  
+
+  text += `\n\n${planLink}`;
+
   return text;
 }
 
 /**
- * Generic share text for when user status is unclear
+ * Generic share text for when user status is unclear (member inviting others)
  */
 function generateGenericShareText(squad: Squad): string {
   const eventName = squad.event.displayTitle;
   const eventDate = formatInTimeZone(new Date(squad.event.startDateTime), AUSTIN_TIMEZONE, 'EEE, MMM d');
-  const eventTime = formatInTimeZone(new Date(squad.event.startDateTime), AUSTIN_TIMEZONE, 'h:mm a');
   const venueName = squad.event.venue.name;
-  const eventLink = `${typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_APP_URL || ''}/events/${squad.event.id}`;
-  
-  return `Thinking about ${eventName} on ${eventDate} at ${eventTime} (${venueName}). Mark if you're in and your ticket situation in the plan so we can see if this one comes together: ${eventLink}`;
+  const planLink = getPlanLink(squad.id);
+
+  return `${eventName} — ${eventDate}\n${venueName}\n\nA few of us are going. You down?\n${planLink}`;
 }

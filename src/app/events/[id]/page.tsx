@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getEventDisplay, getEventDetailedSocial } from '@/db/events';
 import { Header } from '@/components/Header';
@@ -21,6 +22,42 @@ const AUSTIN_TIMEZONE = 'America/Chicago';
 
 interface EventPageProps {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({ params }: EventPageProps): Promise<Metadata> {
+  const { id } = await params;
+  const event = await getEventDisplay(id);
+
+  if (!event) return {};
+
+  const dateFormatted = formatInTimeZone(
+    event.startDateTime,
+    AUSTIN_TIMEZONE,
+    'EEEE, MMMM d · h:mm a'
+  );
+
+  const title = `${event.displayTitle} — Lark`;
+  const description = `${event.venue.name} · ${dateFormatted}`;
+
+  const images = event.imageUrl
+    ? [{ url: event.imageUrl, width: 1200, height: 630 }]
+    : undefined;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images,
+    },
+  };
 }
 
 export default async function EventPage({ params }: EventPageProps) {
