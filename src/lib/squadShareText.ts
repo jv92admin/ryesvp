@@ -68,14 +68,14 @@ export function generateSharePlanText(
   const buyingForCount = userMember.buyingForIds?.length || 0;
 
   if (buyingForCount > 0) {
-    return `${eventName} — ${eventDate}\n${venueName}\n\nI'm grabbing tickets — are you in?\n${planLink}`;
+    return `Here's the plan for ${eventName} — ${eventDate}\n${venueName}\n\nI'm grabbing tickets — are you in?\n${planLink}`;
   }
 
   if (userMember.ticketStatus === 'YES') {
-    return `${eventName} — ${eventDate}\n${venueName}\n\nI've got my ticket — you coming?\n${planLink}`;
+    return `Here's the plan for ${eventName} — ${eventDate}\n${venueName}\n\nI've got my ticket — you coming?\n${planLink}`;
   }
 
-  return `${eventName} — ${eventDate}\n${venueName}\n\nAre you in? ${planLink}`;
+  return `Here's the plan for ${eventName} — ${eventDate}\n${venueName}\n\nAre you in?\n${planLink}`;
 }
 
 /**
@@ -116,5 +116,5 @@ function generateGenericShareText(squad: Squad): string {
   const venueName = squad.event.venue.name;
   const planLink = getPlanLink(squad.id);
 
-  return `${eventName} — ${eventDate}\n${venueName}\n\nA few of us are going. You down?\n${planLink}`;
+  return `Here's the plan for ${eventName} — ${eventDate}\n${venueName}\n\nA few of us are going. You down?\n${planLink}`;
 }
