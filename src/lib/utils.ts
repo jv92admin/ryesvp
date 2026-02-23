@@ -5,6 +5,18 @@ import { formatInTimeZone, toZonedTime, fromZonedTime } from 'date-fns-tz';
 export const AUSTIN_TIMEZONE = 'America/Chicago';
 
 /**
+ * Get start of today (midnight) in Austin time as a proper UTC Date.
+ * Use this instead of `new Date()` for event queries so events stay visible all day.
+ */
+export function getStartOfTodayAustin(): Date {
+  const austinNow = toZonedTime(new Date(), AUSTIN_TIMEZONE);
+  return fromZonedTime(
+    new Date(austinNow.getFullYear(), austinNow.getMonth(), austinNow.getDate(), 0, 0, 0, 0),
+    AUSTIN_TIMEZONE
+  );
+}
+
+/**
  * Create a UTC Date from Austin local time components.
  * Use this in scrapers to ensure times are stored correctly regardless of server timezone.
  * 

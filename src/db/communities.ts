@@ -2,6 +2,7 @@ import prisma from './prisma';
 import { List, ListMember, ListMemberStatus, ListRole, User, FriendshipStatus } from '@prisma/client';
 import { areFriends } from './friends';
 import { nanoid } from 'nanoid';
+import { getStartOfTodayAustin } from '@/lib/utils';
 
 // Types
 export type CommunityWithMembers = List & {
@@ -507,7 +508,7 @@ export async function getCommunityEvents(
   // Get upcoming events where members are going/interested
   const events = await prisma.event.findMany({
     where: {
-      startDateTime: { gte: new Date() },
+      startDateTime: { gte: getStartOfTodayAustin() },
       status: 'SCHEDULED',
       userEvents: {
         some: {
@@ -605,7 +606,7 @@ export async function getCommunityEventStats(
   // Count upcoming events with members going
   const eventCount = await prisma.event.count({
     where: {
-      startDateTime: { gte: new Date() },
+      startDateTime: { gte: getStartOfTodayAustin() },
       status: 'SCHEDULED',
       userEvents: {
         some: {
@@ -622,7 +623,7 @@ export async function getCommunityEventStats(
       userId: { in: memberIds },
       status: 'GOING',
       event: {
-        startDateTime: { gte: new Date() },
+        startDateTime: { gte: getStartOfTodayAustin() },
         status: 'SCHEDULED',
       },
     },

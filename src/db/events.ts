@@ -1,12 +1,11 @@
 import prisma from './prisma';
 import { Event, Venue, EventCategory, EventStatus, Prisma } from '@prisma/client';
-import { toZonedTime } from 'date-fns-tz';
+import { toZonedTime, fromZonedTime } from 'date-fns-tz';
 import { getFriendIds } from './friends';
 import { getListMemberIds, getAllListMemberIds } from './lists';
 import { getCommunityMemberIds, getUserCommunities } from './communities';
 import { type TMPresale, isRelevantPresale } from '@/lib/presales';
-
-const AUSTIN_TIMEZONE = 'America/Chicago';
+import { AUSTIN_TIMEZONE, getStartOfTodayAustin } from '@/lib/utils';
 
 /**
  * Get event IDs that have active presales, upcoming presales, or future on-sale dates.
@@ -14,11 +13,11 @@ const AUSTIN_TIMEZONE = 'America/Chicago';
  */
 async function getPresaleEventIds(): Promise<string[]> {
   const now = new Date();
-  
-  // Fetch all future scheduled events with enrichment data
+
+  // Fetch all scheduled events from today onward (midnight Austin time)
   const events = await prisma.event.findMany({
     where: {
-      startDateTime: { gte: now },
+      startDateTime: { gte: getStartOfTodayAustin() },
       status: 'SCHEDULED',
       enrichment: { isNot: null },
     },
@@ -78,50 +77,56 @@ async function getPresaleEventIds(): Promise<string[]> {
 }
 
 /**
+ * Convert an Austin-local date to start-of-day (midnight) as proper UTC.
+ * The input `d` is a "fake" Date from toZonedTime whose local getters show Austin time.
+ */
+function austinStartOfDay(d: Date): Date {
+  return fromZonedTime(
+    new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0),
+    AUSTIN_TIMEZONE
+  );
+}
+
+/**
+ * Convert an Austin-local date to end-of-day (23:59:59) as proper UTC.
+ */
+function austinEndOfDay(d: Date): Date {
+  return fromZonedTime(
+    new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999),
+    AUSTIN_TIMEZONE
+  );
+}
+
+/**
  * Compute date range for a preset (today, thisWeek, weekend).
- * All calculations in America/Chicago timezone.
+ * All calculations in America/Chicago timezone, properly converted to UTC for DB queries.
  */
 function getDateRangeForPreset(preset: 'today' | 'thisWeek' | 'weekend'): { start: Date; end: Date } {
-  // Get current time in Austin timezone
-  const now = new Date();
-  const austinNow = toZonedTime(now, AUSTIN_TIMEZONE);
-  
-  // Helper to create a date at start/end of day in Austin time
-  const startOfDay = (date: Date): Date => {
-    const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
-    return d;
-  };
-  
-  const endOfDay = (date: Date): Date => {
-    const d = new Date(date);
-    d.setHours(23, 59, 59, 999);
-    return d;
-  };
-  
+  // Get current time in Austin timezone (fake Date whose local getters show Austin time)
+  const austinNow = toZonedTime(new Date(), AUSTIN_TIMEZONE);
   const dayOfWeek = austinNow.getDay(); // 0 = Sunday, 6 = Saturday
-  
+
   switch (preset) {
     case 'today':
       return {
-        start: startOfDay(austinNow),
-        end: endOfDay(austinNow),
+        start: austinStartOfDay(austinNow),
+        end: austinEndOfDay(austinNow),
       };
-      
+
     case 'thisWeek':
       // Today through end of Sunday
       const endOfWeek = new Date(austinNow);
       endOfWeek.setDate(austinNow.getDate() + (7 - dayOfWeek)); // Next Sunday
       return {
-        start: startOfDay(austinNow),
-        end: endOfDay(endOfWeek),
+        start: austinStartOfDay(austinNow),
+        end: austinEndOfDay(endOfWeek),
       };
-      
+
     case 'weekend':
       // Friday through Sunday (current or next weekend)
       let friday: Date;
       let sunday: Date;
-      
+
       if (dayOfWeek === 0) {
         // It's Sunday - show today only
         friday = austinNow;
@@ -143,17 +148,17 @@ function getDateRangeForPreset(preset: 'today' | 'thisWeek' | 'weekend'): { star
         sunday = new Date(friday);
         sunday.setDate(friday.getDate() + 2);
       }
-      
+
       return {
-        start: startOfDay(friday),
-        end: endOfDay(sunday),
+        start: austinStartOfDay(friday),
+        end: austinEndOfDay(sunday),
       };
-      
+
     default:
       // Fallback: today
       return {
-        start: startOfDay(austinNow),
-        end: endOfDay(austinNow),
+        start: austinStartOfDay(austinNow),
+        end: austinEndOfDay(austinNow),
       };
   }
 }
@@ -318,8 +323,8 @@ export async function getEvents(params: GetEventsParams = {}): Promise<EventWith
     if (startDate) (where.startDateTime as Record<string, Date>).gte = startDate;
     if (endDate) (where.startDateTime as Record<string, Date>).lte = endDate;
   } else {
-    // Default: only show future events
-    where.startDateTime = { gte: new Date() };
+    // Default: show all events from today (midnight Austin time) onward
+    where.startDateTime = { gte: getStartOfTodayAustin() };
   }
 
   // Category filter (multi-select takes precedence)
@@ -530,8 +535,8 @@ export async function getEventsWithAttendance(params: GetEventsParams = {}): Pro
     if (params.startDate) (baseWhere.startDateTime as Record<string, Date>).gte = params.startDate;
     if (params.endDate) (baseWhere.startDateTime as Record<string, Date>).lte = params.endDate;
   } else {
-    // Default: only show future events
-    baseWhere.startDateTime = { gte: new Date() };
+    // Default: show all events from today (midnight Austin time) onward
+    baseWhere.startDateTime = { gte: getStartOfTodayAustin() };
   }
   
   // Category filter (multi-select takes precedence)

@@ -1,6 +1,7 @@
 import prisma from './prisma';
 import { SquadMemberStatus, SquadTicketStatus } from '@prisma/client';
 import { getUserEventByEventId, upsertUserEvent } from './userEvents';
+import { getStartOfTodayAustin } from '@/lib/utils';
 
 /**
  * Create a new Squad for an event
@@ -409,7 +410,7 @@ export async function getUserSquads(userId: string) {
   return prisma.squad.findMany({
     where: {
       members: { some: { userId } },
-      event: { startDateTime: { gte: new Date() } },
+      event: { startDateTime: { gte: getStartOfTodayAustin() } },
     },
     include: {
       event: { include: { venue: true } },

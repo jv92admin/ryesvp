@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/db/prisma';
+import { getStartOfTodayAustin } from '@/lib/utils';
 
 export async function GET() {
   const user = await getCurrentUser();
@@ -16,7 +17,7 @@ export async function GET() {
         userId: user.dbUser.id,
         status: { in: ['GOING', 'INTERESTED'] },
         event: {
-          startDateTime: { gte: new Date() },
+          startDateTime: { gte: getStartOfTodayAustin() },
           status: 'SCHEDULED',
         },
       },
