@@ -2,6 +2,7 @@ import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
 import { createAustinDate } from '@/lib/utils';
+import { inferYear } from '../utils/dateParser';
 
 /**
  * Scrape events from Moody Amphitheater at Waterloo Park.
@@ -134,14 +135,8 @@ function parseDate(month: string, day: string, timeStr: string): Date | null {
       return null;
     }
     
-    // Determine year - if month is in the past, use next year
-    const now = new Date();
-    let year = now.getFullYear();
-    const testDate = new Date(year, monthNum, dayNum);
-    
-    if (testDate < now) {
-      year += 1;
-    }
+    // Determine year from month/day (day-level comparison in Austin time)
+    const year = inferYear(monthNum, dayNum);
     
     // Parse time
     let hours = 19; // Default to 7pm

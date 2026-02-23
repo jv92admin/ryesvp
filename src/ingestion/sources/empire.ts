@@ -3,6 +3,7 @@ import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
 import { launchBrowser } from '@/lib/browser';
 import { createAustinDate } from '@/lib/utils';
+import { inferYear } from '../utils/dateParser';
 
 /**
  * Scrape events from Empire Garage & Control Room website.
@@ -190,19 +191,8 @@ function parseEmpireDate(dateStr: string): Date | null {
   const month = monthMap[monthStr];
   if (month === undefined) return null;
   
-  // Determine year - if the date has passed this year, use next year
-  const now = new Date();
-  let year = now.getFullYear();
-  
-  const candidateDate = new Date(year, month, day);
-  if (candidateDate < now) {
-    // Check if it's more than 2 months in the past (probably next year)
-    const twoMonthsAgo = new Date();
-    twoMonthsAgo.setMonth(twoMonthsAgo.getMonth() - 2);
-    if (candidateDate < twoMonthsAgo) {
-      year++;
-    }
-  }
+  // Determine year from month/day (day-level comparison in Austin time)
+  const year = inferYear(month, day);
   
   // Default time to 8 PM for concerts - create in Austin timezone
   return createAustinDate(year, month, day, 20, 0);

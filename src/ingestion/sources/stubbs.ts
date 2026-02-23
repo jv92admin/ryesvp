@@ -1,7 +1,7 @@
 import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
-import { inferCategory } from '../utils/dateParser';
+import { inferCategory, inferYear } from '../utils/dateParser';
 import { createAustinDate } from '@/lib/utils';
 
 /**
@@ -160,14 +160,8 @@ function parseStubbyDate(displayDate: string, url: string, hour: number | null, 
     const month = parseInt(parts[0], 10) - 1; // 0-indexed
     const day = parseInt(parts[1], 10);
 
-    // Determine year - if the date has passed this year, use next year
-    const now = new Date();
-    let year = now.getFullYear();
-    
-    const testDate = new Date(year, month, day);
-    if (testDate < now) {
-      year += 1;
-    }
+    // Determine year from month/day (day-level comparison in Austin time)
+    const year = inferYear(month, day);
 
     // Create date in Austin timezone
     return createAustinDate(year, month, day, finalHour, finalMinute);

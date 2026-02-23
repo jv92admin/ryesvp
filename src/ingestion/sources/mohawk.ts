@@ -3,6 +3,7 @@ import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
 import { launchBrowser } from '@/lib/browser';
 import { createAustinDate } from '@/lib/utils';
+import { inferYear } from '../utils/dateParser';
 
 /**
  * Scrape events from Mohawk Austin website.
@@ -194,14 +195,8 @@ function parseMohawkDate(month: string, day: string, time: string): Date | null 
       }
     }
     
-    // Determine year - if month is before current month, it's next year
-    const now = new Date();
-    let year = now.getFullYear();
-    
-    const testDate = new Date(year, monthNum, dayNum, hour, minute);
-    if (testDate < now) {
-      year++;
-    }
+    // Determine year from month/day (day-level comparison in Austin time)
+    const year = inferYear(monthNum, dayNum);
     
     // Create date in Austin timezone
     return createAustinDate(year, monthNum, dayNum, hour, minute);

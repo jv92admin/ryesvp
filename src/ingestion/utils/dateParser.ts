@@ -1,6 +1,8 @@
 /**
  * Date parsing utilities for scrapers
  */
+import { toZonedTime } from 'date-fns-tz';
+import { AUSTIN_TIMEZONE } from '@/lib/utils';
 
 /**
  * Parse date string like "Sunday / Feb 1 / 2026" or "Tuesday / Feb 3 / 2026"
@@ -58,6 +60,30 @@ export function parseDate(dateStr: string, defaultTime: string = '20:00'): Date 
   // Try other common formats
   // Add more parsers as needed for different venues
   return null;
+}
+
+/**
+ * Infer the correct year for a month/day that has no year.
+ * Many venue websites only show "2/23" without a year. This function determines
+ * whether that means the current year or next year.
+ *
+ * Compares at the DAY level in Austin time — so an event today is never bumped
+ * to next year, regardless of what time the cron runs.
+ *
+ * @param month 0-indexed month (0 = January)
+ * @param day Day of month
+ */
+export function inferYear(month: number, day: number): number {
+  const austinNow = toZonedTime(new Date(), AUSTIN_TIMEZONE);
+  const year = austinNow.getFullYear();
+  const currentMonth = austinNow.getMonth();
+  const currentDay = austinNow.getDate();
+
+  // Only bump to next year if the date is strictly before today
+  if (month < currentMonth || (month === currentMonth && day < currentDay)) {
+    return year + 1;
+  }
+  return year;
 }
 
 /**
