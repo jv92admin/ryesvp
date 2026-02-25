@@ -2,7 +2,8 @@ import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { launchBrowser } from '@/lib/browser';
 import { load } from 'cheerio';
-import { parseDate } from '../utils/dateParser';
+import { inferYear } from '../utils/dateParser';
+import { createAustinDate } from '@/lib/utils';
 
 /**
  * Scraper for The Concourse Project
@@ -104,26 +105,8 @@ export async function fetchEventsFromConcourseProject(): Promise<NormalizedEvent
                 const priceRange = $(el).find('.price').text().trim(); // "$35.00-$55.00"
                 const genre = $(el).find('p.genre').text().trim(); // "DJ/Dance"
 
-                // Parse the date - need to infer year
-                const currentYear = new Date().getFullYear();
-                const currentMonth = new Date().getMonth();
-                
                 // Extract month and day from date text like "Sat Dec 6" or "Fri Dec 12"
                 const dateMatch = dateText.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2})\b/i);
-                let year = currentYear;
-                let month = '';
-                let day = '';
-                
-                if (dateMatch) {
-                    month = dateMatch[1];
-                    day = dateMatch[2];
-                    const monthIndex = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
-                        .indexOf(month.toLowerCase());
-                    // If the event month is before current month, it's next year
-                    if (monthIndex < currentMonth) {
-                        year = currentYear + 1;
-                    }
-                }
 
                 // Parse time: "9:00PM" -> hours, minutes
                 let hours = 20; // Default 8pm
@@ -137,13 +120,15 @@ export async function fetchEventsFromConcourseProject(): Promise<NormalizedEvent
                     if (!isPM && hours === 12) hours = 0;
                 }
 
-                // Build date directly
+                // Build date using Austin timezone
                 let startDateTime: Date | null = null;
-                if (month && day) {
+                if (dateMatch) {
                     const monthIndex = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec']
-                        .indexOf(month.toLowerCase());
+                        .indexOf(dateMatch[1].toLowerCase());
+                    const dayNum = parseInt(dateMatch[2], 10);
                     if (monthIndex >= 0) {
-                        startDateTime = new Date(year, monthIndex, parseInt(day, 10), hours, minutes, 0);
+                        const year = inferYear(monthIndex, dayNum);
+                        startDateTime = createAustinDate(year, monthIndex, dayNum, hours, minutes);
                     }
                 }
 

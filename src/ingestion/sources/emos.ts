@@ -2,6 +2,7 @@ import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import * as cheerio from 'cheerio';
 import { launchBrowser } from '@/lib/browser';
+import { createAustinDate, getStartOfTodayAustin } from '@/lib/utils';
 
 type CheerioAPI = ReturnType<typeof cheerio.load>;
 type CheerioElement = cheerio.Element;
@@ -126,12 +127,8 @@ function extractFromJsonLd($: CheerioAPI, eventsMap: Map<string, NormalizedEvent
             continue;
           }
           
-          // Compare dates only (ignore time) to avoid filtering out events happening later today
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          const eventDate = new Date(startDateTime);
-          eventDate.setHours(0, 0, 0, 0);
-          if (eventDate < today) {
+          // Skip past events (using Austin midnight cutoff)
+          if (startDateTime < getStartOfTodayAustin()) {
             continue;
           }
           
@@ -194,9 +191,10 @@ function extractFromDom($: CheerioAPI, eventsMap: Map<string, NormalizedEvent>):
       }
       
       const [, month, day, year] = urlDateMatch;
-      const startDateTime = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
-      
-      if (isNaN(startDateTime.getTime()) || startDateTime < new Date()) {
+      // Use createAustinDate for proper timezone handling (default 8 PM, refined below if time found)
+      let startDateTime = createAustinDate(parseInt(year), parseInt(month) - 1, parseInt(day), 20, 0);
+
+      if (isNaN(startDateTime.getTime()) || startDateTime < getStartOfTodayAustin()) {
         return;
       }
       
@@ -269,13 +267,14 @@ function extractFromDom($: CheerioAPI, eventsMap: Map<string, NormalizedEvent>):
         const timeParts = timeMatch[1].match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
         if (timeParts) {
           let hours = parseInt(timeParts[1], 10);
-          const minutes = parseInt(timeParts[2], 10);
+          const mins = parseInt(timeParts[2], 10);
           const isPM = timeParts[3].toUpperCase() === 'PM';
-          
+
           if (isPM && hours !== 12) hours += 12;
           if (!isPM && hours === 12) hours = 0;
-          
-          startDateTime.setHours(hours, minutes, 0, 0);
+
+          // Rebuild with correct time in Austin timezone
+          startDateTime = createAustinDate(parseInt(year), parseInt(month) - 1, parseInt(day), hours, mins);
         }
       }
       
@@ -301,42 +300,6 @@ function extractFromDom($: CheerioAPI, eventsMap: Map<string, NormalizedEvent>):
       // Skip this link on error
     }
   });
-}
-
-/**
- * Parse date strings from Emo's website
- */
-function parseEmosDate(dateStr: string): Date | null {
-  try {
-    // Try ISO format first (from datetime attribute)
-    if (dateStr.includes('T') || dateStr.match(/^\d{4}-\d{2}-\d{2}/)) {
-      return new Date(dateStr);
-    }
-    
-    // Try common formats: "Dec 15, 2025", "December 15, 2025", etc.
-    const parsed = new Date(dateStr);
-    if (!isNaN(parsed.getTime())) {
-      return parsed;
-    }
-    
-    // Try parsing "Sat Dec 14" style (add current/next year)
-    const dayMonthMatch = dateStr.match(/(\w+)\s+(\w+)\s+(\d+)/);
-    if (dayMonthMatch) {
-      const [, , month, day] = dayMonthMatch;
-      const year = new Date().getFullYear();
-      const attempt = new Date(`${month} ${day}, ${year}`);
-      
-      // If it's in the past, try next year
-      if (attempt < new Date()) {
-        return new Date(`${month} ${day}, ${year + 1}`);
-      }
-      return attempt;
-    }
-    
-    return null;
-  } catch {
-    return null;
-  }
 }
 
 /**

@@ -204,8 +204,99 @@ Many venues have "Know Before You Go" / FAQ pages with valuable metadata we shou
 
 ---
 
+## 2026-02-23: Year Inference Bug (Stubb's, Mohawk, Moody Amphitheater, Empire)
+
+**Status:** ✅ Fixed
+
+**Severity:** Critical — corrupted live event data, caused events to disappear from listings
+
+**Issue:** Events for "today" were being stored with the wrong year (2027 instead of 2026). A Del Water Gap show at Stubb's on Feb 23 at 6:30 PM vanished from the app because its `startDateTime` was `2027-02-24T00:30:00.000Z`.
+
+**Root Cause:**
+Year inference in 4 scrapers compared `new Date(year, month, day)` (midnight UTC) against `new Date()` (cron execution time, 8 AM UTC). Since midnight < 8 AM, today's events appeared "in the past" and got bumped to the next year.
+
+```typescript
+// BROKEN: At 8 AM UTC, midnight UTC on the same day looks "past"
+const now = new Date();             // 8 AM UTC
+const test = new Date(year, month, day); // midnight UTC same day
+if (test < now) year++;             // midnight < 8 AM → year = 2027!
+```
+
+The upsert pipeline then **overwrote** the previously-correct `startDateTime` with the corrupted 2027 date.
+
+**Fix Applied:**
+Created shared `inferYear(month, day)` utility in `src/ingestion/utils/dateParser.ts`:
+- Compares at **day level** only (not time level)
+- Uses **Austin timezone** for the "now" reference (not UTC)
+- If the month/day is before today in Austin time, assumes next year
+
+```typescript
+export function inferYear(month: number, day: number): number {
+  const austinNow = toZonedTime(new Date(), AUSTIN_TIMEZONE);
+  const year = austinNow.getFullYear();
+  const currentMonth = austinNow.getMonth();
+  const currentDay = austinNow.getDate();
+  if (month < currentMonth || (month === currentMonth && day < currentDay)) {
+    return year + 1;
+  }
+  return year;
+}
+```
+
+Updated 4 scrapers to use `inferYear()`:
+- `stubbs.ts` — replaced inline year check
+- `mohawk.ts` — replaced inline year check
+- `moodyAmphitheater.ts` — replaced inline year check
+- `empire.ts` — replaced 2-month buffer variant
+
+**Result:** Del Water Gap event restored to correct date (Mon, Feb 23, 2026 · 6:30 PM). Verified on live site.
+
+**Files Changed:**
+- `src/ingestion/utils/dateParser.ts` — added `inferYear()` export
+- `src/ingestion/sources/stubbs.ts`
+- `src/ingestion/sources/mohawk.ts`
+- `src/ingestion/sources/moodyAmphitheater.ts`
+- `src/ingestion/sources/empire.ts`
+
+**Commits:** `964052a`
+
+**Lesson:** Year inference must never compare at time-of-day level. The cron schedule (8 AM UTC) creates a window where "today" in UTC midnight terms looks "past." Always compare at day granularity in the target timezone.
+
+---
+
+## 2026-02-23: Event Listing Filter — Midnight Cutoff
+
+**Status:** ✅ Fixed
+
+**Issue:** Events disappeared from listings as soon as their `startDateTime` passed. A 6:30 PM event was gone by 6:31 PM.
+
+**Root Cause:**
+All event queries used `gte: new Date()` to filter future events. This meant:
+1. Events disappeared the instant their start time passed (too aggressive)
+2. `getDateRangeForPreset()` used `startOfDay`/`endOfDay` on "fake" zoned dates without converting back to UTC via `fromZonedTime()` — on Vercel (UTC), "end of today" was ~6 PM CST
+
+**Fix Applied:**
+1. Created `getStartOfTodayAustin()` in `src/lib/utils.ts` — returns midnight Austin time as UTC Date
+2. Replaced `gte: new Date()` with `gte: getStartOfTodayAustin()` in 7 locations across 6 files
+3. Fixed `getDateRangeForPreset()` with proper `austinStartOfDay()`/`austinEndOfDay()` helpers using `fromZonedTime()`
+
+**Result:** Events stay visible for the entire day they occur, regardless of show time.
+
+**Files Changed:**
+- `src/lib/utils.ts` — added `getStartOfTodayAustin()`
+- `src/db/events.ts` — fixed date preset ranges and default filter
+- `src/db/communities.ts` — fixed 3 event queries
+- `src/db/squads.ts` — fixed 1 event query
+- `src/app/api/friends/events/route.ts` — fixed 1 event query
+- `src/app/api/users/me/events/route.ts` — fixed 1 event query
+
+**Commits:** `49f7d53`
+
+---
+
 ## Debug Tools Created
 
 - `scripts/debug/test-scraper.ts` - Run any scraper without DB writes
 - `scripts/audit-event-coverage.ts` - Check event counts & date ranges per venue
+- `scripts/ingest-offline.ts` - Run scrapers locally with DB writes (`--venue=slug` or `--all`)
 

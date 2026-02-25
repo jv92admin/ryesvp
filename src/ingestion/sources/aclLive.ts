@@ -2,7 +2,8 @@ import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
 import { launchBrowser } from '@/lib/browser';
-import { createAustinDate } from '@/lib/utils';
+import { createAustinDate, AUSTIN_TIMEZONE } from '@/lib/utils';
+import { toZonedTime } from 'date-fns-tz';
 
 /**
  * Scrape events from ACL Live website.
@@ -249,7 +250,7 @@ function parseAclLiveDate(month: string, day: string, year: string, url: string)
     }
 
     const dayNum = parseInt(cleanDay, 10);
-    const yearNum = parseInt(cleanYear, 10) || new Date().getFullYear();
+    const yearNum = parseInt(cleanYear, 10) || toZonedTime(new Date(), AUSTIN_TIMEZONE).getFullYear();
 
     // Try to extract time from URL (e.g., "at-8-pm", "at-7-30-pm")
     const timeMatch = url.match(/at-(\d+)(?:-(\d+))?-(am|pm)/i);
@@ -301,7 +302,7 @@ function parseRawDateText(rawText: string, url: string): Date | null {
     
     // Extract year (4 digits at end)
     const yearMatch = text.match(/(\d{4})\s*$/);
-    const year = yearMatch ? parseInt(yearMatch[1], 10) : new Date().getFullYear();
+    const year = yearMatch ? parseInt(yearMatch[1], 10) : toZonedTime(new Date(), AUSTIN_TIMEZONE).getFullYear();
     
     // Find month name
     let month: number | null = null;

@@ -2,6 +2,8 @@ import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import { load } from 'cheerio';
 import { launchBrowser } from '@/lib/browser';
+import { createAustinDate, getStartOfTodayAustin } from '@/lib/utils';
+import { inferYear } from '../utils/dateParser';
 
 /**
  * Scrape events from Scoot Inn website.
@@ -64,7 +66,7 @@ export async function fetchEventsFromScootInn(): Promise<NormalizedEvent[]> {
               category: inferCategory(item.name || ''),
             };
             
-            if (!isNaN(event.startDateTime.getTime()) && event.startDateTime > new Date()) {
+            if (!isNaN(event.startDateTime.getTime()) && event.startDateTime >= getStartOfTodayAustin()) {
               events.push(event);
             }
           }
@@ -115,7 +117,7 @@ export async function fetchEventsFromScootInn(): Promise<NormalizedEvent[]> {
             return; // Skip silently - DOM parsing is fallback
           }
           
-          if (startDateTime < new Date()) {
+          if (startDateTime < getStartOfTodayAustin()) {
             return;
           }
           
@@ -155,47 +157,57 @@ export async function fetchEventsFromScootInn(): Promise<NormalizedEvent[]> {
 
 /**
  * Parse date strings from Scoot Inn website
+ * Uses createAustinDate for proper timezone handling.
  */
 function parseScootInnDate(dateStr: string): Date | null {
   try {
-    // Try ISO format first (from datetime attribute)
+    // Try ISO format first (from datetime attribute) — safe when offset is present
     if (dateStr.includes('T') || dateStr.match(/^\d{4}-\d{2}-\d{2}/)) {
       return new Date(dateStr);
     }
-    
-    // Try common formats: "Dec 15, 2025", "December 15, 2025", etc.
-    const parsed = new Date(dateStr);
-    if (!isNaN(parsed.getTime())) {
-      return parsed;
-    }
-    
-    // Try parsing "Sat Dec 14" style (add current/next year)
-    const dayMonthMatch = dateStr.match(/(\w+)\s+(\w+)\s+(\d+)/);
-    if (dayMonthMatch) {
-      const [, , month, day] = dayMonthMatch;
-      const year = new Date().getFullYear();
-      const attempt = new Date(`${month} ${day}, ${year}`);
-      
-      // If it's in the past, try next year
-      if (attempt < new Date()) {
-        return new Date(`${month} ${day}, ${year + 1}`);
+
+    const monthMap: Record<string, number> = {
+      jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
+      jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
+      january: 0, february: 1, march: 2, april: 3, june: 5,
+      july: 6, august: 7, september: 8, october: 9, november: 10, december: 11,
+    };
+
+    // Try "Dec 15, 2025" or "December 15, 2025" (with explicit year)
+    const fullMatch = dateStr.match(/([A-Za-z]+)\s+(\d{1,2}),?\s*(\d{4})/);
+    if (fullMatch) {
+      const monthNum = monthMap[fullMatch[1].toLowerCase()];
+      if (monthNum !== undefined) {
+        return createAustinDate(parseInt(fullMatch[3], 10), monthNum, parseInt(fullMatch[2], 10), 20, 0);
       }
-      return attempt;
     }
-    
-    // Try "DEC 14" format
-    const shortMatch = dateStr.match(/([A-Za-z]+)\s+(\d+)/);
+
+    // Try "Sat Dec 14" or "DEC 14" style (no year — infer it)
+    const shortMatch = dateStr.match(/([A-Za-z]+)\s+(\d{1,2})/);
     if (shortMatch) {
-      const [, month, day] = shortMatch;
-      const year = new Date().getFullYear();
-      const attempt = new Date(`${month} ${day}, ${year}`);
-      
-      if (attempt < new Date()) {
-        return new Date(`${month} ${day}, ${year + 1}`);
+      // Could be "Sat Dec 14" — extract the month name (skip day-of-week)
+      const parts = dateStr.trim().split(/\s+/);
+      let monthName = '';
+      let dayStr = '';
+
+      if (parts.length >= 3) {
+        // "Sat Dec 14" — second word is month
+        monthName = parts[1];
+        dayStr = parts[2];
+      } else if (parts.length === 2) {
+        // "DEC 14"
+        monthName = parts[0];
+        dayStr = parts[1];
       }
-      return attempt;
+
+      const monthNum = monthMap[monthName.toLowerCase()];
+      if (monthNum !== undefined) {
+        const dayNum = parseInt(dayStr, 10);
+        const year = inferYear(monthNum, dayNum);
+        return createAustinDate(year, monthNum, dayNum, 20, 0);
+      }
     }
-    
+
     return null;
   } catch {
     return null;

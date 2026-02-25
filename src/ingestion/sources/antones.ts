@@ -1,7 +1,8 @@
 import { NormalizedEvent } from '../types';
 import { EventSource, EventCategory } from '@prisma/client';
 import * as cheerio from 'cheerio';
-import { createAustinDate } from '@/lib/utils';
+import { createAustinDate, getStartOfTodayAustin } from '@/lib/utils';
+import { inferYear } from '../utils/dateParser';
 
 type CheerioAPI = ReturnType<typeof cheerio.load>;
 
@@ -106,8 +107,8 @@ function parseAntonesPage($: CheerioAPI, seenUrls: Set<string>): NormalizedEvent
         return;
       }
       
-      // Skip past events
-      if (startDateTime < new Date()) {
+      // Skip past events (using Austin midnight cutoff)
+      if (startDateTime < getStartOfTodayAustin()) {
         return;
       }
       
@@ -171,13 +172,8 @@ function parseAntonesDateTime(dateStr: string, timeStr: string): Date | null {
         const [, monthName, day] = shortMatch;
         monthNum = months[monthName.toLowerCase()] ?? 0;
         dayNum = parseInt(day, 10);
-        yearNum = new Date().getFullYear();
-        
-        // If date is in the past, assume next year
-        const testDate = new Date(yearNum, monthNum, dayNum);
-        if (testDate < new Date()) {
-          yearNum++;
-        }
+        // Use Austin-aware year inference (day-level comparison)
+        yearNum = inferYear(monthNum, dayNum);
       } else {
         return null;
       }

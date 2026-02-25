@@ -2,7 +2,7 @@
 
 > What data is available from each venue source, what we capture, and gaps.
 > 
-> **Last Updated:** December 10, 2025
+> **Last Updated:** February 23, 2026
 > **Purpose:** Inform scraper enhancements and venue info collection
 > **Phase:** 1.3 of Event Discovery
 
@@ -366,14 +366,37 @@
 
 ---
 
+## Date Safety Status (Feb 2026)
+
+| Scraper | `createAustinDate` | `inferYear` | Risk Level |
+|---------|:-:|:-:|---|
+| moodyCenter | - | - | Safe (JSON-LD ISO) |
+| paramount | Yes | - | Safe |
+| aclLive | Yes | - | Safe (year fallback Austin-aware, fixed Feb 2026) |
+| stubbs | Yes | Yes | Safe (fixed Feb 2026) |
+| texasPerformingArts | Yes | - | Safe |
+| longCenter | - | - | Safe (ISO with offset) |
+| emos | Yes | - | Safe (DOM fallback fixed Feb 2026) |
+| mohawk | Yes | Yes | Safe (fixed Feb 2026) |
+| concourseProject | Yes | Yes | Safe (fixed Feb 2026) |
+| antones | Yes | Yes | Safe (fixed Feb 2026) |
+| moodyAmphitheater | Yes | Yes | Safe (fixed Feb 2026) |
+| scootInn | Yes | Yes | Safe (DOM fallback fixed Feb 2026) |
+| radioEast | - | - | Safe (JSON-LD ISO) |
+| empire | Yes | Yes | Safe (fixed Feb 2026) |
+| hebCenter | Yes | - | Safe |
+| cota | Yes | - | Safe |
+| q2Stadium | Yes | - | Safe |
+
 ## Next Steps
 
-1. [x] Fix Moody Amphitheater timezone bug
-2. [ ] Enhance Antone's scraper with door/age fields
-3. [ ] Enhance Mohawk scraper to parse full `.endtop`
-4. [ ] Collect remaining venue info URLs
-5. [ ] Consider adding `doorTime`, `ageRestriction` fields to Event model
-
----
-
-*Phase 1.3 audit complete. Ready for Phase 1.4 (Performer Entity Design).*
+1. [x] Fix Moody Amphitheater timezone bug (Dec 2025)
+2. [x] Fix year inference bug — Stubb's, Mohawk, Moody Amp, Empire (Feb 2026)
+3. [x] Fix event listing midnight cutoff (Feb 2026)
+4. [x] Fix `concourseProject.ts` — replace `new Date()` with `createAustinDate()` + `inferYear()` (Feb 2026)
+5. [x] Fix `antones.ts` — replace local year inference with `inferYear()` (Feb 2026)
+6. [x] Fix `emos.ts`, `scootInn.ts`, `aclLive.ts` — fallback paths use raw `new Date()` (Feb 2026)
+7. [ ] Enhance Antone's scraper with door/age fields
+8. [ ] Enhance Mohawk scraper to parse full `.endtop`
+9. [ ] Collect remaining venue info URLs
+10. [ ] Consider adding `doorTime`, `ageRestriction` fields to Event model
